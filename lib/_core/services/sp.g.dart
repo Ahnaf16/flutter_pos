@@ -7,21 +7,32 @@ part of 'sp.dart';
 // **************************************************************************
 
 extension $SharedPreferencesGenX on SharedPreferences {
-  Set<SharedPrefValueGen> get entries => {accessToken, isDark, themeName, language};
-
-  SharedPrefValue<String> get accessToken {
-    return SharedPrefValue<String>(key: 'accessToken', getter: getString, setter: setString, remover: remove);
-  }
+  Set<SharedPrefValueGen> get entries => {isDark, themeColors, language};
 
   SharedPrefValue<bool> get isDark {
-    return SharedPrefValue<bool>(key: 'isDark', getter: getBool, setter: setBool, remover: remove);
+    return SharedPrefValue<bool>(
+      key: 'isDark',
+      getter: getBool,
+      setter: setBool,
+      remover: remove,
+    );
   }
 
-  SharedPrefValue<String> get themeName {
-    return SharedPrefValue<String>(key: 'themeName', getter: getString, setter: setString, remover: remove);
+  SharedPrefValue<String> get themeColors {
+    return SharedPrefValue<String>(
+      key: 'themeColors',
+      getter: getString,
+      setter: setString,
+      remover: remove,
+    );
   }
 
   SharedPrefValue<String> get language {
-    return SharedPrefValue<String>(key: 'language', getter: getString, setter: setString, remover: remove);
+    return SharedPrefValue<String>(
+      key: 'language',
+      getter: getString,
+      setter: setString,
+      remover: remove,
+    );
   }
 }

@@ -192,6 +192,7 @@ class ShadcnApp {
         }`;
 
         const loaderDiv = document.createElement('div');
+        loaderDiv.id = 'shadcn-loader';
         loaderDiv.style.cssText = loaderStyle;
         loaderDiv.innerHTML = this.config.loaderWidget;
 
@@ -206,15 +207,20 @@ class ShadcnApp {
         this.#createStyleSheet(loaderBarCss);
     }
 
-    onAppReady() {
-        const loaderDiv = document.querySelector('div');
+
+
+    onAppReady = () => {
+        const loaderDiv = document.getElementById('shadcn-loader');
+        if (!loaderDiv) return;
+
         loaderDiv.style.opacity = 0;
         loaderDiv.style.pointerEvents = 'none';
 
         setTimeout(() => {
             loaderDiv.remove();
         }, this.config.transitionDuration + 50);
-    }
+    };
+
 
     onThemeChanged(event) {
         let theme = event.detail;

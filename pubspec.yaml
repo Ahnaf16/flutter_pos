@@ -62,3 +62,10 @@ flutter:
   assets:
     - assets/icons/
     - assets/svg/
+
+flutter_gen:
+  output: lib/_core/strings/
+  line_length: 120
+  integrations:
+    flutter_svg: true
+    lottie: true

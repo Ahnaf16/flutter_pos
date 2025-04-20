@@ -1,4 +1,4 @@
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:pos/main.export.dart';
 
 void main() async {
@@ -16,14 +16,17 @@ class PosApp extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
+    final theme = ref.watch(themeProvider);
+    final route = ref.watch(routerProvider);
+
     return ShadcnApp.router(
       debugShowCheckedModeBanner: false,
       title: kAppName,
-      routerConfig: ref.watch(routerProvider),
+      routerConfig: route,
+      themeMode: theme.mode,
+      theme: theme.theme,
+      darkTheme: theme.theme,
       builder: (context, child) => Layouts.init(context, child),
-      themeMode: ThemeMode.light,
-      theme: ThemeData(colorScheme: ColorSchemes.lightBlue(), radius: 10),
-      darkTheme: ThemeData(colorScheme: ColorSchemes.darkBlue(), radius: 10),
     );
   }
 }

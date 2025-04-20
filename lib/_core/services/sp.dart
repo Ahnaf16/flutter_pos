@@ -9,7 +9,7 @@ typedef SP = SharedPreferences;
 @SharedPrefData(
   entries: [
     SharedPrefEntry<bool>(key: 'isDark'),
-    SharedPrefEntry<String>(key: 'themeName'),
+    SharedPrefEntry<String>(key: 'themeColors'),
     SharedPrefEntry<String>(key: 'language'),
   ],
 )

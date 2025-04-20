@@ -16,4 +16,5 @@ export 'layout/space.dart';
 export 'logging/cat.dart';
 export 'services/sp.dart';
 export 'strings/app_const.dart';
+export 'strings/assets.gen.dart';
 export 'type_def/helper_types.dart.dart';
