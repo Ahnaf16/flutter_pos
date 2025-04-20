@@ -6,14 +6,10 @@ class HomeView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      headers: [AppBar(title: const Text('Home'))],
+      headers: const [AppBar()],
       child: SingleChildScrollView(
         padding: context.layout.pagePadding,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, spacing: 20, children: [
-          
-         
-          ],
-        ),
+        child: const Column(mainAxisAlignment: MainAxisAlignment.center, spacing: 20),
       ),
     );
   }
