@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:dart_appwrite/dart_appwrite.dart';
 
 // This Appwrite function will be executed every time your function is triggered
@@ -7,18 +8,18 @@ Future<dynamic> main(final context) async {
   // You can use the Appwrite SDK to interact with other services
   // For this example, we're using the Users service
   final client = Client()
-    .setEndpoint(Platform.environment['APPWRITE_FUNCTION_API_ENDPOINT'] ?? '')
-    .setProject(Platform.environment['APPWRITE_FUNCTION_PROJECT_ID'] ?? '')
-    .setKey(context.req.headers['x-appwrite-key'] ?? '');
+      .setEndpoint(Platform.environment['APPWRITE_FUNCTION_API_ENDPOINT'] ?? '')
+      .setProject(Platform.environment['APPWRITE_FUNCTION_PROJECT_ID'] ?? '')
+      .setKey(context.req.headers['x-appwrite-key'] ?? '');
   final users = Users(client);
 
   try {
     final response = await users.list();
     // Log messages and errors to the Appwrite Console
     // These logs won't be seen by your end users
-    context.log('Total users: ' + response.total.toString());
+    context.log('Total users: ${response.total}');
   } catch (e) {
-    context.error('Could not list users: ' + e.toString());
+    context.error('Could not list users: $e');
   }
 
   // The req object contains the request data
