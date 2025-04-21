@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:get_it/get_it.dart';
 import 'package:pos/main.export.dart';
 
@@ -12,9 +13,18 @@ extension GetItEX on GetIt {
 }
 
 final locate = GetIt.instance;
+
 Future<void> initDependencies() async {
-  //? SP
   final sp = await SP.getInstance();
+
+  final client = Client(endPoint: AWConst.endpoint);
+  client.setProject(AWConst.projectId).setSelfSigned();
+
+  final account = Account(client);
+  final databases = Databases(client);
+
   locate.registerSingletonIfAbsent<SP>(() => sp);
-  //? SP
+  locate.registerLazyIfAbsent<Client>(() => client);
+  locate.registerLazyIfAbsent<Account>(() => account);
+  locate.registerLazyIfAbsent<Databases>(() => databases);
 }
