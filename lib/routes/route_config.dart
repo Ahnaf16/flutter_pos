@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:pos/app_root.dart';
+import 'package:pos/features/auth/controller/auth_ctrl.dart';
+import 'package:pos/features/auth/view/login_view.dart';
 import 'package:pos/features/home/view/home_view.dart';
 import 'package:pos/features/settings/view/language_view.dart';
 import 'package:pos/features/settings/view/settings_view.dart';
@@ -20,7 +22,6 @@ class AppRouter extends Notifier<GoRouter> {
 
   GoRouter _appRouter(RouteRedirect? redirect) {
     return GoRouter(
-      debugLogDiagnostics: false,
       navigatorKey: _rootNavigator,
       redirect: redirect,
       initialLocation: rootPath,
@@ -31,7 +32,10 @@ class AppRouter extends Notifier<GoRouter> {
 
   /// The app router list
   List<RouteBase> get _routes => [
+    AppRoute(RPaths.splash, (_) => const SplashPage()),
+
     //! auth
+    AppRoute(RPaths.login, (_) => const LoginView()),
 
     //! home
 
@@ -50,10 +54,19 @@ class AppRouter extends Notifier<GoRouter> {
   GoRouter build() {
     Ctx._key = _rootNavigator;
     // Toaster.navigator = _rootNavigator;
+    final auth = ref.watch(authCtrlProvider);
 
     FutureOr<String?> redirectLogic(ctx, GoRouterState state) async {
       final current = state.uri.toString();
       cat(current, 'route');
+
+      if (auth.isLoading) {
+        return RPaths.splash.path;
+      } else if ((auth.value == null || auth.hasError) && !current.contains(RPaths.login.path)) {
+        return RPaths.login.path;
+      } else if (auth.value != null && current.contains(RPaths.login.path)) {
+        return RPaths.home.path;
+      }
 
       return null;
     }

@@ -1,7 +1,29 @@
+import 'dart:io';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
+
+mixin AwHandler {
+  FutureReport<T> handler<T>({required Future<T> Function() call}) async {
+    Failure? failure;
+    try {
+      return right(await call());
+    } on SocketException catch (e, st) {
+      failure = Failure(e.message, error: e, stackTrace: st);
+    } on AppwriteException catch (e, st) {
+      failure = Failure(e.message ?? 'Error', error: e, stackTrace: st);
+    } on Failure catch (e, st) {
+      failure = e.copyWith(stackTrace: st);
+    } catch (e, st) {
+      failure = Failure('$e', error: e, stackTrace: st);
+    } finally {
+      if (failure != null) catErr('AwHandler', failure.message);
+    }
+    return left(failure);
+  }
+}
 
 class _AwDatabase {
   final _db = locate<Databases>();

@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:get_it/get_it.dart';
+import 'package:pos/features/auth/repository/auth_repo.dart';
 import 'package:pos/main.export.dart';
 
 extension GetItEX on GetIt {
@@ -13,12 +14,14 @@ extension GetItEX on GetIt {
 }
 
 final locate = GetIt.instance;
+final awAccount = locate<Account>();
+final awDatabases = locate<Databases>();
 
 Future<void> initDependencies() async {
   final sp = await SP.getInstance();
 
   final client = Client(endPoint: AWConst.endpoint);
-  client.setProject(AWConst.projectId).setSelfSigned();
+  client.setProject(AWConst.projectId.id).setSelfSigned();
 
   final account = Account(client);
   final databases = Databases(client);
@@ -27,4 +30,6 @@ Future<void> initDependencies() async {
   locate.registerLazyIfAbsent<Client>(() => client);
   locate.registerLazyIfAbsent<Account>(() => account);
   locate.registerLazyIfAbsent<Databases>(() => databases);
+
+  locate.registerLazyIfAbsent<AuthRepo>(AuthRepo.new);
 }
