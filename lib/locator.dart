@@ -14,8 +14,6 @@ extension GetItEX on GetIt {
 }
 
 final locate = GetIt.instance;
-final awAccount = locate<Account>();
-final awDatabases = locate<Databases>();
 
 Future<void> initDependencies() async {
   final sp = await SP.getInstance();
@@ -30,6 +28,7 @@ Future<void> initDependencies() async {
   locate.registerLazyIfAbsent<Client>(() => client);
   locate.registerLazyIfAbsent<Account>(() => account);
   locate.registerLazyIfAbsent<Databases>(() => databases);
+  locate.registerLazyIfAbsent<AwService>(AwService.new);
 
   locate.registerLazyIfAbsent<AuthRepo>(AuthRepo.new);
 }

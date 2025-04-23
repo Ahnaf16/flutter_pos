@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 import '../../main.export.dart';
 
 extension MapEx<K, V> on Map<K, V> {
@@ -69,8 +67,8 @@ extension MapEx<K, V> on Map<K, V> {
 
   List<T> mapList<T>(String k, T Function(QMap map) mapper) {
     return switch (this[k]) {
-      {'data': List data} => List<T>.from(data.map((m) => mapper(m))),
-      List data => List<T>.from(data.map((m) => mapper(m))),
+      {'data': final List data} => List<T>.from(data.map((m) => mapper(m))),
+      final List data => List<T>.from(data.map((m) => mapper(m))),
       _ => <T>[],
     };
   }

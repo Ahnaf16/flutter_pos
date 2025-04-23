@@ -2,19 +2,28 @@ import 'package:appwrite/models.dart';
 import 'package:pos/main.export.dart';
 
 class AuthRepo with AwHandler {
-  Future<void> signIn(String email, String password) async {
-    // Implement sign-in logic here
+  FutureReport<Session> signIn(String email, String password) async {
+    final res = await handler(
+      call: () async {
+        await signOut();
+        return await account.createEmailPasswordSession(email: email, password: password);
+      },
+    );
+    return res;
   }
 
   Future<void> signOut() async {
-    // Implement sign-out logic here
+    await handler(call: () async => await account.deleteSessions());
   }
 
-  Future<void> register(String email, String password) async {
-    // Implement registration logic here
+  Future<void> register(String email, String password, AppUser user) async {
+    final newUser = await account.create(userId: ID.unique(), email: email, password: password, name: user.name);
+    await db.createUser(data: user.toMap(), docId: newUser.$id);
   }
 
-  FutureReport<User> currentUser() async {
-    return handler(call: () async => await awAccount.get());
+  FutureReport<AppUser> currentUser() async {
+    final authUser = await handler(call: () async => await account.get());
+
+    return await db.getUser(authUser.getOrNull()?.$id);
   }
 }

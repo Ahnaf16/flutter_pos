@@ -23,6 +23,7 @@ class CircleImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final img = url is Img ? url : Img.icon(LuIcons.imageOff);
     return DecoContainer(
       margin: padding ?? EdgeInsets.zero,
       height: (radius ?? 25) * 2,
@@ -31,7 +32,7 @@ class CircleImage extends StatelessWidget {
       borderColor: borderColor ?? context.colors.primary,
       borderWidth: borderWidth ?? 0,
       borderRadius: 99,
-      child: AspectRatio(aspectRatio: 1, child: HostedImage.square(url, dimension: (radius ?? 0) * 2)),
+      child: AspectRatio(aspectRatio: 1, child: HostedImage.square(img, dimension: (radius ?? 0) * 2)),
     );
   }
 }

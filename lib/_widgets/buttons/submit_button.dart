@@ -2,8 +2,8 @@ import 'package:pos/main.export.dart';
 
 enum LoadingPosition { leading, trailing, center }
 
-class LoadingButton extends HookWidget {
-  const LoadingButton({
+class SubmitButton extends HookWidget {
+  const SubmitButton({
     super.key,
     required this.onPressed,
     required this.child,
@@ -11,8 +11,10 @@ class LoadingButton extends HookWidget {
     this.trailing,
     this.loadingPosition = LoadingPosition.leading,
     this.margin,
-    // this.isDens,
     this.size,
+    this.width,
+    this.height,
+    this.enabled = true,
   });
 
   final Function(ValueNotifier<bool> isLoading)? onPressed;
@@ -20,8 +22,10 @@ class LoadingButton extends HookWidget {
   final Widget? leading;
   final Widget? trailing;
   final EdgeInsetsGeometry? margin;
-  // final bool? isDens;
   final ShadButtonSize? size;
+  final double? width;
+  final double? height;
+  final bool enabled;
 
   final LoadingPosition loadingPosition;
 
@@ -33,8 +37,21 @@ class LoadingButton extends HookWidget {
       padding: margin ?? EdgeInsets.zero,
       child: ShadButton(
         size: size,
-        onPressed: onPressed != null ? () => onPressed!(isLoading) : null,
-        enabled: !isLoading.value,
+        width: width,
+        height: height,
+        onPressed:
+            (onPressed != null && !isLoading.value)
+                ? () async {
+                  try {
+                    await onPressed!(isLoading);
+                  } catch (e) {
+                    rethrow;
+                  } finally {
+                    isLoading.value = false;
+                  }
+                }
+                : null,
+        enabled: enabled,
         trailing: loadingPosition == LoadingPosition.trailing ? _buildLoading(trailing, isLoading.value) : null,
         leading: loadingPosition == LoadingPosition.leading ? _buildLoading(leading, isLoading.value) : null,
         child: loadingPosition == LoadingPosition.center ? (_buildLoading(child, isLoading.value)) ?? child : child,
@@ -43,6 +60,6 @@ class LoadingButton extends HookWidget {
   }
 
   Widget? _buildLoading(Widget? child, bool loading) {
-    return loading ? const Loading() : child;
+    return loading ? const Loading(primary: false, size: 16) : child;
   }
 }

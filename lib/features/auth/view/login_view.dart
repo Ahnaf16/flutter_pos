@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class LoginView extends HookConsumerWidget {
@@ -7,6 +9,12 @@ class LoginView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final layout = context.layout;
+
+    final authCtrl = useCallback(() => ref.read(authCtrlProvider.notifier));
+
+    final email = useTextEditingController();
+    final password = useTextEditingController();
+    final showPass = useState(false);
 
     return Scaffold(
       body: Row(
@@ -39,14 +47,42 @@ class LoginView extends HookConsumerWidget {
                     Text('Login', style: context.text.h3),
                     Text('Enter your email and password to login', style: context.text.muted),
                     const Gap(Insets.sm),
-                    const ShadInput(placeholder: Text('Email')),
+                    ShadInput(placeholder: const Text('Email'), controller: email),
 
-                    const ShadInput(placeholder: Text('Password')),
+                    ShadInput(
+                      placeholder: const Text('Password'),
+                      controller: password,
+                      obscureText: !showPass.value,
+                      trailing: GestureDetector(
+                        child: Icon(showPass.value ? Icons.visibility : Icons.visibility_off),
+                        onTap: () => showPass.toggle(),
+                      ),
+                    ),
 
-                    ShadButton(width: 400, onPressed: () {}, child: const Text('Login')),
+                    SubmitButton(
+                      width: 400,
+                      onPressed: (l) async {
+                        l.value = true;
+                        await authCtrl().signIn(email.text, password.text);
+                        l.value = false;
+                      },
+                      child: const Text('Login'),
+                    ),
 
                     const Gap(Insets.sm),
                     Text('By clicking login, you agree to our terms and conditions', style: context.text.muted),
+                    if (!kReleaseMode)
+                      Row(
+                        children: [
+                          ShadButton.outline(
+                            child: const Text('Admin'),
+                            onPressed: () {
+                              email.text = 'admin@gmail.com';
+                              password.text = '12341234';
+                            },
+                          ),
+                        ],
+                      ),
                   ],
                 ),
               ),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:pos/main.export.dart';
 
 class LimitedWidthBox extends StatelessWidget {
   const LimitedWidthBox({super.key, required this.child, required this.maxWidth, this.padding, this.center = true});
@@ -15,7 +15,7 @@ class LimitedWidthBox extends StatelessWidget {
         final screenWidth = constraints.maxWidth;
         final width = screenWidth > maxWidth ? maxWidth : screenWidth;
 
-        final c = Container(width: width, padding: padding, child: child);
+        final c = AnimatedContainer(duration: 250.ms, width: width, padding: padding, child: child);
 
         return center ? Center(child: c) : c;
       },

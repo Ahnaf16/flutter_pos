@@ -74,3 +74,21 @@ class Failure {
     cat(errors, 'Failure Errors');
   }
 }
+
+extension FailureEx<T> on Report<T> {
+  T getOrThrow() => fold((l) => throw l, (r) => r);
+  T getOrDefault(T defaultValue) => fold((l) => defaultValue, (r) => r);
+  T? getOrNull() => fold((l) => null, (r) => r);
+  T getOrElse(T Function(Failure) onError) => fold(onError, (r) => r);
+
+  Report<R> convert<R>(R Function(T r) right) => map<R>((T r) => right(r));
+}
+
+extension FutureFailureEx<T> on FutureReport<T> {
+  Future<T> getOrThrow() => then((v) => v.getOrThrow());
+  Future<T> getOrDefault(T defaultValue) => then((v) => v.getOrDefault(defaultValue));
+  Future<T?> getOrNull() => then((v) => v.getOrNull());
+  Future<T> getOrElse(T Function(Failure) onError) => then((v) => v.getOrElse(onError));
+
+  Future<Report<R>> convert<R>(R Function(T r) right) => then((v) => v.convert(right));
+}
