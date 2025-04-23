@@ -35,6 +35,10 @@ extension WidgetEx on Widget {
   Widget conditionalFlexible(bool condition, [int flex = 1]) => condition ? Flexible(flex: flex, child: this) : this;
 }
 
+extension ShadButtonEx on ShadButton {
+  ShadButton compact() => ShadButton.ghost(padding: Pads.zero, height: 24, gap: 24, child: child);
+}
+
 extension ColorEX on Color {
   Color op(double opacity) => withValues(alpha: opacity);
   Color get op1 => op(.1);

@@ -14,7 +14,7 @@ class LoginView extends HookConsumerWidget {
 
     final email = useTextEditingController();
     final password = useTextEditingController();
-    final showPass = useState(false);
+    final obscure = useState(true);
 
     return Scaffold(
       body: Row(
@@ -47,20 +47,32 @@ class LoginView extends HookConsumerWidget {
                     Text('Login', style: context.text.h3),
                     Text('Enter your email and password to login', style: context.text.muted),
                     const Gap(Insets.sm),
-                    ShadInput(placeholder: const Text('Email'), controller: email),
+                    ShadInput(
+                      placeholder: const Text('Email'),
+                      controller: email,
+                      leading: const Padding(padding: EdgeInsets.all(4.0), child: Icon(LuIcons.mail)),
+                    ),
 
                     ShadInput(
                       placeholder: const Text('Password'),
                       controller: password,
-                      obscureText: !showPass.value,
-                      trailing: GestureDetector(
-                        child: Icon(showPass.value ? Icons.visibility : Icons.visibility_off),
-                        onTap: () => showPass.toggle(),
+                      leading: const Padding(padding: EdgeInsets.all(4.0), child: Icon(LuIcons.lock)),
+                      obscureText: obscure.value,
+                      trailing: ShadButton.ghost(
+                        width: 24,
+                        height: 24,
+                        padding: Pads.zero,
+                        decoration: const ShadDecoration(
+                          secondaryBorder: ShadBorder.none,
+                          secondaryFocusedBorder: ShadBorder.none,
+                        ),
+                        leading: Icon(obscure.value ? LucideIcons.eyeOff : LucideIcons.eye),
+                        onPressed: () => obscure.toggle(),
                       ),
                     ),
 
                     SubmitButton(
-                      width: 400,
+                      width: double.infinity,
                       onPressed: (l) async {
                         l.value = true;
                         await authCtrl().signIn(email.text, password.text);

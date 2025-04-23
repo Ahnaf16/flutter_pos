@@ -46,7 +46,6 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
 
     return AppBar(
       title: const Text(kAppName),
-
       actions: [
         ShadPopover(
           controller: popCtrl,
@@ -63,13 +62,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(user.name, style: context.text.large),
-
-                      ShadButton.ghost(
-                        size: ShadButtonSize.sm,
-                        padding: Pads.xs(),
-                        onPressed: () {},
-                        child: const Icon(LuIcons.pen),
-                      ),
+                      ShadButton(onPressed: () {}, child: const Icon(LuIcons.pen)).compact(),
                     ],
                   ),
                   Text(user.email, style: context.text.muted),

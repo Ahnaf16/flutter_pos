@@ -1,3 +1,4 @@
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/main.export.dart';
 
 class HomeView extends HookConsumerWidget {
@@ -5,11 +6,29 @@ class HomeView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
         padding: context.layout.pagePadding,
-        child: const Column(mainAxisAlignment: MainAxisAlignment.center, spacing: 20),
+        child: FormBuilder(
+          key: formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 20,
+            children: [
+              ShadButton(
+                onPressed: () {
+                  final state = formKey.currentState!;
+                  if (!state.saveAndValidate()) return;
+                  final data = state.value;
+                  cat(data, 'Form Data');
+                },
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
