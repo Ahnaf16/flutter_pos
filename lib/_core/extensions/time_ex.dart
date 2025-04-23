@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:pos/main.export.dart';
 
 extension TimeOfDayEx on TimeOfDay {
@@ -30,18 +29,16 @@ extension DateTimeEx on DateTime {
   /// Returns the date as `MM/dd/yyyy`
   String get postString => formatDate('MM/dd/yyyy');
 
-  DateTime startOfMonth() => DateTime(year, month, 1);
-  DateTime nextMonth() => DateTime(year, month + 1, 1);
+  DateTime startOfMonth() => DateTime(year, month);
+  DateTime nextMonth() => DateTime(year, month + 1);
 
-  DateTime endOfMonth() => DateTime(year, month + 1, 1).subtract(const Duration(days: 1));
+  DateTime endOfMonth() => DateTime(year, month + 1).subtract(const Duration(days: 1));
 
   DateTime fromDay(int day) {
     final last = endOfMonth().day;
     if (day > last) return endOfMonth();
     return DateTime(year, month, day);
   }
-
-  DateTimeRange toMonthRange() => DateTimeRange(startOfMonth(), endOfMonth());
 
   DateTime changeDate(DateTime date) =>
       DateTime(date.year, date.month, date.day, hour, minute, second, millisecond, microsecond);
@@ -65,7 +62,7 @@ extension DateTimeEx on DateTime {
 
   String? remainingTimeFromNow() {
     final now = isUtc ? DateTime.now().toUtc() : DateTime.now();
-    Duration remainingTime = difference(now);
+    final Duration remainingTime = difference(now);
     if (remainingTime.isNegative) return null;
     return remainingTime.readable;
   }

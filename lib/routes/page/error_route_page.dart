@@ -7,7 +7,7 @@ class ErrorRoutePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      child: Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -15,9 +15,9 @@ class ErrorRoutePage extends StatelessWidget {
             const SizedBox(height: 5),
             Text('Page not found', style: context.text.large),
             const SizedBox(height: 20),
-            Text('$error', style: context.text.base, textAlign: TextAlign.center),
+            Text('$error', style: context.text.p, textAlign: TextAlign.center),
             const SizedBox(height: 20),
-            PrimaryButton(
+            ShadButton(
               onPressed: () => RPaths.home.go(context),
               leading: const Icon(Icons.arrow_back),
               child: const Text('Go to home'),

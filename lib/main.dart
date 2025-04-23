@@ -19,8 +19,7 @@ class PosApp extends HookConsumerWidget {
     final theme = ref.watch(themeProvider);
     final route = ref.watch(routerProvider);
 
-    return ShadcnApp.router(
-      debugShowCheckedModeBanner: false,
+    return ShadApp.materialRouter(
       title: kAppName,
       routerConfig: route,
       themeMode: theme.mode,

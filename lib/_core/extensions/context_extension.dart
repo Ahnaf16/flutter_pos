@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-import 'package:go_router/go_router.dart';
 import 'package:pos/main.export.dart';
 
 extension RouteEx on BuildContext {
@@ -7,7 +5,7 @@ extension RouteEx on BuildContext {
   GoRouterState get routeState => GoRouterState.of(this);
 
   T? tryGetExtra<T>() {
-    if (routeState.extra case T t) return t;
+    if (routeState.extra case final T t) return t;
     return null;
   }
 
@@ -40,11 +38,10 @@ extension ContextEx on BuildContext {
   double get height => size.height;
   double get width => size.width;
 
-  ThemeData get theme => Theme.of(this);
-  CupertinoThemeData get themeCup => CupertinoTheme.of(this);
+  ShadThemeData get theme => ShadTheme.of(this);
 
-  Typography get text => theme.typography;
-  ColorScheme get colors => theme.colorScheme;
+  ShadTextTheme get text => theme.textTheme;
+  ShadColorScheme get colors => theme.colorScheme;
 
   Brightness get bright => theme.brightness;
 

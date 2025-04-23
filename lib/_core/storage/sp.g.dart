@@ -7,7 +7,7 @@ part of 'sp.dart';
 // **************************************************************************
 
 extension $SharedPreferencesGenX on SharedPreferences {
-  Set<SharedPrefValueGen> get entries => {isDark, themeColors, language};
+  Set<SharedPrefValueGen> get entries => {isDark, themeName, language};
 
   SharedPrefValue<bool> get isDark {
     return SharedPrefValue<bool>(
@@ -18,9 +18,9 @@ extension $SharedPreferencesGenX on SharedPreferences {
     );
   }
 
-  SharedPrefValue<String> get themeColors {
+  SharedPrefValue<String> get themeName {
     return SharedPrefValue<String>(
-      key: 'themeColors',
+      key: 'themeName',
       getter: getString,
       setter: setString,
       remover: remove,

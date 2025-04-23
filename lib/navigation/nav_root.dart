@@ -19,40 +19,21 @@ class NavigationRoot extends HookConsumerWidget {
     }, [rootPath]);
 
     return Scaffold(
-      headers: [
-        AppBar(
-          title: const Text(kAppName),
+      appBar: AppBar(
+        title: const Text(kAppName),
+        leading: ShadButton.ghost(onPressed: () => expanded.toggle(), child: const Icon(Icons.menu)),
+        actions: [
+          ShadButton.ghost(
+            onPressed: () => themeCtrl().toggleMode(),
+            child: Icon(themeMode == ThemeMode.dark ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
+          ),
+        ],
+      ),
 
-          leading: [
-            OutlineButton(
-              onPressed: () => expanded.toggle(),
-              density: ButtonDensity.icon,
-              child: const Icon(Icons.menu),
-            ),
-          ],
-          trailing: [
-            OutlineButton(
-              onPressed: () => themeCtrl().toggleMode(),
-              density: ButtonDensity.icon,
-              child: Icon(themeMode == ThemeMode.dark ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
-            ),
-          ],
-        ),
-        const Divider(),
-      ],
-      child: Row(
+      body: Row(
         children: [
-          KNavigationRail(
-            backgroundColor: context.colors.card,
-            labelType: NavigationLabelType.expanded,
-            labelPosition: NavigationLabelPosition.end,
-            alignment: NavigationRailAlignment.start,
-            constraints: const BoxConstraints(minWidth: 200),
-            expanded: expanded.value,
-            index: index.value,
-            onSelected: (v) {
-              index.set(v);
-            },
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               buildButton('Home', LuIcons.house),
               buildLabel('Inventory'),
@@ -61,24 +42,29 @@ class NavigationRoot extends HookConsumerWidget {
               buildButton('Unit', LuIcons.ruler),
               buildButton('Category', LuIcons.group),
               buildButton('Brand', LuIcons.group),
-              const NavigationDivider(),
+              const ShadSeparator.horizontal(),
+
               buildLabel('Sales'),
               buildButton('Sales History', LuIcons.shoppingCart),
               buildButton('Return sales', LuIcons.archiveRestore),
-              const NavigationDivider(),
+              const ShadSeparator.horizontal(),
+
               buildLabel('Purchases'),
               buildButton('Purchase History', LuIcons.scrollText),
               buildButton('Return purchase', LuIcons.panelBottomClose),
-              const NavigationDivider(),
+              const ShadSeparator.horizontal(),
+
               buildLabel('People'),
               buildButton('Customer', LuIcons.users),
               buildButton('Supplier', LuIcons.usersRound),
               buildButton('Staff', LuIcons.userCog),
-              const NavigationDivider(),
+              const ShadSeparator.horizontal(),
+
               buildLabel('Branch'),
               buildButton('Branches', LuIcons.gitBranch),
               buildButton('Stock Transfer', LuIcons.arrowUpDown),
-              const NavigationDivider(),
+              const ShadSeparator.horizontal(),
+
               buildLabel('Accounting'),
               buildButton('Expense', LuIcons.wallet),
               buildButton('Expense category', LuIcons.walletCards),
@@ -86,7 +72,8 @@ class NavigationRoot extends HookConsumerWidget {
               buildButton('Due collection', LuIcons.handCoins),
               buildButton('Money transfer', LuIcons.arrowsUpFromLine),
               buildButton('Transactions', LuIcons.landmark),
-              const NavigationDivider(),
+              const ShadSeparator.horizontal(),
+
               buildLabel('Configuration'),
               buildButton('Settings', LuIcons.settings2),
             ],
@@ -98,20 +85,11 @@ class NavigationRoot extends HookConsumerWidget {
     );
   }
 
-  NavigationItem buildButton(String text, IconData icon) {
-    return NavigationItem(
-      label: Text(text),
-      alignment: Alignment.centerLeft,
-      selectedStyle: const ButtonStyle.primaryIcon(),
-      child: Icon(icon),
-    );
+  Widget buildButton(String text, IconData icon) {
+    return Row(children: [Icon(icon), Text(text)]);
   }
 
-  NavigationLabel buildLabel(String label) {
-    return NavigationLabel(
-      alignment: Alignment.centerLeft,
-      child: Text(label).semiBold().muted(),
-      // padding: EdgeInsets.zero,
-    );
+  Widget buildLabel(String label) {
+    return Text(label);
   }
 }

@@ -6,9 +6,9 @@ class LanguageView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      headers: [AppBar(title: const Text('Language'))],
+      appBar: AppBar(title: const Text('Language')),
 
-      child: ListView.separated(
+      body: ListView.separated(
         padding: context.layout.pagePadding,
         itemCount: AppLocale.values.length,
         separatorBuilder: (_, __) => const Divider(),
@@ -16,13 +16,15 @@ class LanguageView extends HookConsumerWidget {
           final locale = AppLocale.values[index];
           final selected = LocaleSettings.currentLocale == locale;
 
-          return CardButton(
-            onPressed: () => LocaleSettings.setLocale(locale),
-            leading: Avatar(
-              backgroundColor: selected ? context.colors.primary : context.colors.card,
-              initials: locale.languageCode,
+          return GestureDetector(
+            onTap: () => LocaleSettings.setLocale(locale),
+            child: ShadCard(
+              leading: CircleAvatar(
+                backgroundColor: selected ? context.colors.primary : context.colors.card,
+                child: Text(locale.languageCode),
+              ),
+              child: Text(locale.name),
             ),
-            child: Text(locale.name),
           );
         },
       ),

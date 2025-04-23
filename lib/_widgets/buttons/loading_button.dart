@@ -11,7 +11,7 @@ class LoadingButton extends HookWidget {
     this.trailing,
     this.loadingPosition = LoadingPosition.leading,
     this.margin,
-    this.density,
+    // this.isDens,
     this.size,
   });
 
@@ -20,8 +20,9 @@ class LoadingButton extends HookWidget {
   final Widget? leading;
   final Widget? trailing;
   final EdgeInsetsGeometry? margin;
-  final ButtonDensity? density;
-  final ButtonSize? size;
+  // final bool? isDens;
+  final ShadButtonSize? size;
+
   final LoadingPosition loadingPosition;
 
   @override
@@ -30,9 +31,8 @@ class LoadingButton extends HookWidget {
 
     return Padding(
       padding: margin ?? EdgeInsets.zero,
-      child: PrimaryButton(
-        size: size ?? ButtonSize.normal,
-        density: density ?? ButtonDensity.normal,
+      child: ShadButton(
+        size: size,
         onPressed: onPressed != null ? () => onPressed!(isLoading) : null,
         enabled: !isLoading.value,
         trailing: loadingPosition == LoadingPosition.trailing ? _buildLoading(trailing, isLoading.value) : null,

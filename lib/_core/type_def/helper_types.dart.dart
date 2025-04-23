@@ -17,5 +17,3 @@ typedef FutureVCallback<T> = Future<T> Function(T value);
 typedef StSub<T> = StreamSubscription<T>;
 
 typedef LuIcons = LucideIcons;
-typedef BsIcons = BootstrapIcons;
-typedef RdIcons = RadixIcons;
