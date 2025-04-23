@@ -43,6 +43,9 @@ extension ContextEx on BuildContext {
   ShadTextTheme get text => theme.textTheme;
   ShadColorScheme get colors => theme.colorScheme;
 
+  ShadTextTheme textFromGoogle(GoogleFontBuilder fontBuilder) =>
+      ShadTextTheme.fromGoogleFont(fontBuilder, textTheme: text);
+
   Brightness get bright => theme.brightness;
 
   bool get isDark => bright == Brightness.dark;

@@ -1,3 +1,4 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pos/main.export.dart';
 
 typedef ThemeConfig = ({ThemeMode mode, ShadThemeData theme});
@@ -36,7 +37,11 @@ class ThemeCtrl extends Notifier<ThemeConfig> {
   }
 
   ShadThemeData _theme(ShadColorScheme colors, Brightness brightness) {
-    return ShadThemeData(colorScheme: colors, brightness: brightness);
+    return ShadThemeData(
+      colorScheme: colors,
+      brightness: brightness,
+      textTheme: ShadTextTheme.fromGoogleFont(GoogleFonts.poppins),
+    );
   }
 
   static final shadThemeColors = [

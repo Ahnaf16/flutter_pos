@@ -1,3 +1,4 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pos/main.export.dart';
 
 class LoginView extends HookConsumerWidget {
@@ -5,39 +6,49 @@ class LoginView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final layout = context.layout;
+
     return Scaffold(
       body: Row(
         children: [
-          Expanded(
-            child: DecoContainer(
-              padding: context.layout.pagePadding,
-              color: context.colors.border.op7,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Flutter POS', style: context.text.h2),
-                  Text('Every sale counts, every moment matters. Let\'s get started', style: context.text.h4),
-                ],
+          if (layout.isDesktop)
+            Expanded(
+              child: DecoContainer(
+                padding: context.layout.pagePadding,
+                color: context.colors.border.op7,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Flutter POS', style: context.textFromGoogle(GoogleFonts.rubik).h2),
+                    Text('Every sale counts, every moment matters. Let\'s get started', style: context.text.h4),
+                  ],
+                ),
               ),
             ),
-          ),
-          const VerticalDivider(),
+
           Expanded(
             child: DecoContainer(
               padding: context.layout.pagePadding,
-              child: Column(
-                spacing: Insets.med,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Login', style: context.text.h3),
+              child: LimitedWidthBox(
+                maxWidth: 400,
+                child: Column(
+                  spacing: Insets.med,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Login', style: context.text.h3),
+                    Text('Enter your email and password to login', style: context.text.muted),
+                    const Gap(Insets.sm),
+                    const ShadInput(placeholder: Text('Email')),
 
-                  Text('Enter your email and password to login', style: context.text.muted),
+                    const ShadInput(placeholder: Text('Password')),
 
-                  const ShadInput(placeholder: Text('Email')),
+                    ShadButton(width: 400, onPressed: () {}, child: const Text('Login')),
 
-                  const ShadInput(placeholder: Text('Password')),
-                ],
+                    const Gap(Insets.sm),
+                    Text('By clicking login, you agree to our terms and conditions', style: context.text.muted),
+                  ],
+                ),
               ),
             ),
           ),
