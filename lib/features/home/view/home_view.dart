@@ -1,4 +1,5 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:pos/_widgets/form/shad_text_area.dart';
 import 'package:pos/main.export.dart';
 
 class HomeView extends HookConsumerWidget {
@@ -17,6 +18,21 @@ class HomeView extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 20,
             children: [
+              const ShadField(
+                name: 'name',
+                label: 'Name',
+                hintText: 'Enter your name',
+                helperText: 'This is a helper text',
+                isRequired: true,
+              ),
+              const TextArea(
+                expandableHeight: true,
+                isRequired: true,
+                name: 'test',
+                label: 'Name',
+                hintText: 'Enter your name',
+                helperText: 'This is a helper text',
+              ),
               ShadButton(
                 onPressed: () {
                   final state = formKey.currentState!;

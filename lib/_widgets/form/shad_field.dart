@@ -18,6 +18,7 @@ class ShadField extends HookWidget {
     this.controller,
     this.maxLength,
     this.maxLines = 1,
+    this.minLines,
     this.onChanged,
     this.onSubmit,
     this.onTap,
@@ -30,6 +31,8 @@ class ShadField extends HookWidget {
     this.decoration,
     this.helperText,
     this.trailing,
+    this.focusNode,
+    this.expands = false,
   }) : _key = key,
        super(key: superKey);
 
@@ -46,7 +49,7 @@ class ShadField extends HookWidget {
   final void Function(String value)? onSubmit;
   final TextEditingController? controller;
   final int? maxLength;
-  final int maxLines;
+  final int? maxLines;
   final bool readOnly;
   final bool enabled;
   final Function()? onTap;
@@ -57,6 +60,9 @@ class ShadField extends HookWidget {
   final ShadDecoration? decoration;
   final String? helperText;
   final Widget? trailing;
+  final FocusNode? focusNode;
+  final bool expands;
+  final int? minLines;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +77,7 @@ class ShadField extends HookWidget {
       validator: FormBuilderValidators.compose([if (isRequired) FormBuilderValidators.required(), ...?validators]),
       onChanged: (v) => v == null ? null : onChanged?.call(v),
       enabled: enabled,
+      focusNode: focusNode,
       builder: (state) {
         return ShadInputDecorator(
           label: label == null ? null : Text(label!).required(isRequired),
@@ -87,11 +94,15 @@ class ShadField extends HookWidget {
             readOnly: readOnly,
             maxLength: maxLength,
             maxLines: maxLines,
+            minLines: minLines,
             keyboardType: keyboardType,
             textInputAction: textInputAction,
             textAlign: textAlign,
             inputFormatters: inputFormatters,
             onPressed: onTap,
+            enabled: enabled,
+            obscureText: isPassField ? obscure.value : false,
+            expands: expands,
             leading: leading,
             trailing:
                 isPassField
