@@ -16,7 +16,7 @@ class UserRole {
 
   factory UserRole.fromMap(Map<String, dynamic> map) {
     return UserRole(
-      id: map['id'] ?? '',
+      id: map['id'] ?? map['\$id'] ?? '',
       name: map['name'] ?? '',
       permissions: List<String>.from(map['permissions'] ?? []),
     );

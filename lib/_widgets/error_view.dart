@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:pos/main.export.dart';
 
-class ErrorView extends ConsumerWidget {
+class ErrorView extends HookConsumerWidget {
   const ErrorView(
     this.error,
     this.stackTrace, {

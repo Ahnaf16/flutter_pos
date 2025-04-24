@@ -1,4 +1,4 @@
-import 'package:pos/routes/logic/app_route.dart';
+import 'package:pos/main.export.dart';
 
 export 'package:go_router/go_router.dart';
 
@@ -11,57 +11,59 @@ class RPaths {
   static final login = welcome + const RPath('/login');
 
   // home
-  static const home = RPath('/home');
+  static RPath home = const RPath('/home');
 
   // products
-  static const products = RPath('/products');
+  static RPath products = const RPath('/products');
 
   // stock
-  static const stock = RPath('/stock');
+  static RPath stock = const RPath('/stock');
 
   // unit
-  static const unit = RPath('/unit');
+  static RPath unit = const RPath('/unit');
 
   // sales
-  static const sales = RPath('/sales');
+  static RPath sales = const RPath('/sales');
 
   // return sales
-  static const returnSales = RPath('/return_sales');
+  static RPath returnSales = const RPath('/return_sales');
 
   // purchases
-  static const purchases = RPath('/purchases');
+  static RPath purchases = const RPath('/purchases');
 
   // return purchases
-  static const returnPurchases = RPath('/return_purchases');
+  static RPath returnPurchases = const RPath('/return_purchases');
 
   // customer
-  static const customer = RPath('/customer');
+  static RPath customer = const RPath('/customer');
 
   // supplier
-  static const supplier = RPath('/supplier');
+  static RPath supplier = const RPath('/supplier');
 
   // staffs
-  static const staffs = RPath('/staffs');
+  static RPath staffs = const RPath('/staffs');
+  static RPath createStaffs = const RPath('/create_staffs');
+  static RPath editStaffs(String id) => RPath('/edit_staff', {'id': id});
 
   // warehouse
-  static const warehouse = RPath('/warehouse');
+  static RPath warehouse = const RPath('/warehouse');
 
   // stockTransfer
-  static const stockTransfer = RPath('/stock_transfer');
+  static RPath stockTransfer = const RPath('/stock_transfer');
 
   // expense
-  static const expense = RPath('/expense');
+  static RPath expense = const RPath('/expense');
 
   // due
-  static const due = RPath('/due');
+  static RPath due = const RPath('/due');
 
   // moneyTransfer
-  static const moneyTransfer = RPath('/money_transfer');
+  static RPath moneyTransfer = const RPath('/money_transfer');
 
   // transactions
-  static const transactions = RPath('/transactions');
+  static RPath transactions = const RPath('/transactions');
 
   // settings
-  static const settings = RPath('/settings');
+  static RPath settings = const RPath('/settings');
   static RPath language = settings + const RPath('/language');
 }

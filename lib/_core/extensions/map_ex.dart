@@ -41,6 +41,13 @@ extension MapEx<K, V> on Map<K, V> {
     return it;
   }
 
+  String? parseID([String key = 'id']) {
+    final it = this[key] ?? this['\$$key'];
+    if (it is String) return it;
+
+    return null;
+  }
+
   String printMap() {
     String str = '';
     forEach((key, value) => str += '$key: ${value.toString}, ');

@@ -70,7 +70,7 @@ class Parser {
   static String formatBytes(int bytes, [int decimals = 2]) {
     if (bytes <= 0) return '0 B';
     const suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    var i = (log(bytes) / log(1024)).floor();
+    final i = (log(bytes) / log(1024)).floor();
     return '${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
   }
 
@@ -119,8 +119,8 @@ class Parser {
   }
 
   static String tryFormatDate(dynamic date, [String pattern = 'dd-MM-yyyy']) {
-    if (date case DateTime dt) return dt.formatDate(pattern);
-    if (date case String str) {
+    if (date case final DateTime dt) return dt.formatDate(pattern);
+    if (date case final String str) {
       final parsedDate = DateTime.tryParse(str);
       if (parsedDate != null) return parsedDate.formatDate(pattern);
 

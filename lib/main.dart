@@ -19,6 +19,8 @@ class PosApp extends HookConsumerWidget {
     final theme = ref.watch(themeProvider);
     final route = ref.watch(routerProvider);
 
+    useEffect(() => null, [theme]);
+
     return ShadApp.materialRouter(
       title: kAppName,
       routerConfig: route,

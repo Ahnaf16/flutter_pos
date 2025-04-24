@@ -31,7 +31,7 @@ class Corners {
   static const smRadius = Radius.circular(sm);
 
   /// 12 px
-  static const mdRadius = Radius.circular(med);
+  static const medRadius = Radius.circular(med);
 
   /// 16 px
   static const lgRadius = Radius.circular(lg);
@@ -52,7 +52,7 @@ class Corners {
   static const smBorder = BorderRadius.all(smRadius);
 
   /// 12 px
-  static const mdBorder = BorderRadius.all(mdRadius);
+  static const medBorder = BorderRadius.all(medRadius);
 
   /// 16 px
   static const lgBorder = BorderRadius.all(lgRadius);

@@ -41,10 +41,24 @@ class ThemeCtrl extends Notifier<ThemeConfig> {
       colorScheme: colors,
       brightness: brightness,
       textTheme: ShadTextTheme.fromGoogleFont(GoogleFonts.poppins),
+      cardTheme: ShadCardTheme(padding: Pads.sm(), rowMainAxisAlignment: MainAxisAlignment.start),
+      inputTheme: ShadInputTheme(
+        padding: kDefInputPadding,
+      ).copyWith(decoration: ShadDecoration(border: ShadBorder.all(width: 2))),
+      selectTheme: ShadSelectTheme(padding: kDefInputPadding),
+      decoration: ShadDecoration(
+        labelPadding: Pads.padding(bottom: 0, left: 5),
+        descriptionPadding: Pads.padding(top: 0, left: 5),
+        errorPadding: Pads.padding(top: 3, left: 5),
+      ),
     );
   }
 
   static final shadThemeColors = [
+    'stone',
+    'slate',
+    'yellow',
+    'violet',
     'blue',
     'gray',
     'green',
@@ -52,10 +66,8 @@ class ThemeCtrl extends Notifier<ThemeConfig> {
     'orange',
     'red',
     'rose',
-    'slate',
-    'stone',
-    'violet',
-    'yellow',
     'zinc',
   ];
 }
+
+final kDefInputPadding = Pads.padding(v: 15, h: 20);

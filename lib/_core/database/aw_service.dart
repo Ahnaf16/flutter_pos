@@ -7,89 +7,116 @@ import 'package:pos/main.export.dart';
 
 export 'package:appwrite/appwrite.dart' show ID;
 
+part 'aw_helper.dart';
+
 mixin AwHandler {
   final account = locate<Account>();
-  // final db = locate<Databases>();
-  final db = locate<AwService>();
+  final storage = locate<AwStorage>();
+  final db = locate<AwDatabase>();
 
   FutureReport<T> handler<T>({required Future<T> Function() call}) async {
-    return await _AwDatabase()._handler<T>(call: call);
+    return await _handler<T>(call: call);
   }
 }
 
-class _AwDatabase {
+class AwDatabase {
   final _db = locate<Databases>();
 
-  FutureReport<T> _handler<T>({required Future<T> Function() call, String? errorMsg}) async {
-    Failure? failure;
-    try {
-      return right(await call());
-    } on SocketException catch (e, st) {
-      failure = Failure(e.message, error: e, stackTrace: st);
-    } on AppwriteException catch (e, st) {
-      failure = Failure(e.message ?? errorMsg ?? kError('AwHandler'), error: e, stackTrace: st);
-    } on Failure catch (e, st) {
-      failure = e.copyWith(stackTrace: st);
-    } catch (e, st) {
-      failure = Failure(errorMsg ?? '$e', error: e, stackTrace: st);
-    } finally {
-      if (failure != null) catErr('AwHandler', failure.message);
-    }
-    return left(failure);
-  }
-
-  FutureReport<Document> _create(AwId collId, String docId, {required Map data}) async {
+  FutureReport<Document> create(AwId collId, String docId, {required Map data}) async {
+    catAw({'collId': collId.id, 'docId': docId, 'data': data}, '${collId.name} create');
     return await _handler<Document>(
       call: () async {
-        return await _db.createDocument(
+        final doc = await _db.createDocument(
           databaseId: AWConst.databaseId.id,
           collectionId: collId.id,
           documentId: ID.unique(),
           data: data,
         );
+        catAw(doc.toMap(), '${collId.name} created');
+        return doc;
       },
       errorMsg: 'Error creating document ${collId.name}',
     );
   }
 
-  FutureReport<DocumentList> _getList(AwId collId, {List<String>? queries}) async {
+  FutureReport<DocumentList> getList(AwId collId, {List<String>? queries}) async {
+    catAw({'collId': collId.id, 'queries': queries}, '${collId.name} get List');
     return await _handler<DocumentList>(
       call: () async {
-        return await _db.listDocuments(databaseId: AWConst.databaseId.id, collectionId: collId.id, queries: queries);
+        final list = await _db.listDocuments(
+          databaseId: AWConst.databaseId.id,
+          collectionId: collId.id,
+          queries: queries,
+        );
+        catAw(list.toMap(), '${collId.name} list');
+        return list;
       },
       errorMsg: 'Not found ${collId.name}',
     );
   }
 
-  FutureReport<Document> _get(AwId collId, String docId, {List<String>? queries}) async {
-    cat({'collId': collId.id, 'docId': docId, 'queries': queries}, 'AwDatabase._get');
+  FutureReport<Document> get(AwId collId, String docId, {List<String>? queries}) async {
+    catAw({'collId': collId.id, 'docId': docId, 'queries': queries}, '${collId.name} get');
     return await _handler<Document>(
       call: () async {
-        return await _db.getDocument(
+        final data = await _db.getDocument(
           databaseId: AWConst.databaseId.id,
           collectionId: collId.id,
           documentId: docId,
           queries: queries,
         );
+        catAw(data.toMap(), collId.name);
+        return data;
       },
       errorMsg: 'Not found ${collId.name} $docId',
     );
   }
 }
 
-class AwService {
-  final _db = _AwDatabase();
+class AwStorage {
+  final _storage = locate<Storage>();
 
-  FutureReport<Document> createUser({required Map data, String? docId}) async {
-    return await _db._create(AWConst.collections.users, docId ?? ID.unique(), data: data);
+  FutureReport<File> createFile(String name, String path, {Function(UploadProgress)? onProgress}) async {
+    catAw({'name': name, 'path': path}, 'Creating File');
+
+    return await _handler<File>(
+      call: () async {
+        final file = await _storage.createFile(
+          bucketId: AWConst.storageId.id,
+          fileId: ID.unique(),
+          file: InputFile.fromPath(path: path, filename: name),
+          onProgress: onProgress,
+        );
+        catAw(file.toMap(), 'File Created');
+        return file;
+      },
+      errorMsg: 'Error creating file',
+    );
   }
 
-  FutureReport<DocumentList> getUsers(String id, {List<String>? queries}) async {
-    return await _db._getList(AWConst.collections.users, queries: queries);
+  FutureReport<Unit> deleteFile(String id) async {
+    catAw('Deleting File $id', 'Delete File');
+
+    return await _handler<Unit>(
+      call: () async {
+        await _storage.deleteFile(bucketId: AWConst.storageId.id, fileId: ID.unique());
+        return unit;
+      },
+      errorMsg: 'Error deleting file',
+    );
   }
 
-  FutureReport<AppUser> getUser(String? id) async {
-    if (id == null) return failure('User ID cannot be null');
-    return await _db._get(AWConst.collections.users, id).convert(AppUser.fromDoc);
+  String buildUrl(String id) {
+    if (id.startsWith('http')) return id;
+
+    final parts = [
+      AWConst.endpoint,
+      'storage/buckets',
+      AWConst.storageId.id,
+      'files',
+      id,
+      'view?project=${AWConst.projectId.id}',
+    ];
+    return parts.join('/');
   }
 }

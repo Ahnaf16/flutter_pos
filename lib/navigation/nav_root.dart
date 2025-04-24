@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/main.export.dart';
 
@@ -46,6 +47,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
     return AppBar(
       title: const Text(kAppName),
       actions: [
+        if (!kReleaseMode) ...[Text(context.layout.deviceSize.name), const Gap(Insets.lg)],
         ShadPopover(
           controller: popCtrl,
           padding: Pads.padding(v: Insets.med, h: Insets.lg),

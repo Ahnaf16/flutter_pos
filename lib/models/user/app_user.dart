@@ -22,7 +22,7 @@ class AppUser {
 
   factory AppUser.fromDoc(Document doc) {
     final data = doc.data;
-    cat(data);
+
     return AppUser(
       id: doc.$id,
       name: data['name'] ?? '',
@@ -31,6 +31,18 @@ class AppUser {
       photo: data['photo'],
       role: UserRole.tyrParse(data['role']),
       warehouse: WareHouse.tyrParse(data['warehouse']),
+    );
+  }
+
+  factory AppUser.fromMap(Map<String, dynamic> map) {
+    return AppUser(
+      id: map.parseID() ?? '',
+      name: map['name'] ?? '',
+      phone: map['phone'] ?? '',
+      email: map['email'] ?? '',
+      photo: map['photo'],
+      role: UserRole.tyrParse(map['role']),
+      warehouse: WareHouse.tyrParse(map['warehouse']),
     );
   }
 

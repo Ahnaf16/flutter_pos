@@ -5,7 +5,7 @@ export 'package:flutter_hooks/flutter_hooks.dart';
 export 'package:gap/gap.dart';
 export 'package:hooks_riverpod/hooks_riverpod.dart';
 export 'package:recase/recase.dart';
-export 'package:shadcn_ui/shadcn_ui.dart';
+export 'package:shadcn_ui/shadcn_ui.dart' hide ShadCard, ShadInputDecorator;
 
 export '_core/_core.dart';
 export '_styled_widgets/_styled_widgets.dart';

@@ -16,14 +16,11 @@ class AuthRepo with AwHandler {
     await handler(call: () async => await account.deleteSessions());
   }
 
-  Future<void> register(String email, String password, AppUser user) async {
-    final newUser = await account.create(userId: ID.unique(), email: email, password: password, name: user.name);
-    await db.createUser(data: user.toMap(), docId: newUser.$id);
-  }
-
   FutureReport<AppUser> currentUser() async {
     final authUser = await handler(call: () async => await account.get());
+    final id = authUser.getOrNull()?.$id;
+    if (id == null) return failure('User ID cannot be null');
 
-    return await db.getUser(authUser.getOrNull()?.$id);
+    return db.get(AWConst.collections.users, id).convert(AppUser.fromDoc);
   }
 }

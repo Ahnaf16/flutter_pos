@@ -1,5 +1,4 @@
 import 'package:pos/main.export.dart';
-import 'package:universal_image/universal_image.dart';
 
 class HostedImage extends StatelessWidget {
   const HostedImage(
@@ -11,6 +10,7 @@ class HostedImage extends StatelessWidget {
     this.onImgTap,
     this.errorIcon,
     this.tag,
+    this.radius = 0,
   });
 
   const HostedImage.square(
@@ -21,6 +21,7 @@ class HostedImage extends StatelessWidget {
     this.onImgTap,
     this.errorIcon,
     this.tag,
+    this.radius = 0,
   }) : height = dimension,
        width = dimension;
 
@@ -31,6 +32,7 @@ class HostedImage extends StatelessWidget {
   final double? height;
   final double? width;
   final String? tag;
+  final double radius;
 
   /// [AssetImg], [FileImg], [NetImg], [IconImg]
   final Img img;
@@ -39,14 +41,18 @@ class HostedImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onImgTap,
-      child: UniversalImage(
-        img.path,
-        height: height,
-        width: width,
-        heroTag: tag ?? img.toString(),
-        fit: fit,
-        errorPlaceholder: Icon(errorIcon ?? Icons.error, color: context.colors.destructive),
-        placeholder: const Center(child: SizedBox.square(dimension: 20, child: CircularProgressIndicator())),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+
+        child: UniversalImage(
+          img.path,
+          height: height,
+          width: width,
+          heroTag: tag ?? img.toString(),
+          fit: fit,
+          errorPlaceholder: Icon(errorIcon ?? Icons.error, color: context.colors.destructive),
+          placeholder: const Center(child: SizedBox.square(dimension: 20, child: CircularProgressIndicator())),
+        ),
       ),
     );
   }

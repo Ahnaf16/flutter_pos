@@ -15,6 +15,7 @@ import 'package:pos/features/returnSales/view/return_sales_view.dart';
 import 'package:pos/features/sales/view/sales_view.dart';
 import 'package:pos/features/settings/view/language_view.dart';
 import 'package:pos/features/settings/view/settings_view.dart';
+import 'package:pos/features/staffs/view/create_staff_view.dart';
 import 'package:pos/features/staffs/view/staffs_view.dart';
 import 'package:pos/features/stock/view/stock_view.dart';
 import 'package:pos/features/stockTransfer/view/stock_transfer_view.dart';
@@ -32,13 +33,13 @@ typedef RouteRedirect = FutureOr<String?> Function(BuildContext, GoRouterState);
 final routerProvider = NotifierProvider<AppRouter, GoRouter>(AppRouter.new);
 
 class AppRouter extends Notifier<GoRouter> {
-  final _rootNavigator = GlobalKey<NavigatorState>(debugLabel: 'root');
+  final _root = GlobalKey<NavigatorState>(debugLabel: 'root');
 
-  final _shellNavigator = GlobalKey<NavigatorState>(debugLabel: 'shell');
+  final _shell = GlobalKey<NavigatorState>(debugLabel: 'shell');
 
   GoRouter _appRouter(RouteRedirect? redirect) {
     return GoRouter(
-      navigatorKey: _rootNavigator,
+      navigatorKey: _root,
       redirect: redirect,
       initialLocation: rootPath,
       routes: [ShellRoute(routes: _routes, builder: (_, s, c) => AppRoot(key: s.pageKey, child: c))],
@@ -53,71 +54,65 @@ class AppRouter extends Notifier<GoRouter> {
     //! auth
     AppRoute(RPaths.login, (_) => const LoginView()),
 
-    //!home
-
-    //!products
-
-    //!stock
-
-    //!unit
-
-    //!sales
-
-    //!returnSales
-
-    //!purchases
-
-    //!returnPurchases
-
-    //!customer
-
-    //!supplier
-
-    //!staffs
-
-    //!warehouse
-
-    //!stockTransfer
-
-    //!due
-
-    //!moneyTransfer
-
-    //!transactions
-
-    //! settings
-    AppRoute(RPaths.language, (_) => const LanguageView()),
-
     //! shell
     ShellRoute(
-      navigatorKey: _shellNavigator,
+      navigatorKey: _shell,
       builder: (_, s, child) => NavigationRoot(child, key: s.pageKey),
       routes: [
+        //! home
         AppRoute(RPaths.home, (_) => const HomeView()),
+        //! products
         AppRoute(RPaths.products, (_) => const ProductsView()),
+        //! stock
         AppRoute(RPaths.stock, (_) => const StockView()),
+        //! unit
         AppRoute(RPaths.unit, (_) => const UnitView()),
+        //! sales
         AppRoute(RPaths.sales, (_) => const SalesView()),
+        //! returnSales
         AppRoute(RPaths.returnSales, (_) => const ReturnSalesView()),
+        //! purchases
         AppRoute(RPaths.purchases, (_) => const PurchasesView()),
+        //! returnPurchases
         AppRoute(RPaths.returnPurchases, (_) => const ReturnPurchasesView()),
+        //! customer
         AppRoute(RPaths.customer, (_) => const CustomerView()),
+        //! supplier
         AppRoute(RPaths.supplier, (_) => const SupplierView()),
-        AppRoute(RPaths.staffs, (_) => const StaffsView()),
+        //! staffs
+        AppRoute(
+          RPaths.staffs,
+          (_) => const StaffsView(),
+          routes: [
+            AppRoute(RPaths.createStaffs, (_) => const CreateStaffView(), parentKey: _shell),
+            AppRoute(RPaths.editStaffs(':id'), (_) => const CreateStaffView(), parentKey: _shell),
+          ],
+        ),
+        //! warehouse
         AppRoute(RPaths.warehouse, (_) => const WarehouseView()),
+        //! stockTransfer
         AppRoute(RPaths.stockTransfer, (_) => const StockTransferView()),
+        //! expense
         AppRoute(RPaths.expense, (_) => const ExpenseView()),
+        //! due
         AppRoute(RPaths.due, (_) => const DueView()),
+        //! moneyTransfer
         AppRoute(RPaths.moneyTransfer, (_) => const MoneyTransferView()),
+        //! transactions
         AppRoute(RPaths.transactions, (_) => const TransactionsView()),
-        AppRoute(RPaths.settings, (_) => const SettingsView()),
+        //! settings
+        AppRoute(
+          RPaths.settings,
+          (_) => const SettingsView(),
+          routes: [AppRoute(RPaths.language, (_) => const LanguageView())],
+        ),
       ],
     ),
   ];
 
   @override
   GoRouter build() {
-    Ctx._key = _rootNavigator;
+    Ctx._key = _root;
     // Toaster.navigator = _rootNavigator;
     final auth = ref.watch(authCtrlProvider);
 

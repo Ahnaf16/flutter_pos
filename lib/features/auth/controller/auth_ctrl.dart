@@ -17,17 +17,13 @@ class AuthCtrl extends _$AuthCtrl {
   Future<void> signIn(String email, String password) async {
     final res = await _repo.signIn(email, password);
     res.fold(Toast.showErr, (r) {
-      ref.invalidateSelf();
       Toast.show('Login successful');
+      ref.invalidateSelf();
     });
   }
 
   Future<void> signOut() async {
     await _repo.signOut();
     ref.invalidateSelf();
-  }
-
-  Future<void> register(String email, String password, AppUser user) async {
-    await _repo.register(email, password, user);
   }
 }

@@ -1,25 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'auth_ctrl.dart';
+part of 'staffs_ctrl.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authCtrlHash() => r'8ae592073022bb0be4a0eb0c08718358ac7b8da5';
+String _$staffsCtrlHash() => r'82a441dbc450627e498f26f87595538f6bdd00d5';
 
-/// See also [AuthCtrl].
-@ProviderFor(AuthCtrl)
-final authCtrlProvider =
-    AutoDisposeAsyncNotifierProvider<AuthCtrl, AppUser?>.internal(
-  AuthCtrl.new,
-  name: r'authCtrlProvider',
+/// See also [StaffsCtrl].
+@ProviderFor(StaffsCtrl)
+final staffsCtrlProvider =
+    AutoDisposeAsyncNotifierProvider<StaffsCtrl, List<AppUser>>.internal(
+  StaffsCtrl.new,
+  name: r'staffsCtrlProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$authCtrlHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$staffsCtrlHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$AuthCtrl = AutoDisposeAsyncNotifier<AppUser?>;
+typedef _$StaffsCtrl = AutoDisposeAsyncNotifier<List<AppUser>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

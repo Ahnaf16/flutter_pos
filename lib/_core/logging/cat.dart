@@ -4,13 +4,22 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+final _ansi = AnsiColor();
+
 void cat(dynamic msg, [dynamic name]) => Cat._(name?.toString()).log(msg);
 void catErr(String name, Object? error, [StackTrace? stackTrace]) => Cat._(name).logErr(error, stackTrace);
 
+void catAw(dynamic msg, [dynamic name]) {
+  Cat._(name?.toString(), _ansi.green, _ansi.cyan).log(msg);
+}
+
 class Cat {
-  Cat._(this.name);
+  Cat._(this.name, [this.colorKey, this.colorValue]);
 
   final String? name;
+
+  final String Function(String text)? colorKey;
+  final String Function(String text)? colorValue;
 
   final bool _isDebug = kDebugMode;
 
@@ -39,7 +48,7 @@ class Cat {
   void log(dynamic msg) {
     if (!doLog) return;
 
-    const h = LogHelper(false);
+    final h = LogHelper(false, colorKey, colorValue);
     final sb = StringBuffer();
     sb.writeln(h.start(name));
     sb.writeln(h.jsonMap(1, msg));
@@ -50,14 +59,17 @@ class Cat {
 }
 
 class LogHelper {
-  const LogHelper(this.isErr);
+  const LogHelper(this.isErr, [this.colorKey, this.colorValue]);
 
   final bool isErr;
+
+  final String Function(String text)? colorKey;
+  final String Function(String text)? colorValue;
 
   AnsiColor get ansi => AnsiColor();
 
   String stackTrace(StackTrace stackTrace) {
-    StringBuffer buffer = StringBuffer();
+    final StringBuffer buffer = StringBuffer();
 
     stackTrace.toString().split('\n').forEach((element) {
       buffer.write('$element\n');
@@ -66,7 +78,7 @@ class LogHelper {
   }
 
   String jsonMap(int l, dynamic json) {
-    StringBuffer buffer = StringBuffer();
+    final StringBuffer buffer = StringBuffer();
 
     if (json is Map) {
       json.entries.toList().asMap().forEach((index, entry) {
@@ -84,12 +96,7 @@ class LogHelper {
           final vPart = jsonList(l + 1, v);
           final j = v.isEmpty ? '--' : '\n';
           buffer.write('$keyPart $j$vPart');
-        }
-        //?? file
-        // else if (v is FormData) {
-        //   buffer.write('${'  ' * l}${_colorKey(k)}:\n${jsonMap(l + 1, v)}');
-        // }
-        else {
+        } else {
           buffer.write('${'  ' * l}${_keyValue(k, v)}');
         }
 
@@ -97,12 +104,7 @@ class LogHelper {
       });
     } else if (json is List) {
       buffer.write(jsonList(l, json));
-    }
-    //?? dio
-    //  else if (json is FormData) {
-    //   buffer.write(_processFormData(json, l));
-    // }
-    else {
+    } else {
       buffer.write('${'  ' * l}${_colorValue(json)}');
     }
 
@@ -110,7 +112,7 @@ class LogHelper {
   }
 
   String jsonList(int l, List list) {
-    StringBuffer buffer = StringBuffer();
+    final StringBuffer buffer = StringBuffer();
 
     for (int i = 0; i < list.length; i++) {
       final item = list[i];
@@ -137,15 +139,7 @@ class LogHelper {
       return _colorValue('NULL');
     } else if (value is File) {
       return _colorValue('"${value.path}"(FILE)');
-    }
-    //?? dio
-    //  else if (value is MultipartFile) {
-    //   return _colorValue('"${value.filename ?? value.toString()}"(MULTIPART)');
-    //?? file
-    // } else if (value is PlatformFile) {
-    //   return _colorValue('"${value.path}"(PLATFORM)');
-    // }
-    else if (value is DateTime) {
+    } else if (value is DateTime) {
       return _colorValue('"${value.toIso8601String()}"');
     } else {
       return _colorValue('$value');
@@ -166,21 +160,6 @@ class LogHelper {
 
   String kvLine(String key, Object? v) => _line(1, _keyValue(key, v));
 
-  //?? dio
-  // String _processFormData(FormData formData, int l) {
-  //   String str = '';
-  //   for (var field in formData.fields) {
-  //     str += '${'  ' * l}${_colorKey(field.key)}: ${_colorValue(field.value)}\n';
-  //   }
-
-  //   for (var file in formData.files) {
-  //     str +=
-  //         '${'  ' * l}${_colorKey(file.key)}: ${_colorValue(file.value.filename ?? file.value.toString())}(MULTIPART)\n';
-  //   }
-
-  //   return str;
-  // }
-
   String _keyValue(dynamic key, dynamic value) => '${_colorKey(key)}: ${valueParse(value)}';
 
   String _line([int layer = 0, String? t, String? p]) {
@@ -189,9 +168,15 @@ class LogHelper {
     return '$indent$pre${t ?? ''} ';
   }
 
-  String _colorKey(dynamic key) => isErr ? ansi.red(key) : ansi.cyan(key);
+  String _colorKey(dynamic key) {
+    if (colorKey != null) return colorKey!(key.toString());
+    return isErr ? ansi.red(key) : ansi.cyan(key);
+  }
 
-  String _colorValue(dynamic value) => isErr ? ansi.magenta(value) : ansi.yellow(value);
+  String _colorValue(dynamic value) {
+    if (colorValue != null) return colorValue!(value.toString());
+    return isErr ? ansi.magenta(value) : ansi.yellow(value);
+  }
 }
 
 class AnsiColor {

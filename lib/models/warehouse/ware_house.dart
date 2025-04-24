@@ -1,5 +1,5 @@
 import 'package:appwrite/models.dart';
-import 'package:pos/_core/extensions/map_ex.dart';
+import 'package:pos/main.export.dart';
 
 class WareHouse {
   const WareHouse({
@@ -20,7 +20,6 @@ class WareHouse {
 
   factory WareHouse.fromDoc(Document doc) {
     final data = doc.data;
-
     return WareHouse(
       id: doc.$id,
       name: data['name'] ?? '',
@@ -33,8 +32,8 @@ class WareHouse {
 
   factory WareHouse.fromMap(Map<String, dynamic> map) {
     return WareHouse(
-      id: map['id'] ?? '',
-      name: map['name'] ?? '',
+      id: map['id'] ?? map['\$id'] ?? '',
+      name: map['name'] ?? 'n/a',
       address: map['address'] ?? '',
       isDefault: map['is_default'] ?? false,
       contactNumber: map['contact_number'] ?? '',
@@ -44,8 +43,8 @@ class WareHouse {
 
   static WareHouse? tyrParse(dynamic value) {
     try {
-      if (value case final Document doc) WareHouse.fromDoc(doc);
-      if (value case final Map map) WareHouse.fromMap(map.toStringKey());
+      if (value case final Document doc) return WareHouse.fromDoc(doc);
+      if (value case final Map map) return WareHouse.fromMap(map.toStringKey());
       return null;
     } catch (e) {
       return null;
