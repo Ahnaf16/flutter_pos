@@ -1,4 +1,3 @@
-import 'package:pos/_widgets/error_view.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/main.export.dart';
 
@@ -164,13 +163,13 @@ class _NavButton extends HookWidget {
     if (icon == null && expanded) return DecoContainer(padding: Pads.padding(top: Insets.sm), child: Text(text));
 
     return ShadButton(
-      leading: Icon(icon),
       mainAxisAlignment: MainAxisAlignment.start,
       backgroundColor: selected ? context.colors.primary.op2 : Colors.transparent,
       hoverBackgroundColor: context.colors.primary.op1,
       hoverForegroundColor: context.colors.foreground,
       foregroundColor: context.colors.foreground,
       onPressed: onTap,
+      leading: Icon(icon),
       child:
           !expanded
               ? null
@@ -188,41 +187,40 @@ class _NavButton extends HookWidget {
 List<(String text, IconData? icon, RPath? path)> get _items => [
   ('Home', LuIcons.house, RPaths.home),
   ('Inventory', null, null),
-  ('Products', LuIcons.box, RPaths.home),
-  ('Stock', LuIcons.arrowUp01, RPaths.home),
-  ('Unit', LuIcons.ruler, RPaths.home),
-  ('Category', LuIcons.group, RPaths.home),
-  ('Brand', LuIcons.group, RPaths.home),
+  ('Products', LuIcons.box, RPaths.products),
+  ('Stock', LuIcons.arrowUp01, RPaths.stock),
+  ('Unit', LuIcons.ruler, RPaths.unit),
+  // ('Category', LuIcons.group, RPaths.home),
+  // ('Brand', LuIcons.group, RPaths.home),
 
   // ('', null, null),
   ('Sales', null, null),
-  ('Sales History', LuIcons.shoppingCart, RPaths.home),
-  ('Return sales', LuIcons.archiveRestore, RPaths.home),
+  ('Sales History', LuIcons.shoppingCart, RPaths.sales),
+  ('Return sales', LuIcons.archiveRestore, RPaths.returnSales),
 
   // ('', null, null),
   ('Purchases', null, null),
-  ('Purchase History', LuIcons.scrollText, RPaths.home),
-  ('Return purchase', LuIcons.panelBottomClose, RPaths.home),
+  ('Purchase History', LuIcons.scrollText, RPaths.purchases),
+  ('Return purchase', LuIcons.panelBottomClose, RPaths.returnPurchases),
 
   // ('', null, null),
   ('People', null, null),
-  ('Customer', LuIcons.users, RPaths.home),
-  ('Supplier', LuIcons.usersRound, RPaths.home),
-  ('Staff', LuIcons.userCog, RPaths.home),
+  ('Customer', LuIcons.users, RPaths.customer),
+  ('Supplier', LuIcons.usersRound, RPaths.supplier),
+  ('Staff', LuIcons.userCog, RPaths.staffs),
 
   // ('', null, null),
-  ('Branch', null, null),
-  ('Branches', LuIcons.gitBranch, RPaths.home),
-  ('Stock Transfer', LuIcons.arrowUpDown, RPaths.home),
+  ('Inventory', null, null),
+  ('Warehouse', LuIcons.gitBranch, RPaths.warehouse),
+  ('Stock Transfer', LuIcons.arrowUpDown, RPaths.stockTransfer),
 
   // ('', null, null),
   ('Accounting', null, null),
-  ('Expense', LuIcons.wallet, RPaths.home),
-  ('Expense category', LuIcons.walletCards, RPaths.home),
-  ('Due', LuIcons.coins, RPaths.home),
-  ('Due collection', LuIcons.handCoins, RPaths.home),
-  ('Money transfer', LuIcons.arrowsUpFromLine, RPaths.home),
-  ('Transactions', LuIcons.landmark, RPaths.home),
+  ('Expense', LuIcons.wallet, RPaths.expense),
+  ('Due', LuIcons.coins, RPaths.due),
+  // ('Due collection', LuIcons.handCoins, RPaths.home),
+  ('Money transfer', LuIcons.arrowsUpFromLine, RPaths.moneyTransfer),
+  ('Transactions', LuIcons.landmark, RPaths.transactions),
 
   // ('', null, null),
   ('Configuration', null, null),

@@ -3,9 +3,25 @@ import 'dart:async';
 import 'package:pos/app_root.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/auth/view/login_view.dart';
+import 'package:pos/features/customer/view/customer_view.dart';
+import 'package:pos/features/due/view/due_view.dart';
+import 'package:pos/features/expense/view/expense_view.dart';
 import 'package:pos/features/home/view/home_view.dart';
+import 'package:pos/features/moneyTransfer/view/money_transfer_view.dart';
+import 'package:pos/features/products/view/products_view.dart';
+import 'package:pos/features/purchases/view/purchases_view.dart';
+import 'package:pos/features/returnPurchases/view/return_purchases_view.dart';
+import 'package:pos/features/returnSales/view/return_sales_view.dart';
+import 'package:pos/features/sales/view/sales_view.dart';
 import 'package:pos/features/settings/view/language_view.dart';
 import 'package:pos/features/settings/view/settings_view.dart';
+import 'package:pos/features/staffs/view/staffs_view.dart';
+import 'package:pos/features/stock/view/stock_view.dart';
+import 'package:pos/features/stockTransfer/view/stock_transfer_view.dart';
+import 'package:pos/features/supplier/view/supplier_view.dart';
+import 'package:pos/features/transactions/view/transactions_view.dart';
+import 'package:pos/features/unit/view/unit_view.dart';
+import 'package:pos/features/warehouse/view/warehouse_view.dart';
 import 'package:pos/main.export.dart';
 import 'package:pos/navigation/nav_root.dart';
 
@@ -37,7 +53,37 @@ class AppRouter extends Notifier<GoRouter> {
     //! auth
     AppRoute(RPaths.login, (_) => const LoginView()),
 
-    //! home
+    //!home
+
+    //!products
+
+    //!stock
+
+    //!unit
+
+    //!sales
+
+    //!returnSales
+
+    //!purchases
+
+    //!returnPurchases
+
+    //!customer
+
+    //!supplier
+
+    //!staffs
+
+    //!warehouse
+
+    //!stockTransfer
+
+    //!due
+
+    //!moneyTransfer
+
+    //!transactions
 
     //! settings
     AppRoute(RPaths.language, (_) => const LanguageView()),
@@ -46,7 +92,26 @@ class AppRouter extends Notifier<GoRouter> {
     ShellRoute(
       navigatorKey: _shellNavigator,
       builder: (_, s, child) => NavigationRoot(child, key: s.pageKey),
-      routes: [AppRoute(RPaths.home, (_) => const HomeView()), AppRoute(RPaths.settings, (_) => const SettingsView())],
+      routes: [
+        AppRoute(RPaths.home, (_) => const HomeView()),
+        AppRoute(RPaths.products, (_) => const ProductsView()),
+        AppRoute(RPaths.stock, (_) => const StockView()),
+        AppRoute(RPaths.unit, (_) => const UnitView()),
+        AppRoute(RPaths.sales, (_) => const SalesView()),
+        AppRoute(RPaths.returnSales, (_) => const ReturnSalesView()),
+        AppRoute(RPaths.purchases, (_) => const PurchasesView()),
+        AppRoute(RPaths.returnPurchases, (_) => const ReturnPurchasesView()),
+        AppRoute(RPaths.customer, (_) => const CustomerView()),
+        AppRoute(RPaths.supplier, (_) => const SupplierView()),
+        AppRoute(RPaths.staffs, (_) => const StaffsView()),
+        AppRoute(RPaths.warehouse, (_) => const WarehouseView()),
+        AppRoute(RPaths.stockTransfer, (_) => const StockTransferView()),
+        AppRoute(RPaths.expense, (_) => const ExpenseView()),
+        AppRoute(RPaths.due, (_) => const DueView()),
+        AppRoute(RPaths.moneyTransfer, (_) => const MoneyTransferView()),
+        AppRoute(RPaths.transactions, (_) => const TransactionsView()),
+        AppRoute(RPaths.settings, (_) => const SettingsView()),
+      ],
     ),
   ];
 
