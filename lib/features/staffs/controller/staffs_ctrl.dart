@@ -18,17 +18,10 @@ class StaffsCtrl extends _$StaffsCtrl {
   }
 
   FVoid createStaff(String password, QMap formData) async {
-    await _repo.createStaff('121212121', {
-      'name': 'abab',
-      // 'warehouse': '680a07e8001aeae9972c',
-      // 'role': '680a082b001d1b08d793',
-      'email': 'emem@example.com',
-      // 'phone': '+8812121212121',
+    final res = await _repo.createStaff(password, formData);
+    res.fold(Toast.showErr, (r) {
+      Toast.show('Staff created successfully');
+      // ref.invalidateSelf();
     });
-    // final res = await _repo.createStaff(password, formData);
-    // res.fold(Toast.showErr, (r) {
-    //   Toast.show('Staff created successfully');
-    //   // ref.invalidateSelf();
-    // });
   }
 }

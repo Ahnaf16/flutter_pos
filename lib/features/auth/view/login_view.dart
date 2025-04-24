@@ -75,7 +75,9 @@ class LoginView extends HookConsumerWidget {
                       width: double.infinity,
                       onPressed: (l) async {
                         l.value = true;
-                        await authCtrl().signIn(email.text, password.text);
+                        final msg = await authCtrl().signIn(email.text, password.text);
+                        if (msg != null && context.mounted) context.showErr(msg);
+
                         l.value = false;
                       },
                       child: const Text('Login'),

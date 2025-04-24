@@ -3,36 +3,35 @@ import 'package:pos/main.export.dart';
 class Toast {
   static final _context = Ctx.context;
 
-  static void showErr(dynamic message, {String? title, Widget? Function(String id)? action}) {
+  static void showErr(dynamic message, {String? title, Widget? Function(String id)? action, BuildContext? ctx}) {
     String err = message.toString();
 
     if (message case final Failure f) err = f.message;
-
-    final sonner = ShadSonner.of(_context);
     final id = DateTime.now().millisecondsSinceEpoch.toString();
+    action ??= (id) => _defAction(id, true, ctx);
 
-    action ??= (id) => _defAction(id, true);
-
+    final sonner = ShadSonner.of(ctx ?? _context);
     sonner.show(_buildToast(id, title, err, action, true));
   }
 
-  static void show(String message, {String? title, Widget? Function(String id)? action}) {
-    final sonner = ShadSonner.of(_context);
+  static void show(String message, {String? title, Widget? Function(String id)? action, BuildContext? ctx}) {
+    final sonner = ShadSonner.of(ctx ?? _context);
     final id = DateTime.now().millisecondsSinceEpoch.toString();
 
-    action ??= (id) => _defAction(id, true);
+    action ??= (id) => _defAction(id, true, ctx);
 
     sonner.show(_buildToast(id, title, message, action, false));
   }
 
-  static Widget _defAction(String id, bool isDistractive) {
+  static Widget _defAction(String id, bool isDistractive, [BuildContext? ctx]) {
+    final context = ctx ?? _context;
     return ShadButton.ghost(
-      onPressed: () => ShadSonner.of(_context).hide(id),
-      foregroundColor: isDistractive ? _context.colors.destructiveForeground : _context.colors.foreground,
+      onPressed: () => ShadSonner.of(context).hide(id),
+      foregroundColor: isDistractive ? context.colors.destructiveForeground : context.colors.foreground,
       leading: const Icon(LuIcons.x),
       size: ShadButtonSize.sm,
-      hoverBackgroundColor: isDistractive ? _context.colors.destructiveForeground.op1 : null,
-      hoverForegroundColor: isDistractive ? _context.colors.destructiveForeground : _context.colors.foreground,
+      hoverBackgroundColor: isDistractive ? context.colors.destructiveForeground.op1 : null,
+      hoverForegroundColor: isDistractive ? context.colors.destructiveForeground : context.colors.foreground,
     );
   }
 

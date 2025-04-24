@@ -1,36 +1,46 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pos/main.export.dart';
 
 class StaffRepo with AwHandler {
   FutureReport<Document> createStaff(String password, QMap form) async {
-    final data = QMap.from(form);
-    final user = AppUser.fromMap(data);
+    AppUser user = AppUser.fromMap(form);
+    user = user.copyWith(password: () => password);
 
-    // final photoPath = user.photo;
+    final photoPath = user.photo;
 
-    // if (photoPath != null) {
-    //   final xFile = XFile(photoPath);
-    //   final file = await storage.createFile(xFile.name, xFile.path);
+    if (photoPath != null) {
+      final xFile = XFile(photoPath);
+      final file = await storage.createFile(xFile.name, xFile.path);
 
-    //   String? error;
+      String? error;
 
-    //   file.fold((l) => error = l.message, (r) => data['photo'] = storage.buildUrl(r.$id));
+      file.fold((l) => error = l.message, (r) => user = user.copyWith(photo: () => r.$id));
 
-    //   if (error != null) return failure(error ?? 'Error uploading photo');
-    // }
+      if (error != null) return failure(error ?? 'Error uploading photo');
+    }
 
-    final newUser = await account.create(userId: ID.unique(), email: user.email, password: password, name: user.name);
-    cat(newUser.toMap(), 'New User');
-
-    // final doc = await db.create(AWConst.collections.users, newUser.$id, data: data);
-    // doc.fold((_) {
-    //   storage.deleteFile(data['photo']);
-    // }, identityNull);
-    // return doc;
-    return failure('test');
+    final doc = await db.create(AWConst.collections.users, ID.unique(), data: user.toAwPost());
+    doc.fold((_) {
+      if (user.photo != null) storage.deleteFile(user.photo!);
+    }, identityNull);
+    return doc;
   }
 
   FutureReport<List<AppUser>> getStaffs() async {
     return await db.getList(AWConst.collections.users).convert((docs) => docs.convertDoc(AppUser.fromDoc));
+  }
+
+  FutureReport<AppUser?> getNotCreatedStaff(String email, String pass) async {
+    final hash = hashPass(pass);
+    final users = await db
+        .getList(
+          AWConst.collections.users,
+          queries: [Query.equal('password', hash), Query.equal('is_user_created', false), Query.equal('email', email)],
+        )
+        .convert((r) => r.convertDoc(AppUser.fromDoc));
+
+    return users.convert((r) => r.firstOrNull);
   }
 }

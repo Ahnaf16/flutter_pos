@@ -29,7 +29,7 @@ class CreateStaffView extends HookConsumerWidget {
           child: const Text('Create'),
           onPressed: (l) async {
             final state = formKey.currentState!;
-            // if (!state.saveAndValidate()) return;
+            if (!state.saveAndValidate()) return;
             l.value = true;
             final data = state.value;
             cat(data, 'Form Data');
@@ -56,7 +56,7 @@ class CreateStaffView extends HookConsumerWidget {
                   ),
 
                   Expanded(
-                    child: FormBuilderField<String>(
+                    child: FormBuilderField<QMap>(
                       name: 'warehouse',
                       validator: FormBuilderValidators.required(),
                       builder: (form) {
@@ -82,7 +82,7 @@ class CreateStaffView extends HookConsumerWidget {
                                   selectedOptionBuilder: (context, v) => Text(v.name),
                                   onSearchChanged: searchWarehouse.set,
                                   allowDeselection: true,
-                                  onChanged: (v) => form.didChange(v?.id),
+                                  onChanged: (v) => form.didChange(v?.toMap()),
                                 ),
                               );
                             },
@@ -92,7 +92,7 @@ class CreateStaffView extends HookConsumerWidget {
                     ),
                   ),
                   Expanded(
-                    child: FormBuilderField<String>(
+                    child: FormBuilderField<QMap>(
                       name: 'role',
                       validator: FormBuilderValidators.required(),
                       builder: (form) {
@@ -120,7 +120,7 @@ class CreateStaffView extends HookConsumerWidget {
                                   selectedOptionBuilder: (context, v) => Text(v.name),
                                   onSearchChanged: searchRole.set,
                                   allowDeselection: true,
-                                  onChanged: (v) => form.didChange(v?.id),
+                                  onChanged: (v) => form.didChange(v?.toMap()),
                                 ),
                               );
                             },
@@ -142,7 +142,7 @@ class CreateStaffView extends HookConsumerWidget {
                 ],
               ),
               FormBuilderField<String>(
-                name: 'photo',
+                name: 'photo_id',
                 builder: (form) {
                   return ShadInputDecorator(
                     label: const Text('Profile image'),

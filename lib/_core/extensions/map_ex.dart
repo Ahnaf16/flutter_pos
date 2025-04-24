@@ -37,7 +37,6 @@ extension MapEx<K, V> on Map<K, V> {
     if (it is String && it.isEmpty) return null;
     if (it is List && it.isEmpty) return null;
     if (it is Map && it.isEmpty) return null;
-
     return it;
   }
 

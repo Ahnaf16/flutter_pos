@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:pos/main.export.dart';
@@ -82,3 +85,9 @@ String? tryDecodeUri(dynamic uri) {
 String encodeUri(String uri) => Uri.encodeComponent(uri);
 
 final decimalRegExp = RegExp(r'^\d*\.?\d*$');
+
+String hashPass(String password) {
+  final bytes = utf8.encode(password);
+  final digest = sha256.convert(bytes);
+  return digest.toString();
+}

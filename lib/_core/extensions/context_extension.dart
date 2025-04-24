@@ -52,4 +52,10 @@ extension ContextEx on BuildContext {
   bool get isLight => bright == Brightness.light;
 
   Layouts get layout => Layouts.of(this);
+
+  void showToast(String msg, {String? title, Widget? Function(String id)? action}) =>
+      Toast.show(msg, title: title, action: action, ctx: this);
+
+  void showErr(dynamic msg, {String? title, Widget? Function(String id)? action}) =>
+      Toast.showErr(msg, title: title, action: action, ctx: this);
 }

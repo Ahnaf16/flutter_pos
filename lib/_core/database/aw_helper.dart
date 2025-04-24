@@ -7,13 +7,13 @@ FutureReport<T> _handler<T>({required Future<T> Function() call, String? errorMs
   } on SocketException catch (e, st) {
     failure = Failure(e.message, error: e, stackTrace: st);
   } on AppwriteException catch (e, st) {
-    failure = Failure(e.message ?? errorMsg ?? kError('AwHandler'), error: e, stackTrace: st);
+    failure = Failure(e.message ?? errorMsg ?? kError('AwHandler'), error: e, stackTrace: st, type: e.type);
   } on Failure catch (e, st) {
     failure = e.copyWith(stackTrace: st);
   } catch (e, st) {
     failure = Failure(errorMsg ?? '$e', error: e, stackTrace: st);
   } finally {
-    if (failure != null) catErr('AwHandler', failure.message, failure.stackTrace);
+    if (failure != null) catErr('AwHandler:: ${failure.type}', failure.message, failure.stackTrace);
   }
   return left(failure);
 }

@@ -57,7 +57,7 @@ class StaffsView extends HookConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  OverflowMarquee(child: Text(staff.name, style: context.text.lead)),
+                                  OverflowMarquee(child: Text(staff.name, style: context.text.list)),
                                   OverflowMarquee(child: Text('Phone: ${staff.phone}')),
                                   OverflowMarquee(child: Text('Email: ${staff.email}')),
                                 ],

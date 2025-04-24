@@ -69,6 +69,6 @@ class FileUtil {
       if (files == null) return [];
 
       return files.files;
-    }, (e, s) => Failure(e.toString(), stackTrace: s)..log('FilePicker'));
+    }, (e, s) => Failure(e.toString(), stackTrace: s));
   }
 }
