@@ -4,4 +4,8 @@ class WarehouseRepo with AwHandler {
   FutureReport<List<WareHouse>> getWareHouses() async {
     return await db.getList(AWConst.collections.warehouse).convert((docs) => docs.convertDoc(WareHouse.fromDoc));
   }
+
+  // FutureReport<WareHouse> createWareHouses() async {
+  //   final data = await db.create(AWConst.collections.warehouse, data: data);
+  // }
 }

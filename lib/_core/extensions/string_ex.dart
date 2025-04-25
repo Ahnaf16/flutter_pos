@@ -30,6 +30,9 @@ extension StringEx on String {
 
 extension ValueEx on ValueNotifier<bool> {
   void toggle() => value = !value;
+
+  void falsey() => value = false;
+  void truthy() => value = true;
 }
 
 extension ValueTEx<T> on ValueNotifier<T> {

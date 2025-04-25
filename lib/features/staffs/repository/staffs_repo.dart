@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pos/main.export.dart';
 
@@ -50,6 +51,15 @@ class StaffRepo with AwHandler {
 
   FutureReport<List<AppUser>> getStaffs() async {
     return await db.getList(AWConst.collections.users).convert((docs) => docs.convertDoc(AppUser.fromDoc));
+  }
+
+  FutureReport<Unit> checkEmailAvailability(String email) async {
+    final (err, docs) = await db.getList(AWConst.collections.users, queries: [Query.equal('email', email)]).toRecord();
+
+    if (err != null || docs == null) return left(err ?? const Failure('Error checking email availability'));
+
+    if (docs.total > 0) return failure('This email already exists');
+    return right(unit);
   }
 
   FutureReport<AppUser?> getNotCreatedStaff(String email, String pass) async {

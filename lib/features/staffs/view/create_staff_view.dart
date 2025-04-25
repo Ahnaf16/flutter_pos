@@ -2,6 +2,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pos/_widgets/base_body.dart';
+import 'package:pos/_widgets/image_picked_view.dart';
 import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/features/user_roles/controller/user_roles_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
@@ -30,12 +31,28 @@ class CreateStaffView extends HookConsumerWidget {
           onPressed: (l) async {
             final state = formKey.currentState!;
             if (!state.saveAndValidate()) return;
-            l.value = true;
             final data = state.value;
-            cat(data, 'Form Data');
             final ctrl = ref.read(staffsCtrlProvider.notifier);
-            await ctrl.createStaff('12341234', data);
-            l.value = false;
+
+            l.truthy();
+            final (ok, msg) = await ctrl.checkAvailability(data['email']);
+            l.falsey();
+
+            if (!ok) {
+              state.fields['email']?.invalidate(msg);
+              return;
+            }
+
+            final result = await showShadDialog<Result>(
+              context: context,
+              builder: (context) => _CreateStaffDialog(data: data),
+            );
+
+            if (result case final Result r) {
+              if (!context.mounted) return;
+              r.showToast(context);
+              if (r.success) context.pop();
+            }
           },
         ),
       ],
@@ -104,7 +121,6 @@ class CreateStaffView extends HookConsumerWidget {
                             orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
                             data: (roles) {
                               final filtered = roles.where((e) => e.name.low.contains(searchRole.value.low));
-
                               return LimitedWidthBox(
                                 maxWidth: null,
                                 child: ShadSelect<UserRole>.withSearch(
@@ -166,24 +182,7 @@ class CreateStaffView extends HookConsumerWidget {
                                 Row(
                                   spacing: Insets.med,
                                   children: [
-                                    Stack(
-                                      children: [
-                                        HostedImage.square(Img.file(form.value!), radius: Corners.sm, dimension: 120),
-                                        Positioned(
-                                          top: 5,
-                                          right: 5,
-                                          child: ShadBadge.destructive(
-                                            padding: Pads.xs(),
-                                            onPressed: () => form.didChange(null),
-                                            child: Icon(
-                                              LuIcons.x,
-                                              size: 12,
-                                              color: context.colors.destructiveForeground,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    ImagePickedView(img: FileImg(form.value!), onDelete: () => form.didChange(null)),
                                     Text(XFile(form.value!).name, style: context.text.muted),
                                   ],
                                 )
@@ -198,6 +197,72 @@ class CreateStaffView extends HookConsumerWidget {
                     ),
                   );
                 },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CreateStaffDialog extends HookConsumerWidget {
+  const _CreateStaffDialog({required this.data});
+
+  final QMap data;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
+
+    return ShadDialog(
+      title: const Text('Create Staff'),
+      description: const Text('Enter a default password so the staff can log in. They can change it later.'),
+      actions: [
+        SubmitButton(
+          child: const Text('Create'),
+          onPressed: (l) async {
+            final state = formKey.currentState!;
+            if (!state.saveAndValidate()) return;
+            final (pass, confirmPass) = (state.value['pass'].toString(), state.value['confirm_pass'].toString());
+
+            if (pass != confirmPass) {
+              state.fields['confirm_pass']?.invalidate('Passwords do not match');
+              return;
+            }
+
+            l.truthy();
+            final ctrl = ref.read(staffsCtrlProvider.notifier);
+            final result = await ctrl.createStaff(pass, data);
+            l.falsey();
+            if (context.mounted) context.nPop(result);
+          },
+        ),
+      ],
+      child: Container(
+        width: 375,
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: FormBuilder(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: Insets.med,
+            children: [
+              ShadField(
+                name: 'pass',
+                label: 'Password',
+                hintText: 'Enter a password',
+                isRequired: true,
+                isPassField: true,
+                validators: [FormBuilderValidators.minLength(8)],
+              ),
+              ShadField(
+                name: 'confirm_pass',
+                label: 'Confirm Password',
+                hintText: 'Confirm your password',
+                isRequired: true,
+                isPassField: true,
+                validators: [FormBuilderValidators.minLength(8)],
               ),
             ],
           ),

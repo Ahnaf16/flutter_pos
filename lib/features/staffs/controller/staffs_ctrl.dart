@@ -20,8 +20,13 @@ class StaffsCtrl extends _$StaffsCtrl {
   Future<Result> createStaff(String password, QMap formData) async {
     final res = await _repo.createStaff(password, formData);
     return res.fold(leftResult, (r) {
-      // ref.invalidateSelf();
+      ref.invalidateSelf();
       return rightResult('Staff created successfully');
     });
+  }
+
+  Future<Result> checkAvailability(String email) async {
+    final res = await _repo.checkEmailAvailability(email);
+    return res.fold(leftResult, (_) => rightResult('Email available'));
   }
 }
