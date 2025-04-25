@@ -1,13 +1,16 @@
 import 'package:pos/_widgets/base_body.dart';
+import 'package:pos/_widgets/data_table_builder.dart';
 import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+
+const _headings = [('Name', double.nan), ('Role', 200.0), ('Warehouse', 200.0), ('Action', 260.0)];
 
 class StaffsView extends HookConsumerWidget {
   const StaffsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const headings = ['Name', 'Role', 'Warehouse', 'Action'];
     final staffList = ref.watch(staffsCtrlProvider);
     return BaseBody(
       title: 'Staffs',
@@ -25,69 +28,41 @@ class StaffsView extends HookConsumerWidget {
           loading: () => const Loading(),
           error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
           data: (staffs) {
-            return ListView.builder(
-              itemCount: staffs.length + 1,
-              itemBuilder: (BuildContext context, int index) {
-                if (index == 0) {
-                  return ShadCard(
-                    backgroundColor: context.colors.border.op5,
+            return DataTableBuilder<AppUser, (String, double)>(
+              rowHeight: 100,
+              items: staffs,
+              headings: _headings,
+              headingBuilder: (heading) {
+                return GridColumn(
+                  columnName: heading.$1,
+                  columnWidthMode: ColumnWidthMode.fill,
+                  maximumWidth: heading.$2,
+                  minimumWidth: 200,
+                  label: Container(
                     padding: Pads.med(),
-                    radius: BorderRadius.vertical(
-                      top: Corners.medRadius,
-                      bottom: staffs.isEmpty ? Corners.medRadius : Radius.zero,
-                    ),
-                    child: Row(
-                      children: [
-                        ...headings.map((e) {
-                          final isFirst = e == headings.first;
-                          return Expanded(flex: isFirst ? 2 : 1, child: Text(e));
-                        }),
-                      ],
-                    ),
-                  );
-                }
-                final staff = staffs[index - 1];
-                final isLast = index == staffs.length;
-                return ShadCard(
-                  radius: BorderRadius.vertical(bottom: isLast ? Corners.medRadius : Radius.zero),
-                  child: Row(
-                    spacing: Insets.sm,
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Row(
-                          spacing: Insets.med,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleImage(staff.getPhoto, borderWidth: 1, radius: 20),
-                            Flexible(
-                              child: Column(
-                                spacing: Insets.xs,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  OverflowMarquee(child: Text(staff.name, style: context.text.list)),
-                                  OverflowMarquee(child: Text('Phone: ${staff.phone}')),
-                                  OverflowMarquee(child: Text('Email: ${staff.email}')),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(child: Text(staff.role?.name ?? '--')),
-                      Expanded(child: Text(staff.warehouse?.name ?? '--')),
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            ShadButton(size: ShadButtonSize.sm, child: const Icon(LuIcons.pen), onPressed: () {}),
-                          ],
-                        ),
-                      ),
-                    ],
+                    alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Text(heading.$1),
                   ),
                 );
+              },
+              cellAlignment: Alignment.centerLeft,
+              cellBuilder: (data, head) {
+                return switch (head.$1) {
+                  'Name' => DataGridCell(columnName: head.$1, value: _nameCellBuilder(data)),
+                  'Warehouse' => DataGridCell(columnName: head.$1, value: Text(data.warehouse?.name ?? '--')),
+                  'Role' => DataGridCell(columnName: head.$1, value: Text(data.role?.name ?? '--')),
+                  'Action' => DataGridCell(
+                    columnName: head.$1,
+                    value: const Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.eye)),
+                        ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.pen)),
+                      ],
+                    ),
+                  ),
+                  _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                };
               },
             );
           },
@@ -96,10 +71,28 @@ class StaffsView extends HookConsumerWidget {
     );
   }
 
-  // SizedBox _divider(BuildContext context) {
-  //   return SizedBox(
-  //     height: 25,
-  //     child: ShadSeparator.vertical(color: context.colors.border, thickness: 2, margin: Pads.sm('lr')),
-  //   );
-  // }
+  Widget _nameCellBuilder(AppUser staff) => Builder(
+    builder: (context) {
+      return Row(
+        spacing: Insets.med,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleImage(staff.getPhoto, borderWidth: 1, radius: 20),
+          Flexible(
+            child: Column(
+              spacing: Insets.xs,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OverflowMarquee(child: Text(staff.name, style: context.text.list)),
+                OverflowMarquee(child: Text('Phone: ${staff.phone}')),
+                OverflowMarquee(child: Text('Email: ${staff.email}')),
+              ],
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }
