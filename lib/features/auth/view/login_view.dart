@@ -75,8 +75,8 @@ class LoginView extends HookConsumerWidget {
                       width: double.infinity,
                       onPressed: (l) async {
                         l.value = true;
-                        final msg = await authCtrl().signIn(email.text, password.text);
-                        if (msg != null && context.mounted) context.showErr(msg);
+                        final result = await authCtrl().signIn(email.text, password.text);
+                        if (context.mounted) result.showToast(context);
 
                         l.value = false;
                       },

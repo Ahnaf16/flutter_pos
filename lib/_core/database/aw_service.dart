@@ -10,7 +10,7 @@ export 'package:appwrite/appwrite.dart' show ID;
 part 'aw_helper.dart';
 
 mixin AwHandler {
-  final account = locate<Account>();
+  final account = locate<AwAccount>();
   final storage = locate<AwStorage>();
   final db = locate<AwDatabase>();
 
@@ -22,17 +22,38 @@ mixin AwHandler {
 class AwDatabase {
   final _db = locate<Databases>();
 
-  FutureReport<Document> create(AwId collId, String docId, {required Map data}) async {
-    catAw({'collId': collId.id, 'docId': docId, 'data': data}, '${collId.name} create');
+  FutureReport<Document> create(AwId collId, {required Map data, String? docId, List<String>? permissions}) async {
+    final documentId = docId ?? ID.unique();
+
+    catAw({'collId': collId.id, 'docId': documentId, 'data': data}, '${collId.name} create');
     return await _handler<Document>(
       call: () async {
         final doc = await _db.createDocument(
           databaseId: AWConst.databaseId.id,
           collectionId: collId.id,
-          documentId: ID.unique(),
+          documentId: documentId,
           data: data,
+          permissions: permissions,
         );
         catAw(doc.toMap(), '${collId.name} created');
+        return doc;
+      },
+      errorMsg: 'Error creating document ${collId.name}',
+    );
+  }
+
+  FutureReport<Document> update(AwId collId, String docId, {required Map data, List<String>? permissions}) async {
+    catAw({'collId': collId.id, 'docId': docId, 'data': data}, '${collId.name} update');
+    return await _handler<Document>(
+      call: () async {
+        final doc = await _db.updateDocument(
+          databaseId: AWConst.databaseId.id,
+          collectionId: collId.id,
+          documentId: docId,
+          data: data,
+          permissions: permissions,
+        );
+        catAw(doc.toMap(), '${collId.name} updated');
         return doc;
       },
       errorMsg: 'Error creating document ${collId.name}',
@@ -118,5 +139,54 @@ class AwStorage {
       'view?project=${AWConst.projectId.id}',
     ];
     return parts.join('/');
+  }
+}
+
+class AwAccount {
+  final account = locate<Account>();
+
+  FutureReport<User> create({
+    required String userId,
+    required String email,
+    required String password,
+    String? name,
+  }) async {
+    catAw({'userId': userId, 'email': email, 'name': name, 'password': password}, 'create account');
+    return await _handler<User>(
+      call: () async {
+        final data = await account.create(userId: userId, email: email, password: password);
+        catAw(data.toMap(), 'Account created');
+        return data;
+      },
+      errorMsg: 'Error creating account',
+    );
+  }
+
+  FutureReport<Session> createSession(String email, String password) async {
+    catAw({'email': email, 'password': password}, 'create session');
+    return await _handler<Session>(
+      call: () async {
+        final data = await account.createEmailPasswordSession(email: email, password: password);
+        catAw(data.toMap(), 'Session created');
+        return data;
+      },
+      errorMsg: 'Error creating Session',
+    );
+  }
+
+  FutureReport<Unit> deleteSessions() async {
+    catAw('Deleting session', 'Account');
+    return await _handler<Unit>(
+      call: () async {
+        await account.deleteSessions();
+        return unit;
+      },
+      errorMsg: 'Error deleting Session',
+    );
+  }
+
+  FutureReport<User> user() async {
+    catAw('Getting current user', 'Account');
+    return await _handler<User>(call: () async => account.get(), errorMsg: 'Error getting user');
   }
 }

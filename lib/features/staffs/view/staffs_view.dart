@@ -36,7 +36,14 @@ class StaffsView extends HookConsumerWidget {
                       top: Corners.medRadius,
                       bottom: staffs.isEmpty ? Corners.medRadius : Radius.zero,
                     ),
-                    child: Row(children: [...headings.map((e) => Expanded(child: Text(e)))]),
+                    child: Row(
+                      children: [
+                        ...headings.map((e) {
+                          final isFirst = e == headings.first;
+                          return Expanded(flex: isFirst ? 2 : 1, child: Text(e));
+                        }),
+                      ],
+                    ),
                   );
                 }
                 final staff = staffs[index - 1];
@@ -44,8 +51,10 @@ class StaffsView extends HookConsumerWidget {
                 return ShadCard(
                   radius: BorderRadius.vertical(bottom: isLast ? Corners.medRadius : Radius.zero),
                   child: Row(
+                    spacing: Insets.sm,
                     children: [
                       Expanded(
+                        flex: 2,
                         child: Row(
                           spacing: Insets.med,
                           crossAxisAlignment: CrossAxisAlignment.start,

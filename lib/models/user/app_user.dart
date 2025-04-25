@@ -10,9 +10,8 @@ class AppUser {
     this.photo,
     required this.role,
     required this.warehouse,
-    this.isUserCreated = false,
+    this.isAccountCreated = false,
     this.password,
-    this.authId,
   });
 
   final String email;
@@ -24,9 +23,8 @@ class AppUser {
   final WareHouse? warehouse;
 
   /// is the user has been created in auth
-  final bool isUserCreated;
+  final bool isAccountCreated;
   final String? password;
-  final String? authId;
 
   factory AppUser.fromDoc(Document doc) {
     final data = doc.data;
@@ -39,9 +37,8 @@ class AppUser {
       photo: data['photo_id'],
       role: UserRole.tyrParse(data['role']),
       warehouse: WareHouse.tyrParse(data['warehouse']),
-      isUserCreated: data['is_user_created'],
+      isAccountCreated: data['is_user_created'],
       password: data['password'],
-      authId: data['auth_id'],
     );
   }
 
@@ -54,9 +51,8 @@ class AppUser {
       photo: map['photo_id'],
       role: UserRole.tyrParse(map['role']),
       warehouse: WareHouse.tyrParse(map['warehouse']),
-      isUserCreated: map.parseBool('is_user_created'),
+      isAccountCreated: map.parseBool('is_user_created'),
       password: map['password'],
-      authId: map['auth_id'],
     );
   }
 
@@ -70,9 +66,8 @@ class AppUser {
     'photo_id': photo,
     'role': role?.toMap(),
     'warehouse': warehouse?.toMap(),
-    'is_user_created': isUserCreated,
+    'is_user_created': isAccountCreated,
     'password': password,
-    'auth_id': authId,
   };
   Map<String, dynamic> toAwPost() => {
     'name': name,
@@ -81,9 +76,8 @@ class AppUser {
     'photo_id': photo,
     'role': role?.id,
     'warehouse': warehouse?.id,
-    'is_user_created': isUserCreated,
-    if (password != null) 'password': hashPass(password!),
-    'auth_id': authId,
+    'is_user_created': isAccountCreated,
+    'password': password != null ? hashPass(password!) : null,
   };
 
   AppUser copyWith({
@@ -94,9 +88,8 @@ class AppUser {
     ValueGetter<String?>? photo,
     ValueGetter<UserRole?>? role,
     ValueGetter<WareHouse?>? warehouse,
-    bool? isUserCreated,
+    bool? isAccountCreated,
     ValueGetter<String?>? password,
-    ValueGetter<String?>? authId,
   }) {
     return AppUser(
       email: email ?? this.email,
@@ -106,9 +99,8 @@ class AppUser {
       photo: photo != null ? photo() : this.photo,
       role: role != null ? role() : this.role,
       warehouse: warehouse != null ? warehouse() : this.warehouse,
-      isUserCreated: isUserCreated ?? this.isUserCreated,
+      isAccountCreated: isAccountCreated ?? this.isAccountCreated,
       password: password != null ? password() : this.password,
-      authId: authId != null ? authId() : this.authId,
     );
   }
 }

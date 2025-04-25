@@ -54,8 +54,8 @@ extension ContextEx on BuildContext {
   Layouts get layout => Layouts.of(this);
 
   void showToast(String msg, {String? title, Widget? Function(String id)? action}) =>
-      Toast.show(msg, title: title, action: action, ctx: this);
+      Toast.show(this, msg, title: title, action: action);
 
   void showErr(dynamic msg, {String? title, Widget? Function(String id)? action}) =>
-      Toast.showErr(msg, title: title, action: action, ctx: this);
+      Toast.showErr(this, msg, title: title, action: action);
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:pos/main.export.dart';
 
 class HostedImage extends StatelessWidget {
@@ -39,20 +40,36 @@ class HostedImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLocalWebImg = img is FileImg && img.path.startsWith('blob') && kIsWeb;
+    final loading = SizedBox(height: height, width: width, child: const Loading());
+
     return GestureDetector(
       onTap: onImgTap,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(radius),
-
-        child: UniversalImage(
-          img.path,
-          height: height,
-          width: width,
-          heroTag: tag ?? img.toString(),
-          fit: fit,
-          errorPlaceholder: Icon(errorIcon ?? Icons.error, color: context.colors.destructive),
-          placeholder: const Center(child: SizedBox.square(dimension: 20, child: CircularProgressIndicator())),
-        ),
+        child:
+            isLocalWebImg
+                ? Image.network(
+                  img.path,
+                  height: height,
+                  width: width,
+                  fit: fit,
+                  errorBuilder: (_, e, s) {
+                    return Center(child: Icon(errorIcon ?? Icons.error, color: context.colors.destructive));
+                  },
+                  loadingBuilder: (_, c, l) {
+                    return l != null ? loading : c;
+                  },
+                )
+                : UniversalImage(
+                  img.path,
+                  height: height,
+                  width: width,
+                  heroTag: tag ?? img.toString(),
+                  fit: fit,
+                  errorPlaceholder: Icon(errorIcon ?? Icons.error, color: context.colors.destructive),
+                  placeholder: loading,
+                ),
       ),
     );
   }

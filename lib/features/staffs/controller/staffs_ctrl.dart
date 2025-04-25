@@ -12,16 +12,16 @@ class StaffsCtrl extends _$StaffsCtrl {
   Future<List<AppUser>> build() async {
     final staffs = await _repo.getStaffs();
     return staffs.fold((l) {
-      Toast.showErr(l);
+      Toast.showErr(Ctx.context, l);
       return [];
     }, identity);
   }
 
-  FVoid createStaff(String password, QMap formData) async {
+  Future<Result> createStaff(String password, QMap formData) async {
     final res = await _repo.createStaff(password, formData);
-    res.fold(Toast.showErr, (r) {
-      Toast.show('Staff created successfully');
+    return res.fold(leftResult, (r) {
       // ref.invalidateSelf();
+      return rightResult('Staff created successfully');
     });
   }
 }

@@ -64,6 +64,13 @@ class Failure {
   bool isWrongCredentials() => type?.low == 'user_invalid_credentials';
 }
 
+extension FailureRecordEx<T> on (Failure? err, T? data) {
+  Failure? get error => this.$1;
+  T? get data => this.$2;
+  bool get hasError => error != null;
+  bool get hasData => data != null;
+}
+
 extension FailureEx<T> on Report<T> {
   T getOrThrow() => fold((l) => throw l, (r) => r);
   T getOrDefault(T defaultValue) => fold((l) => defaultValue, (r) => r);
@@ -71,6 +78,8 @@ extension FailureEx<T> on Report<T> {
   T getOrElse(T Function(Failure) onError) => fold(onError, (r) => r);
 
   Report<R> convert<R>(R Function(T r) right) => map<R>((T r) => right(r));
+
+  (Failure? err, T? data) toRecord() => fold((l) => (l, null), (r) => (null, r));
 }
 
 extension FutureFailureEx<T> on FutureReport<T> {
@@ -80,4 +89,6 @@ extension FutureFailureEx<T> on FutureReport<T> {
   Future<T> getOrElse(T Function(Failure) onError) => then((v) => v.getOrElse(onError));
 
   Future<Report<R>> convert<R>(R Function(T r) right) => then((v) => v.convert(right));
+
+  Future<(Failure? err, T? data)> toRecord() => then((v) => v.toRecord());
 }

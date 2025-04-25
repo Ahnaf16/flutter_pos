@@ -21,9 +21,29 @@ class StaffRepo with AwHandler {
       if (error != null) return failure(error ?? 'Error uploading photo');
     }
 
-    final doc = await db.create(AWConst.collections.users, ID.unique(), data: user.toAwPost());
+    final doc = await db.create(AWConst.collections.users, data: user.toAwPost());
     doc.fold((_) {
       if (user.photo != null) storage.deleteFile(user.photo!);
+    }, identityNull);
+    return doc;
+  }
+
+  FutureReport<Document> updateStaff(AppUser user, [XFile? photo]) async {
+    String? oldPhoto;
+    if (photo != null) {
+      final file = await storage.createFile(photo.name, photo.path);
+      String? error;
+      file.fold((l) => error = l.message, (r) {
+        oldPhoto = user.photo;
+        user = user.copyWith(photo: () => r.$id);
+      });
+
+      if (error != null) return failure(error ?? 'Error uploading photo');
+    }
+
+    final doc = await db.update(AWConst.collections.users, user.id, data: user.toAwPost());
+    doc.fold((_) {
+      if (oldPhoto != null) storage.deleteFile(oldPhoto!);
     }, identityNull);
     return doc;
   }

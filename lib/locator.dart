@@ -38,6 +38,7 @@ Future<void> initDependencies() async {
   locate.registerLazyIfAbsent<Storage>(() => storage);
   locate.registerLazyIfAbsent<AwDatabase>(AwDatabase.new);
   locate.registerLazyIfAbsent<AwStorage>(AwStorage.new);
+  locate.registerLazyIfAbsent<AwAccount>(AwAccount.new);
 
   locate.registerLazyIfAbsent<AuthRepo>(AuthRepo.new);
   locate.registerLazyIfAbsent<StaffRepo>(StaffRepo.new);

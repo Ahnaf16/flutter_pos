@@ -26,7 +26,7 @@ class ErrorView extends HookConsumerWidget {
     final isFailure = error is Failure;
 
     useEffect(() {
-      if (showToast && isFailure) Toast.showErr(failure);
+      if (showToast && isFailure) Toast.showErr(context, failure);
       return null;
     }, const []);
 

@@ -12,7 +12,8 @@ class WarehouseCtrl extends _$WarehouseCtrl {
   Future<List<WareHouse>> build() async {
     final staffs = await _repo.getWareHouses();
     return staffs.fold((l) {
-      Toast.showErr(l);
+      Toast.showErr(Ctx.context, l);
+
       return [];
     }, identity);
   }

@@ -14,12 +14,11 @@ class AuthCtrl extends _$AuthCtrl {
     return user.fold((l) => null, (r) => r);
   }
 
-  Future<String?> signIn(String email, String password) async {
+  Future<Result> signIn(String email, String password) async {
     final res = await _repo.signIn(email, password);
-    return res.fold((l) => l.message, (r) {
-      Toast.show('Login successful');
+    return res.fold(leftResult, (r) {
       ref.invalidateSelf();
-      return null;
+      return rightResult('Login successful');
     });
   }
 
