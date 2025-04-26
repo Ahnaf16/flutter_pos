@@ -52,18 +52,22 @@ class HostedImage extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) return loading;
           if (snapshot.hasError) return error;
 
-          return GestureDetector(
-            onTap: onImgTap,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(radius),
-              child: UniversalImage(
-                snapshot.data,
-                height: height,
-                width: width,
-                heroTag: tag ?? img.toString(),
-                fit: fit,
-                errorPlaceholder: error,
-                placeholder: loading,
+          return SizedBox(
+            height: height,
+            width: width,
+            child: GestureDetector(
+              onTap: onImgTap,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(radius),
+                child: UniversalImage(
+                  snapshot.data,
+                  height: height,
+                  width: width,
+                  heroTag: tag ?? img.toString(),
+                  fit: fit,
+                  errorPlaceholder: error,
+                  placeholder: loading,
+                ),
               ),
             ),
           );
@@ -71,18 +75,22 @@ class HostedImage extends StatelessWidget {
       );
     }
 
-    return GestureDetector(
-      onTap: onImgTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(radius),
-        child: UniversalImage(
-          img.path,
-          height: height,
-          width: width,
-          heroTag: tag ?? img.toString(),
-          fit: fit,
-          errorPlaceholder: error,
-          placeholder: loading,
+    return SizedBox(
+      height: height,
+      width: width,
+      child: GestureDetector(
+        onTap: onImgTap,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(radius),
+          child: UniversalImage(
+            img.path,
+            height: height,
+            width: width,
+            heroTag: tag ?? img.toString(),
+            fit: fit,
+            errorPlaceholder: error,
+            placeholder: loading,
+          ),
         ),
       ),
     );
@@ -108,6 +116,8 @@ sealed class Img {
   factory Img.file(PlatformFile file) => FileImg(file);
 
   factory Img.net(String url) => NetImg(url);
+
+  factory Img.aw(String fileId) => AwImg(fileId);
 
   @override
   String toString() => path.toString();

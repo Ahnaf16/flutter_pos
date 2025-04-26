@@ -133,7 +133,7 @@ class AwStorage {
 
     return await _handler<Unit>(
       call: () async {
-        await _storage.deleteFile(bucketId: AWConst.storageId.id, fileId: ID.unique());
+        await _storage.deleteFile(bucketId: AWConst.storageId.id, fileId: id);
         return unit;
       },
       errorMsg: 'Error deleting file',

@@ -6,7 +6,7 @@ part of 'user_roles_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userRolesCtrlHash() => r'07124047d13efb7b31e58401cfa619d830fe3955';
+String _$userRolesCtrlHash() => r'367e6b083f3d54c8ed2be19f3a4300d19025de37';
 
 /// See also [UserRolesCtrl].
 @ProviderFor(UserRolesCtrl)

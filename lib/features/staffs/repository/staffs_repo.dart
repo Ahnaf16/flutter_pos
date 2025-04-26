@@ -39,14 +39,16 @@ class StaffRepo with AwHandler {
     }
 
     final doc = await db.update(AWConst.collections.users, user.id, data: user.toAwPost());
-    doc.fold((_) {
-      if (oldPhoto != null) storage.deleteFile(oldPhoto!);
-    }, identityNull);
+    if (oldPhoto != null) await storage.deleteFile(oldPhoto!);
     return doc;
   }
 
   FutureReport<List<AppUser>> getStaffs() async {
     return await db.getList(AWConst.collections.users).convert((docs) => docs.convertDoc(AppUser.fromDoc));
+  }
+
+  FutureReport<AppUser> getStaffById(String id) async {
+    return await db.get(AWConst.collections.users, id).convert(AppUser.fromDoc);
   }
 
   FutureReport<Unit> checkEmailAvailability(String email) async {

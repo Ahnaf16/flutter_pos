@@ -1,5 +1,3 @@
-import 'package:pos/_widgets/base_body.dart';
-import 'package:pos/_widgets/data_table_builder.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -57,11 +55,23 @@ class WarehouseView extends HookConsumerWidget {
                 ),
                 'Action' => DataGridCell(
                   columnName: head.$1,
-                  value: const Row(
+                  value: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.eye)),
-                      ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.pen)),
+                      ShadButton.secondary(
+                        size: ShadButtonSize.sm,
+                        leading: const Icon(LuIcons.eye),
+                        onPressed:
+                            () => showShadDialog(
+                              context: context,
+                              builder: (context) => _WarehouseViewDialog(house: data),
+                            ),
+                      ),
+                      ShadButton.secondary(
+                        size: ShadButtonSize.sm,
+                        leading: const Icon(LuIcons.pen),
+                        onPressed: () => RPaths.editWarehouse(data.id).pushNamed(context),
+                      ),
                     ],
                   ),
                 ),
@@ -88,4 +98,50 @@ class WarehouseView extends HookConsumerWidget {
       );
     },
   );
+}
+
+class _WarehouseViewDialog extends HookConsumerWidget {
+  const _WarehouseViewDialog({required this.house});
+
+  final WareHouse house;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ShadDialog(
+      title: const Text('Warehouse'),
+      description: Text('Details of ${house.name}'),
+      actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
+      child: Container(
+        padding: Pads.padding(v: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: Insets.med,
+          children: [
+            SpacedText(left: 'Name', right: house.name, styleBuilder: (l, r) => (l, r.bold), spaced: false),
+            SpacedText(
+              left: 'Address',
+              right: house.address,
+              styleBuilder: (l, r) => (l, r.bold),
+              spaced: false,
+              trailing: SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(house.address)),
+            ),
+            SpacedText(
+              left: 'Contact Person',
+              right: house.contactPerson ?? 'N/a',
+              styleBuilder: (l, r) => (l, r.bold),
+              spaced: false,
+            ),
+            SpacedText(
+              left: 'Contact Number',
+              right: house.contactNumber,
+              styleBuilder: (l, r) => (l, r.bold),
+              spaced: false,
+              trailing: SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(house.contactNumber)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

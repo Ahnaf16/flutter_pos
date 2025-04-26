@@ -74,11 +74,20 @@ class UserRolesView extends HookConsumerWidget {
                 ),
                 'Action' => DataGridCell(
                   columnName: head.$1,
-                  value: const Row(
+                  value: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.eye)),
-                      ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.pen)),
+                      ShadButton.secondary(
+                        size: ShadButtonSize.sm,
+                        leading: const Icon(LuIcons.eye),
+                        onPressed:
+                            () => showShadDialog(context: context, builder: (context) => _RoleViewDialog(role: data)),
+                      ),
+                      ShadButton.secondary(
+                        size: ShadButtonSize.sm,
+                        leading: const Icon(LuIcons.pen),
+                        onPressed: () => RPaths.editRole(data.id).pushNamed(context),
+                      ),
                     ],
                   ),
                 ),
@@ -104,4 +113,37 @@ class UserRolesView extends HookConsumerWidget {
       );
     },
   );
+}
+
+class _RoleViewDialog extends HookConsumerWidget {
+  const _RoleViewDialog({required this.role});
+
+  final UserRole role;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ShadDialog(
+      title: const Text('Permissions'),
+      description: Text('Permissions assigned to ${role.name}'),
+      actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
+      child: Container(
+        padding: Pads.padding(v: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: Insets.med,
+          children: [
+            for (final permission in role.permissions)
+              Row(
+                spacing: Insets.med,
+                children: [
+                  DecoContainer(width: 10, height: 10, borderRadius: 180, color: context.colors.primary),
+                  Text(permission.name.titleCase),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 }

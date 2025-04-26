@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:pos/main.export.dart';
 
-typedef StyleBuilder = (TextStyle?, TextStyle?) Function(TextStyle? left, TextStyle? right);
+typedef StyleBuilder = (TextStyle, TextStyle) Function(TextStyle left, TextStyle right);
 
 class SpacedText extends StatelessWidget {
   const SpacedText({
@@ -14,6 +13,9 @@ class SpacedText extends StatelessWidget {
     this.style,
     this.onTap,
     this.styleBuilder,
+    this.spaced = true,
+    this.crossAxisAlignment,
+    this.builder,
   });
 
   static (TextStyle?, TextStyle?) buildStye(left, right) => (left, right);
@@ -31,23 +33,35 @@ class SpacedText extends StatelessWidget {
   /// Override style for left and right
   final StyleBuilder? styleBuilder;
 
+  final bool spaced;
+  final CrossAxisAlignment? crossAxisAlignment;
+
+  final Widget Function(String right)? builder;
+
   @override
   Widget build(BuildContext context) {
-    final defBuilder = (style, style);
+    final effectiveStyle = style ?? context.text.p;
+    final defBuilder = (effectiveStyle, effectiveStyle);
 
-    final (lSty, rSty) = styleBuilder?.call(style, style) ?? defBuilder;
+    final (lSty, rSty) = styleBuilder?.call(effectiveStyle, effectiveStyle) ?? defBuilder;
 
-    return InkWell(
+    return GestureDetector(
       onTap: onTap == null ? null : () => onTap?.call(left, right),
-      borderRadius: Corners.lgBorder,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: spaced ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+        crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.start,
         children: [
           Text('$left$separator', style: lSty),
           const Gap(Insets.med),
           ...[
             if (leading != null) ...[leading!, const Gap(Insets.sm)],
-            Flexible(child: Text(right, style: rSty, textAlign: TextAlign.end)),
+            Flexible(
+              child: DefaultTextStyle(
+                style: rSty,
+                textAlign: spaced ? TextAlign.end : TextAlign.start,
+                child: builder?.call(right) ?? Text(right),
+              ),
+            ),
             if (trailing != null) ...[const Gap(Insets.sm), trailing!],
           ],
         ],

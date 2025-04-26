@@ -56,6 +56,20 @@ class AppUser {
     );
   }
 
+  AppUser marge(Map<String, dynamic> map) {
+    return AppUser(
+      id: map.parseID() ?? id,
+      email: map['email'] ?? email,
+      name: map['name'] ?? name,
+      phone: map['phone'] ?? phone,
+      photo: map['photo_id'] ?? photo,
+      role: map['role'] == null ? role : UserRole.tyrParse(map['role']),
+      warehouse: map['warehouse'] == null ? warehouse : WareHouse.tyrParse(map['warehouse']),
+      isAccountCreated: map.parseBool('is_user_created', isAccountCreated),
+      password: map['password'] ?? password,
+    );
+  }
+
   Img get getPhoto => photo == null ? Img.icon(LucideIcons.user) : AwImg(photo!);
 
   Map<String, dynamic> toMap() => {
