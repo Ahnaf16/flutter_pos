@@ -40,6 +40,16 @@ class WareHouse {
       contactPerson: map['contact_person'],
     );
   }
+  WareHouse marge(Map<String, dynamic> map) {
+    return WareHouse(
+      id: map.parseID() ?? id,
+      name: map['name'] ?? name,
+      address: map['address'] ?? address,
+      isDefault: map['is_default'] ?? isDefault,
+      contactNumber: map['contact_number'] ?? contactNumber,
+      contactPerson: map['contact_person'] ?? contactPerson,
+    );
+  }
 
   static WareHouse? tyrParse(dynamic value) {
     try {

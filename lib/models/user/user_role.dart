@@ -45,6 +45,18 @@ class UserRole {
     }
   }
 
+  UserRole marge(Map<String, dynamic> map) {
+    return UserRole(
+      id: map.parseID() ?? id,
+      name: map['name'] ?? name,
+      isEnabled: map['enabled'] ?? isEnabled,
+      permissions: switch (map['permissions']) {
+        final List l => l.map((e) => RolePermissions.values.byName(e)).toList(),
+        _ => permissions,
+      },
+    );
+  }
+
   Map<String, dynamic> toMap() => {
     'id': id,
     'name': name,

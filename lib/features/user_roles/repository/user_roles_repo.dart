@@ -6,6 +6,10 @@ class UserRolesRepo with AwHandler {
     return await db.getList(AWConst.collections.role).convert((docs) => docs.convertDoc(UserRole.fromDoc));
   }
 
+  FutureReport<UserRole> getRoleById(String id) async {
+    return await db.get(AWConst.collections.role, id).convert(UserRole.fromDoc);
+  }
+
   FutureReport<Document> createRole(UserRole role) async {
     return await db.create(AWConst.collections.role, data: role.toAwPost());
   }

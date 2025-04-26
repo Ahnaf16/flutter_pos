@@ -1,5 +1,3 @@
-import 'package:pos/_widgets/base_body.dart';
-import 'package:pos/_widgets/data_table_builder.dart';
 import 'package:pos/features/user_roles/controller/user_roles_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
