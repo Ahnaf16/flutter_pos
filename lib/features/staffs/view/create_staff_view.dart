@@ -1,6 +1,5 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:pos/_widgets/base_body.dart';
 import 'package:pos/_widgets/image_picked_view.dart';
 import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
@@ -21,6 +20,8 @@ class CreateStaffView extends HookConsumerWidget {
 
     final searchRole = useState('');
     final searchWarehouse = useState('');
+
+    final selectedFile = useState<PFile?>(null);
 
     return BaseBody(
       title: 'Create Staff',
@@ -45,7 +46,8 @@ class CreateStaffView extends HookConsumerWidget {
 
             final result = await showShadDialog<Result>(
               context: context,
-              builder: (context) => _CreateStaffDialog(data: data),
+              barrierDismissible: false,
+              builder: (context) => _CreateStaffDialog(data: data, file: selectedFile.value),
             );
 
             if (result case final Result r) {
@@ -157,46 +159,44 @@ class CreateStaffView extends HookConsumerWidget {
                   ),
                 ],
               ),
-              FormBuilderField<String>(
-                name: 'photo_id',
-                builder: (form) {
-                  return ShadInputDecorator(
-                    label: const Text('Profile image'),
-                    error: form.errorText == null ? null : Text(form.errorText!),
-                    decoration: context.theme.decoration.copyWith(hasError: form.hasError),
-                    child: GestureDetector(
-                      onTap: () async {
-                        if (form.value != null) return;
-                        final files = await fileUtil.openGallery(multi: false);
-                        final file = files.fold(identityNull, (r) => r.firstOrNull);
-                        form.didChange(file?.path);
-                      },
-                      child: ShadCard(
-                        height: 150,
-                        padding: Pads.med(),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (form.value != null)
-                                Row(
-                                  spacing: Insets.med,
-                                  children: [
-                                    ImagePickedView(img: FileImg(form.value!), onDelete: () => form.didChange(null)),
-                                    Text(XFile(form.value!).name, style: context.text.muted),
-                                  ],
-                                )
-                              else ...[
-                                const Icon(LuIcons.cloudUpload, size: 40),
-                                Text('Drag and drop your image here', style: context.text.muted),
+              ShadInputDecorator(
+                label: const Text('Profile image'),
+
+                child: GestureDetector(
+                  onTap: () async {
+                    if (selectedFile.value != null) return;
+                    final files = await fileUtil.pickImages(multi: false);
+                    final file = files.fold(identityNull, (r) => r.firstOrNull);
+                    selectedFile.set(file);
+                  },
+                  child: ShadCard(
+                    height: 150,
+                    padding: Pads.med(),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (selectedFile.value != null)
+                            Row(
+                              spacing: Insets.med,
+                              children: [
+                                ImagePickedView(
+                                  img: FileImg(selectedFile.value!),
+                                  size: 120,
+                                  onDelete: () => selectedFile.set(null),
+                                ),
+                                Text(selectedFile.value!.name, style: context.text.muted),
                               ],
-                            ],
-                          ),
-                        ),
+                            )
+                          else ...[
+                            const Icon(LuIcons.cloudUpload, size: 40),
+                            Text('Drag and drop your image here', style: context.text.muted),
+                          ],
+                        ],
                       ),
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
             ],
           ),
@@ -207,9 +207,10 @@ class CreateStaffView extends HookConsumerWidget {
 }
 
 class _CreateStaffDialog extends HookConsumerWidget {
-  const _CreateStaffDialog({required this.data});
+  const _CreateStaffDialog({required this.data, this.file});
 
   final QMap data;
+  final PFile? file;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -219,6 +220,7 @@ class _CreateStaffDialog extends HookConsumerWidget {
       title: const Text('Create Staff'),
       description: const Text('Enter a default password so the staff can log in. They can change it later.'),
       actions: [
+        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         SubmitButton(
           child: const Text('Create'),
           onPressed: (l) async {
@@ -233,7 +235,7 @@ class _CreateStaffDialog extends HookConsumerWidget {
 
             l.truthy();
             final ctrl = ref.read(staffsCtrlProvider.notifier);
-            final result = await ctrl.createStaff(pass, data);
+            final result = await ctrl.createStaff(pass, data, file);
             l.falsey();
             if (context.mounted) context.nPop(result);
           },

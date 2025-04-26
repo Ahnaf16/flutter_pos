@@ -1,36 +1,17 @@
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:pos/main.export.dart';
 
-extension FileEx on PlatformFile {
-  File get file => File(xFile.path);
-  bool get isImage => extension == 'jpg' || extension == 'png' || extension == 'jpeg';
-}
+typedef PFile = PlatformFile;
 
-extension XFileEx on XFile {
-  File get file => File(path);
+extension FileEx on PlatformFile {
+  // File get file => File(xFile.path);
+  bool get isImage => extension == 'jpg' || extension == 'png' || extension == 'jpeg';
 }
 
 class FileUtil {
   final picker = FilePicker.platform;
-  final imgPicker = ImagePicker();
-
-  FutureReport<XFile> openCamera() async {
-    final photo = await imgPicker.pickImage(source: ImageSource.camera);
-    if (photo == null) return failure('No img selected');
-    return right(photo);
-  }
-
-  FutureReport<List<XFile>> openGallery({bool multi = true}) async {
-    if (multi) return right(await imgPicker.pickMultiImage(limit: 5));
-    final photo = await imgPicker.pickImage(source: ImageSource.gallery);
-
-    return right([if (photo != null) photo]);
-  }
 
   FutureReport<List<PlatformFile>> pickFiles({bool multi = false, FileType? type}) async {
     final file = _selectFiles(multi, type).flatMap(_fileValidation);
@@ -61,14 +42,14 @@ class FileUtil {
     final t = type ?? FileType.any;
 
     return TaskEither.tryCatch(() async {
-      final files = await picker.pickFiles(
+      final result = await picker.pickFiles(
         type: t,
         allowMultiple: multi,
         allowedExtensions: t == FileType.custom ? [] : null,
       );
-      if (files == null) return [];
+      if (result == null) return [];
 
-      return files.files;
+      return result.files;
     }, (e, s) => Failure(e.toString(), stackTrace: s));
   }
 }

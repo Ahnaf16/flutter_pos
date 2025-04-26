@@ -56,7 +56,7 @@ class AppUser {
     );
   }
 
-  Img get getPhoto => photo == null ? Img.icon(LucideIcons.user) : Img.net(photo!);
+  Img get getPhoto => photo == null ? Img.icon(LucideIcons.user) : AwImg(photo!);
 
   Map<String, dynamic> toMap() => {
     'id': id,

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 
@@ -97,15 +98,27 @@ class AwDatabase {
 class AwStorage {
   final _storage = locate<Storage>();
 
-  FutureReport<File> createFile(String name, String path, {Function(UploadProgress)? onProgress}) async {
-    catAw({'name': name, 'path': path}, 'Creating File');
+  FutureReport<File> createFile(PFile file, {Function(UploadProgress)? onProgress}) async {
+    catAw({'name': file.name, 'path': file.path}, 'Creating File');
+
+    InputFile inputFile;
+
+    if (kIsWeb) {
+      final b = file.bytes;
+      if (b == null) return failure('Unable to read file');
+      inputFile = InputFile.fromBytes(bytes: b, filename: file.name);
+    } else {
+      final p = file.path;
+      if (p == null) return failure('Unable to read file');
+      inputFile = InputFile.fromPath(path: p, filename: file.name);
+    }
 
     return await _handler<File>(
       call: () async {
         final file = await _storage.createFile(
           bucketId: AWConst.storageId.id,
           fileId: ID.unique(),
-          file: InputFile.fromPath(path: path, filename: name),
+          file: inputFile,
           onProgress: onProgress,
         );
         catAw(file.toMap(), 'File Created');
@@ -127,18 +140,8 @@ class AwStorage {
     );
   }
 
-  String buildUrl(String id) {
-    if (id.startsWith('http')) return id;
-
-    final parts = [
-      AWConst.endpoint,
-      'storage/buckets',
-      AWConst.storageId.id,
-      'files',
-      id,
-      'view?project=${AWConst.projectId.id}',
-    ];
-    return parts.join('/');
+  Future<Uint8List> imgPreview(String id) async {
+    return await _storage.getFileView(bucketId: AWConst.storageId.id, fileId: id);
   }
 }
 

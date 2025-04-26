@@ -1,19 +1,15 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:pos/main.export.dart';
 
 class StaffRepo with AwHandler {
-  FutureReport<Document> createStaff(String password, QMap form) async {
+  FutureReport<Document> createStaff(String password, QMap form, PFile? xfile) async {
     AppUser user = AppUser.fromMap(form);
     user = user.copyWith(password: () => password);
 
-    final photoPath = user.photo;
-
-    if (photoPath != null) {
-      final xFile = XFile(photoPath);
-      final file = await storage.createFile(xFile.name, xFile.path);
+    if (xfile != null) {
+      final file = await storage.createFile(xfile);
 
       String? error;
 
@@ -29,10 +25,10 @@ class StaffRepo with AwHandler {
     return doc;
   }
 
-  FutureReport<Document> updateStaff(AppUser user, [XFile? photo]) async {
+  FutureReport<Document> updateStaff(AppUser user, [PFile? photo]) async {
     String? oldPhoto;
     if (photo != null) {
-      final file = await storage.createFile(photo.name, photo.path);
+      final file = await storage.createFile(photo);
       String? error;
       file.fold((l) => error = l.message, (r) {
         oldPhoto = user.photo;

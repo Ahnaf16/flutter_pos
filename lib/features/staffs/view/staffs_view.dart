@@ -79,6 +79,7 @@ class StaffsView extends HookConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           CircleImage(staff.getPhoto, borderWidth: 1, radius: 20),
+
           Flexible(
             child: Column(
               spacing: Insets.xs,

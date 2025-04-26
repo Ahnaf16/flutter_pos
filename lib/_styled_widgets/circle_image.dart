@@ -9,7 +9,7 @@ class CircleImage extends StatelessWidget {
   CircleImage.assets(String url, {super.key, this.padding, this.borderColor, this.radius, this.borderWidth})
     : url = Img.asset(url);
 
-  CircleImage.file(String path, {super.key, this.padding, this.borderColor, this.radius, this.borderWidth})
+  CircleImage.file(PFile path, {super.key, this.padding, this.borderColor, this.radius, this.borderWidth})
     : url = Img.file(path);
 
   CircleImage.icon(IconData icon, {super.key, this.padding, this.borderColor, this.radius, this.borderWidth})

@@ -17,8 +17,8 @@ class StaffsCtrl extends _$StaffsCtrl {
     }, identity);
   }
 
-  Future<Result> createStaff(String password, QMap formData) async {
-    final res = await _repo.createStaff(password, formData);
+  Future<Result> createStaff(String password, QMap formData, [PFile? file]) async {
+    final res = await _repo.createStaff(password, formData, file);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       return rightResult('Staff created successfully');

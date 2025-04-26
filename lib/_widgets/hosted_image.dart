@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pos/main.export.dart';
 
@@ -40,36 +41,49 @@ class HostedImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLocalWebImg = img is FileImg && img.path.startsWith('blob') && kIsWeb;
     final loading = SizedBox(height: height, width: width, child: const Loading());
+    final error = Icon(errorIcon ?? Icons.error, color: context.colors.destructive);
+
+    if (img is AwImg) {
+      final st = locate<AwStorage>();
+      return FutureBuilder<Uint8List>(
+        future: st.imgPreview(img.path),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) return loading;
+          if (snapshot.hasError) return error;
+
+          return GestureDetector(
+            onTap: onImgTap,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(radius),
+              child: UniversalImage(
+                snapshot.data,
+                height: height,
+                width: width,
+                heroTag: tag ?? img.toString(),
+                fit: fit,
+                errorPlaceholder: error,
+                placeholder: loading,
+              ),
+            ),
+          );
+        },
+      );
+    }
 
     return GestureDetector(
       onTap: onImgTap,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(radius),
-        child:
-            isLocalWebImg
-                ? Image.network(
-                  img.path,
-                  height: height,
-                  width: width,
-                  fit: fit,
-                  errorBuilder: (_, e, s) {
-                    return Center(child: Icon(errorIcon ?? Icons.error, color: context.colors.destructive));
-                  },
-                  loadingBuilder: (_, c, l) {
-                    return l != null ? loading : c;
-                  },
-                )
-                : UniversalImage(
-                  img.path,
-                  height: height,
-                  width: width,
-                  heroTag: tag ?? img.toString(),
-                  fit: fit,
-                  errorPlaceholder: Icon(errorIcon ?? Icons.error, color: context.colors.destructive),
-                  placeholder: loading,
-                ),
+        child: UniversalImage(
+          img.path,
+          height: height,
+          width: width,
+          heroTag: tag ?? img.toString(),
+          fit: fit,
+          errorPlaceholder: error,
+          placeholder: loading,
+        ),
       ),
     );
   }
@@ -79,18 +93,19 @@ sealed class Img {
   const Img(this.path);
   final dynamic path;
 
-  static Img from(String path) =>
-      path.startsWith('http')
-          ? NetImg(path)
-          : path.startsWith('assets')
-          ? AssetImg(path)
-          : FileImg(path);
+  static Img from(dynamic path) => switch (path) {
+    final String s when s.startsWith('http') => NetImg(s),
+    final String s when s.startsWith('assets') => AssetImg(s),
+    final IconData i => IconImg(i),
+    final PlatformFile f => FileImg(f),
+    _ => throw UnsupportedError('Unsupported image type'),
+  };
 
   factory Img.icon(IconData icon) => IconImg(icon);
 
   factory Img.asset(String path) => AssetImg(path);
 
-  factory Img.file(String path) => FileImg(path);
+  factory Img.file(PlatformFile file) => FileImg(file);
 
   factory Img.net(String url) => NetImg(url);
 
@@ -103,7 +118,7 @@ class AssetImg extends Img {
 }
 
 class FileImg extends Img {
-  FileImg(String super.path);
+  FileImg(PlatformFile file) : super(kIsWeb ? file.bytes : file.path);
 }
 
 class NetImg extends Img {
@@ -114,4 +129,8 @@ class NetImg extends Img {
 
 class IconImg extends Img {
   IconImg(IconData super.icon);
+}
+
+class AwImg extends Img {
+  AwImg(String super.fileId);
 }
