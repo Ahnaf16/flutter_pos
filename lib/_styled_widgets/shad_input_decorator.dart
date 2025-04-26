@@ -42,7 +42,6 @@ class ShadInputDecorator extends StatelessWidget {
             false => defaultLabelStyle,
           };
     }
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,

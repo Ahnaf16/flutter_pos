@@ -22,51 +22,48 @@ class StaffsView extends HookConsumerWidget {
           },
         ),
       ],
-      body: Padding(
-        padding: context.layout.pagePadding,
-        child: staffList.when(
-          loading: () => const Loading(),
-          error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
-          data: (staffs) {
-            return DataTableBuilder<AppUser, (String, double)>(
-              rowHeight: 100,
-              items: staffs,
-              headings: _headings,
-              headingBuilder: (heading) {
-                return GridColumn(
-                  columnName: heading.$1,
-                  columnWidthMode: ColumnWidthMode.fill,
-                  maximumWidth: heading.$2,
-                  minimumWidth: 200,
-                  label: Container(
-                    padding: Pads.med(),
-                    alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Text(heading.$1),
+      body: staffList.when(
+        loading: () => const Loading(),
+        error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
+        data: (staffs) {
+          return DataTableBuilder<AppUser, (String, double)>(
+            rowHeight: 100,
+            items: staffs,
+            headings: _headings,
+            headingBuilder: (heading) {
+              return GridColumn(
+                columnName: heading.$1,
+                columnWidthMode: ColumnWidthMode.fill,
+                maximumWidth: heading.$2,
+                minimumWidth: 200,
+                label: Container(
+                  padding: Pads.med(),
+                  alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Text(heading.$1),
+                ),
+              );
+            },
+            cellAlignment: Alignment.centerLeft,
+            cellBuilder: (data, head) {
+              return switch (head.$1) {
+                'Name' => DataGridCell(columnName: head.$1, value: _nameCellBuilder(data)),
+                'Warehouse' => DataGridCell(columnName: head.$1, value: Text(data.warehouse?.name ?? '--')),
+                'Role' => DataGridCell(columnName: head.$1, value: Text(data.role?.name ?? '--')),
+                'Action' => DataGridCell(
+                  columnName: head.$1,
+                  value: const Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.eye)),
+                      ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.pen)),
+                    ],
                   ),
-                );
-              },
-              cellAlignment: Alignment.centerLeft,
-              cellBuilder: (data, head) {
-                return switch (head.$1) {
-                  'Name' => DataGridCell(columnName: head.$1, value: _nameCellBuilder(data)),
-                  'Warehouse' => DataGridCell(columnName: head.$1, value: Text(data.warehouse?.name ?? '--')),
-                  'Role' => DataGridCell(columnName: head.$1, value: Text(data.role?.name ?? '--')),
-                  'Action' => DataGridCell(
-                    columnName: head.$1,
-                    value: const Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.eye)),
-                        ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.pen)),
-                      ],
-                    ),
-                  ),
-                  _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
-                };
-              },
-            );
-          },
-        ),
+                ),
+                _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+              };
+            },
+          );
+        },
       ),
     );
   }

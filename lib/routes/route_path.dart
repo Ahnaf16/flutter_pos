@@ -45,8 +45,15 @@ class RPaths {
   static RPath createStaffs = const RPath('/create_staffs');
   static RPath editStaffs(String id) => RPath('/edit_staff', {'id': id});
 
+  // roles
+  static RPath roles = const RPath('/roles');
+  static RPath createRole = const RPath('/create_role');
+  static RPath editRole(String id) => RPath('/edit_role', {'id': id});
+
   // warehouse
   static RPath warehouse = const RPath('/warehouse');
+  static RPath createWarehouse = const RPath('/create_warehouse');
+  static RPath editWarehouse(String id) => RPath('/edit_warehouse', {'id': id});
 
   // stockTransfer
   static RPath stockTransfer = const RPath('/stock_transfer');

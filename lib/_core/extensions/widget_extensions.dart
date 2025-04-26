@@ -10,7 +10,7 @@ extension TestWiEx on Text {
             children: [
               TextSpan(text: data, style: style),
               if (isRequired)
-                TextSpan(text: '*', style: (style ?? context.text.p).textColor(context.colors.destructive)),
+                TextSpan(text: '*', style: (style ?? const TextStyle()).textColor(context.colors.destructive)),
             ],
           ),
         );

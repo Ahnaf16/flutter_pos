@@ -82,3 +82,19 @@ class _DataSource<T, R> extends DataGridSource {
     );
   }
 }
+
+class TableHeading {
+  const TableHeading({
+    required this.cellWidget,
+    required this.columnName,
+    this.columnWidth,
+    this.cellAlignment,
+    this.headAlignment,
+  });
+
+  final Widget cellWidget;
+  final String columnName;
+  final double? columnWidth;
+  final Alignment? cellAlignment;
+  final Alignment? headAlignment;
+}

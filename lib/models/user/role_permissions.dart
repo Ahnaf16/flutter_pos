@@ -1,0 +1,18 @@
+enum RolePermissions {
+  manageProduct,
+  manageStock,
+  manageUnit,
+  makeSale,
+  returnSale,
+  makePurchase,
+  returnPurchase,
+  manageCustomer,
+  manageSupplier,
+  manageStaff,
+  manageRole,
+  manageWarehouse,
+  transferStock,
+  manageExpanse,
+  manageDue,
+  transferMoney,
+}

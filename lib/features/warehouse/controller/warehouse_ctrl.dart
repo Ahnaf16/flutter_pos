@@ -13,8 +13,15 @@ class WarehouseCtrl extends _$WarehouseCtrl {
     final staffs = await _repo.getWareHouses();
     return staffs.fold((l) {
       Toast.showErr(Ctx.context, l);
-
       return [];
     }, identity);
+  }
+
+  Future<Result> createWarehouse(QMap formData) async {
+    final res = await _repo.createWareHouse(WareHouse.fromMap(formData));
+    return res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      return rightResult('Warehouse created successfully');
+    });
   }
 }

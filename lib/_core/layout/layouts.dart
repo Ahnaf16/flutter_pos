@@ -12,7 +12,7 @@ class Layouts extends InheritedWidget {
   static const double maxMobileWidth = 600;
   static const double maxTabletWidth = 1200;
 
-  static final mobilePadding = Pads.lg();
+  static final mobilePadding = Pads.med();
   static final tabletPadding = Pads.xl();
   static final deskTopPadding = Pads.xxl();
 

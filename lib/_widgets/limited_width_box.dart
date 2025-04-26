@@ -1,7 +1,7 @@
 import 'package:pos/main.export.dart';
 
 class LimitedWidthBox extends StatelessWidget {
-  const LimitedWidthBox({super.key, required this.child, required this.maxWidth, this.padding, this.center = true});
+  const LimitedWidthBox({super.key, required this.child, this.maxWidth, this.padding, this.center = true});
 
   final Widget child;
   final double? maxWidth;

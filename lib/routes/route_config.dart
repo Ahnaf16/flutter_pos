@@ -22,6 +22,9 @@ import 'package:pos/features/stockTransfer/view/stock_transfer_view.dart';
 import 'package:pos/features/supplier/view/supplier_view.dart';
 import 'package:pos/features/transactions/view/transactions_view.dart';
 import 'package:pos/features/unit/view/unit_view.dart';
+import 'package:pos/features/user_roles/view/create_user_role_view.dart';
+import 'package:pos/features/user_roles/view/user_roles_view.dart';
+import 'package:pos/features/warehouse/view/create_warehouse_view.dart';
 import 'package:pos/features/warehouse/view/warehouse_view.dart';
 import 'package:pos/main.export.dart';
 import 'package:pos/navigation/nav_root.dart';
@@ -88,8 +91,25 @@ class AppRouter extends Notifier<GoRouter> {
             AppRoute(RPaths.editStaffs(':id'), (_) => const CreateStaffView(), parentKey: _shell),
           ],
         ),
+        //! roles
+        AppRoute(
+          RPaths.roles,
+          (_) => const UserRolesView(),
+          routes: [
+            AppRoute(RPaths.createRole, (_) => const CreateUserRoleView(), parentKey: _shell),
+            AppRoute(RPaths.editRole(':id'), (_) => const CreateUserRoleView(), parentKey: _shell),
+          ],
+        ),
         //! warehouse
-        AppRoute(RPaths.warehouse, (_) => const WarehouseView()),
+        AppRoute(
+          RPaths.warehouse,
+          (_) => const WarehouseView(),
+          routes: [
+            AppRoute(RPaths.createWarehouse, (_) => const CreateWarehouseView(), parentKey: _shell),
+            AppRoute(RPaths.editWarehouse(':id'), (_) => const CreateWarehouseView(), parentKey: _shell),
+          ],
+        ),
+
         //! stockTransfer
         AppRoute(RPaths.stockTransfer, (_) => const StockTransferView()),
         //! expense

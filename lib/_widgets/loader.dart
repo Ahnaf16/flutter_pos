@@ -1,14 +1,17 @@
 import 'package:pos/main.export.dart';
 
 class Loading extends StatelessWidget {
-  const Loading({super.key, this.size, this.primary = true, this.strokeWidth, this.value}) : liner = false;
-  const Loading.liner({super.key, this.size, this.primary = true, this.strokeWidth, this.value}) : liner = true;
+  const Loading({super.key, this.center = true, this.size, this.primary = true, this.strokeWidth, this.value})
+    : liner = false;
+  const Loading.liner({super.key, this.center = true, this.size, this.primary = true, this.strokeWidth, this.value})
+    : liner = true;
 
   final double? size;
   final bool primary;
   final double? value;
   final double? strokeWidth;
   final bool liner;
+  final bool center;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +24,8 @@ class Loading extends StatelessWidget {
     } else {
       loader = CircularProgressIndicator(color: color, value: value, strokeWidth: strokeWidth ?? 3);
     }
-    return Center(child: SizedBox(height: liner ? null : size ?? defSize, width: size ?? defSize, child: loader));
+    final widget = SizedBox(height: liner ? null : size ?? defSize, width: size ?? defSize, child: loader);
+
+    return center == true ? Center(child: widget) : widget;
   }
 }

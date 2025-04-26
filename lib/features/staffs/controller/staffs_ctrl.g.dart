@@ -6,7 +6,7 @@ part of 'staffs_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$staffsCtrlHash() => r'82a441dbc450627e498f26f87595538f6bdd00d5';
+String _$staffsCtrlHash() => r'12e42f8691fa2b58b636994d094158dd8678683b';
 
 /// See also [StaffsCtrl].
 @ProviderFor(StaffsCtrl)

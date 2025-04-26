@@ -33,7 +33,7 @@ class WareHouse {
   factory WareHouse.fromMap(Map<String, dynamic> map) {
     return WareHouse(
       id: map.parseID() ?? '',
-      name: map['name'] ?? 'n/a',
+      name: map['name'] ?? '',
       address: map['address'] ?? '',
       isDefault: map['is_default'] ?? false,
       contactNumber: map['contact_number'] ?? '',
@@ -53,6 +53,14 @@ class WareHouse {
 
   Map<String, dynamic> toMap() => {
     'id': id,
+    'name': name,
+    'address': address,
+    'is_default': isDefault,
+    'contact_number': contactNumber,
+    'contact_person': contactPerson,
+  };
+
+  Map<String, dynamic> toAwPost() => {
     'name': name,
     'address': address,
     'is_default': isDefault,

@@ -15,6 +15,7 @@ class BaseBody extends StatelessWidget {
     this.bottomNavigationBar,
     this.isLoading = false,
     this.appBarSeparator = false,
+    this.padding,
     required this.body,
   });
 
@@ -30,6 +31,7 @@ class BaseBody extends StatelessWidget {
   final Widget body;
   final bool isLoading;
   final bool appBarSeparator;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +50,9 @@ class BaseBody extends StatelessWidget {
         children: [
           if (appBarSeparator) const ShadSeparator.horizontal(margin: Pads.zero),
           if (isLoading) const ShadProgress(minHeight: 1),
-          Expanded(child: body),
+          Expanded(
+            child: AnimatedPadding(padding: padding ?? context.layout.pagePadding, duration: 250.ms, child: body),
+          ),
         ],
       ),
     );

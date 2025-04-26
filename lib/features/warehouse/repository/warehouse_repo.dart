@@ -1,3 +1,4 @@
+import 'package:appwrite/models.dart';
 import 'package:pos/main.export.dart';
 
 class WarehouseRepo with AwHandler {
@@ -5,7 +6,11 @@ class WarehouseRepo with AwHandler {
     return await db.getList(AWConst.collections.warehouse).convert((docs) => docs.convertDoc(WareHouse.fromDoc));
   }
 
-  // FutureReport<WareHouse> createWareHouses() async {
-  //   final data = await db.create(AWConst.collections.warehouse, data: data);
+  FutureReport<Document> createWareHouse(WareHouse data) async {
+    return await db.create(AWConst.collections.warehouse, data: data.toAwPost());
+  }
+
+  // FutureReport<Document> createWareHouse(WareHouse data) async {
+  //   return await db.create(AWConst.collections.warehouse, data: data.toAwPost());
   // }
 }

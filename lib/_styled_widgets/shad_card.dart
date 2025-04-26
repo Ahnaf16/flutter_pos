@@ -30,6 +30,8 @@ class ShadCard extends StatelessWidget {
     this.rowMainAxisSize,
     this.columnMainAxisSize,
     this.clipBehavior,
+    this.childPadding,
+    this.childSeparator,
   });
 
   /// {@template ShadCard.title}
@@ -50,6 +52,8 @@ class ShadCard extends StatelessWidget {
   /// {@endtemplate}
   final Widget? child;
 
+  final Widget? childSeparator;
+
   /// {@template ShadCard.footer}
   /// The footer widget displayed at the bottom of the card.
   /// Useful for actions or additional information.
@@ -61,6 +65,8 @@ class ShadCard extends StatelessWidget {
   /// Defaults to EdgeInsets.all(24) if not specified.
   /// {@endtemplate}
   final EdgeInsets? padding;
+
+  final EdgeInsets? childPadding;
 
   /// {@template ShadCard.backgroundColor}
   /// The background color of the card.
@@ -202,14 +208,17 @@ class ShadCard extends StatelessWidget {
               mainAxisSize: effectiveColumnMainAxisSize,
               crossAxisAlignment: effectiveColumnCrossAxisAlignment,
               mainAxisAlignment: effectiveColumnMainAxisAlignment,
+
               children: [
                 if (title != null)
                   DefaultTextStyle(
-                    style: theme.textTheme.h3.copyWith(color: theme.colorScheme.cardForeground),
+                    style: theme.textTheme.large.copyWith(color: theme.colorScheme.cardForeground),
                     child: title!,
                   ),
+
                 if (description != null) DefaultTextStyle(style: theme.textTheme.muted, child: description!),
-                if (child != null) Flexible(child: child!),
+                if (child != null && childSeparator != null) childSeparator!,
+                if (child != null) Flexible(child: Padding(padding: childPadding ?? Pads.zero, child: child)),
                 if (footer != null) footer!,
               ],
             ),

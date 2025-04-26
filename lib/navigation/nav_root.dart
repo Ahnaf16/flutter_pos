@@ -210,6 +210,7 @@ List<(String text, IconData? icon, RPath? path)> get _items => [
   ('Customer', LuIcons.users, RPaths.customer),
   ('Supplier', LuIcons.usersRound, RPaths.supplier),
   ('Staff', LuIcons.userCog, RPaths.staffs),
+  ('Roles', LuIcons.shield, RPaths.roles),
 
   // ('', null, null),
   ('Inventory', null, null),

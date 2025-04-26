@@ -68,7 +68,7 @@ class ShadField extends HookWidget {
   Widget build(BuildContext context) {
     final obscure = useState<bool>(true);
 
-    final decoration = this.decoration ?? context.theme.decoration;
+    final decoration = context.theme.decoration.mergeWith(this.decoration);
 
     return FormBuilderField(
       key: _key,

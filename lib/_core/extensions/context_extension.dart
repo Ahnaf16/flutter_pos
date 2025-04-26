@@ -39,6 +39,7 @@ extension ContextEx on BuildContext {
   double get width => size.width;
 
   ShadThemeData get theme => ShadTheme.of(this);
+  ShadDecoration get decor => theme.decoration;
 
   ShadTextTheme get text => theme.textTheme;
   ShadColorScheme get colors => theme.colorScheme;
