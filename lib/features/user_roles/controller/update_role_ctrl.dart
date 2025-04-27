@@ -1,3 +1,4 @@
+import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/user_roles/controller/user_roles_ctrl.dart';
 import 'package:pos/features/user_roles/repository/user_roles_repo.dart';
 import 'package:pos/main.export.dart';
@@ -31,6 +32,7 @@ class UpdateRoleCtrl extends _$UpdateRoleCtrl {
     final res = await _repo.updateRole(role);
     return res.fold(leftResult, (r) {
       ref.invalidate(userRolesCtrlProvider);
+      ref.invalidate(authCtrlProvider);
       return rightResult('Role updated successfully');
     });
   }

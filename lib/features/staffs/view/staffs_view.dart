@@ -13,7 +13,7 @@ class StaffsView extends HookConsumerWidget {
     return BaseBody(
       title: 'Staffs',
       actions: [
-        ShadButton.outline(
+        ShadButton(
           child: const Text('Create Staff'),
           onPressed: () {
             RPaths.createStaffs.pushNamed(context);

@@ -75,7 +75,9 @@ class CreateStaffView extends HookConsumerWidget {
         error: (e, s) => ErrorView(e, s, prov: updateStaffCtrlProvider(updatingId)),
         loading: () => const Loading(),
         data: (updating) {
-          if (updatingId != null && updating == null) return const ErrorView('Staff not found', null);
+          if (updatingId != null && updating == null) {
+            return const ErrorDisplay('No Staff found', description: 'This staff does not exist or has been deleted');
+          }
           return SingleChildScrollView(
             child: FormBuilder(
               key: formKey,
@@ -206,6 +208,7 @@ class CreateStaffView extends HookConsumerWidget {
                                 },
                                 child: ShadCard(
                                   height: 150,
+
                                   padding: Pads.med(),
                                   child: Center(
                                     child: Column(

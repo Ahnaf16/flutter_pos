@@ -3,7 +3,7 @@ import 'package:pos/main.export.dart';
 class KAppBar extends StatelessWidget implements PreferredSizeWidget {
   const KAppBar({
     super.key,
-    required this.title,
+    this.title,
     this.actions = const [],
     this.leading,
     this.bottom,
@@ -12,7 +12,7 @@ class KAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actionGapEnd = Insets.med,
   });
 
-  final String title;
+  final String? title;
   final List<Widget> actions;
   final Widget? leading;
   final Widget? bottom;
@@ -30,14 +30,16 @@ class KAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return AppBar(
-      title: Text(title),
+      title: title == null ? null : Text(title!),
       actions: actionCopy,
       leading: leading,
       bottom: bottom == null ? null : PreferredSize(preferredSize: bottomHeight ?? preferredSize, child: bottom!),
       centerTitle: false,
+      toolbarHeight: preferredSize.height,
+      scrolledUnderElevation: 0,
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 10);
 }

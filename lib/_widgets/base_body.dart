@@ -1,10 +1,9 @@
-import 'package:pos/_widgets/k_app_bar.dart';
 import 'package:pos/main.export.dart';
 
 class BaseBody extends StatelessWidget {
   const BaseBody({
     super.key,
-    required this.title,
+    this.title,
     this.actions = const [],
     this.leading,
     this.bottom,
@@ -16,10 +15,11 @@ class BaseBody extends StatelessWidget {
     this.isLoading = false,
     this.appBarSeparator = false,
     this.padding,
+    this.alignment = Alignment.topCenter,
     required this.body,
   });
 
-  final String title;
+  final String? title;
   final List<Widget> actions;
   final Widget? leading;
   final Widget? bottom;
@@ -32,6 +32,7 @@ class BaseBody extends StatelessWidget {
   final bool isLoading;
   final bool appBarSeparator;
   final EdgeInsetsGeometry? padding;
+  final AlignmentGeometry alignment;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,10 @@ class BaseBody extends StatelessWidget {
           if (appBarSeparator) const ShadSeparator.horizontal(margin: Pads.zero),
           if (isLoading) const ShadProgress(minHeight: 1),
           Expanded(
-            child: AnimatedPadding(padding: padding ?? context.layout.pagePadding, duration: 250.ms, child: body),
+            child: Align(
+              alignment: alignment,
+              child: AnimatedPadding(padding: padding ?? context.layout.pagePadding, duration: 250.ms, child: body),
+            ),
           ),
         ],
       ),

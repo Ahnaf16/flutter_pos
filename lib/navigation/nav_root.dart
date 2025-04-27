@@ -24,16 +24,20 @@ class NavigationRoot extends HookConsumerWidget {
       error: (e, s) => ErrorView(e, s, prov: authCtrlProvider),
       loading: () => const SplashPage(),
       data: (user) {
-        return Scaffold(appBar: _AppBar(user: user), body: _BODY(expanded: expanded, index: index, child: child));
+        return Scaffold(
+          appBar: _AppBar(user: user, onLeadingPressed: () => expanded.toggle()),
+          body: _BODY(expanded: expanded, index: index, child: child),
+        );
       },
     );
   }
 }
 
 class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
-  const _AppBar({this.user});
+  const _AppBar({this.user, this.onLeadingPressed});
 
   final AppUser? user;
+  final VoidCallback? onLeadingPressed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -46,6 +50,16 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
 
     return AppBar(
       title: const Text(kAppName),
+
+      // leading: UnconstrainedBox(
+      //   child: ShadButton.ghost(
+      //     leading: const Icon(LuIcons.panelRightClose, size: 20),
+      //     onPressed: onLeadingPressed,
+      //     padding: Pads.zero,
+      //   ),
+      // ),
+      scrolledUnderElevation: 0,
+
       actions: [
         if (!kReleaseMode) ...[Text(context.layout.deviceSize.name), const Gap(Insets.lg)],
         ShadPopover(
@@ -110,42 +124,52 @@ class _BODY extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const ShadSeparator.horizontal(margin: Pads.zero),
-        Expanded(
-          child: Row(
+    final navItems = SingleChildScrollView(
+      padding: Pads.med(),
+      child: LimitedWidthBox(
+        maxWidth: expanded.value ? 200 : 60,
+        child: IntrinsicWidth(
+          child: Column(
+            spacing: Insets.xs,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SingleChildScrollView(
-                padding: Pads.med(),
-                child: LimitedWidthBox(
-                  maxWidth: expanded.value ? 200 : 60,
-                  child: IntrinsicWidth(
-                    child: Column(
-                      spacing: Insets.xs,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        for (final (text, icon, path) in _items)
-                          _NavButton(
-                            text: text,
-                            icon: icon,
-                            expanded: expanded.value,
-                            selected: index.value == _items.indexOf((text, icon, path)),
-                            onTap: () {
-                              index.value = _items.indexOf((text, icon, path));
-                              if (path != null) path.go(context);
-                            },
-                          ),
-                      ],
-                    ),
+              for (final (text, icon, path) in _items)
+                if (!expanded.value && icon == null)
+                  const SizedBox.shrink()
+                else
+                  _NavButton(
+                    text: text,
+                    icon: icon,
+                    expanded: expanded.value,
+                    selected: index.value == _items.indexOf((text, icon, path)),
+                    onTap: () {
+                      index.value = _items.indexOf((text, icon, path));
+                      if (path != null) path.go(context);
+                    },
                   ),
-                ),
-              ),
-              const ShadSeparator.vertical(margin: Pads.zero),
-              Expanded(child: child),
             ],
           ),
         ),
+      ),
+    );
+
+    return Stack(
+      children: [
+        Column(
+          children: [
+            const ShadSeparator.horizontal(margin: Pads.zero),
+            Expanded(
+              child: Row(
+                children: [
+                  if (!context.layout.isMobile) navItems,
+                  if (!context.layout.isMobile) const ShadSeparator.vertical(margin: Pads.zero),
+                  Expanded(child: child),
+                ],
+              ),
+            ),
+          ],
+        ),
+        if (context.layout.isMobile && expanded.value) ShadCard(width: 300, child: navItems),
       ],
     );
   }
@@ -165,7 +189,8 @@ class _NavButton extends HookWidget {
     if (icon == null && expanded) return DecoContainer(padding: Pads.padding(top: Insets.sm), child: Text(text));
 
     return ShadButton(
-      mainAxisAlignment: MainAxisAlignment.start,
+      key: ValueKey(text),
+      mainAxisAlignment: expanded ? MainAxisAlignment.start : null,
       backgroundColor: selected ? context.colors.primary.op2 : Colors.transparent,
       hoverBackgroundColor: context.colors.primary.op1,
       hoverForegroundColor: context.colors.foreground,

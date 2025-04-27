@@ -39,7 +39,7 @@ class ErrorView extends HookConsumerWidget {
         children: [
           Text(kError('ErrorView'), style: context.text.large),
           const Gap(Insets.sm),
-          Flexible(child: Text(error.toString())),
+          Text(error.toString()),
 
           if (prov != null)
             ShadButton(
@@ -58,5 +58,68 @@ class ErrorView extends HookConsumerWidget {
     );
 
     return scrollable ? SingleChildScrollView(child: child) : child;
+  }
+}
+
+class ErrorDisplay extends HookConsumerWidget {
+  const ErrorDisplay(this.error, {super.key, this.description, this.prov});
+
+  final String error;
+  final String? description;
+  final ProviderOrFamily? prov;
+
+  Widget withSF() => Scaffold(appBar: AppBar(), body: this);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Widget? child;
+
+    // child = Center(
+    //   child: ShadCard(
+    //     rowMainAxisSize: MainAxisSize.min,
+    //     columnMainAxisSize: MainAxisSize.min,
+    //     childPadding: Pads.xxxl(),
+    //     child: Center(
+    //       child: Column(
+    //         spacing: Insets.lg,
+    //         mainAxisAlignment: MainAxisAlignment.center,
+    //         children: [
+    //           Text(error, style: context.text.h4),
+    //           if (description != null) Text(description!, style: context.text.muted),
+    //           const Gap(Insets.med),
+    //           ShadButton.outline(
+    //             onPressed: () {
+    //               HapticFeedback.mediumImpact();
+    //               if (prov != null) {
+    //                 ref.invalidate(prov!);
+    //               } else {
+    //                 RPaths.home.go(context);
+    //               }
+    //             },
+
+    //             child: Text(prov == null ? 'Go Back' : 'Retry'),
+    //           ),
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
+
+    return ShadDialog(
+      title: Text(error),
+      description: description == null ? null : Text(description!, style: context.text.muted),
+      closeIconData: LuIcons.arrowLeft,
+      actions: [
+        if (prov != null)
+          ShadButton.outline(
+            onPressed: () {
+              HapticFeedback.mediumImpact();
+              ref.invalidate(prov!);
+            },
+
+            child: const Text('Retry'),
+          ),
+      ],
+    );
   }
 }

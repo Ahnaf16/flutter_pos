@@ -28,6 +28,7 @@ import 'package:pos/features/warehouse/view/create_warehouse_view.dart';
 import 'package:pos/features/warehouse/view/warehouse_view.dart';
 import 'package:pos/main.export.dart';
 import 'package:pos/navigation/nav_root.dart';
+import 'package:pos/routes/page/protected_page.dart';
 
 String rootPath = RPaths.home.path;
 
@@ -51,84 +52,87 @@ class AppRouter extends Notifier<GoRouter> {
   }
 
   /// The app router list
-  List<RouteBase> get _routes => [
-    AppRoute(RPaths.splash, (_) => const SplashPage()),
+  List<RouteBase> get _routes {
+    return [
+      AppRoute(RPaths.splash, (_) => const SplashPage()),
+      AppRoute(RPaths.protected, (_) => const ProtectedPage()),
 
-    //! auth
-    AppRoute(RPaths.login, (_) => const LoginView()),
+      //! auth
+      AppRoute(RPaths.login, (_) => const LoginView()),
 
-    //! shell
-    ShellRoute(
-      navigatorKey: _shell,
-      builder: (_, s, child) => NavigationRoot(child, key: s.pageKey),
-      routes: [
-        //! home
-        AppRoute(RPaths.home, (_) => const HomeView()),
-        //! products
-        AppRoute(RPaths.products, (_) => const ProductsView()),
-        //! stock
-        AppRoute(RPaths.stock, (_) => const StockView()),
-        //! unit
-        AppRoute(RPaths.unit, (_) => const UnitView()),
-        //! sales
-        AppRoute(RPaths.sales, (_) => const SalesView()),
-        //! returnSales
-        AppRoute(RPaths.returnSales, (_) => const ReturnSalesView()),
-        //! purchases
-        AppRoute(RPaths.purchases, (_) => const PurchasesView()),
-        //! returnPurchases
-        AppRoute(RPaths.returnPurchases, (_) => const ReturnPurchasesView()),
-        //! customer
-        AppRoute(RPaths.customer, (_) => const CustomerView()),
-        //! supplier
-        AppRoute(RPaths.supplier, (_) => const SupplierView()),
-        //! staffs
-        AppRoute(
-          RPaths.staffs,
-          (_) => const StaffsView(),
-          routes: [
-            AppRoute(RPaths.createStaffs, (_) => const CreateStaffView(), parentKey: _shell),
-            AppRoute(RPaths.editStaffs(':id'), (_) => const CreateStaffView(), parentKey: _shell),
-          ],
-        ),
-        //! roles
-        AppRoute(
-          RPaths.roles,
-          (_) => const UserRolesView(),
-          routes: [
-            AppRoute(RPaths.createRole, (_) => const CreateUserRoleView(), parentKey: _shell),
-            AppRoute(RPaths.editRole(':id'), (_) => const CreateUserRoleView(), parentKey: _shell),
-          ],
-        ),
-        //! warehouse
-        AppRoute(
-          RPaths.warehouse,
-          (_) => const WarehouseView(),
-          routes: [
-            AppRoute(RPaths.createWarehouse, (_) => const CreateWarehouseView(), parentKey: _shell),
-            AppRoute(RPaths.editWarehouse(':id'), (_) => const CreateWarehouseView(), parentKey: _shell),
-          ],
-        ),
+      //! shell
+      ShellRoute(
+        navigatorKey: _shell,
+        builder: (_, s, child) => NavigationRoot(child, key: s.pageKey),
+        routes: [
+          //! home
+          AppRoute(RPaths.home, (_) => const HomeView()),
+          //! products
+          AppRoute(RPaths.products, (_) => const ProductsView()),
+          //! stock
+          AppRoute(RPaths.stock, (_) => const StockView()),
+          //! unit
+          AppRoute(RPaths.unit, (_) => const UnitView()),
+          //! sales
+          AppRoute(RPaths.sales, (_) => const SalesView()),
+          //! returnSales
+          AppRoute(RPaths.returnSales, (_) => const ReturnSalesView()),
+          //! purchases
+          AppRoute(RPaths.purchases, (_) => const PurchasesView()),
+          //! returnPurchases
+          AppRoute(RPaths.returnPurchases, (_) => const ReturnPurchasesView()),
+          //! customer
+          AppRoute(RPaths.customer, (_) => const CustomerView()),
+          //! supplier
+          AppRoute(RPaths.supplier, (_) => const SupplierView()),
+          //! staffs
+          AppRoute(
+            RPaths.staffs,
+            (_) => const StaffsView(),
+            routes: [
+              AppRoute(RPaths.createStaffs, (_) => const CreateStaffView(), parentKey: _shell),
+              AppRoute(RPaths.editStaffs(':id'), (_) => const CreateStaffView(), parentKey: _shell),
+            ],
+          ),
+          //! roles
+          AppRoute(
+            RPaths.roles,
+            (_) => const UserRolesView(),
+            routes: [
+              AppRoute(RPaths.createRole, (_) => const CreateUserRoleView(), parentKey: _shell),
+              AppRoute(RPaths.editRole(':id'), (_) => const CreateUserRoleView(), parentKey: _shell),
+            ],
+          ),
+          //! warehouse
+          AppRoute(
+            RPaths.warehouse,
+            (_) => const WarehouseView(),
+            routes: [
+              AppRoute(RPaths.createWarehouse, (_) => const CreateWarehouseView(), parentKey: _shell),
+              AppRoute(RPaths.editWarehouse(':id'), (_) => const CreateWarehouseView(), parentKey: _shell),
+            ],
+          ),
 
-        //! stockTransfer
-        AppRoute(RPaths.stockTransfer, (_) => const StockTransferView()),
-        //! expense
-        AppRoute(RPaths.expense, (_) => const ExpenseView()),
-        //! due
-        AppRoute(RPaths.due, (_) => const DueView()),
-        //! moneyTransfer
-        AppRoute(RPaths.moneyTransfer, (_) => const MoneyTransferView()),
-        //! transactions
-        AppRoute(RPaths.transactions, (_) => const TransactionsView()),
-        //! settings
-        AppRoute(
-          RPaths.settings,
-          (_) => const SettingsView(),
-          routes: [AppRoute(RPaths.language, (_) => const LanguageView())],
-        ),
-      ],
-    ),
-  ];
+          //! stockTransfer
+          AppRoute(RPaths.stockTransfer, (_) => const StockTransferView()),
+          //! expense
+          AppRoute(RPaths.expense, (_) => const ExpenseView()),
+          //! due
+          AppRoute(RPaths.due, (_) => const DueView()),
+          //! moneyTransfer
+          AppRoute(RPaths.moneyTransfer, (_) => const MoneyTransferView()),
+          //! transactions
+          AppRoute(RPaths.transactions, (_) => const TransactionsView()),
+          //! settings
+          AppRoute(
+            RPaths.settings,
+            (_) => const SettingsView(),
+            routes: [AppRoute(RPaths.language, (_) => const LanguageView())],
+          ),
+        ],
+      ),
+    ];
+  }
 
   @override
   GoRouter build() {
@@ -147,7 +151,6 @@ class AppRouter extends Notifier<GoRouter> {
       } else if (auth.value != null && current.contains(RPaths.login.path)) {
         return RPaths.home.path;
       }
-
       return null;
     }
 
