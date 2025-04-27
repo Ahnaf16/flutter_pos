@@ -51,6 +51,7 @@ class ThemeCtrl extends Notifier<ThemeConfig> {
         descriptionPadding: Pads.padding(top: 0, left: 5),
         errorPadding: Pads.padding(top: 3, left: 5),
       ),
+      primaryDialogTheme: const ShadDialogTheme(constraints: BoxConstraints(maxWidth: 700)),
     );
   }
 

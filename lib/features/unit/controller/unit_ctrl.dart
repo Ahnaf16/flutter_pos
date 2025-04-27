@@ -17,11 +17,27 @@ class UnitCtrl extends _$UnitCtrl {
     }, identity);
   }
 
-  Future<Result> createStaff(QMap formData) async {
-    final res = await _repo.createUnit(formData);
+  Future<Result> createUnit(QMap form) async {
+    final res = await _repo.createUnit(form);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       return rightResult('Unit created successfully');
+    });
+  }
+
+  Future<Result> updateUnit(ProductUnit unit) async {
+    final res = await _repo.updateUnit(unit);
+    return res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      return rightResult('Unit updated successfully');
+    });
+  }
+
+  Future<Result> toggleEnable(bool isActive, ProductUnit unit) async {
+    final res = await _repo.updateUnit(unit.copyWith(isActive: isActive));
+    return await res.fold(leftResult, (r) async {
+      state = await AsyncValue.guard(() async => build());
+      return rightResult('Unit updated successfully');
     });
   }
 }

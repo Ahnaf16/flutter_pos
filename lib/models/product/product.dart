@@ -26,7 +26,7 @@ class Product {
 
   int get quantity => stock.map((e) => e.quantity).sum;
 
-  String get unitName => unit?.name ?? '';
+  String get unitName => unit?.unitName ?? '';
 
   WareHouse? get warehouse => stock.map((e) => e.warehouse).firstOrNull;
 

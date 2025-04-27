@@ -104,3 +104,68 @@ extension RemoveNull<K, V> on Map<K, V?> {
     return result.map((key, value) => MapEntry(key, value));
   }
 }
+
+extension FlattenMapExtension on Map<String, dynamic> {
+  /// Flatten map, keeping the key paths (e.g., a.b.c)
+  Map<String, dynamic> flatten() {
+    return _flatten(this);
+  }
+
+  Map<String, dynamic> _flatten(Map<String, dynamic> map, [String prefix = '']) {
+    final result = <String, dynamic>{};
+
+    map.forEach((key, value) {
+      final newKey = prefix.isEmpty ? key : '$prefix.$key';
+      if (value is Map<String, dynamic>) {
+        result.addAll(_flatten(value, newKey));
+      } else {
+        result[newKey] = value;
+      }
+    });
+
+    return result;
+  }
+
+  /// Flatten map, merging all keys without path (might overwrite keys if same name exists)
+  Map<String, dynamic> flattenSimple() {
+    return _flattenSimple(this);
+  }
+
+  Map<String, dynamic> _flattenSimple(Map<String, dynamic> map) {
+    final result = <String, dynamic>{};
+
+    map.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        result.addAll(_flattenSimple(value));
+      } else {
+        result[key] = value;
+      }
+    });
+
+    return result;
+  }
+}
+
+extension UnflattenedMapExtension on Map<String, dynamic> {
+  /// unflattened a map (e.g., turns 'stock.purchase_price' into {stock: {purchase_price: value}})
+  Map<String, dynamic> unflattened() {
+    final result = <String, dynamic>{};
+
+    forEach((key, value) {
+      final parts = key.split('.');
+      Map<String, dynamic> current = result;
+
+      for (var i = 0; i < parts.length; i++) {
+        final part = parts[i];
+
+        if (i == parts.length - 1) {
+          current[part] = value;
+        } else {
+          current = current.putIfAbsent(part, () => <String, dynamic>{}) as Map<String, dynamic>;
+        }
+      }
+    });
+
+    return result;
+  }
+}

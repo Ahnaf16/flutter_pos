@@ -16,6 +16,7 @@ class BaseBody extends StatelessWidget {
     this.appBarSeparator = false,
     this.padding,
     this.alignment = Alignment.topCenter,
+    this.scrollable = false,
     required this.body,
   });
 
@@ -33,9 +34,15 @@ class BaseBody extends StatelessWidget {
   final bool appBarSeparator;
   final EdgeInsetsGeometry? padding;
   final AlignmentGeometry alignment;
+  final bool scrollable;
 
   @override
   Widget build(BuildContext context) {
+    Widget child = AnimatedPadding(padding: padding ?? context.layout.pagePadding, duration: 250.ms, child: body);
+
+    if (scrollable) {
+      child = SingleChildScrollView(child: child);
+    }
     return Scaffold(
       appBar: KAppBar(
         title: title,
@@ -51,12 +58,7 @@ class BaseBody extends StatelessWidget {
         children: [
           if (appBarSeparator) const ShadSeparator.horizontal(margin: Pads.zero),
           if (isLoading) const ShadProgress(minHeight: 1),
-          Expanded(
-            child: Align(
-              alignment: alignment,
-              child: AnimatedPadding(padding: padding ?? context.layout.pagePadding, duration: 250.ms, child: body),
-            ),
-          ),
+          Expanded(child: Align(alignment: alignment, child: child)),
         ],
       ),
     );

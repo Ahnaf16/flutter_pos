@@ -106,7 +106,11 @@ class ProductsView extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          ShadCard(expanded: false, child: HostedImage.square(product.getPhoto, radius: Corners.med, dimension: 60)),
+          ShadCard(
+            expanded: false,
+            padding: Pads.xs(),
+            child: HostedImage.square(product.getPhoto, radius: Corners.sm, dimension: 60),
+          ),
 
           Flexible(
             child: Column(

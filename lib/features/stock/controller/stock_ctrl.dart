@@ -17,7 +17,7 @@ class StockCtrl extends _$StockCtrl {
     }, identity);
   }
 
-  Future<Result> createStaff(QMap formData) async {
+  Future<Result> createStock(QMap formData) async {
     final res = await _repo.createStock(formData);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
