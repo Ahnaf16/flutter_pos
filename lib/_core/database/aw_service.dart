@@ -27,6 +27,7 @@ class AwDatabase {
     final documentId = docId ?? ID.unique();
 
     catAw({'collId': collId.id, 'docId': documentId, 'data': data}, '${collId.name} create');
+
     return await _handler<Document>(
       call: () async {
         final doc = await _db.createDocument(
@@ -167,6 +168,7 @@ class AwAccount {
 
   FutureReport<Session> createSession(String email, String password) async {
     catAw({'email': email, 'password': password}, 'create session');
+
     return await _handler<Session>(
       call: () async {
         final data = await account.createEmailPasswordSession(email: email, password: password);

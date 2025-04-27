@@ -32,6 +32,7 @@ class ShadCard extends StatelessWidget {
     this.clipBehavior,
     this.childPadding,
     this.childSeparator,
+    this.expanded = true,
   });
 
   /// {@template ShadCard.title}
@@ -157,6 +158,7 @@ class ShadCard extends StatelessWidget {
   /// Defaults to [Clip.antiAlias] if not specified.
   /// {@endtemplate}
   final Clip? clipBehavior;
+  final bool expanded;
 
   @override
   Widget build(BuildContext context) {
@@ -203,26 +205,24 @@ class ShadCard extends StatelessWidget {
         crossAxisAlignment: effectiveRowCrossAxisAlignment,
         children: [
           if (leading != null) leading!,
-          Expanded(
-            child: Column(
-              mainAxisSize: effectiveColumnMainAxisSize,
-              crossAxisAlignment: effectiveColumnCrossAxisAlignment,
-              mainAxisAlignment: effectiveColumnMainAxisAlignment,
+          Column(
+            mainAxisSize: effectiveColumnMainAxisSize,
+            crossAxisAlignment: effectiveColumnCrossAxisAlignment,
+            mainAxisAlignment: effectiveColumnMainAxisAlignment,
 
-              children: [
-                if (title != null)
-                  DefaultTextStyle(
-                    style: theme.textTheme.large.copyWith(color: theme.colorScheme.cardForeground),
-                    child: title!,
-                  ),
+            children: [
+              if (title != null)
+                DefaultTextStyle(
+                  style: theme.textTheme.large.copyWith(color: theme.colorScheme.cardForeground),
+                  child: title!,
+                ),
 
-                if (description != null) DefaultTextStyle(style: theme.textTheme.muted, child: description!),
-                if (child != null && childSeparator != null) childSeparator!,
-                if (child != null) Flexible(child: Padding(padding: childPadding ?? Pads.zero, child: child)),
-                if (footer != null) footer!,
-              ],
-            ),
-          ),
+              if (description != null) DefaultTextStyle(style: theme.textTheme.muted, child: description!),
+              if (child != null && childSeparator != null) childSeparator!,
+              if (child != null) Flexible(child: Padding(padding: childPadding ?? Pads.zero, child: child)),
+              if (footer != null) footer!,
+            ],
+          ).conditionalExpanded(expanded),
           if (trailing != null) trailing!,
         ],
       ),

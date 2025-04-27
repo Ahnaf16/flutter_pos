@@ -13,7 +13,7 @@ class NavigationRoot extends HookConsumerWidget {
     final getIndex = _items.indexWhere((item) => item.$3?.path.contains(rootPath) ?? false);
 
     final index = useState(0);
-    final expanded = useState(true);
+    final expanded = useState(!context.layout.isMobile);
 
     useEffect(() {
       index.value = getIndex;
@@ -51,13 +51,13 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
     return AppBar(
       title: const Text(kAppName),
 
-      // leading: UnconstrainedBox(
-      //   child: ShadButton.ghost(
-      //     leading: const Icon(LuIcons.panelRightClose, size: 20),
-      //     onPressed: onLeadingPressed,
-      //     padding: Pads.zero,
-      //   ),
-      // ),
+      leading: UnconstrainedBox(
+        child: ShadButton.ghost(
+          leading: const Icon(LuIcons.panelRightClose, size: 20),
+          onPressed: onLeadingPressed,
+          padding: Pads.zero,
+        ),
+      ),
       scrolledUnderElevation: 0,
 
       actions: [
@@ -115,7 +115,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _BODY extends StatelessWidget {
+class _BODY extends HookWidget {
   const _BODY({required this.expanded, required this.index, required this.child});
 
   final ValueNotifier<bool> expanded;

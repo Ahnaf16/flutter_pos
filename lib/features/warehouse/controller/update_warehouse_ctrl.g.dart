@@ -7,7 +7,7 @@ part of 'update_warehouse_ctrl.dart';
 // **************************************************************************
 
 String _$updateWarehouseCtrlHash() =>
-    r'4a6840a14d6bf8822a43731bf78423355c4812ae';
+    r'533d1ffd9fac7fefa7abbcd63bdb60143f494e63';
 
 /// Copied from Dart SDK
 class _SystemHash {

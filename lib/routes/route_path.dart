@@ -16,6 +16,8 @@ class RPaths {
 
   // products
   static RPath products = const RPath('/products');
+  static RPath createProduct = const RPath('/create_product');
+  static RPath editProduct(String id) => RPath('/edit_product', {'id': id});
 
   // stock
   static RPath stock = const RPath('/stock');
@@ -25,12 +27,14 @@ class RPaths {
 
   // sales
   static RPath sales = const RPath('/sales');
+  static RPath createSales = const RPath('/create_sales');
 
   // return sales
   static RPath returnSales = const RPath('/return_sales');
 
   // purchases
   static RPath purchases = const RPath('/purchases');
+  static RPath createPurchases = const RPath('/create_purchases');
 
   // return purchases
   static RPath returnPurchases = const RPath('/return_purchases');

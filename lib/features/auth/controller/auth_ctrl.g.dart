@@ -6,7 +6,7 @@ part of 'auth_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authCtrlHash() => r'9cc368f1b25b4c2eb212d3dff8f7d962f48b44ce';
+String _$authCtrlHash() => r'1228180bf817ef7c7e2d91500ca41ec49659f026';
 
 /// See also [AuthCtrl].
 @ProviderFor(AuthCtrl)
@@ -21,7 +21,7 @@ final authCtrlProvider =
 );
 
 typedef _$AuthCtrl = AutoDisposeAsyncNotifier<AppUser?>;
-String _$authStateSyncHash() => r'ce0ebce6b23705468eb30bad278efe5aec7e6ba7';
+String _$authStateSyncHash() => r'444c52ae4aacf8ed327889c961715e0b62297227';
 
 /// See also [AuthStateSync].
 @ProviderFor(AuthStateSync)

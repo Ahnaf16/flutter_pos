@@ -1,7 +1,10 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:get_it/get_it.dart';
 import 'package:pos/features/auth/repository/auth_repo.dart';
+import 'package:pos/features/products/repository/products_repo.dart';
 import 'package:pos/features/staffs/repository/staffs_repo.dart';
+import 'package:pos/features/stock/repository/stock_repo.dart';
+import 'package:pos/features/unit/repository/unit_repo.dart';
 import 'package:pos/features/user_roles/repository/user_roles_repo.dart';
 import 'package:pos/features/warehouse/repository/warehouse_repo.dart';
 import 'package:pos/main.export.dart';
@@ -44,4 +47,7 @@ Future<void> initDependencies() async {
   locate.registerLazyIfAbsent<StaffRepo>(StaffRepo.new);
   locate.registerLazyIfAbsent<WarehouseRepo>(WarehouseRepo.new);
   locate.registerLazyIfAbsent<UserRolesRepo>(UserRolesRepo.new);
+  locate.registerLazyIfAbsent<ProductRepo>(ProductRepo.new);
+  locate.registerLazyIfAbsent<ProductUnitRepo>(ProductUnitRepo.new);
+  locate.registerLazyIfAbsent<StockRepo>(StockRepo.new);
 }

@@ -8,6 +8,7 @@ import 'package:pos/features/due/view/due_view.dart';
 import 'package:pos/features/expense/view/expense_view.dart';
 import 'package:pos/features/home/view/home_view.dart';
 import 'package:pos/features/moneyTransfer/view/money_transfer_view.dart';
+import 'package:pos/features/products/view/create_product_view.dart';
 import 'package:pos/features/products/view/products_view.dart';
 import 'package:pos/features/purchases/view/purchases_view.dart';
 import 'package:pos/features/returnPurchases/view/return_purchases_view.dart';
@@ -68,7 +69,14 @@ class AppRouter extends Notifier<GoRouter> {
           //! home
           AppRoute(RPaths.home, (_) => const HomeView()),
           //! products
-          AppRoute(RPaths.products, (_) => const ProductsView()),
+          AppRoute(
+            RPaths.products,
+            (_) => const ProductsView(),
+            routes: [
+              AppRoute(RPaths.createProduct, (_) => const CreateProductView(), parentKey: _shell),
+              AppRoute(RPaths.editProduct(':id'), (_) => const CreateProductView(), parentKey: _shell),
+            ],
+          ),
           //! stock
           AppRoute(RPaths.stock, (_) => const StockView()),
           //! unit

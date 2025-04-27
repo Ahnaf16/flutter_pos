@@ -65,6 +65,7 @@ class HostedImage extends StatelessWidget {
                   width: width,
                   heroTag: tag ?? img.toString(),
                   fit: fit,
+                  size: img is IconImg ? (img as IconImg).size : null,
                   errorPlaceholder: error,
                   placeholder: loading,
                 ),
@@ -88,6 +89,8 @@ class HostedImage extends StatelessWidget {
             width: width,
             heroTag: tag ?? img.toString(),
             fit: fit,
+            size: img is IconImg ? (img as IconImg).size : null,
+
             errorPlaceholder: error,
             placeholder: loading,
           ),
@@ -104,12 +107,12 @@ sealed class Img {
   static Img from(dynamic path) => switch (path) {
     final String s when s.startsWith('http') => NetImg(s),
     final String s when s.startsWith('assets') => AssetImg(s),
-    final IconData i => IconImg(i),
+    final IconData i => IconImg(i, null),
     final PlatformFile f => FileImg(f),
     _ => throw UnsupportedError('Unsupported image type'),
   };
 
-  factory Img.icon(IconData icon) => IconImg(icon);
+  factory Img.icon(IconData icon, [double? size]) => IconImg(icon, size);
 
   factory Img.asset(String path) => AssetImg(path);
 
@@ -138,7 +141,9 @@ class NetImg extends Img {
 }
 
 class IconImg extends Img {
-  IconImg(IconData super.icon);
+  IconImg(IconData super.icon, this.size);
+
+  final double? size;
 }
 
 class AwImg extends Img {
