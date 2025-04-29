@@ -11,6 +11,7 @@ class Layouts extends InheritedWidget {
   // Device width breakpoints
   static const double maxMobileWidth = 600;
   static const double maxTabletWidth = 1200;
+  static const double maxContentWidth = 1500;
 
   static final mobilePadding = Pads.med();
   static final tabletPadding = Pads.xl();

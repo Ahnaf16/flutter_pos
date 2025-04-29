@@ -2,7 +2,7 @@ import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-class DataTableBuilder<T, R> extends StatelessWidget {
+class DataTableBuilder<T, R> extends StatefulWidget {
   const DataTableBuilder({
     super.key,
     required this.items,
@@ -13,16 +13,41 @@ class DataTableBuilder<T, R> extends StatelessWidget {
     this.cellPadding,
     this.cellAlignment,
     this.footer,
+    this.columnGroup,
   });
 
   final List<T> items;
   final List<R> headings;
-  final DataGridCell<Widget> Function(T data, R head) cellBuilder;
+  final DataGridCell Function(T data, R head) cellBuilder;
   final GridColumn Function(R heading) headingBuilder;
   final double? rowHeight;
   final EdgeInsetsGeometry? cellPadding;
   final AlignmentGeometry? cellAlignment;
   final Widget? footer;
+  final ColumnGroup? columnGroup;
+
+  @override
+  State<DataTableBuilder<T, R>> createState() => _DataTableBuilderState<T, R>();
+}
+
+class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
+  List<T> itemList = <T>[];
+  late _DataSource source;
+
+  @override
+  void initState() {
+    super.initState();
+    itemList = widget.items;
+    source = _DataSource<T, R>(
+      items: widget.items,
+      headings: widget.headings,
+      cellBuilder: widget.cellBuilder,
+      padding: widget.cellPadding,
+      alignment: widget.cellAlignment,
+    );
+
+    if (widget.columnGroup != null) source.addColumnGroup(widget.columnGroup!);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,19 +56,14 @@ class DataTableBuilder<T, R> extends StatelessWidget {
       child: SfDataGridTheme(
         data: SfDataGridThemeData(headerColor: context.colors.border, gridLineColor: context.colors.border),
         child: SfDataGrid(
-          source: _DataSource(
-            items: items,
-            headings: headings,
-            cellBuilder: cellBuilder,
-            padding: cellPadding,
-            alignment: cellAlignment,
-          ),
+          source: source,
+          allowExpandCollapseGroup: true,
           headerGridLinesVisibility: GridLinesVisibility.both,
           highlightRowOnHover: false,
           isScrollbarAlwaysShown: true,
-          rowHeight: rowHeight ?? double.nan,
-          columns: [for (final h in headings) headingBuilder(h)],
-          footer: footer,
+          rowHeight: widget.rowHeight ?? double.nan,
+          columns: [for (final h in widget.headings) widget.headingBuilder(h)],
+          footer: widget.footer,
         ),
       ),
     );
@@ -54,7 +74,7 @@ class _DataSource<T, R> extends DataGridSource {
   _DataSource({
     required List<T> items,
     required List<R> headings,
-    required DataGridCell<Widget> Function(T data, R head) cellBuilder,
+    required DataGridCell Function(T data, R head) cellBuilder,
     this.padding,
     this.alignment,
   }) {
@@ -77,9 +97,16 @@ class _DataSource<T, R> extends DataGridSource {
             Padding(
               padding: padding ?? Pads.med(),
               child: Align(alignment: alignment ?? Alignment.center, child: cell.value as Widget),
-            ),
+            )
+          else
+            Text(cell.value.toString()),
       ],
     );
+  }
+
+  @override
+  Widget? buildGroupCaptionCellWidget(RowColumnIndex rowColumnIndex, String summaryValue) {
+    return Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15), child: Text(summaryValue));
   }
 }
 

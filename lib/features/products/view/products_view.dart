@@ -45,7 +45,7 @@ class ProductsView extends HookConsumerWidget {
             cellAlignment: Alignment.centerLeft,
             cellBuilder: (data, head) {
               return switch (head.$1) {
-                'Name' => DataGridCell(columnName: head.$1, value: _nameCellBuilder(data)),
+                'Name' => DataGridCell(columnName: head.$1, value: nameCellBuilder(data)),
                 'Warehouse' => DataGridCell(
                   columnName: head.$1,
                   value: Text(data.stock.firstWhereOrNull((e) => e.warehouse != null)?.warehouse?.name ?? '--'),
@@ -99,7 +99,7 @@ class ProductsView extends HookConsumerWidget {
       );
     },
   );
-  Widget _nameCellBuilder(Product product) => Builder(
+  static Widget nameCellBuilder(Product product, [double gap = Insets.xs, double imgSize = 60]) => Builder(
     builder: (context) {
       return Row(
         spacing: Insets.med,
@@ -109,20 +109,22 @@ class ProductsView extends HookConsumerWidget {
           ShadCard(
             expanded: false,
             padding: Pads.xs(),
-            child: HostedImage.square(product.getPhoto, radius: Corners.sm, dimension: 60),
+            child: HostedImage.square(product.getPhoto, radius: Corners.sm, dimension: imgSize),
           ),
 
           Flexible(
             child: Column(
-              spacing: Insets.xs,
+              spacing: gap,
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 OverflowMarquee(child: Text(product.name, style: context.text.list)),
-                OverflowMarquee(child: Text('SKU: ${product.sku ?? '--'}', style: context.text.muted)),
-                OverflowMarquee(
-                  child: Text('Manufacturer: ${product.manufacturer ?? '--'}', style: context.text.muted),
-                ),
+                if (product.sku != null)
+                  OverflowMarquee(child: Text('SKU: ${product.sku ?? '--'}', style: context.text.muted)),
+                if (product.manufacturer != null)
+                  OverflowMarquee(
+                    child: Text('Manufacturer: ${product.manufacturer ?? '--'}', style: context.text.muted),
+                  ),
               ],
             ),
           ),
