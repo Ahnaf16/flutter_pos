@@ -1,4 +1,7 @@
 export 'config/config.dart';
+export 'inventory/inventory_details.dart';
+export 'inventory/inventory_record.dart';
+export 'inventory/payment_account.dart';
 export 'misc/result.dart';
 export 'parties/parti.dart';
 export 'product/product.dart';

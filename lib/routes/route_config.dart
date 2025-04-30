@@ -6,14 +6,14 @@ import 'package:pos/features/auth/view/login_view.dart';
 import 'package:pos/features/due/view/due_view.dart';
 import 'package:pos/features/expense/view/expense_view.dart';
 import 'package:pos/features/home/view/home_view.dart';
+import 'package:pos/features/inventory_record/view/create_record_view.dart';
+import 'package:pos/features/inventory_record/view/inventory_record_view.dart';
 import 'package:pos/features/moneyTransfer/view/money_transfer_view.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/products/view/create_product_view.dart';
 import 'package:pos/features/products/view/products_view.dart';
-import 'package:pos/features/purchases/view/purchases_view.dart';
 import 'package:pos/features/returnPurchases/view/return_purchases_view.dart';
 import 'package:pos/features/returnSales/view/return_sales_view.dart';
-import 'package:pos/features/sales/view/sales_view.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/settings/view/language_view.dart';
 import 'package:pos/features/settings/view/settings_view.dart';
@@ -84,11 +84,13 @@ class AppRouter extends Notifier<GoRouter> {
           //! unit
           AppRoute(RPaths.unit, (_) => const UnitView()),
           //! sales
-          AppRoute(RPaths.sales, (_) => const SalesView()),
+          AppRoute(RPaths.sales, (_) => const InventoryRecordView(type: RecordType.sale)),
+          AppRoute(RPaths.createSales, (_) => const CreateRecordView(type: RecordType.sale)),
           //! returnSales
           AppRoute(RPaths.returnSales, (_) => const ReturnSalesView()),
           //! purchases
-          AppRoute(RPaths.purchases, (_) => const PurchasesView()),
+          AppRoute(RPaths.purchases, (_) => const InventoryRecordView(type: RecordType.purchase)),
+          AppRoute(RPaths.createPurchases, (_) => const CreateRecordView(type: RecordType.purchase)),
           //! returnPurchases
           AppRoute(RPaths.returnPurchases, (_) => const ReturnPurchasesView()),
           //! customer

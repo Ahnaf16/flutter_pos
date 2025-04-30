@@ -21,7 +21,7 @@ class $AWCollections {
   AwId get config => ('6805c476002d4333ccb1', 'config');
   AwId get expanse => ('6806529f0034aec8d975', 'expanse');
   AwId get inventoryDetails => ('68064a58002fe1687f71', 'inventoryDetails');
-  AwId get inventoryReport => ('680628f40031fda735e1', 'inventoryReport');
+  AwId get inventoryRecord => ('680628f40031fda735e1', 'inventoryRecord');
   AwId get parties => ('680629bf003151f6f6ad', 'parties');
   AwId get paymentAccount => ('68063141003974052255', 'paymentAccount');
   AwId get products => ('6805c655000722776983', 'products');
@@ -36,7 +36,7 @@ class $AWCollections {
     config,
     expanse,
     inventoryDetails,
-    inventoryReport,
+    inventoryRecord,
     parties,
     paymentAccount,
     products,

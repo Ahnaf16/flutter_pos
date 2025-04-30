@@ -1,4 +1,3 @@
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/main.export.dart';
 
 extension StringEx on String {
@@ -58,4 +57,12 @@ extension NumEx on num {
   String twoDigits([String padWith = '0']) => toString().padLeft(2, padWith);
 }
 
-extension FormEx on FormBuilderState {}
+extension EnumByName<T extends Enum> on Iterable<T> {
+  T? tryByName(dynamic name) {
+    for (final value in this) {
+      if (value.name == name) return value;
+    }
+
+    return null;
+  }
+}
