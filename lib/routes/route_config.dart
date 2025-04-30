@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:pos/app_root.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/auth/view/login_view.dart';
-import 'package:pos/features/customer/view/customer_view.dart';
 import 'package:pos/features/due/view/due_view.dart';
 import 'package:pos/features/expense/view/expense_view.dart';
 import 'package:pos/features/home/view/home_view.dart';
 import 'package:pos/features/moneyTransfer/view/money_transfer_view.dart';
+import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/products/view/create_product_view.dart';
 import 'package:pos/features/products/view/products_view.dart';
 import 'package:pos/features/purchases/view/purchases_view.dart';
@@ -21,7 +21,6 @@ import 'package:pos/features/staffs/view/create_staff_view.dart';
 import 'package:pos/features/staffs/view/staffs_view.dart';
 import 'package:pos/features/stock/view/stock_view.dart';
 import 'package:pos/features/stockTransfer/view/stock_transfer_view.dart';
-import 'package:pos/features/supplier/view/supplier_view.dart';
 import 'package:pos/features/transactions/view/transactions_view.dart';
 import 'package:pos/features/unit/view/unit_view.dart';
 import 'package:pos/features/user_roles/view/create_user_role_view.dart';
@@ -93,9 +92,9 @@ class AppRouter extends Notifier<GoRouter> {
           //! returnPurchases
           AppRoute(RPaths.returnPurchases, (_) => const ReturnPurchasesView()),
           //! customer
-          AppRoute(RPaths.customer, (_) => const CustomerView()),
+          AppRoute(RPaths.customer, (_) => const PartiesView(isCustomer: true)),
           //! supplier
-          AppRoute(RPaths.supplier, (_) => const SupplierView()),
+          AppRoute(RPaths.supplier, (_) => const PartiesView()),
           //! staffs
           AppRoute(
             RPaths.staffs,

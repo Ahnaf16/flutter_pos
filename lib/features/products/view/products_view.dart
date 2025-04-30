@@ -3,7 +3,7 @@ import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('Name', double.nan), ('Warehouse', 200.0), ('Stock', 200.0), ('Pricing', 200.0), ('Action', 200.0)];
+const _headings = [('Name', double.nan), ('Warehouse', 150.0), ('Stock', 100.0), ('Pricing', 200.0), ('Action', 200.0)];
 
 class ProductsView extends HookConsumerWidget {
   const ProductsView({super.key});
@@ -99,18 +99,14 @@ class ProductsView extends HookConsumerWidget {
       );
     },
   );
-  static Widget nameCellBuilder(Product product, [double gap = Insets.xs, double imgSize = 60]) => Builder(
+  static Widget nameCellBuilder(Product product, [double gap = Insets.xs, double imgSize = 40]) => Builder(
     builder: (context) {
       return Row(
         spacing: Insets.med,
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          ShadCard(
-            expanded: false,
-            padding: Pads.xs(),
-            child: HostedImage.square(product.getPhoto, radius: Corners.sm, dimension: imgSize),
-          ),
+          HostedImage.square(product.getPhoto, radius: Corners.sm, dimension: imgSize),
 
           Flexible(
             child: Column(
@@ -122,9 +118,7 @@ class ProductsView extends HookConsumerWidget {
                 if (product.sku != null)
                   OverflowMarquee(child: Text('SKU: ${product.sku ?? '--'}', style: context.text.muted)),
                 if (product.manufacturer != null)
-                  OverflowMarquee(
-                    child: Text('Manufacturer: ${product.manufacturer ?? '--'}', style: context.text.muted),
-                  ),
+                  OverflowMarquee(child: Text(product.manufacturer ?? '--', style: context.text.muted)),
               ],
             ),
           ),

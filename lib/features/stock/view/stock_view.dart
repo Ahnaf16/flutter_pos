@@ -45,23 +45,6 @@ class StockView extends HookConsumerWidget {
       ),
     );
   }
-
-  // Widget _priceCellBuilder(Product product) => Builder(
-  //   builder: (context) {
-  //     final stock = product.stock.firstOrNull;
-  //     return Column(
-  //       spacing: Insets.xs,
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         OverflowMarquee(child: Text('Purchase: ${stock?.purchasePrice.toString() ?? '--'}')),
-  //         OverflowMarquee(child: Text('Sale: ${stock?.salesPrice.toString() ?? '--'}')),
-  //         OverflowMarquee(child: Text('Wholesale: ${stock?.wholesalePrice.toString() ?? '--'}')),
-  //         OverflowMarquee(child: Text('Dealer: ${stock?.dealerPrice.toString() ?? '--'}')),
-  //       ],
-  //     );
-  //   },
-  // );
 }
 
 class _ProductSection extends StatelessWidget {

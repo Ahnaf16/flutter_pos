@@ -13,7 +13,6 @@ class DataTableBuilder<T, R> extends StatefulWidget {
     this.cellPadding,
     this.cellAlignment,
     this.footer,
-    this.columnGroup,
   });
 
   final List<T> items;
@@ -24,31 +23,12 @@ class DataTableBuilder<T, R> extends StatefulWidget {
   final EdgeInsetsGeometry? cellPadding;
   final AlignmentGeometry? cellAlignment;
   final Widget? footer;
-  final ColumnGroup? columnGroup;
 
   @override
   State<DataTableBuilder<T, R>> createState() => _DataTableBuilderState<T, R>();
 }
 
 class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
-  List<T> itemList = <T>[];
-  late _DataSource source;
-
-  @override
-  void initState() {
-    super.initState();
-    itemList = widget.items;
-    source = _DataSource<T, R>(
-      items: widget.items,
-      headings: widget.headings,
-      cellBuilder: widget.cellBuilder,
-      padding: widget.cellPadding,
-      alignment: widget.cellAlignment,
-    );
-
-    if (widget.columnGroup != null) source.addColumnGroup(widget.columnGroup!);
-  }
-
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -56,7 +36,13 @@ class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
       child: SfDataGridTheme(
         data: SfDataGridThemeData(headerColor: context.colors.border, gridLineColor: context.colors.border),
         child: SfDataGrid(
-          source: source,
+          source: _DataSource<T, R>(
+            items: widget.items,
+            headings: widget.headings,
+            cellBuilder: widget.cellBuilder,
+            padding: widget.cellPadding,
+            alignment: widget.cellAlignment,
+          ),
           allowExpandCollapseGroup: true,
           headerGridLinesVisibility: GridLinesVisibility.both,
           highlightRowOnHover: false,
@@ -102,11 +88,6 @@ class _DataSource<T, R> extends DataGridSource {
             Text(cell.value.toString()),
       ],
     );
-  }
-
-  @override
-  Widget? buildGroupCaptionCellWidget(RowColumnIndex rowColumnIndex, String summaryValue) {
-    return Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15), child: Text(summaryValue));
   }
 }
 
