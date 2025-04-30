@@ -42,12 +42,18 @@ extension ValueTEx<T> on ValueNotifier<T> {
 extension NumEx on num {
   String readableByte([int? decimals]) => Parser.formatBytes(toInt(), decimals ?? 2);
 
-  // String formate() {
-  //   final config = locate<ConfigRepo>().getGuestConfigSync();
-  //   final symbol = locate<SP>().currencySymbol.value;
-  //   final c = config?.currencyConfig ?? CurrencyConfig.def();
-  //   return c.formate(this, symbol);
-  // }
+  String currency() {
+    final symbol = locate<SP>().currencySymbol.value ?? Config.def().currencySymbol;
+    final onLeft = locate<SP>().symbolOnLeft.value ?? Config.def().symbolLeft;
+
+    final String pattern = onLeft ? '$symbol##,##,##,##,##0' : '##,##,##,##,##0$symbol';
+
+    return NumberFormat.currency(customPattern: pattern, decimalDigits: clean is int ? 0 : 2).format(this);
+  }
+
+  num get clean => this is double && this % 1 == 0 ? toInt() : this;
+
+  bool get isDecimal => this is double && this % 1 != 0;
 
   String twoDigits([String padWith = '0']) => toString().padLeft(2, padWith);
 }

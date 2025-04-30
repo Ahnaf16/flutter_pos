@@ -32,7 +32,7 @@ class WareHouse {
 
   factory WareHouse.fromMap(Map<String, dynamic> map) {
     return WareHouse(
-      id: map.parseID() ?? '',
+      id: map.parseAwField(),
       name: map['name'] ?? '',
       address: map['address'] ?? '',
       isDefault: map['is_default'] ?? false,
@@ -42,7 +42,7 @@ class WareHouse {
   }
   WareHouse marge(Map<String, dynamic> map) {
     return WareHouse(
-      id: map.parseID() ?? id,
+      id: map.tryParseAwField() ?? id,
       name: map['name'] ?? name,
       address: map['address'] ?? address,
       isDefault: map['is_default'] ?? isDefault,

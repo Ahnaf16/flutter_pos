@@ -40,7 +40,11 @@ extension MapEx<K, V> on Map<K, V> {
     return it;
   }
 
-  String? parseID([String key = 'id']) {
+  String parseAwField([String key = 'id']) {
+    return tryParseAwField(key) ?? '';
+  }
+
+  String? tryParseAwField([String key = 'id']) {
     final it = this[key] ?? this['\$$key'];
     if (it is String) return it;
 

@@ -51,6 +51,7 @@ final mockStock = [
               isDefault: i == 0,
               contactNumber: '39423746',
             ),
+            createdAt: DateTime.now().subtract(Duration(days: i)),
           ),
       ],
       manageStock: true,

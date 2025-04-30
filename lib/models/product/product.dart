@@ -50,7 +50,7 @@ class Product {
 
   factory Product.fromMap(Map<String, dynamic> map) {
     return Product(
-      id: map.parseID() ?? '',
+      id: map.parseAwField(),
       name: map['name'] ?? '',
       description: map['description'],
       sku: map['sku'],
@@ -77,7 +77,7 @@ class Product {
 
   Product marge(Map<String, dynamic> map) {
     return Product(
-      id: map.parseID() ?? id,
+      id: map.tryParseAwField() ?? id,
       name: map['name'] ?? name,
       description: map['description'] ?? description,
       sku: map['sku'] ?? sku,

@@ -11,6 +11,8 @@ typedef SP = SharedPreferences;
     SharedPrefEntry<bool>(key: 'isDark'),
     SharedPrefEntry<String>(key: 'themeName'),
     SharedPrefEntry<String>(key: 'language'),
+    SharedPrefEntry<String>(key: 'currencySymbol'),
+    SharedPrefEntry<bool>(key: 'symbolOnLeft'),
   ],
 )
 // ignore: unused_element

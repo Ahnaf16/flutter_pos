@@ -14,6 +14,7 @@ class AWConst {
   static const AwId storageId = ('68053f7b0023347615c2', 'pos_bucket');
 
   static $AWCollections collections = $AWCollections();
+  static $AWDocs docs = $AWDocs();
 }
 
 class $AWCollections {
@@ -31,5 +32,25 @@ class $AWCollections {
   AwId get users => ('680536a4003be2a282af', 'users');
   AwId get warehouse => ('6805bdcd00107f585ff2', 'warehouse');
 
-  List<AwId> get values => [users];
+  List<AwId> get values => [
+    config,
+    expanse,
+    inventoryDetails,
+    inventoryReport,
+    parties,
+    paymentAccount,
+    products,
+    role,
+    stock,
+    transactions,
+    unit,
+    users,
+    warehouse,
+  ];
+}
+
+class $AWDocs {
+  AwId get config => ('APP_CONFIG', 'config');
+
+  List<AwId> get values => [config];
 }

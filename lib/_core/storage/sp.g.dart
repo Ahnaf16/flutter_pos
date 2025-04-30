@@ -7,7 +7,8 @@ part of 'sp.dart';
 // **************************************************************************
 
 extension $SharedPreferencesGenX on SharedPreferences {
-  Set<SharedPrefValueGen> get entries => {isDark, themeName, language};
+  Set<SharedPrefValueGen> get entries =>
+      {isDark, themeName, language, currencySymbol, symbolOnLeft};
 
   SharedPrefValue<bool> get isDark {
     return SharedPrefValue<bool>(
@@ -32,6 +33,24 @@ extension $SharedPreferencesGenX on SharedPreferences {
       key: 'language',
       getter: getString,
       setter: setString,
+      remover: remove,
+    );
+  }
+
+  SharedPrefValue<String> get currencySymbol {
+    return SharedPrefValue<String>(
+      key: 'currencySymbol',
+      getter: getString,
+      setter: setString,
+      remover: remove,
+    );
+  }
+
+  SharedPrefValue<bool> get symbolOnLeft {
+    return SharedPrefValue<bool>(
+      key: 'symbolOnLeft',
+      getter: getBool,
+      setter: setBool,
       remover: remove,
     );
   }

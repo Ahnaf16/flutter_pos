@@ -5,6 +5,10 @@ import 'package:pos/main.export.dart';
 class NavigationRoot extends HookConsumerWidget {
   const NavigationRoot(this.child, {super.key});
   final Widget child;
+
+  static double expandedPaneSize = 200.0;
+  static double collapsedPaneSize = 60.0;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authUser = ref.watch(authCtrlProvider);
@@ -61,7 +65,16 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
 
       actions: [
-        if (!kReleaseMode) ...[Text(context.layout.deviceSize.name), const Gap(Insets.lg)],
+        if (!kReleaseMode) ...[
+          DefaultTextStyle(
+            style: context.text.muted.size(12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [Text(context.layout.deviceSize.name), Text('W: ${context.width}')],
+            ),
+          ),
+          const Gap(Insets.lg),
+        ],
         ShadPopover(
           controller: popCtrl,
           padding: Pads.padding(v: Insets.med, h: Insets.lg),
@@ -127,7 +140,7 @@ class _BODY extends HookWidget {
     final navItems = SingleChildScrollView(
       padding: Pads.med(),
       child: LimitedWidthBox(
-        maxWidth: expanded.value ? 200 : 60,
+        maxWidth: expanded.value ? NavigationRoot.expandedPaneSize : NavigationRoot.collapsedPaneSize,
         child: IntrinsicWidth(
           child: Column(
             spacing: Insets.xs,

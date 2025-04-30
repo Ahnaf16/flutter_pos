@@ -16,6 +16,7 @@ class DecoContainer extends StatelessWidget {
     this.padding,
     this.alignment,
     this.margin,
+    this.size,
   }) : duration = const Duration(),
        curve = Curves.linear;
 
@@ -36,6 +37,7 @@ class DecoContainer extends StatelessWidget {
     this.padding,
     this.alignment,
     this.margin,
+    this.size,
   });
 
   final Alignment? alignment;
@@ -53,6 +55,7 @@ class DecoContainer extends StatelessWidget {
   final List<BoxShadow>? shadows;
   final double? width;
   final Curve curve;
+  final double? size;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +65,7 @@ class DecoContainer extends StatelessWidget {
       border = Border.all(color: borderColor!, width: borderWidth);
     }
     // Create decoration
-    BoxDecoration dec = BoxDecoration(
+    final BoxDecoration dec = BoxDecoration(
       color: color,
       border: border,
       borderRadius: BorderRadius.circular(borderRadius),
@@ -75,18 +78,12 @@ class DecoContainer extends StatelessWidget {
         duration: duration,
         curve: curve,
         decoration: dec,
-        width: width,
-        height: height,
+        width: size ?? width,
+        height: size ?? height,
         padding: padding,
         margin: margin,
         alignment: alignment,
-        child:
-            clipChild
-                ? ClipRRect(
-                  borderRadius: BorderRadius.circular(borderRadius),
-                  child: child,
-                )
-                : child,
+        child: clipChild ? ClipRRect(borderRadius: BorderRadius.circular(borderRadius), child: child) : child,
       ),
     );
   }

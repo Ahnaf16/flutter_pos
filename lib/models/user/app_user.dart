@@ -44,7 +44,7 @@ class AppUser {
 
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
-      id: map.parseID() ?? '',
+      id: map.parseAwField(),
       name: map['name'] ?? '',
       phone: map['phone'] ?? '',
       email: map['email'] ?? '',
@@ -58,7 +58,7 @@ class AppUser {
 
   AppUser marge(Map<String, dynamic> map) {
     return AppUser(
-      id: map.parseID() ?? id,
+      id: map.tryParseAwField() ?? id,
       email: map['email'] ?? email,
       name: map['name'] ?? name,
       phone: map['phone'] ?? phone,

@@ -20,7 +20,7 @@ class ProductUnit {
 
   factory ProductUnit.fromMap(Map<String, dynamic> map) {
     return ProductUnit(
-      id: map.parseID() ?? '',
+      id: map.parseAwField(),
       name: map['name'] ?? '',
       unitName: map['unit_name'] ?? '',
       isActive: map.parseBool('is_active', true),
@@ -39,7 +39,7 @@ class ProductUnit {
 
   ProductUnit marge(Map<String, dynamic> map) {
     return ProductUnit(
-      id: map.parseID() ?? id,
+      id: map.tryParseAwField() ?? id,
       name: map['name'] ?? name,
       unitName: map['unit_name'] ?? unitName,
       isActive: map['is_active'] ?? isActive,

@@ -1,17 +1,7 @@
 import 'package:pos/features/products/controller/products_ctrl.dart';
-import 'package:pos/features/products/view/products_view.dart';
-import 'package:pos/features/stock/controller/stock_ctrl.dart';
+import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:sliver_tools/sliver_tools.dart';
-
-const _headings = [
-  ('id', 10.0),
-  ('Name', double.nan),
-  ('Warehouse', 200.0),
-  ('Stock', 200.0),
-  ('Pricing', 200.0),
-  ('Action', 200.0),
-];
 
 class StockView extends HookConsumerWidget {
   const StockView({super.key});
@@ -19,6 +9,7 @@ class StockView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productList = ref.watch(productsCtrlProvider);
+    final scrCtrl = useScrollController();
     return BaseBody(
       title: 'Products',
       actions: [
@@ -30,41 +21,28 @@ class StockView extends HookConsumerWidget {
         ),
       ],
       body: Scrollbar(
+        controller: scrCtrl,
         child: SingleChildScrollView(
+          controller: scrCtrl,
           scrollDirection: Axis.horizontal,
-          child: SizedBox(
-            width: 800,
-            height: context.height,
-            child: CustomScrollView(
-              slivers: [
-                MultiSliver(
-                  children: [
-                    for (final product in mockStock) _ProductSection(model: product),
-                    SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
+          child: LimitedWidthBox(
+            maxWidth: Layouts.maxContentWidth,
+            minWidth: Layouts.minContentWidth,
+            useActualWidth: true,
+            child: productList.when(
+              loading: () => const Loading(),
+              error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
+              data: (products) {
+                return CustomScrollView(
+                  slivers: [
+                    MultiSliver(children: [for (final product in products) _ProductSection(model: product)]),
                   ],
-                ),
-              ],
+                );
+              },
             ),
           ),
         ),
       ),
-
-      // productList.when(
-      //   loading: () => const Loading(),
-      //   error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
-      //   data: (products) {
-      //     return CustomScrollView(
-      //       slivers: [
-      //         MultiSliver(
-      //           children: [
-      //             for (final product in products) _ProductSection(model: product),
-      //             SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
-      //           ],
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // ),
     );
   }
 
@@ -135,14 +113,14 @@ class _ProductSection extends StatelessWidget {
                     children: [
                       SpacedText(
                         left: 'Purchase',
-                        right: stock.purchasePrice.toString(),
+                        right: stock.purchasePrice.currency(),
                         spaced: false,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         styleBuilder: (_, _) => (context.text.muted, context.text.small),
                       ),
                       SpacedText(
                         left: 'Sale',
-                        right: stock.salesPrice.toString(),
+                        right: stock.salesPrice.currency(),
                         spaced: false,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         styleBuilder: (_, _) => (context.text.muted, context.text.small),
@@ -155,22 +133,30 @@ class _ProductSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SpacedText(
-                        left: 'Wholesale',
-                        right: stock.wholesalePrice.toString(),
+                        left: stock.isProfitable ? 'Profit' : 'Loss',
+                        right: (stock.getProfitLoss).currency(),
                         spaced: false,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        styleBuilder: (_, _) => (context.text.muted, context.text.small),
-                      ),
-                      SpacedText(
-                        left: 'Dealer',
-                        right: stock.dealerPrice.toString(),
-                        spaced: false,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        styleBuilder: (_, _) => (context.text.muted, context.text.small),
+                        styleBuilder: (_, _) {
+                          final c = stock.isProfitable ? Colors.green.shade500 : context.colors.destructive;
+                          return (context.text.muted.textColor(c), context.text.small.textColor(c));
+                        },
                       ),
                     ],
                   ),
                 ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [Text('Date: ${stock.createdAt.formatDate()}', style: context.text.muted)],
+                  ),
+                ),
+                // const Expanded(
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.end,
+                //     children: [ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.eye))],
+                //   ),
+                // ),
               ],
             ),
           );
@@ -194,7 +180,39 @@ class _ProductHeader extends StatelessWidget {
       decoration: ShadDecoration(border: ShadBorder(bottom: ShadBorderSide(width: 1, color: context.colors.border))),
       child: Padding(
         padding: Pads.padding(top: topInset * 2, bottom: topInset, h: topInset),
-        child: ProductsView.nameCellBuilder(product, 0, 40),
+        child: Row(
+          spacing: Insets.med,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ShadCard(
+              expanded: false,
+              padding: Pads.xs(),
+              child: HostedImage.square(product.getPhoto, radius: Corners.sm, dimension: 40),
+            ),
+
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  OverflowMarquee(child: Text(product.name, style: context.text.list)),
+
+                  Row(
+                    spacing: Insets.med,
+                    children: [
+                      if (product.sku != null) Text('SKU: ${product.sku ?? '--'}', style: context.text.muted),
+                      if (product.sku != null && product.manufacturer != null)
+                        DecoContainer(size: 5, color: context.colors.primary.op7, borderRadius: Corners.circle),
+                      if (product.manufacturer != null)
+                        Text('Manufacturer: ${product.manufacturer ?? '--'}', style: context.text.muted),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

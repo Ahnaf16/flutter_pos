@@ -1,3 +1,4 @@
+export 'config/config.dart';
 export 'misc/result.dart';
 export 'product/product.dart';
 export 'product/product_unit.dart';

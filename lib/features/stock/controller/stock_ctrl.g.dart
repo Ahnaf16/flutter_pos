@@ -6,7 +6,7 @@ part of 'stock_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$stockCtrlHash() => r'8b6ee856dc67ad4297d158fc5faf66d090640bbd';
+String _$stockCtrlHash() => r'625ee2dca2ccd0181c61659e5c137935bbbe3899';
 
 /// See also [StockCtrl].
 @ProviderFor(StockCtrl)

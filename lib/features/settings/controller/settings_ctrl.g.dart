@@ -1,25 +1,24 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'products_ctrl.dart';
+part of 'settings_ctrl.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$productsCtrlHash() => r'3d19855c5ce8fb083c6c41a588ea9578479cca45';
+String _$configCtrlHash() => r'bebac268bbdf75c22eac8093f69c2e04cfb17ebc';
 
-/// See also [ProductsCtrl].
-@ProviderFor(ProductsCtrl)
-final productsCtrlProvider =
-    AutoDisposeAsyncNotifierProvider<ProductsCtrl, List<Product>>.internal(
-  ProductsCtrl.new,
-  name: r'productsCtrlProvider',
+/// See also [ConfigCtrl].
+@ProviderFor(ConfigCtrl)
+final configCtrlProvider = NotifierProvider<ConfigCtrl, Config>.internal(
+  ConfigCtrl.new,
+  name: r'configCtrlProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$productsCtrlHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$configCtrlHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$ProductsCtrl = AutoDisposeAsyncNotifier<List<Product>>;
+typedef _$ConfigCtrl = Notifier<Config>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -25,7 +25,7 @@ class UserRole {
 
   factory UserRole.fromMap(Map<String, dynamic> map) {
     return UserRole(
-      id: map.parseID() ?? '',
+      id: map.parseAwField(),
       name: map['name'] ?? '',
       isEnabled: map['enabled'] ?? true,
       permissions: switch (map['permissions']) {
@@ -47,7 +47,7 @@ class UserRole {
 
   UserRole marge(Map<String, dynamic> map) {
     return UserRole(
-      id: map.parseID() ?? id,
+      id: map.tryParseAwField() ?? id,
       name: map['name'] ?? name,
       isEnabled: map['enabled'] ?? isEnabled,
       permissions: switch (map['permissions']) {

@@ -14,6 +14,7 @@ import 'package:pos/features/purchases/view/purchases_view.dart';
 import 'package:pos/features/returnPurchases/view/return_purchases_view.dart';
 import 'package:pos/features/returnSales/view/return_sales_view.dart';
 import 'package:pos/features/sales/view/sales_view.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/settings/view/language_view.dart';
 import 'package:pos/features/settings/view/settings_view.dart';
 import 'package:pos/features/staffs/view/create_staff_view.dart';
@@ -29,6 +30,7 @@ import 'package:pos/features/warehouse/view/create_warehouse_view.dart';
 import 'package:pos/features/warehouse/view/warehouse_view.dart';
 import 'package:pos/main.export.dart';
 import 'package:pos/navigation/nav_root.dart';
+import 'package:pos/routes/page/maintenance_page.dart';
 import 'package:pos/routes/page/protected_page.dart';
 
 String rootPath = RPaths.home.path;
@@ -57,6 +59,7 @@ class AppRouter extends Notifier<GoRouter> {
     return [
       AppRoute(RPaths.splash, (_) => const SplashPage()),
       AppRoute(RPaths.protected, (_) => const ProtectedPage()),
+      AppRoute(RPaths.maintenance, (_) => const MaintenancePage()),
 
       //! auth
       AppRoute(RPaths.login, (_) => const LoginView()),
@@ -145,12 +148,17 @@ class AppRouter extends Notifier<GoRouter> {
   @override
   GoRouter build() {
     Ctx._key = _root;
-    // Toaster.navigator = _rootNavigator;
     final auth = ref.watch(authCtrlProvider);
+
+    final maintenanceMode = ref.watch(configCtrlProvider.select((s) => s.maintenanceMode));
 
     FutureOr<String?> redirectLogic(ctx, GoRouterState state) async {
       final current = state.uri.toString();
       cat(current, 'route');
+
+      if (maintenanceMode == true) {
+        return RPaths.maintenance.path;
+      }
 
       if (auth.isLoading) {
         return RPaths.splash.path;

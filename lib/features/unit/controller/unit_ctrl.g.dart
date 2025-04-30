@@ -6,7 +6,7 @@ part of 'unit_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$unitCtrlHash() => r'a5998c9ad5cecf297bb55a1596c49a80444c85ca';
+String _$unitCtrlHash() => r'cd92e089f6c5a67b8fcc214f67c57ae8c5433c72';
 
 /// See also [UnitCtrl].
 @ProviderFor(UnitCtrl)

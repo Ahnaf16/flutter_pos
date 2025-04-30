@@ -10,6 +10,7 @@ class Stock {
     required this.dealerPrice,
     required this.quantity,
     required this.warehouse,
+    required this.createdAt,
   });
 
   final String id;
@@ -19,6 +20,7 @@ class Stock {
   final num dealerPrice;
   final int quantity;
   final WareHouse? warehouse;
+  final DateTime createdAt;
 
   factory Stock.fromDoc(Document doc) {
     final data = doc.data;
@@ -30,18 +32,26 @@ class Stock {
       dealerPrice: data.parseNum('dealer_price'),
       quantity: data.parseInt('quantity'),
       warehouse: WareHouse.tyrParse(data['warehouse']),
+      createdAt: DateTime.parse(doc.$createdAt),
     );
   }
 
+  num get getProfitLoss {
+    return (salesPrice - purchasePrice) * quantity;
+  }
+
+  bool get isProfitable => getProfitLoss > 0;
+
   factory Stock.fromMap(QMap map) {
     return Stock(
-      id: map.parseID() ?? '',
+      id: map.parseAwField(),
       purchasePrice: map.parseNum('purchase_price'),
       salesPrice: map.parseNum('sales_price'),
       wholesalePrice: map.parseNum('wholesale_price'),
       dealerPrice: map.parseNum('dealer_price'),
       quantity: map.parseInt('quantity'),
       warehouse: WareHouse.tyrParse(map['warehouse']),
+      createdAt: DateTime.parse(map.parseAwField('createdAt')),
     );
   }
 
@@ -57,13 +67,15 @@ class Stock {
 
   Stock marge(Map<String, dynamic> map) {
     return Stock(
-      id: map.parseID() ?? id,
+      id: map.tryParseAwField() ?? id,
       purchasePrice: map['purchase_price'] ?? purchasePrice,
       salesPrice: map['sales_price'] ?? salesPrice,
       wholesalePrice: map['wholesale_price'] ?? wholesalePrice,
       dealerPrice: map['dealer_price'] ?? dealerPrice,
       quantity: map['quantity'] ?? quantity,
       warehouse: WareHouse.tyrParse(map['warehouse']) ?? warehouse,
+      createdAt:
+          map.tryParseAwField('createdAt') != null ? DateTime.parse(map.tryParseAwField('createdAt')!) : createdAt,
     );
   }
 
@@ -75,6 +87,7 @@ class Stock {
     'dealer_price': dealerPrice,
     'quantity': quantity,
     'warehouse': warehouse?.toMap(),
+    'createdAt': createdAt.toString(),
   };
 
   Map<String, dynamic> toAwPost() => {

@@ -2,6 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:get_it/get_it.dart';
 import 'package:pos/features/auth/repository/auth_repo.dart';
 import 'package:pos/features/products/repository/products_repo.dart';
+import 'package:pos/features/settings/repository/config_repo.dart';
 import 'package:pos/features/staffs/repository/staffs_repo.dart';
 import 'package:pos/features/stock/repository/stock_repo.dart';
 import 'package:pos/features/unit/repository/unit_repo.dart';
@@ -43,6 +44,7 @@ Future<void> initDependencies() async {
   locate.registerLazyIfAbsent<AwStorage>(AwStorage.new);
   locate.registerLazyIfAbsent<AwAccount>(AwAccount.new);
 
+  locate.registerLazyIfAbsent<ConfigRepo>(ConfigRepo.new);
   locate.registerLazyIfAbsent<AuthRepo>(AuthRepo.new);
   locate.registerLazyIfAbsent<StaffRepo>(StaffRepo.new);
   locate.registerLazyIfAbsent<WarehouseRepo>(WarehouseRepo.new);
