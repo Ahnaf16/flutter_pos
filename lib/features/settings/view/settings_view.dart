@@ -20,7 +20,6 @@ class SettingsView extends HookConsumerWidget {
             ShadTabs<int>(
               value: index.value,
               tabBarConstraints: const BoxConstraints(maxWidth: 500),
-
               tabs: [
                 for (int i = 0; i < _paths.length; i++)
                   ShadTab(value: i, onPressed: () => index.value = i, child: Text(_paths[i].$1)),

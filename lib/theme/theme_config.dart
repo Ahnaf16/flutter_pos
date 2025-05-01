@@ -50,7 +50,7 @@ class ThemeCtrl extends Notifier<ThemeConfig> {
       cardTheme: ShadCardTheme(padding: Pads.sm(), rowMainAxisAlignment: MainAxisAlignment.start),
       inputTheme: ShadInputTheme(
         padding: kDefInputPadding,
-      ).copyWith(decoration: ShadDecoration(border: ShadBorder.all(width: 2))),
+      ).copyWith(decoration: ShadDecoration(border: ShadBorder.all(width: 1))),
       selectTheme: ShadSelectTheme(padding: kDefInputPadding),
       decoration: ShadDecoration(
         labelPadding: Pads.padding(bottom: 0, left: 5),

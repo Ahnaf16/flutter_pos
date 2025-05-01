@@ -96,7 +96,6 @@ class CreateProductView extends HookConsumerWidget {
                       spacing: Insets.med,
                       children: [
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Expanded(
                               child: ShadField(
