@@ -9,35 +9,55 @@ class SettingsView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final index = useState(0);
+    final ly = context.layout;
+
     return BaseBody(
       title: 'Settings',
-      padding: Pads.med(),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: Insets.sm,
+      padding: Pads.zero,
+      body: Column(
         children: [
-          SizedBox(
-            width: 150,
-            child: IntrinsicWidth(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (int i = 0; i < _paths.length; i++)
-                    ShadButton.secondary(
-                      key: ValueKey(_paths[i].$1),
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      backgroundColor: i == index.value ? context.colors.primary.op2 : Colors.transparent,
-                      hoverBackgroundColor: context.colors.primary.op1,
-                      hoverForegroundColor: context.colors.foreground,
-                      foregroundColor: context.colors.foreground,
-                      leading: Text(_paths[i].$1),
-                      onPressed: () => index.value = i,
+          if (!ly.isDesktop)
+            ShadTabs<int>(
+              value: index.value,
+              tabBarConstraints: const BoxConstraints(maxWidth: 500),
+
+              tabs: [
+                for (int i = 0; i < _paths.length; i++)
+                  ShadTab(value: i, onPressed: () => index.value = i, child: Text(_paths[i].$1)),
+              ],
+            ),
+          Padding(
+            padding: Pads.med(),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: Insets.sm,
+              children: [
+                if (ly.isDesktop)
+                  SizedBox(
+                    width: 150,
+                    child: IntrinsicWidth(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (int i = 0; i < _paths.length; i++)
+                            ShadButton.secondary(
+                              key: ValueKey(_paths[i].$1),
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              backgroundColor: i == index.value ? context.colors.primary.op2 : Colors.transparent,
+                              hoverBackgroundColor: context.colors.primary.op1,
+                              hoverForegroundColor: context.colors.foreground,
+                              foregroundColor: context.colors.foreground,
+                              leading: Text(_paths[i].$1),
+                              onPressed: () => index.value = i,
+                            ),
+                        ],
+                      ),
                     ),
-                ],
-              ),
+                  ),
+                Expanded(child: _paths[index.value].$2),
+              ],
             ),
           ),
-          Expanded(child: _paths[index.value].$2),
         ],
       ),
     );
