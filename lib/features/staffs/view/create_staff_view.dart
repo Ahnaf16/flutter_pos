@@ -103,6 +103,21 @@ class CreateStaffView extends HookConsumerWidget {
                         children: [
                           const ShadField(name: 'name', label: 'Name', hintText: 'Enter your name', isRequired: true),
 
+                          ShadField(
+                            name: 'email',
+                            label: 'Email',
+                            hintText: 'Enter your email',
+                            isRequired: true,
+                            enabled: updatingId == null,
+                            helperText: updatingId == null ? null : 'Email is not editable',
+                          ),
+
+                          const ShadField(
+                            name: 'phone',
+                            label: 'Phone',
+                            hintText: 'Enter your phone',
+                            isRequired: true,
+                          ),
                           FormBuilderField<QMap>(
                             name: 'warehouse',
                             validator: FormBuilderValidators.required(),
@@ -177,22 +192,6 @@ class CreateStaffView extends HookConsumerWidget {
                                 ),
                               );
                             },
-                          ),
-
-                          ShadField(
-                            name: 'email',
-                            label: 'Email',
-                            hintText: 'Enter your email',
-                            isRequired: true,
-                            enabled: updatingId == null,
-                            helperText: updatingId == null ? null : 'Email is not editable',
-                          ),
-
-                          const ShadField(
-                            name: 'phone',
-                            label: 'Phone',
-                            hintText: 'Enter your phone',
-                            isRequired: true,
                           ),
 
                           ShadInputDecorator(

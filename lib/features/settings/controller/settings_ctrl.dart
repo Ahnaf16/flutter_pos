@@ -24,4 +24,14 @@ class ConfigCtrl extends _$ConfigCtrl {
       state = config;
     }
   }
+
+  Future<Result> updateConfig(QMap formData) async {
+    final user = state.marge(formData);
+
+    final res = await _repo.updateConfig(user);
+    return res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      return rightResult('Settings updated successfully');
+    });
+  }
 }

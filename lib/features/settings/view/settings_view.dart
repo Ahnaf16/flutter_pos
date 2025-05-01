@@ -1,3 +1,6 @@
+import 'package:pos/features/settings/view/appearance_settings_view.dart';
+import 'package:pos/features/settings/view/general_settings_view.dart';
+import 'package:pos/features/settings/view/profile_view.dart';
 import 'package:pos/main.export.dart';
 
 class SettingsView extends HookConsumerWidget {
@@ -5,20 +8,44 @@ class SettingsView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ListTile(
-              onTap: () => RPaths.language.push(context),
-              leading: const Icon(Icons.language),
-              title: const Text('Language'),
+    final index = useState(0);
+    return BaseBody(
+      title: 'Settings',
+      padding: Pads.med(),
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: Insets.sm,
+        children: [
+          SizedBox(
+            width: 150,
+            child: IntrinsicWidth(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (int i = 0; i < _paths.length; i++)
+                    ShadButton.secondary(
+                      key: ValueKey(_paths[i].$1),
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      backgroundColor: i == index.value ? context.colors.primary.op2 : Colors.transparent,
+                      hoverBackgroundColor: context.colors.primary.op1,
+                      hoverForegroundColor: context.colors.foreground,
+                      foregroundColor: context.colors.foreground,
+                      leading: Text(_paths[i].$1),
+                      onPressed: () => index.value = i,
+                    ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+          Expanded(child: _paths[index.value].$2),
+        ],
       ),
     );
   }
 }
+
+final _paths = [
+  ('Profile', const ProfileView()),
+  ('General', const GeneralSettingsView()),
+  ('Appearance', const AppearanceSettingsView()),
+];

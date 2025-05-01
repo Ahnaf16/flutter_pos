@@ -8,8 +8,14 @@ final themeProvider = NotifierProvider<ThemeCtrl, ThemeConfig>(ThemeCtrl.new);
 class ThemeCtrl extends Notifier<ThemeConfig> {
   final _sp = locate<SP>();
 
-  void setTheme(String name) async {
+  void setTheme(String? name) async {
+    if (name == null) return;
     await _sp.themeName.setValue(name);
+    ref.invalidateSelf();
+  }
+
+  void setMode(ThemeMode? mode) async {
+    await _sp.isDark.setValue(mode == ThemeMode.dark);
     ref.invalidateSelf();
   }
 
@@ -56,19 +62,23 @@ class ThemeCtrl extends Notifier<ThemeConfig> {
   }
 
   static final shadThemeColors = [
-    'stone',
-    'slate',
-    'yellow',
-    'violet',
     'blue',
     'gray',
     'green',
-    'neutral',
     'orange',
     'red',
     'rose',
+    'violet',
+    'yellow',
+    'neutral',
+    'slate',
+    'stone',
     'zinc',
   ];
 }
 
-final kDefInputPadding = Pads.padding(v: 15, h: 20);
+final kDefInputPadding = Pads.padding(v: 10, h: 20);
+
+extension ThemeModeEx on ThemeMode {
+  Brightness get brightness => this == ThemeMode.dark ? Brightness.dark : Brightness.light;
+}

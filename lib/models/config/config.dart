@@ -64,7 +64,10 @@ class Config {
       maintenanceMode: map['maintenance_mode'] ?? maintenanceMode,
       currencySymbol: map['currency_symbol'] ?? currencySymbol,
       symbolLeft: map['currency_symbol_on_left'] ?? symbolLeft,
-      stockDistPolicy: map['stock_distribution_policy'] ?? stockDistPolicy,
+      stockDistPolicy:
+          map['stock_distribution_policy'] == null
+              ? stockDistPolicy
+              : StockDistPolicy.values.byName(map['stock_distribution_policy']),
       minimumVersion: map['minimum_version'] ?? minimumVersion,
     );
   }
@@ -74,7 +77,7 @@ class Config {
       'maintenance_mode': maintenanceMode,
       'currency_symbol': currencySymbol,
       'currency_symbol_on_left': symbolLeft,
-      'stock_distribution_policy': stockDistPolicy,
+      'stock_distribution_policy': stockDistPolicy.name,
       'minimum_version': minimumVersion,
     };
   }

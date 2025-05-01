@@ -11,13 +11,14 @@ class NavigationRoot extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authUser = ref.watch(authCtrlProvider);
+    final authUser = ref.watch(currentUserProvider);
 
     final rootPath = context.routeState.uri.pathSegments.first;
     final getIndex = _items.indexWhere((item) => item.$3?.path.contains(rootPath) ?? false);
 
     final index = useState(0);
-    final expanded = useState(!context.layout.isMobile);
+    final expanded = useState(true);
+    final drawerOpen = useState(false);
 
     useEffect(() {
       index.value = getIndex;
@@ -29,8 +30,14 @@ class NavigationRoot extends HookConsumerWidget {
       loading: () => const SplashPage(),
       data: (user) {
         return Scaffold(
-          appBar: _AppBar(user: user, onLeadingPressed: () => expanded.toggle()),
-          body: _BODY(expanded: expanded, index: index, child: child),
+          appBar: _AppBar(
+            user: user,
+            onLeadingPressed: () {
+              if (context.layout.isMobile) drawerOpen.toggle();
+              if (!context.layout.isMobile) expanded.toggle();
+            },
+          ),
+          body: _BODY(expanded: expanded, drawerOpen: drawerOpen, index: index, child: child),
         );
       },
     );
@@ -129,9 +136,10 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
 }
 
 class _BODY extends HookWidget {
-  const _BODY({required this.expanded, required this.index, required this.child});
+  const _BODY({required this.expanded, required this.drawerOpen, required this.index, required this.child});
 
   final ValueNotifier<bool> expanded;
+  final ValueNotifier<bool> drawerOpen;
   final ValueNotifier<int> index;
   final Widget child;
 
@@ -150,12 +158,12 @@ class _BODY extends HookWidget {
                 if (!expanded.value && icon == null)
                   const SizedBox.shrink()
                 else
-                  _NavButton(
+                  NavButton(
                     text: text,
                     icon: icon,
                     expanded: expanded.value,
                     selected: index.value == _items.indexOf((text, icon, path)),
-                    onTap: () {
+                    onPressed: () {
                       index.value = _items.indexOf((text, icon, path));
                       if (path != null) path.go(context);
                     },
@@ -182,20 +190,27 @@ class _BODY extends HookWidget {
             ),
           ],
         ),
-        if (context.layout.isMobile && expanded.value) ShadCard(width: 300, child: navItems),
+        if (context.layout.isMobile && drawerOpen.value) ShadCard(width: 300, child: navItems),
       ],
     );
   }
 }
 
-class _NavButton extends HookWidget {
-  const _NavButton({required this.text, this.icon, this.onTap, this.selected = false, this.expanded = true});
+class NavButton extends HookWidget {
+  const NavButton({
+    super.key,
+    required this.text,
+    this.icon,
+    this.onPressed,
+    this.selected = false,
+    this.expanded = true,
+  });
 
   final String text;
   final IconData? icon;
   final bool selected;
   final bool expanded;
-  final Function()? onTap;
+  final Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +223,7 @@ class _NavButton extends HookWidget {
       hoverBackgroundColor: context.colors.primary.op1,
       hoverForegroundColor: context.colors.foreground,
       foregroundColor: context.colors.foreground,
-      onPressed: onTap,
+      onPressed: onPressed,
       leading: Icon(icon),
       child:
           !expanded

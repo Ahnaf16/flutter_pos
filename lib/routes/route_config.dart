@@ -16,7 +16,6 @@ import 'package:pos/features/products/view/products_view.dart';
 import 'package:pos/features/returnPurchases/view/return_purchases_view.dart';
 import 'package:pos/features/returnSales/view/return_sales_view.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
-import 'package:pos/features/settings/view/language_view.dart';
 import 'package:pos/features/settings/view/settings_view.dart';
 import 'package:pos/features/staffs/view/create_staff_view.dart';
 import 'package:pos/features/staffs/view/staffs_view.dart';
@@ -139,11 +138,7 @@ class AppRouter extends Notifier<GoRouter> {
           //! payment accounts
           AppRoute(RPaths.paymentAccount, (_) => const PaymentAccountsView()),
           //! settings
-          AppRoute(
-            RPaths.settings,
-            (_) => const SettingsView(),
-            routes: [AppRoute(RPaths.language, (_) => const LanguageView())],
-          ),
+          AppRoute(RPaths.settings, (_) => const SettingsView()),
         ],
       ),
     ];
