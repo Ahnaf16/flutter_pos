@@ -259,9 +259,9 @@ List<(String text, IconData? icon, RPath? path)> get _items => [
   ('Accounting', null, null),
   ('Expense', LuIcons.wallet, RPaths.expense),
   ('Due', LuIcons.coins, RPaths.due),
-  // ('Due collection', LuIcons.handCoins, RPaths.home),
   ('Money transfer', LuIcons.arrowsUpFromLine, RPaths.moneyTransfer),
   ('Transactions', LuIcons.landmark, RPaths.transactions),
+  ('Payment Accounts', LuIcons.creditCard, RPaths.paymentAccount),
 
   // ('', null, null),
   ('Configuration', null, null),

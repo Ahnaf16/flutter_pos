@@ -70,6 +70,9 @@ class RPaths {
   // due
   static RPath due = const RPath('/due');
 
+  // Payment account
+  static RPath paymentAccount = const RPath('/payment_account');
+
   // moneyTransfer
   static RPath moneyTransfer = const RPath('/money_transfer');
 

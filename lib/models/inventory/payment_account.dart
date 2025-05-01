@@ -32,7 +32,7 @@ class PaymentAccount {
       name: map['name'] ?? '',
       description: map['description'],
       amount: map.parseNum('amount'),
-      isActive: map.parseBool('is_active'),
+      isActive: map.parseBool('is_active', true),
     );
   }
   static PaymentAccount? tryParse(dynamic value) {
@@ -61,5 +61,15 @@ class PaymentAccount {
 
   Map<String, dynamic> toAwPost() {
     return toMap()..removeWhere((key, value) => key == 'id');
+  }
+
+  PaymentAccount copyWith({String? id, String? name, ValueGetter<String?>? description, num? amount, bool? isActive}) {
+    return PaymentAccount(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description != null ? description() : this.description,
+      amount: amount ?? this.amount,
+      isActive: isActive ?? this.isActive,
+    );
   }
 }

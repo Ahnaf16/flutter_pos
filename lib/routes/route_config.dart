@@ -10,6 +10,7 @@ import 'package:pos/features/inventory_record/view/create_record_view.dart';
 import 'package:pos/features/inventory_record/view/inventory_record_view.dart';
 import 'package:pos/features/moneyTransfer/view/money_transfer_view.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
+import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
 import 'package:pos/features/products/view/create_product_view.dart';
 import 'package:pos/features/products/view/products_view.dart';
 import 'package:pos/features/returnPurchases/view/return_purchases_view.dart';
@@ -135,6 +136,8 @@ class AppRouter extends Notifier<GoRouter> {
           AppRoute(RPaths.moneyTransfer, (_) => const MoneyTransferView()),
           //! transactions
           AppRoute(RPaths.transactions, (_) => const TransactionsView()),
+          //! payment accounts
+          AppRoute(RPaths.paymentAccount, (_) => const PaymentAccountsView()),
           //! settings
           AppRoute(
             RPaths.settings,
