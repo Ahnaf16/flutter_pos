@@ -18,7 +18,7 @@ dependencies:
   # UI
   cupertino_icons: ^1.0.8
   # shadcn_flutter: ^0.0.34
-  shadcn_ui: ^0.24.0
+  shadcn_ui: ^0.25.0
   flutter_animate: ^4.5.2
   flutter_svg: ^2.1.0
   # State
