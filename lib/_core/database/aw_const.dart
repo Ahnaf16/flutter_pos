@@ -31,6 +31,7 @@ class $AWCollections {
   AwId get unit => ('6805dc02001027cde1e6', 'unit');
   AwId get users => ('680536a4003be2a282af', 'users');
   AwId get warehouse => ('6805bdcd00107f585ff2', 'warehouse');
+  AwId get dueLog => ('68130121000d796dd775', 'due_adjustment_log');
 
   List<AwId> get values => [
     config,

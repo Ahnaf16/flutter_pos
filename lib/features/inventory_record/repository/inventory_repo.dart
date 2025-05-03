@@ -26,7 +26,7 @@ class InventoryRepo with AwHandler {
     //! update Due
     Parti? parti = record.parti;
     if (inventory.hasDue || inventory.hasBalance) {
-      final (partiErr, partiData) = await _updateDue(parti, inventory.due).toRecord();
+      final (partiErr, partiData) = await _updateDue(parti, inventory.due, record.type).toRecord();
       if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
       parti = Parti.fromDoc(partiData);
     }
@@ -37,7 +37,7 @@ class InventoryRepo with AwHandler {
 
     if (inventory.partiHasBalance && inventory.dueBalance > 0) {
       // [Parti.Due] is already [-] in this case
-      final (partiErr, partiData) = await _updateDue(parti, inventory.dueBalance).toRecord();
+      final (partiErr, partiData) = await _updateDue(parti, inventory.dueBalance, record.type).toRecord();
       if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
     }
 
@@ -71,10 +71,9 @@ class InventoryRepo with AwHandler {
     return await repo.updateStock(stock.copyWith(quantity: stock.quantity - qty));
   }
 
-  FutureReport<Document> _updateDue(Parti parti, num due) async {
+  FutureReport<Document> _updateDue(Parti parti, num due, RecordType type) async {
     final repo = locate<PartiesRepo>();
-    return await repo.updateParti(parti.copyWith(due: parti.due + due));
-    // TODO : Add Due log
+    return await repo.updateDue(parti, due, !due.isNegative, 'Due created from ${type.name}');
   }
 
   FutureReport<Document> updateRecord(InventoryRecord record) async {
