@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:pos/features/inventory_record/repository/sales_repo.dart';
+import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -17,19 +17,19 @@ class InventoryCtrl extends _$InventoryCtrl {
     }, identity);
   }
 
-  Future<Result> createUnit(QMap form) async {
-    final res = await _repo.createInventory(form);
-    return res.fold(leftResult, (r) {
-      ref.invalidateSelf();
-      return rightResult('Record created successfully');
-    });
-  }
+  // Future<Result> createUnit(QMap form) async {
+  //   final res = await _repo.createInventory(form);
+  //   return res.fold(leftResult, (r) {
+  //     ref.invalidateSelf();
+  //     return rightResult('Record created successfully');
+  //   });
+  // }
 
-  Future<Result> updateUnit(InventoryRecord record) async {
-    final res = await _repo.updateRecord(record);
-    return res.fold(leftResult, (r) {
-      ref.invalidateSelf();
-      return rightResult('Record updated successfully');
-    });
-  }
+  // Future<Result> updateUnit(InventoryRecord record) async {
+  //   final res = await _repo.updateRecord(record);
+  //   return res.fold(leftResult, (r) {
+  //     ref.invalidateSelf();
+  //     return rightResult('Record updated successfully');
+  //   });
+  // }
 }

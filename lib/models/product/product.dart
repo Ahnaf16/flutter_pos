@@ -24,12 +24,6 @@ class Product {
   final bool manageStock;
   final String? manufacturer;
 
-  int get quantity => stock.map((e) => e.quantity).sum;
-
-  String get unitName => unit?.unitName ?? '';
-
-  WareHouse? get warehouse => stock.map((e) => e.warehouse).firstOrNull;
-
   factory Product.fromDoc(Document doc) {
     final data = doc.data;
     return Product(
@@ -139,5 +133,28 @@ class Product {
       manageStock: manageStock ?? this.manageStock,
       manufacturer: manufacturer ?? this.manufacturer,
     );
+  }
+
+  int get quantity => stock.map((e) => e.quantity).sum;
+
+  String get unitName => unit?.unitName ?? '';
+
+  WareHouse? get warehouse => stock.map((e) => e.warehouse).firstOrNull;
+
+  Stock? getLatestStock() {
+    if (stock.isEmpty) return null;
+    return stock.reduce((a, b) => a.createdAt.isAfter(b.createdAt) ? a : b);
+  }
+
+  Stock? getOldestStock() {
+    if (stock.isEmpty) return null;
+    return stock.reduce((a, b) => a.createdAt.isBefore(b.createdAt) ? a : b);
+  }
+
+  Stock? getEffectiveStock(StockDistPolicy policy) {
+    return switch (policy) {
+      StockDistPolicy.newerFirst => getLatestStock(),
+      StockDistPolicy.olderFirst => getOldestStock(),
+    };
   }
 }

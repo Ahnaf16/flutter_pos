@@ -6,7 +6,7 @@ part of 'parties_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$partiesCtrlHash() => r'1ffcbb8c5ad37c21d5445d22f439956618ccdd40';
+String _$partiesCtrlHash() => r'995a1470045025097d4ac9e563f09bd125b79662';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -31,10 +31,10 @@ class _SystemHash {
 
 abstract class _$PartiesCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<Parti>> {
-  late final bool isCustomer;
+  late final bool? isCustomer;
 
   FutureOr<List<Parti>> build(
-    bool isCustomer,
+    bool? isCustomer,
   );
 }
 
@@ -49,7 +49,7 @@ class PartiesCtrlFamily extends Family<AsyncValue<List<Parti>>> {
 
   /// See also [PartiesCtrl].
   PartiesCtrlProvider call(
-    bool isCustomer,
+    bool? isCustomer,
   ) {
     return PartiesCtrlProvider(
       isCustomer,
@@ -85,7 +85,7 @@ class PartiesCtrlProvider
     extends AutoDisposeAsyncNotifierProviderImpl<PartiesCtrl, List<Parti>> {
   /// See also [PartiesCtrl].
   PartiesCtrlProvider(
-    bool isCustomer,
+    bool? isCustomer,
   ) : this._internal(
           () => PartiesCtrl()..isCustomer = isCustomer,
           from: partiesCtrlProvider,
@@ -110,7 +110,7 @@ class PartiesCtrlProvider
     required this.isCustomer,
   }) : super.internal();
 
-  final bool isCustomer;
+  final bool? isCustomer;
 
   @override
   FutureOr<List<Parti>> runNotifierBuild(
@@ -161,7 +161,7 @@ class PartiesCtrlProvider
 // ignore: unused_element
 mixin PartiesCtrlRef on AutoDisposeAsyncNotifierProviderRef<List<Parti>> {
   /// The parameter `isCustomer` of this provider.
-  bool get isCustomer;
+  bool? get isCustomer;
 }
 
 class _PartiesCtrlProviderElement
@@ -170,7 +170,7 @@ class _PartiesCtrlProviderElement
   _PartiesCtrlProviderElement(super.provider);
 
   @override
-  bool get isCustomer => (origin as PartiesCtrlProvider).isCustomer;
+  bool? get isCustomer => (origin as PartiesCtrlProvider).isCustomer;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

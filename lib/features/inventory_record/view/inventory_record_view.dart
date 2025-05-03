@@ -24,9 +24,13 @@ class InventoryRecordView extends HookConsumerWidget {
       title: 'All ${type.name}',
       actions: [
         ShadButton(
-          child: const Text('Create Sale'),
+          child: Text('Create ${type.name}'),
           onPressed: () {
-            RPaths.createSales.pushNamed(context);
+            if (type == RecordType.purchase) {
+              RPaths.createPurchases.pushNamed(context);
+            } else {
+              RPaths.createSales.pushNamed(context);
+            }
           },
         ),
       ],

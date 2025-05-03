@@ -8,7 +8,7 @@ class PaymentAccountsRepo with AwHandler {
     return doc;
   }
 
-  FutureReport<Document> updateUnit(PaymentAccount acc) async {
+  FutureReport<Document> updateAccount(PaymentAccount acc) async {
     final doc = await db.update(AWConst.collections.paymentAccount, acc.id, data: acc.toAwPost());
     return doc;
   }

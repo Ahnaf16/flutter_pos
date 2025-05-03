@@ -6,7 +6,7 @@ part of 'settings_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$configCtrlHash() => r'bebac268bbdf75c22eac8093f69c2e04cfb17ebc';
+String _$configCtrlHash() => r'bf5b3f4e53159760a5c34d3e862e5fcbb6ec8af8';
 
 /// See also [ConfigCtrl].
 @ProviderFor(ConfigCtrl)

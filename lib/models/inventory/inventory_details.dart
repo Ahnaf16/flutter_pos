@@ -13,7 +13,7 @@ class InventoryDetails {
     final data = doc.data;
     return InventoryDetails(
       id: doc.$id,
-      product: Product.fromMap(data['product']),
+      product: Product.fromMap(data['products']),
       stock: Stock.fromMap(data['stock']),
       quantity: data['quantity'],
     );
@@ -22,7 +22,7 @@ class InventoryDetails {
   factory InventoryDetails.fromMap(Map<String, dynamic> map) {
     return InventoryDetails(
       id: map.parseAwField(),
-      product: Product.fromMap(map['product']),
+      product: Product.fromMap(map['products']),
       stock: Stock.fromMap(map['stock']),
       quantity: map['quantity'],
     );
@@ -47,9 +47,9 @@ class InventoryDetails {
     );
   }
 
-  Map<String, dynamic> toMap() => {'id': id, 'product': product.toMap(), 'stock': stock.toMap(), 'quantity': quantity};
+  Map<String, dynamic> toMap() => {'id': id, 'products': product.toMap(), 'stock': stock.toMap(), 'quantity': quantity};
 
-  Map<String, dynamic> toAwPost() => {'product': product.id, 'stock': stock.id, 'quantity': quantity};
+  Map<String, dynamic> toAwPost() => {'products': product.id, 'stock': stock.id, 'quantity': quantity};
 
   InventoryDetails copyWith({String? id, Product? product, Stock? stock, int? quantity}) {
     return InventoryDetails(
@@ -59,4 +59,10 @@ class InventoryDetails {
       quantity: quantity ?? this.quantity,
     );
   }
+
+  num totalPriceByType(RecordType type) =>
+      quantity * (type == RecordType.sale ? stock.salesPrice : stock.purchasePrice);
+
+  num totalPriceSale() => quantity * (stock.salesPrice);
+  num totalPricePurchase() => quantity * (stock.purchasePrice);
 }

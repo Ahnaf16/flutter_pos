@@ -7,6 +7,7 @@ export 'parties/parti.dart';
 export 'product/product.dart';
 export 'product/product_unit.dart';
 export 'product/stock.dart';
+export 'states/inventory_record_state.dart';
 export 'user/app_user.dart';
 export 'user/role_permissions.dart';
 export 'user/user_role.dart';

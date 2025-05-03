@@ -98,4 +98,26 @@ class Stock {
     'quantity': quantity,
     'warehouse': warehouse?.id,
   };
+
+  Stock copyWith({
+    String? id,
+    num? purchasePrice,
+    num? salesPrice,
+    num? wholesalePrice,
+    num? dealerPrice,
+    int? quantity,
+    ValueGetter<WareHouse?>? warehouse,
+    DateTime? createdAt,
+  }) {
+    return Stock(
+      id: id ?? this.id,
+      purchasePrice: purchasePrice ?? this.purchasePrice,
+      salesPrice: salesPrice ?? this.salesPrice,
+      wholesalePrice: wholesalePrice ?? this.wholesalePrice,
+      dealerPrice: dealerPrice ?? this.dealerPrice,
+      quantity: quantity ?? this.quantity,
+      warehouse: warehouse != null ? warehouse() : this.warehouse,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }

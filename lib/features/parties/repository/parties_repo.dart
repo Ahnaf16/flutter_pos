@@ -41,9 +41,12 @@ class PartiesRepo with AwHandler {
     return doc;
   }
 
-  FutureReport<List<Parti>> getParties(List<PartiType> type) async {
+  FutureReport<List<Parti>> getParties(List<PartiType>? type) async {
     return await db
-        .getList(AWConst.collections.parties, queries: [Query.equal('type', type.map((e) => e.name).toList())])
+        .getList(
+          AWConst.collections.parties,
+          queries: [if (type != null) Query.equal('type', type.map((e) => e.name).toList())],
+        )
         .convert((docs) => docs.convertDoc(Parti.fromDoc));
   }
 

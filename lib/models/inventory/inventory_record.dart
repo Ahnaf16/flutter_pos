@@ -52,7 +52,7 @@ class InventoryRecord {
       shipping: data['shipping'],
       status: InventoryStatus.values.byName(data['status']),
       date: DateTime.parse(data['date']),
-      type: RecordType.values.byName(data['type']),
+      type: RecordType.values.byName(data['record_type']),
     );
   }
 
@@ -72,7 +72,7 @@ class InventoryRecord {
       shipping: map.parseNum('shipping'),
       status: InventoryStatus.values.byName(map['status']),
       date: DateTime.parse(map['date']),
-      type: RecordType.values.byName(map['type']),
+      type: RecordType.values.byName(map['record_type']),
     );
   }
   static InventoryRecord? tryParse(dynamic value) {
@@ -101,7 +101,7 @@ class InventoryRecord {
       shipping: map.parseNum('shipping', fallBack: shipping),
       status: map['status'] == null ? status : InventoryStatus.values.byName(map['status']),
       date: map['date'] == null ? date : DateTime.parse(map['date']),
-      type: map['type'] == null ? type : RecordType.values.byName(map['type']),
+      type: map['record_type'] == null ? type : RecordType.values.byName(map['record_type']),
     );
   }
 
@@ -116,8 +116,8 @@ class InventoryRecord {
     'discount_type': discountType.name,
     'shipping': shipping,
     'status': status.name,
-    'date': date,
-    'type': type.name,
+    'date': date.toIso8601String(),
+    'record_type': type.name,
   };
 
   Map<String, dynamic> toAwPost() => {
@@ -130,7 +130,7 @@ class InventoryRecord {
     'discount_type': discountType.name,
     'shipping': shipping,
     'status': status.name,
-    'date': date,
-    'type': type.name,
+    'date': date.toIso8601String(),
+    'record_type': type.name,
   };
 }

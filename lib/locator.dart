@@ -1,7 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:get_it/get_it.dart';
 import 'package:pos/features/auth/repository/auth_repo.dart';
-import 'package:pos/features/inventory_record/repository/sales_repo.dart';
+import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
 import 'package:pos/features/parties/repository/parties_repo.dart';
 import 'package:pos/features/payment_accounts/repository/payment_accounts_repo.dart';
 import 'package:pos/features/products/repository/products_repo.dart';

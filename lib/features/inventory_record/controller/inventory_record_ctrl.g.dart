@@ -6,7 +6,7 @@ part of 'inventory_record_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$inventoryCtrlHash() => r'3307e9a32bec390d3ee101c10e8f0e55d9f81037';
+String _$inventoryCtrlHash() => r'903c88d7251a5b808ddd6d1d9ccf4db083054a54';
 
 /// Copied from Dart SDK
 class _SystemHash {

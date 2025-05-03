@@ -26,7 +26,7 @@ class PaymentAccountsCtrl extends _$PaymentAccountsCtrl {
   }
 
   Future<Result> updateUnit(PaymentAccount acc) async {
-    final res = await _repo.updateUnit(acc);
+    final res = await _repo.updateAccount(acc);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       return rightResult('Payment account updated successfully');
@@ -34,7 +34,7 @@ class PaymentAccountsCtrl extends _$PaymentAccountsCtrl {
   }
 
   Future<Result> toggleEnable(bool isActive, PaymentAccount acc) async {
-    final res = await _repo.updateUnit(acc.copyWith(isActive: isActive));
+    final res = await _repo.updateAccount(acc.copyWith(isActive: isActive));
     return await res.fold(leftResult, (r) async {
       state = await AsyncValue.guard(() async => build());
       return rightResult('Unit updated successfully');

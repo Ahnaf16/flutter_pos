@@ -9,8 +9,13 @@ part 'parties_ctrl.g.dart';
 class PartiesCtrl extends _$PartiesCtrl {
   final _repo = locate<PartiesRepo>();
   @override
-  Future<List<Parti>> build(bool isCustomer) async {
-    final staffs = await _repo.getParties(isCustomer ? PartiType.customers : PartiType.suppliers);
+  Future<List<Parti>> build(bool? isCustomer) async {
+    final types = switch (isCustomer) {
+      true => PartiType.customers,
+      false => PartiType.suppliers,
+      _ => null,
+    };
+    final staffs = await _repo.getParties(types);
     return staffs.fold((l) {
       Toast.showErr(Ctx.context, l);
       return [];
@@ -20,7 +25,7 @@ class PartiesCtrl extends _$PartiesCtrl {
   Future<Result> createParti(QMap formData, [PFile? file]) async {
     final res = await _repo.createParti(formData, file);
     return res.fold(leftResult, (r) {
-      ref.invalidateSelf();
+      ref.invalidate(partiesCtrlProvider);
       return rightResult('Parti created successfully');
     });
   }
@@ -28,6 +33,7 @@ class PartiesCtrl extends _$PartiesCtrl {
   Future<Result> updateParti(Parti parti, [PFile? file]) async {
     final res = await _repo.updateParti(parti, file);
     return res.fold(leftResult, (r) {
+      ref.invalidate(partiesCtrlProvider);
       return rightResult('Parti updated successfully');
     });
   }

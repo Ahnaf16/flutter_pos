@@ -1,5 +1,4 @@
 import 'package:appwrite/models.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/products/repository/products_repo.dart';
 import 'package:pos/features/stock/repository/stock_repo.dart';
 import 'package:pos/main.export.dart';
@@ -10,13 +9,29 @@ part 'products_ctrl.g.dart';
 @riverpod
 class ProductsCtrl extends _$ProductsCtrl {
   final _repo = locate<ProductRepo>();
+  final List<Product> _searchFrom = [];
   @override
   Future<List<Product>> build() async {
     final staffs = await _repo.getProducts();
-    return staffs.fold((l) {
-      Toast.showErr(Ctx.context, l);
-      return [];
-    }, identity);
+    return staffs.fold(
+      (l) {
+        Toast.showErr(Ctx.context, l);
+        return [];
+      },
+      (r) {
+        _searchFrom.clear();
+        _searchFrom.addAll(r);
+        return r;
+      },
+    );
+  }
+
+  void search(String query) async {
+    if (query.isEmpty) {
+      state = AsyncValue.data(_searchFrom);
+    }
+
+    state = AsyncData(_searchFrom.where((e) => e.name.low.contains(query)).toList());
   }
 
   Future<Result> createProduct(QMap formData, [PFile? file]) async {
@@ -41,6 +56,7 @@ class ProductsCtrl extends _$ProductsCtrl {
 
   FutureReport<Document> _createFirstStock(QMap stockData) async {
     final repo = locate<StockRepo>();
+    stockData.addAll({'createdAt': DateTime.now().toIso8601String()});
     return await repo.createStock(stockData);
   }
 }

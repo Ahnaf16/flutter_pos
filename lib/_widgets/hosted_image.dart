@@ -2,6 +2,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pos/main.export.dart';
 
+Map<String, Uint8List> _cache = {};
+
 class HostedImage extends StatelessWidget {
   const HostedImage(
     this.img, {
@@ -49,8 +51,16 @@ class HostedImage extends StatelessWidget {
       return FutureBuilder<Uint8List>(
         future: st.imgPreview(img.path),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) return loading;
-          if (snapshot.hasError) return error;
+          final Uint8List? bytes = _cache[img.path];
+
+          if (bytes == null) {
+            if (snapshot.connectionState == ConnectionState.waiting) return loading;
+            if (snapshot.hasError) return error;
+
+            _cache[img.path] = snapshot.data!;
+
+            if (_cache.length > 100) _cache.clear();
+          }
 
           return SizedBox(
             height: height,
@@ -60,7 +70,7 @@ class HostedImage extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(radius),
                 child: UniversalImage(
-                  snapshot.data,
+                  bytes ?? snapshot.data!,
                   height: height,
                   width: width,
                   heroTag: tag ?? img.toString(),

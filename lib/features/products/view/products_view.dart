@@ -1,5 +1,4 @@
 import 'package:pos/features/products/controller/products_ctrl.dart';
-import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -23,7 +22,7 @@ class ProductsView extends HookConsumerWidget {
       ],
       body: productList.when(
         loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
+        error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
         data: (products) {
           return DataTableBuilder<Product, (String, double)>(
             rowHeight: 120,

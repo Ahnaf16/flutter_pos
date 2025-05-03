@@ -33,6 +33,7 @@ class ShadField extends HookWidget {
     this.trailing,
     this.focusNode,
     this.expands = false,
+    this.padding,
   }) : _key = key,
        super(key: superKey);
 
@@ -63,6 +64,7 @@ class ShadField extends HookWidget {
   final FocusNode? focusNode;
   final bool expands;
   final int? minLines;
+  final EdgeInsets? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +106,7 @@ class ShadField extends HookWidget {
             obscureText: isPassField ? obscure.value : false,
             expands: expands,
             leading: leading,
+            padding: padding,
             trailing:
                 isPassField
                     ? ShadButton.ghost(

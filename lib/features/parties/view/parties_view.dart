@@ -11,6 +11,10 @@ class PartiesView extends HookConsumerWidget {
   const PartiesView({super.key, this.isCustomer = false});
   final bool isCustomer;
 
+  static FVoid showAddDialog(BuildContext context, bool isCustomer) async {
+    await showShadDialog(context: context, builder: (context) => _PartiAddDialog(isCustomer: isCustomer));
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final partiList = ref.watch(partiesCtrlProvider(isCustomer));
@@ -78,13 +82,10 @@ class PartiesView extends HookConsumerWidget {
                         size: ShadButtonSize.sm,
                         leading: const Icon(LuIcons.pen),
                         onPressed: () async {
-                          final result = await showShadDialog<bool>(
+                          await showShadDialog<Parti>(
                             context: context,
                             builder: (context) => _PartiAddDialog(parti: data, isCustomer: isCustomer),
                           );
-                          if (result == true) {
-                            ref.invalidate(partiesCtrlProvider(isCustomer));
-                          }
                         },
                       ),
                     ],
@@ -176,7 +177,6 @@ class _PartiAddDialog extends HookConsumerWidget {
               result = await ctrl.updateParti(updated, selectedFile.value);
               l.falsey();
             }
-
             if (result case final Result r) {
               if (!context.mounted) return;
               r.showToast(context);
