@@ -1,5 +1,4 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:pos/_widgets/form/shad_text_area.dart';
 import 'package:pos/main.export.dart';
 
 class HomeView extends HookConsumerWidget {
@@ -24,6 +23,7 @@ class HomeView extends HookConsumerWidget {
                 hintText: 'Enter your name',
                 helperText: 'This is a helper text',
                 isRequired: true,
+                initialValue: 'initial',
               ),
               const TextArea(
                 expandableHeight: true,

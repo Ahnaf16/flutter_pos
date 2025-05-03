@@ -9,6 +9,7 @@ class InventoryRecordState {
   final num shipping;
   final num discount;
   final DiscountType discountType;
+  final num dueBalance;
 
   const InventoryRecordState({
     this.parti,
@@ -19,6 +20,7 @@ class InventoryRecordState {
     this.discount = 0,
     this.discountType = DiscountType.flat,
     this.shipping = 0,
+    this.dueBalance = 0,
   });
 
   InventoryRecordState copyWith({
@@ -30,6 +32,7 @@ class InventoryRecordState {
     num? shipping,
     num? discount,
     DiscountType? discountType,
+    num? dueBalance,
   }) {
     return InventoryRecordState(
       parti: parti != null ? parti() : this.parti,
@@ -40,6 +43,7 @@ class InventoryRecordState {
       shipping: shipping ?? this.shipping,
       discount: discount ?? this.discount,
       discountType: discountType ?? this.discountType,
+      dueBalance: dueBalance ?? this.dueBalance,
     );
   }
 
@@ -49,9 +53,12 @@ class InventoryRecordState {
 
   num totalPriceSale() => (subtotalSale() + shipping + vat) - calculateDiscount();
 
-  num get due => totalPriceSale() - amount;
+  num get due => totalPriceSale() - amount - dueBalance;
 
   bool get hasDue => due > 0;
+  bool get hasBalance => due < 0;
+
+  bool get partiHasBalance => parti?.due.isNegative ?? false;
 
   InventoryRecord? toInventoryRecord(RecordType type) {
     if (parti == null) return null;
@@ -70,6 +77,7 @@ class InventoryRecordState {
       status: hasDue ? InventoryStatus.unpaid : InventoryStatus.paid,
       date: DateTime.now(),
       type: type,
+      dueBalance: dueBalance,
     );
   }
 }

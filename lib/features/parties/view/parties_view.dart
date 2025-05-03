@@ -82,7 +82,7 @@ class PartiesView extends HookConsumerWidget {
                         size: ShadButtonSize.sm,
                         leading: const Icon(LuIcons.pen),
                         onPressed: () async {
-                          await showShadDialog<Parti>(
+                          await showShadDialog(
                             context: context,
                             builder: (context) => _PartiAddDialog(parti: data, isCustomer: isCustomer),
                           );
@@ -147,6 +147,8 @@ class _PartiAddDialog extends HookConsumerWidget {
     final actionTxt = parti == null ? 'Add' : 'Update';
 
     final selectedFile = useState<PFile?>(null);
+
+    cat(parti?.toMap());
     return ShadDialog(
       title: Text('$actionTxt Parti'),
       description: Text(

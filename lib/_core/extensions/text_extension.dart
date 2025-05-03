@@ -26,12 +26,18 @@ extension TextStyleExtensions on TextStyle {
 
   /// Shortcut for color
   TextStyle textColor(Color? v) => copyWith(color: v);
-  // TextStyle get primary => copyWith(color: KColor.primary);
-  // TextStyle get tonal => copyWith(color: KColor.primaryContainer);
-  // TextStyle get highlight => copyWith(color: KColor.yellow);
-  // TextStyle get white => copyWith(color: KColor.white);
-  // TextStyle get error => copyWith(color: KColor.error);
-  // TextStyle get success => copyWith(color: KColor.success);
+  TextStyle primary(BuildContext context) => copyWith(color: context.colors.primary);
+  TextStyle onPrimary(BuildContext context) => copyWith(color: context.colors.primaryForeground);
+
+  TextStyle secondary(BuildContext context) => copyWith(color: context.colors.secondary);
+  TextStyle onSecondary(BuildContext context) => copyWith(color: context.colors.secondaryForeground);
+
+  TextStyle error(BuildContext context) => copyWith(color: context.colors.destructive);
+  TextStyle onError(BuildContext context) => copyWith(color: context.colors.destructiveForeground);
+
+  TextStyle white() => copyWith(color: Colors.white);
+  TextStyle success() => copyWith(color: Colors.green);
+
   TextStyle op(double v) => copyWith(color: color?.op(v));
 
   /// Shortcut for backgroundColor

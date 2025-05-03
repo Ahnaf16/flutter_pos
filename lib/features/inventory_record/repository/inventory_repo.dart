@@ -15,7 +15,7 @@ class InventoryRepo with AwHandler {
     //! add details
     final (detailErr, detailsData) = await _createRecordDetails(inventory.details).toRecord();
     if (detailErr != null || detailsData == null) return left(detailErr ?? Failure(_generalFailure));
-    final record = inventory.copyWith(details: detailsData).toInventoryRecord(RecordType.sale);
+    InventoryRecord? record = inventory.copyWith(details: detailsData).toInventoryRecord(RecordType.sale);
     if (record == null) return left(Failure(_emptyFields));
 
     //! update account amount
@@ -24,13 +24,24 @@ class InventoryRepo with AwHandler {
     if (accErr != null || accData == null) return left(detailErr ?? Failure(_updateAccountFailure));
 
     //! update Due
-    if (inventory.hasDue) {
-      final parti = record.parti;
+    Parti? parti = record.parti;
+    if (inventory.hasDue || inventory.hasBalance) {
       final (partiErr, partiData) = await _updateDue(parti, inventory.due).toRecord();
+      if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
+      parti = Parti.fromDoc(partiData);
+    }
+
+    if (inventory.hasDue && inventory.partiHasBalance) {
+      record = record.copyWith(dueBalance: record.dueBalance + inventory.due);
+    }
+
+    if (inventory.partiHasBalance && inventory.dueBalance > 0) {
+      // [Parti.Due] is already [-] in this case
+      final (partiErr, partiData) = await _updateDue(parti, inventory.dueBalance).toRecord();
       if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
     }
 
-    //! update account amount
+    //! add record
     final doc = await db.create(AWConst.collections.inventoryRecord, data: record.toAwPost());
     return doc;
   }
@@ -63,6 +74,7 @@ class InventoryRepo with AwHandler {
   FutureReport<Document> _updateDue(Parti parti, num due) async {
     final repo = locate<PartiesRepo>();
     return await repo.updateParti(parti.copyWith(due: parti.due + due));
+    // TODO : Add Due log
   }
 
   FutureReport<Document> updateRecord(InventoryRecord record) async {

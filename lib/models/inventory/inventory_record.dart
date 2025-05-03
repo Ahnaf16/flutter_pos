@@ -21,7 +21,9 @@ class InventoryRecord {
     required this.status,
     required this.date,
     required this.type,
+    required this.dueBalance,
   });
+
   final String id;
   final Parti parti;
   final List<InventoryDetails> details;
@@ -31,6 +33,9 @@ class InventoryRecord {
   final num discount;
   final DiscountType discountType;
   final num shipping;
+
+  /// the amount covered by due_balance from parti
+  final num dueBalance;
   final InventoryStatus status;
   final DateTime date;
   final RecordType type;
@@ -53,6 +58,7 @@ class InventoryRecord {
       status: InventoryStatus.values.byName(data['status']),
       date: DateTime.parse(data['date']),
       type: RecordType.values.byName(data['record_type']),
+      dueBalance: data['due_balance'],
     );
   }
 
@@ -73,6 +79,7 @@ class InventoryRecord {
       status: InventoryStatus.values.byName(map['status']),
       date: DateTime.parse(map['date']),
       type: RecordType.values.byName(map['record_type']),
+      dueBalance: map.parseNum('due_balance'),
     );
   }
   static InventoryRecord? tryParse(dynamic value) {
@@ -102,6 +109,7 @@ class InventoryRecord {
       status: map['status'] == null ? status : InventoryStatus.values.byName(map['status']),
       date: map['date'] == null ? date : DateTime.parse(map['date']),
       type: map['record_type'] == null ? type : RecordType.values.byName(map['record_type']),
+      dueBalance: map.parseNum('due_balance', fallBack: dueBalance),
     );
   }
 
@@ -118,6 +126,7 @@ class InventoryRecord {
     'status': status.name,
     'date': date.toIso8601String(),
     'record_type': type.name,
+    'due_balance': dueBalance,
   };
 
   Map<String, dynamic> toAwPost() => {
@@ -132,5 +141,43 @@ class InventoryRecord {
     'status': status.name,
     'date': date.toIso8601String(),
     'record_type': type.name,
+    'due_balance': dueBalance,
   };
+
+  String discountString() => discountType == DiscountType.percentage ? '$discount%' : discount.currency();
+
+  num get total => details.map((e) => e.totalPriceByType(type)).sum;
+  num get due => total - amount - dueBalance;
+
+  InventoryRecord copyWith({
+    String? id,
+    Parti? parti,
+    List<InventoryDetails>? details,
+    num? amount,
+    PaymentAccount? account,
+    num? vat,
+    num? discount,
+    DiscountType? discountType,
+    num? shipping,
+    num? dueBalance,
+    InventoryStatus? status,
+    DateTime? date,
+    RecordType? type,
+  }) {
+    return InventoryRecord(
+      id: id ?? this.id,
+      parti: parti ?? this.parti,
+      details: details ?? this.details,
+      amount: amount ?? this.amount,
+      account: account ?? this.account,
+      vat: vat ?? this.vat,
+      discount: discount ?? this.discount,
+      discountType: discountType ?? this.discountType,
+      shipping: shipping ?? this.shipping,
+      dueBalance: dueBalance ?? this.dueBalance,
+      status: status ?? this.status,
+      date: date ?? this.date,
+      type: type ?? this.type,
+    );
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/_widgets/hover_builder.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
@@ -16,110 +17,133 @@ class CreateRecordView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final record = ref.watch(recordEditingCtrlProvider);
     final recordCtrl = useCallback(() => ref.read(recordEditingCtrlProvider.notifier));
+    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
 
-    final isSale = type == RecordType.sale;
+    // final isSale = type == RecordType.sale;
 
     return BaseBody(
       title: type.name.up,
-
       padding: context.layout.pagePadding.copyWith(top: 5, bottom: 15),
-      body: ShadCard(
-        padding: Pads.zero,
-        child: ShadResizablePanelGroup(
-          showHandle: true,
-          children: [
-            ShadResizablePanel(
-              id: 0,
-              defaultSize: .8,
-              child: Column(
-                spacing: Insets.sm,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  //! Parti
-                  _PartiSection(onPartiSelect: recordCtrl().changeParti, parti: record.parti, type: type),
-                  const ShadSeparator.horizontal(margin: Pads.zero),
-
-                  Expanded(
-                    child: ShadResizablePanelGroup(
-                      axis: Axis.vertical,
-                      showHandle: true,
-                      children: [
-                        //! selected products
-                        ShadResizablePanel(
-                          id: 2,
-                          defaultSize: 0.7,
-                          child: Padding(
-                            padding: Pads.sm('b'),
-                            child: ListView.separated(
-                              padding: Pads.med('blr'),
-                              itemCount: record.details.length,
-                              separatorBuilder: (_, _) => const ShadSeparator.horizontal(),
-                              itemBuilder: (BuildContext context, int index) {
-                                final detail = record.details[index];
-                                return _ProductTile(
-                                  detail: detail,
-                                  index: index,
-                                  type: type,
-                                  onQtyChange: (q) => recordCtrl().changeQuantity(detail.product.id, (_) => q),
-                                  onProductRemove: (pId) => recordCtrl().removeProduct(pId),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-
-                        //! calculations
-                        ShadResizablePanel(
-                          id: 3,
-                          defaultSize: 0.3,
-                          minSize: 0.1,
-                          child: SingleChildScrollView(
-                            padding: Pads.sm(),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              spacing: Insets.sm,
-                              children: [
-                                //! inputs
-                                Expanded(
-                                  flex: 2,
-                                  child: _Inputs(
-                                    record: record,
-                                    type: type,
-                                    onTypeChange: recordCtrl().changeDiscountType,
-                                    onAccountSelect: recordCtrl().changeAccount,
-                                    onInputChange: recordCtrl().setInputsFromMap,
-                                  ),
-                                ),
-                                const SizedBox(height: 200, child: ShadSeparator.vertical()),
-
-                                //! summary
-                                Expanded(
-                                  child: _Summary(
-                                    record: record,
-                                    type: type,
-                                    onSubmit: () async => recordCtrl().submitSale(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+      body: FormBuilder(
+        key: formKey,
+        onChanged: () {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final state = formKey.currentState!..saveAndValidate();
+            recordCtrl().setInputsFromMap(state.instantValue);
+          });
+        },
+        child: ShadCard(
+          padding: Pads.zero,
+          child: ShadResizablePanelGroup(
+            showHandle: true,
+            children: [
+              ShadResizablePanel(
+                id: 0,
+                defaultSize: .8,
+                child: Column(
+                  spacing: Insets.sm,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //! Parti
+                    _PartiSection(
+                      record: record,
+                      type: type,
+                      onPartiSelect: (p) {
+                        recordCtrl().changeParti(p);
+                        formKey.currentState?.fields['due_balance']?.reset();
+                      },
                     ),
-                  ),
-                ],
-              ),
-            ),
+                    const ShadSeparator.horizontal(margin: Pads.zero),
+                    Expanded(
+                      child: ShadResizablePanelGroup(
+                        axis: Axis.vertical,
+                        showHandle: true,
+                        children: [
+                          //! selected products
+                          ShadResizablePanel(
+                            id: 2,
+                            defaultSize: 0.7,
+                            child: Padding(
+                              padding: Pads.sm('b'),
+                              child: ListView.separated(
+                                padding: Pads.med('blr'),
+                                itemCount: record.details.length,
+                                separatorBuilder: (_, _) => const ShadSeparator.horizontal(),
+                                itemBuilder: (BuildContext context, int index) {
+                                  final detail = record.details[index];
+                                  return _ProductTile(
+                                    detail: detail,
+                                    index: index,
+                                    type: type,
+                                    onQtyChange: (q) => recordCtrl().changeQuantity(detail.product.id, (_) => q),
+                                    onProductRemove: (pId) => recordCtrl().removeProduct(pId),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
 
-            //! Products list
-            ShadResizablePanel(
-              id: 1,
-              defaultSize: .3,
-              minSize: .2,
-              maxSize: .4,
-              child: _ProductsPanel(onProductSelect: (p) => recordCtrl().addProduct(p)),
-            ),
-          ],
+                          //! calculations
+                          ShadResizablePanel(
+                            id: 3,
+                            defaultSize: 0.4,
+                            minSize: 0.2,
+                            child: SingleChildScrollView(
+                              padding: Pads.sm(),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                spacing: Insets.sm,
+                                children: [
+                                  //! inputs
+                                  Expanded(
+                                    flex: 2,
+                                    child: _Inputs(
+                                      record: record,
+                                      type: type,
+                                      onTypeChange: recordCtrl().changeDiscountType,
+                                      onAccountSelect: recordCtrl().changeAccount,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 200, child: ShadSeparator.vertical(margin: Pads.zero)),
+
+                                  //! summary
+                                  Expanded(
+                                    child: _Summary(
+                                      record: record,
+                                      type: type,
+                                      onSubmit: () async {
+                                        final res = await recordCtrl().submitSale();
+
+                                        if (context.mounted) res.showToast(context);
+
+                                        if (res.success) {
+                                          formKey.currentState?.reset();
+                                          if (context.mounted) context.nPop();
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              //! Products list
+              ShadResizablePanel(
+                id: 1,
+                defaultSize: .3,
+                minSize: .2,
+                maxSize: .4,
+                child: _ProductsPanel(onProductSelect: (p) => recordCtrl().addProduct(p)),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -127,82 +151,93 @@ class CreateRecordView extends HookConsumerWidget {
 }
 
 class _Inputs extends HookConsumerWidget {
-  const _Inputs({
-    required this.onTypeChange,
-    required this.record,
-    required this.type,
-    required this.onAccountSelect,
-    required this.onInputChange,
-  });
+  const _Inputs({required this.onTypeChange, required this.record, required this.type, required this.onAccountSelect});
 
   final InventoryRecordState record;
   final RecordType type;
   final Function(DiscountType type) onTypeChange;
   final Function(PaymentAccount? acc) onAccountSelect;
-  final Function(QMap formData) onInputChange;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
-    return FormBuilder(
-      key: formKey,
-      onChanged: () {
-        final state = formKey.currentState!;
-        onInputChange(state.instantValue);
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: Insets.sm,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: ShadField(
-                  name: 'amount',
-                  hintText: 'Amount',
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: Insets.sm,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: ShadField(
+                name: 'amount',
+                hintText: 'Amount',
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
               ),
-              Expanded(
-                child: ShadField(
-                  name: 'vat',
-                  hintText: 'Vat',
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
-                ),
+            ),
+            Expanded(
+              child: ShadField(
+                name: 'vat',
+                hintText: 'Vat',
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
 
-          Row(
-            children: [
+        Row(
+          children: [
+            Expanded(
+              flex: 4,
+              child: ShadField(
+                name: 'discount',
+                hintText: 'Discount',
+                padding: kDefInputPadding.copyWith(bottom: 0, top: 0, right: 5),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                trailing: _DiscountTypePopOver(onTypeChange: onTypeChange, type: record.discountType),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: ShadField(
+                name: 'shipping',
+                hintText: 'Shipping',
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            if (record.partiHasBalance)
               Expanded(
                 flex: 4,
-                child: ShadField(
-                  name: 'discount',
-                  hintText: 'Discount',
-                  padding: kDefInputPadding.copyWith(bottom: 0, top: 0, right: 5),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
-                  trailing: _DiscountTypePopOver(onTypeChange: onTypeChange, type: record.discountType),
+                child: ShadInputDecorator(
+                  label: const Text('Due/Balance'),
+                  child: ShadField(
+                    name: 'due_balance',
+                    hintText: 'Use due/balance',
+                    initialValue: '0',
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                    validators: [
+                      if (record.partiHasBalance)
+                        FormBuilderValidators.max(
+                          record.parti?.due.abs() ?? 0,
+                          errorText: 'This can\'t be more than available balance',
+                          checkNullOrEmpty: false,
+                        ),
+                    ],
+                  ),
                 ),
               ),
-              Expanded(
-                flex: 3,
-                child: ShadField(
-                  name: 'shipping',
-                  hintText: 'Shipping',
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
-                ),
-              ),
-            ],
-          ),
-          _AccountSelect(onAccountSelect: onAccountSelect, type: type),
-        ],
-      ),
+            _AccountSelect(onAccountSelect: onAccountSelect, type: type),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -216,34 +251,56 @@ class _Summary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      spacing: Insets.sm,
-      children: [
-        SpacedText(left: 'Subtotal', right: record.subtotalSale().currency(), styleBuilder: (l, r) => (l, r.bold)),
-        SpacedText(
-          left: 'Total',
-          right: record.totalPriceSale().currency(),
-          styleBuilder: (l, r) => (l, context.text.large),
-        ),
-        SpacedText(
-          left: 'Due',
-          right: record.due.currency(),
-          styleBuilder: (l, r) {
-            return (l, r.textColor(record.hasDue ? context.colors.destructive : null));
-          },
-        ),
-        const Gap(Insets.xs),
-        SubmitButton(
-          width: double.infinity,
-          height: 50,
-          onPressed: (l) async {
-            l.truthy();
-            await onSubmit();
-            l.falsey();
-          },
-          child: Text(type.name.up, style: context.text.large.textColor(context.colors.primaryForeground)),
-        ),
-      ],
+    return Padding(
+      padding: Pads.sm('tl'),
+      child: Column(
+        spacing: Insets.sm,
+        children: [
+          SpacedText(left: 'Subtotal', right: record.subtotalSale().currency(), styleBuilder: (l, r) => (l, r.bold)),
+          SpacedText(
+            left: 'Total',
+            right: record.totalPriceSale().currency(),
+            styleBuilder: (l, r) => (l, context.text.large),
+          ),
+          SpacedText(
+            left: 'Due',
+            right: record.due.currency(),
+            styleBuilder: (l, r) {
+              return (l, r.textColor(record.hasDue ? context.colors.destructive : null));
+            },
+          ),
+          if (record.hasDue && record.partiHasBalance)
+            ShadCard(
+              border: Border.all(color: context.colors.destructive),
+              leading: Icon(LuIcons.triangleAlert, color: context.colors.destructive),
+              childPadding: Pads.sm('l'),
+              rowCrossAxisAlignment: CrossAxisAlignment.center,
+              child: Text('The due amount will be deducted from balance', style: context.text.muted.error(context)),
+            ),
+          if (record.hasBalance)
+            ShadCard(
+              border: Border.all(color: context.colors.destructive),
+              leading: Icon(LuIcons.triangleAlert, color: context.colors.destructive),
+              childPadding: Pads.sm('l'),
+              rowCrossAxisAlignment: CrossAxisAlignment.center,
+              child: Text(
+                'The due amount ${record.due.abs().currency()} will be added to balance',
+                style: context.text.muted.error(context),
+              ),
+            ),
+          const Gap(Insets.xs),
+          SubmitButton(
+            width: double.infinity,
+            height: 50,
+            onPressed: (l) async {
+              l.truthy();
+              await onSubmit();
+              l.falsey();
+            },
+            child: Text(type.name.up, style: context.text.large.textColor(context.colors.primaryForeground)),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -473,10 +530,10 @@ class _AccountSelect extends HookConsumerWidget {
 }
 
 class _PartiSection extends HookConsumerWidget {
-  const _PartiSection({required this.onPartiSelect, required this.parti, required this.type});
+  const _PartiSection({required this.onPartiSelect, required this.record, required this.type});
 
   final Function(Parti? parti) onPartiSelect;
-  final Parti? parti;
+  final InventoryRecordState record;
   final RecordType type;
 
   @override
@@ -484,6 +541,8 @@ class _PartiSection extends HookConsumerWidget {
     final partiList = ref.watch(partiesCtrlProvider(null));
 
     final search = useState('');
+
+    final parti = record.parti;
 
     return partiList.when(
       loading: () => Padding(padding: Pads.sm('lrt'), child: const ShadCard(width: 300, child: Loading())),
@@ -547,14 +606,26 @@ class _PartiSection extends HookConsumerWidget {
                         DecoContainer(
                           color: context.colors.border,
                           borderRadius: Corners.sm,
-                          child: HostedImage.square(parti!.getPhoto, radius: Corners.sm, dimension: 60),
+                          child: HostedImage.square(parti.getPhoto, radius: Corners.sm, dimension: 60),
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(parti!.name),
-                            Text('Due: ${parti!.due.currency()}', style: context.text.p.size(12)),
-                            Text(parti!.phone, style: context.text.muted.size(12)),
+                            Text(parti.name),
+                            Text.rich(
+                              TextSpan(
+                                text: 'Due: ${parti.due.currency()}',
+                                children: [
+                                  if (record.dueBalance > 0)
+                                    TextSpan(
+                                      text: ' (-${record.dueBalance.currency()})',
+                                      style: context.text.p.size(12).textColor(Colors.green),
+                                    ),
+                                ],
+                              ),
+                              style: context.text.p.size(12),
+                            ),
+                            Text(parti.phone, style: context.text.muted.size(12)),
                           ],
                         ),
                       ],
@@ -630,7 +701,7 @@ class _ProductsPanel extends HookConsumerWidget {
                             left: -1,
                             right: -1,
                             child: DecoContainer(
-                              color: Colors.black87,
+                              color: context.colors.border.op8,
                               alignment: Alignment.center,
                               child: Text(product.name, maxLines: 3),
                             ),
@@ -656,8 +727,9 @@ class _ProductsPanel extends HookConsumerWidget {
                             Positioned.fill(
                               child: DecoContainer.animated(
                                 duration: 250.ms,
-                                color: hovering ? Colors.black54 : Colors.transparent,
+                                color: hovering ? context.colors.border.op7 : Colors.transparent,
                                 alignment: Alignment.center,
+                                borderRadius: Corners.med,
                                 child:
                                     hovering
                                         ? DecoContainer(

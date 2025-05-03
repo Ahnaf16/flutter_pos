@@ -16,20 +16,4 @@ class InventoryCtrl extends _$InventoryCtrl {
       return [];
     }, identity);
   }
-
-  // Future<Result> createUnit(QMap form) async {
-  //   final res = await _repo.createInventory(form);
-  //   return res.fold(leftResult, (r) {
-  //     ref.invalidateSelf();
-  //     return rightResult('Record created successfully');
-  //   });
-  // }
-
-  // Future<Result> updateUnit(InventoryRecord record) async {
-  //   final res = await _repo.updateRecord(record);
-  //   return res.fold(leftResult, (r) {
-  //     ref.invalidateSelf();
-  //     return rightResult('Record updated successfully');
-  //   });
-  // }
 }

@@ -4,12 +4,12 @@ import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
-  ('Product', 200.0),
   ('Parti', double.nan),
+  ('Product', 200.0),
   ('Amount', 200.0),
-  ('Account', 200.0),
+  ('Account', 150.0),
   ('Status', 100.0),
-  ('Action', 200.0),
+  ('Action', 150.0),
 ];
 
 class InventoryRecordView extends HookConsumerWidget {
@@ -39,15 +39,16 @@ class InventoryRecordView extends HookConsumerWidget {
         error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
         data: (inventories) {
           return DataTableBuilder<InventoryRecord, (String, double)>(
-            rowHeight: 100,
+            rowHeight: 150,
             items: inventories,
             headings: _headings,
+
             headingBuilder: (heading) {
               return GridColumn(
                 columnName: heading.$1,
                 columnWidthMode: ColumnWidthMode.fill,
                 maximumWidth: heading.$2,
-                minimumWidth: 200,
+                minimumWidth: heading.$1 == 'Status' ? 100 : 150,
                 label: Container(
                   padding: Pads.med(),
                   alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
@@ -59,30 +60,36 @@ class InventoryRecordView extends HookConsumerWidget {
             cellBuilder: (data, head) {
               return switch (head.$1) {
                 'Parti' => DataGridCell(columnName: head.$1, value: _nameCellBuilder(data.parti)),
-                'Product' => DataGridCell(columnName: head.$1, value: Text('${data.details.length}')),
-                'Amount' => DataGridCell(columnName: head.$1, value: Text(data.amount.currency())),
+                'Product' => DataGridCell(columnName: head.$1, value: _productCellBuilder(data.details)),
+                'Amount' => DataGridCell(columnName: head.$1, value: _amountBuilder(data)),
                 'Account' => DataGridCell(columnName: head.$1, value: Text(data.account.name)),
-                'Status' => DataGridCell(columnName: head.$1, value: Text(data.status.name.titleCase)),
+                'Status' => DataGridCell(
+                  columnName: head.$1,
+                  value: ShadBadge.secondary(child: Text(data.status.name.titleCase)),
+                ),
                 'Action' => DataGridCell(
                   columnName: head.$1,
-                  value: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.eye),
-                        onPressed:
-                            () => showShadDialog(
-                              context: context,
-                              builder: (context) => _InventoryViewDialog(inventory: data),
-                            ),
-                      ),
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.pen),
-                        onPressed: () => RPaths.editStaffs(data.id).pushNamed(context),
-                      ),
-                    ],
+                  value: CenterRight(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ShadButton.secondary(
+                          size: ShadButtonSize.sm,
+                          leading: const Icon(LuIcons.eye),
+                          onPressed:
+                              () => showShadDialog(
+                                context: context,
+                                builder: (context) => _InventoryViewDialog(inventory: data),
+                              ),
+                        ),
+                        ShadButton.secondary(
+                          size: ShadButtonSize.sm,
+                          leading: const Icon(LuIcons.pen),
+                          onPressed: () => RPaths.editStaffs(data.id).pushNamed(context),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
@@ -103,7 +110,84 @@ class InventoryRecordView extends HookConsumerWidget {
         children: [
           OverflowMarquee(child: Text(staff.name, style: context.text.list)),
           OverflowMarquee(child: Text('Phone: ${staff.phone}')),
-          OverflowMarquee(child: Text('Email: ${staff.email}')),
+          if (staff.email != null) OverflowMarquee(child: Text('Email: ${staff.email}')),
+        ],
+      );
+    },
+  );
+  Widget _productCellBuilder(List<InventoryDetails> details) => Builder(
+    builder: (context) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final p in details.takeFirst(2))
+            Row(
+              spacing: Insets.xs,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(child: Text(p.product.name, style: context.text.small, maxLines: 1)),
+                Text(' (${p.quantity})', style: context.text.muted.size(12)),
+              ],
+            ),
+
+          if (details.length > 2) Text('+ ${details.length - 2} more', style: context.text.muted.size(12)),
+        ],
+      );
+    },
+  );
+  Widget _amountBuilder(InventoryRecord data) => Builder(
+    builder: (context) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SpacedText(
+            left: data.type == RecordType.purchase ? 'Paid' : 'Received',
+            right: data.amount.currency(),
+            crossAxisAlignment: CrossAxisAlignment.center,
+            styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+          ),
+          if (data.dueBalance != 0)
+            SpacedText(
+              left: 'Balance used',
+              right: data.dueBalance.currency(),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+            ),
+          if (data.vat != 0)
+            SpacedText(
+              left: 'Vat',
+              right: data.vat.currency(),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+            ),
+          if (data.shipping != 0)
+            SpacedText(
+              left: 'Shipping',
+              right: data.shipping.currency(),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+            ),
+          SpacedText(
+            left: 'Discount',
+            right: data.discountString(),
+            crossAxisAlignment: CrossAxisAlignment.center,
+            styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+          ),
+          if (data.due > 0)
+            SpacedText(
+              left: 'Due',
+              right: data.due.currency(),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold.error(context)),
+            ),
+          SpacedText(
+            left: 'Total',
+            right: data.total.currency(),
+            crossAxisAlignment: CrossAxisAlignment.center,
+            styleBuilder: (l, r) => (context.text.small.textHeight(1.1), context.text.p.bold),
+          ),
         ],
       );
     },

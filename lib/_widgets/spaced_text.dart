@@ -40,7 +40,7 @@ class SpacedText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveStyle = style ?? context.text.p;
+    final effectiveStyle = style ?? context.text.small;
     final defBuilder = (effectiveStyle, effectiveStyle);
 
     final (lSty, rSty) = styleBuilder?.call(effectiveStyle, effectiveStyle) ?? defBuilder;

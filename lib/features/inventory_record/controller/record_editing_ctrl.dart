@@ -1,7 +1,5 @@
+import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
-import 'package:pos/features/parties/controller/parties_ctrl.dart';
-import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
-import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -52,7 +50,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
   }
 
   void changeParti(Parti? parti) {
-    state = state.copyWith(parti: () => parti);
+    state = state.copyWith(parti: () => parti, dueBalance: 0);
   }
 
   void changeAccount(PaymentAccount? account) {
@@ -69,29 +67,30 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       vat: data.parseNum('vat'),
       discount: data.parseNum('discount'),
       shipping: data.parseNum('shipping'),
+      dueBalance: data.parseNum('due_balance'),
     );
   }
 
-  FVoid submitSale() async {
+  Future<Result> submitSale() async {
     if (state.parti == null) {
-      return Toast.showErr(Ctx.context, 'Please select a party');
+      return (false, 'Please select a party');
     }
     if (state.account == null) {
-      return Toast.showErr(Ctx.context, 'Please select a payment account');
+      return (false, 'Please select a payment account');
     }
     if (state.details.isEmpty) {
-      return Toast.showErr(Ctx.context, 'Please select at least one product');
+      return (false, 'Please select at least one product');
+    }
+    if (state.partiHasBalance && state.dueBalance > (state.parti?.due.abs() ?? 0)) {
+      return (false, 'Given balance can\'t be more than available balance');
     }
 
     final res = await _repo.createSale(state);
 
-    res.fold((l) => Toast.showErr(Ctx.context, l), (r) {
-      Toast.show(Ctx.context, 'Record created successfully');
-      ref.invalidate(productsCtrlProvider);
-      ref.invalidate(paymentAccountsCtrlProvider);
-      if (state.hasDue) {
-        ref.invalidate(partiesCtrlProvider);
-      }
+    return res.fold(leftResult, (r) {
+      ref.invalidate(inventoryCtrlProvider);
+      ref.invalidateSelf();
+      return (true, 'Record created successfully');
     });
   }
 }

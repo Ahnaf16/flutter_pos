@@ -15,7 +15,7 @@ class ShadField extends HookWidget {
     this.initialValue,
     this.validators,
     this.keyboardType,
-    this.controller,
+    // this.controller,
     this.maxLength,
     this.maxLines = 1,
     this.minLines,
@@ -48,7 +48,7 @@ class ShadField extends HookWidget {
   final List<FormFieldValidator<String>>? validators;
   final void Function(String value)? onChanged;
   final void Function(String value)? onSubmit;
-  final TextEditingController? controller;
+  // final TextEditingController? controller;
   final int? maxLength;
   final int? maxLines;
   final bool readOnly;
@@ -69,7 +69,6 @@ class ShadField extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final obscure = useState<bool>(true);
-
     final decoration = context.theme.decoration.mergeWith(this.decoration);
 
     return FormBuilderField(
@@ -77,7 +76,7 @@ class ShadField extends HookWidget {
       name: name ?? label?.snakeCase ?? hintText?.snakeCase ?? 'field',
       initialValue: initialValue,
       validator: FormBuilderValidators.compose([if (isRequired) FormBuilderValidators.required(), ...?validators]),
-      onChanged: (v) => v == null ? null : onChanged?.call(v),
+      onReset: () {},
       enabled: enabled,
       focusNode: focusNode,
       builder: (state) {
@@ -87,11 +86,13 @@ class ShadField extends HookWidget {
           error: state.hasError ? Text(state.errorText ?? '') : null,
           decoration: decoration.copyWith(hasError: state.hasError),
           child: ShadInput(
-            controller: controller,
             initialValue: state.value,
             placeholder: hintText == null ? null : Text(hintText!),
             decoration: decoration.copyWith(hasError: state.hasError),
-            onChanged: (v) => state.didChange(v),
+            onChanged: (v) {
+              state.didChange(v);
+              onChanged?.call(v);
+            },
             onSubmitted: (v) => onSubmit?.call(v),
             readOnly: readOnly,
             maxLength: maxLength,

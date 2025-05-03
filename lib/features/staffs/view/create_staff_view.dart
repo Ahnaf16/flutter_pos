@@ -121,6 +121,7 @@ class CreateStaffView extends HookConsumerWidget {
                           FormBuilderField<QMap>(
                             name: 'warehouse',
                             validator: FormBuilderValidators.required(),
+                            onReset: () {},
                             builder: (form) {
                               return ShadInputDecorator(
                                 label: const Text('Choose warehouse').required(),
