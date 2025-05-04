@@ -96,9 +96,9 @@ class LoginView extends HookConsumerWidget {
                             },
                           ),
                           ShadButton.outline(
-                            child: const Text('AA'),
+                            child: const Text('Ja'),
                             onPressed: () {
-                              email.text = 'aa@a.com';
+                              email.text = 'ja@gmail.com';
                               password.text = '12341234';
                             },
                           ),

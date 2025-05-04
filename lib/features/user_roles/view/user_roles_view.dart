@@ -1,5 +1,4 @@
 import 'package:pos/features/user_roles/controller/user_roles_ctrl.dart';
-import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -23,7 +22,7 @@ class UserRolesView extends HookConsumerWidget {
       ],
       body: rolesList.when(
         loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: warehouseCtrlProvider),
+        error: (e, s) => ErrorView(e, s, prov: userRolesCtrlProvider),
         data: (roles) {
           return DataTableBuilder<UserRole, (String, double)>(
             rowHeight: 100,

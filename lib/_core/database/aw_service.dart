@@ -80,6 +80,7 @@ class AwDatabase {
 
   FutureReport<Document> get(AwId collId, String docId, {List<String>? queries}) async {
     catAw({'collId': collId.id, 'docId': docId, 'queries': queries}, '${collId.name} get');
+
     return await _handler<Document>(
       call: () async {
         final data = await _db.getDocument(

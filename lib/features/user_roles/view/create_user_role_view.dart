@@ -9,7 +9,7 @@ class CreateUserRoleView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final updatingId = context.param('id');
-    final updatingStaff = ref.watch(updateRoleCtrlProvider(updatingId));
+    final updatingRole = ref.watch(updateRoleCtrlProvider(updatingId));
     final updateCtrl = useCallback(() => ref.read(updateRoleCtrlProvider(updatingId).notifier));
 
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
@@ -48,7 +48,7 @@ class CreateUserRoleView extends HookConsumerWidget {
         ),
       ],
 
-      body: updatingStaff.when(
+      body: updatingRole.when(
         error: (e, s) => ErrorView(e, s, prov: updateRoleCtrlProvider(updatingId)),
         loading: () => const Loading(),
         data: (updating) {

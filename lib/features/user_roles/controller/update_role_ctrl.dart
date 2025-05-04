@@ -32,7 +32,7 @@ class UpdateRoleCtrl extends _$UpdateRoleCtrl {
     final res = await _repo.updateRole(role);
     return res.fold(leftResult, (r) {
       ref.invalidate(userRolesCtrlProvider);
-      ref.invalidate(authCtrlProvider);
+      ref.invalidate(currentUserProvider);
       return rightResult('Role updated successfully');
     });
   }

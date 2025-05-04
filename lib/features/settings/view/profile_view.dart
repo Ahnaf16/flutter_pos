@@ -110,6 +110,7 @@ class ProfileView extends HookConsumerWidget {
 
                         if (result case final Result r) {
                           if (!context.mounted) return;
+                          selectedFile.set(null);
                           r.showToast(context);
                           ref.invalidate(currentUserProvider);
                         }
