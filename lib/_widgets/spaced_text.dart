@@ -16,6 +16,7 @@ class SpacedText extends StatelessWidget {
     this.spaced = true,
     this.crossAxisAlignment,
     this.builder,
+    this.enableSelection = true,
   });
 
   static (TextStyle?, TextStyle?) buildStye(left, right) => (left, right);
@@ -37,6 +38,7 @@ class SpacedText extends StatelessWidget {
   final CrossAxisAlignment? crossAxisAlignment;
 
   final Widget Function(String right)? builder;
+  final bool enableSelection;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +61,7 @@ class SpacedText extends StatelessWidget {
               child: DefaultTextStyle(
                 style: rSty,
                 textAlign: spaced ? TextAlign.end : TextAlign.start,
-                child: builder?.call(right) ?? Text(right),
+                child: builder?.call(right) ?? SelectableText(right, enableInteractiveSelection: enableSelection),
               ),
             ),
             if (trailing != null) ...[const Gap(Insets.sm), trailing!],

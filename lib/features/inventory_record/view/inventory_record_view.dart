@@ -83,11 +83,11 @@ class InventoryRecordView extends HookConsumerWidget {
                                 builder: (context) => _InventoryViewDialog(inventory: data),
                               ),
                         ),
-                        ShadButton.secondary(
-                          size: ShadButtonSize.sm,
-                          leading: const Icon(LuIcons.pen),
-                          onPressed: () => RPaths.editStaffs(data.id).pushNamed(context),
-                        ),
+                        // ShadButton.secondary(
+                        //   size: ShadButtonSize.sm,
+                        //   leading: const Icon(LuIcons.pen),
+                        //   onPressed: () => RPaths.editStaffs(data.id).pushNamed(context),
+                        // ),
                       ],
                     ),
                   ),

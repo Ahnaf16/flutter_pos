@@ -1,6 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:get_it/get_it.dart';
 import 'package:pos/features/auth/repository/auth_repo.dart';
+import 'package:pos/features/due/repository/due_repo.dart';
 import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
 import 'package:pos/features/parties/repository/parties_repo.dart';
 import 'package:pos/features/payment_accounts/repository/payment_accounts_repo.dart';
@@ -58,4 +59,5 @@ Future<void> initDependencies() async {
   locate.registerLazyIfAbsent<PartiesRepo>(PartiesRepo.new);
   locate.registerLazyIfAbsent<InventoryRepo>(InventoryRepo.new);
   locate.registerLazyIfAbsent<PaymentAccountsRepo>(PaymentAccountsRepo.new);
+  locate.registerLazyIfAbsent<DueRepo>(DueRepo.new);
 }

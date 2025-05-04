@@ -8,17 +8,24 @@ class DataTableBuilder<T, R> extends StatefulWidget {
     required this.items,
     required this.headings,
     required this.cellBuilder,
-    required this.headingBuilder,
+    this.headingBuilder,
+    this.headingBuilderIndexed,
     this.rowHeight,
     this.cellPadding,
     this.cellAlignment,
     this.footer,
-  });
+  }) : assert(
+         headingBuilder != null || headingBuilderIndexed != null,
+         'Either headingBuilder or headingBuilderIndexed must be provided',
+       );
 
   final List<T> items;
   final List<R> headings;
   final DataGridCell Function(T data, R head) cellBuilder;
-  final GridColumn Function(R heading) headingBuilder;
+
+  /// will be ignored if headingBuilderIndexed is provided
+  final GridColumn Function(R heading)? headingBuilder;
+  final GridColumn Function(R heading, int index)? headingBuilderIndexed;
   final double? rowHeight;
   final EdgeInsetsGeometry? cellPadding;
   final AlignmentGeometry? cellAlignment;
@@ -48,7 +55,10 @@ class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
           highlightRowOnHover: false,
           isScrollbarAlwaysShown: true,
           rowHeight: widget.rowHeight ?? double.nan,
-          columns: [for (final h in widget.headings) widget.headingBuilder(h)],
+          columns: [
+            for (int i = 0; i < widget.headings.length; i++)
+              widget.headingBuilderIndexed?.call(widget.headings[i], i) ?? widget.headingBuilder!(widget.headings[i]),
+          ],
           footer: widget.footer,
         ),
       ),
