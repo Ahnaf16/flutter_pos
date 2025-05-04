@@ -13,6 +13,7 @@ class DataTableBuilder<T, R> extends StatefulWidget {
     this.rowHeight,
     this.cellPadding,
     this.cellAlignment,
+    this.cellAlignmentBuilder,
     this.footer,
   }) : assert(
          headingBuilder != null || headingBuilderIndexed != null,
@@ -29,6 +30,8 @@ class DataTableBuilder<T, R> extends StatefulWidget {
   final double? rowHeight;
   final EdgeInsetsGeometry? cellPadding;
   final AlignmentGeometry? cellAlignment;
+  final AlignmentGeometry Function(String head)? cellAlignmentBuilder;
+
   final Widget? footer;
 
   @override
@@ -49,6 +52,7 @@ class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
             cellBuilder: widget.cellBuilder,
             padding: widget.cellPadding,
             alignment: widget.cellAlignment,
+            alignmentBuilder: widget.cellAlignmentBuilder,
           ),
           allowExpandCollapseGroup: true,
           headerGridLinesVisibility: GridLinesVisibility.both,
@@ -73,6 +77,7 @@ class _DataSource<T, R> extends DataGridSource {
     required DataGridCell Function(T data, R head) cellBuilder,
     this.padding,
     this.alignment,
+    this.alignmentBuilder,
   }) {
     datas = items.map((e) => DataGridRow(cells: headings.map((h) => cellBuilder(e, h)).toList())).toList();
   }
@@ -80,6 +85,7 @@ class _DataSource<T, R> extends DataGridSource {
   List<DataGridRow> datas = [];
   final EdgeInsetsGeometry? padding;
   final AlignmentGeometry? alignment;
+  final AlignmentGeometry Function(String head)? alignmentBuilder;
 
   @override
   List<DataGridRow> get rows => datas;
@@ -92,7 +98,10 @@ class _DataSource<T, R> extends DataGridSource {
           if (cell.value is Widget)
             Padding(
               padding: padding ?? Pads.med(),
-              child: Align(alignment: alignment ?? Alignment.center, child: cell.value as Widget),
+              child: Align(
+                alignment: alignmentBuilder?.call(cell.columnName) ?? alignment ?? Alignment.center,
+                child: cell.value as Widget,
+              ),
             )
           else
             Text(cell.value.toString()),

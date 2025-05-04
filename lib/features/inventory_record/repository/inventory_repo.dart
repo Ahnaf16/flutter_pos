@@ -1,9 +1,11 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:pos/features/auth/repository/auth_repo.dart';
 import 'package:pos/features/parties/repository/parties_repo.dart';
 import 'package:pos/features/payment_accounts/repository/payment_accounts_repo.dart';
 import 'package:pos/features/stock/repository/stock_repo.dart';
+import 'package:pos/features/transactions/repository/transactions_repo.dart';
 import 'package:pos/main.export.dart';
 
 class InventoryRepo with AwHandler {
@@ -41,6 +43,9 @@ class InventoryRepo with AwHandler {
       if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
     }
 
+    //! add transaction log
+    await _addTransactionLog(record);
+
     //! add record
     final doc = await db.create(AWConst.collections.inventoryRecord, data: record.toAwPost());
     return doc;
@@ -74,6 +79,15 @@ class InventoryRepo with AwHandler {
   FutureReport<Document> _updateDue(Parti parti, num due, RecordType type) async {
     final repo = locate<PartiesRepo>();
     return await repo.updateDue(parti, due, !due.isNegative, 'Due created from ${type.name}');
+  }
+
+  FutureReport<Document> _addTransactionLog(InventoryRecord record) async {
+    final repo = locate<TransactionsRepo>();
+    final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
+    if (err != null || user == null) return left(err ?? const Failure('Unable to getting current user'));
+
+    final transaction = TransactionLog.fromInventoryRecord(record, user);
+    return await repo.addTransaction(transaction);
   }
 
   FutureReport<Document> updateRecord(InventoryRecord record) async {

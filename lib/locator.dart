@@ -9,6 +9,7 @@ import 'package:pos/features/products/repository/products_repo.dart';
 import 'package:pos/features/settings/repository/config_repo.dart';
 import 'package:pos/features/staffs/repository/staffs_repo.dart';
 import 'package:pos/features/stock/repository/stock_repo.dart';
+import 'package:pos/features/transactions/repository/transactions_repo.dart';
 import 'package:pos/features/unit/repository/unit_repo.dart';
 import 'package:pos/features/user_roles/repository/user_roles_repo.dart';
 import 'package:pos/features/warehouse/repository/warehouse_repo.dart';
@@ -60,4 +61,5 @@ Future<void> initDependencies() async {
   locate.registerLazyIfAbsent<InventoryRepo>(InventoryRepo.new);
   locate.registerLazyIfAbsent<PaymentAccountsRepo>(PaymentAccountsRepo.new);
   locate.registerLazyIfAbsent<DueRepo>(DueRepo.new);
+  locate.registerLazyIfAbsent<TransactionsRepo>(TransactionsRepo.new);
 }

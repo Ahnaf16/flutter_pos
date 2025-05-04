@@ -36,11 +36,13 @@ class ErrorView extends HookConsumerWidget {
     child = Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+
         children: [
           Text(kError('ErrorView'), style: context.text.large),
           const Gap(Insets.sm),
           Text(error.toString()),
 
+          if (prov != null) const Gap(Insets.med),
           if (prov != null)
             ShadButton(
               onPressed: () {

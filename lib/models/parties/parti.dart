@@ -64,6 +64,17 @@ class Parti {
     type: PartiType.values.byName(map['type']),
   );
 
+  static Parti? tyrParse(dynamic value) {
+    try {
+      if (value case final Parti p) return p;
+      if (value case final Document doc) return Parti.fromDoc(doc);
+      if (value case final Map map) return Parti.fromMap(map.toStringKey());
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Parti marge(Map<String, dynamic> map) {
     return Parti(
       id: map.tryParseAwField() ?? id,
