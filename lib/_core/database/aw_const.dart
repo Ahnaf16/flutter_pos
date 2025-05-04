@@ -8,7 +8,9 @@ extension AwIdX on AwId {
 class AWConst {
   const AWConst._();
 
-  static const String endpoint = 'https://fra.cloud.appwrite.io/v1';
+  // static const String endpoint = 'https://fra.cloud.appwrite.io/v1';
+  static const String endpoint = 'http://localhost/v1';
+
   static const AwId projectId = ('68048fb0003cd8a04477', 'flutter_pos');
   static const AwId databaseId = ('6805362c0032bd189cd2', '');
   static const AwId storageId = ('68053f7b0023347615c2', 'pos_bucket');

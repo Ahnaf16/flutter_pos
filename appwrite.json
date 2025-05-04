@@ -1,0 +1,1083 @@
+{
+    "projectId": "68048fb0003cd8a04477",
+    "databases": [
+        {
+            "$id": "6805362c0032bd189cd2",
+            "name": "pos_db",
+            "enabled": true
+        }
+    ],
+    "projectName": "flutter_pos",
+    "collections": [
+        {
+            "$id": "6805c476002d4333ccb1",
+            "$permissions": [
+                "read(\"users\")",
+                "update(\"users\")",
+                "read(\"any\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "config",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "maintenance_mode",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": false
+                },
+                {
+                    "key": "currency_symbol",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 5,
+                    "default": null
+                },
+                {
+                    "key": "currency_symbol_on_left",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": true
+                },
+                {
+                    "key": "stock_distribution_policy",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "elements": [
+                        "newerFirst",
+                        "olderFirst"
+                    ],
+                    "format": "enum",
+                    "default": "newerFirst"
+                },
+                {
+                    "key": "minimum_version",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "6806529f0034aec8d975",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "expanse",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "amount",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "expanse_for",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "payment_account",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "68063141003974052255",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "68065302000d3a8a1d7a",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "users",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680536a4003be2a282af",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "68065336003572692284",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "date",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "note",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 300,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "68064a58002fe1687f71",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "inventory_details",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "products",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6805c655000722776983",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "68126dae001aade36416",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "stock",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6805dbf9001793b1a019",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "68126de7001b0ec95cc3",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "quantity",
+                    "type": "integer",
+                    "required": true,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "680628f40031fda735e1",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "inventory_record",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "parties",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680629bf003151f6f6ad",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "680631a2001b79616702",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "inventory_details",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "68064a58002fe1687f71",
+                    "relationType": "oneToMany",
+                    "twoWay": false,
+                    "twoWayKey": "68064af1003506b201de",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "amount",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": 0,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "payment_account",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "68063141003974052255",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "68064b67002f7155c381",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "vat",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": 0,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "discount",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": 0,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "discount_type",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "elements": [
+                        "flat",
+                        "percent"
+                    ],
+                    "format": "enum",
+                    "default": "flat"
+                },
+                {
+                    "key": "shipping",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": 0,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "status",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "elements": [
+                        "paid",
+                        "unpaid",
+                        "returned"
+                    ],
+                    "format": "enum",
+                    "default": null
+                },
+                {
+                    "key": "date",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "record_type",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "elements": [
+                        "sale",
+                        "purchase"
+                    ],
+                    "format": "enum",
+                    "default": null
+                },
+                {
+                    "key": "due_balance",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "680629bf003151f6f6ad",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "parties",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "phone",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 20,
+                    "default": null
+                },
+                {
+                    "key": "email",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "format": "email",
+                    "default": null
+                },
+                {
+                    "key": "address",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 60,
+                    "default": null
+                },
+                {
+                    "key": "due",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": 0
+                },
+                {
+                    "key": "type",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "elements": [
+                        "retailer",
+                        "dealer",
+                        "wholesaler",
+                        "supplier",
+                        "customer"
+                    ],
+                    "format": "enum",
+                    "default": null
+                },
+                {
+                    "key": "photo",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 100,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "68063141003974052255",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "payment_account",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "description",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 500,
+                    "default": null
+                },
+                {
+                    "key": "amount",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": 0
+                },
+                {
+                    "key": "is_active",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": true
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "6805c655000722776983",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "products",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                },
+                {
+                    "key": "sku",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "manufacturer",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "manage_stock",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": true
+                },
+                {
+                    "key": "stock",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6805dbf9001793b1a019",
+                    "relationType": "oneToMany",
+                    "twoWay": false,
+                    "twoWayKey": "6806229600222282c623",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "unit",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6805dc02001027cde1e6",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "680622ba00236c611583",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "photo",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 400,
+                    "default": null
+                },
+                {
+                    "key": "description",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 50000,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "6805c0c30020316ea3e6",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "read(\"any\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "role",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 20,
+                    "default": null
+                },
+                {
+                    "key": "enabled",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "permissions",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "elements": [
+                        "manageProduct",
+                        "manageStock",
+                        "manageUnit",
+                        "makeSale",
+                        "returnSale",
+                        "makePurchase",
+                        "returnPurchase",
+                        "manageCustomer",
+                        "manageSupplier",
+                        "manageStaff",
+                        "manageRole",
+                        "transferStock",
+                        "manageExpanse",
+                        "manageDue",
+                        "transferMoney",
+                        "manageWarehouse"
+                    ],
+                    "format": "enum",
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "6805dbf9001793b1a019",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "read(\"any\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "stock",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "purchase_price",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": 0,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "sales_price",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": 0,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "wholesale_price",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": 0,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "dealer_price",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": 0,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "quantity",
+                    "type": "integer",
+                    "required": false,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": 0
+                },
+                {
+                    "key": "warehouse",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6805bdcd00107f585ff2",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "680623670012ece3c2be",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "680653b7000d496a9473",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "transaction",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "amount",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "payment_account",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "68063141003974052255",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "680653ed0020ca55e88c",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "parties",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680629bf003151f6f6ad",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "680654fc003bc3eed6bc",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "transaction_type",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "elements": [
+                        "menual",
+                        "expanse",
+                        "purchase",
+                        "sale"
+                    ],
+                    "format": "enum",
+                    "default": null
+                },
+                {
+                    "key": "date",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "note",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 400,
+                    "default": null
+                },
+                {
+                    "key": "transact_to",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 300,
+                    "default": null
+                },
+                {
+                    "key": "transaction_by",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680536a4003be2a282af",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "68170f2b002600b24802",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "used_due_balance",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "6805dc02001027cde1e6",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "read(\"any\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "unit",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 20,
+                    "default": null
+                },
+                {
+                    "key": "is_active",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": true
+                },
+                {
+                    "key": "unit_name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "680536a4003be2a282af",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "read(\"any\")",
+                "update(\"any\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "users",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 30,
+                    "default": null
+                },
+                {
+                    "key": "phone",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 20,
+                    "default": null
+                },
+                {
+                    "key": "role",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6805c0c30020316ea3e6",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "6805c28c001d3a686c85",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "warehouse",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6805bdcd00107f585ff2",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "6806239c000bcfb8636c",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "email",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "format": "email",
+                    "default": null
+                },
+                {
+                    "key": "is_user_created",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "password",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "photo_id",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 300,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "6805bdcd00107f585ff2",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "read(\"any\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "warehouse",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "address",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 100,
+                    "default": null
+                },
+                {
+                    "key": "is_default",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "contact_number",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 20,
+                    "default": null
+                },
+                {
+                    "key": "contact_person",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "68130121000d796dd775",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "due_adjustment_log",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "amount",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "is_added",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "adjustment_date",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "parties",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680629bf003151f6f6ad",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "6813028a0023b4cc2ad2",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "note",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 400,
+                    "default": null
+                },
+                {
+                    "key": "post_amount",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        }
+    ],
+    "buckets": [
+        {
+            "$id": "68053f7b0023347615c2",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")"
+            ],
+            "fileSecurity": false,
+            "name": "pos_bucket",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        }
+    ],
+    "settings": {
+        "services": {
+            "account": true,
+            "avatars": true,
+            "databases": true,
+            "locale": true,
+            "health": true,
+            "storage": true,
+            "teams": true,
+            "users": true,
+            "functions": true,
+            "graphql": true,
+            "messaging": true
+        },
+        "auth": {
+            "methods": {
+                "jwt": false,
+                "phone": false,
+                "invites": false,
+                "anonymous": false,
+                "email-otp": false,
+                "magic-url": false,
+                "email-password": true
+            },
+            "security": {
+                "duration": 31536000,
+                "limit": 0,
+                "sessionsLimit": 10,
+                "passwordHistory": 0,
+                "passwordDictionary": false,
+                "personalDataCheck": false,
+                "sessionAlerts": false,
+                "mockNumbers": []
+            }
+        }
+    }
+}
