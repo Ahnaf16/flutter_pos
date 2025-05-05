@@ -137,7 +137,7 @@ class CreateRecordView extends HookConsumerWidget {
               //! Products list
               ShadResizablePanel(
                 id: 1,
-                defaultSize: .3,
+                defaultSize: .2,
                 minSize: .2,
                 maxSize: .4,
                 child: _ProductsPanel(onProductSelect: (p) => recordCtrl().addProduct(p)),

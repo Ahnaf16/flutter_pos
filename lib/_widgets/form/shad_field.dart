@@ -34,6 +34,7 @@ class ShadField extends HookWidget {
     this.focusNode,
     this.expands = false,
     this.padding,
+    this.outsideTrailing,
   }) : _key = key,
        super(key: superKey);
 
@@ -61,6 +62,7 @@ class ShadField extends HookWidget {
   final ShadDecoration? decoration;
   final String? helperText;
   final Widget? trailing;
+  final Widget? outsideTrailing;
   final FocusNode? focusNode;
   final bool expands;
   final int? minLines;
@@ -85,43 +87,50 @@ class ShadField extends HookWidget {
           description: helperText == null ? null : Text(helperText!),
           error: state.hasError ? Text(state.errorText ?? '') : null,
           decoration: decoration.copyWith(hasError: state.hasError),
-          child: ShadInput(
-            initialValue: state.value,
-            placeholder: hintText == null ? null : Text(hintText!),
-            decoration: decoration.copyWith(hasError: state.hasError),
-            onChanged: (v) {
-              state.didChange(v);
-              onChanged?.call(v);
-            },
-            onSubmitted: (v) => onSubmit?.call(v),
-            readOnly: readOnly,
-            maxLength: maxLength,
-            maxLines: maxLines,
-            minLines: minLines,
-            keyboardType: keyboardType,
-            textInputAction: textInputAction,
-            textAlign: textAlign,
-            inputFormatters: inputFormatters,
-            onPressed: onTap,
-            enabled: enabled,
-            obscureText: isPassField ? obscure.value : false,
-            expands: expands,
-            leading: leading,
-            padding: padding,
-            trailing:
-                isPassField
-                    ? ShadButton.ghost(
-                      width: 24,
-                      height: 24,
-                      padding: Pads.zero,
-                      decoration: const ShadDecoration(
-                        secondaryBorder: ShadBorder.none,
-                        secondaryFocusedBorder: ShadBorder.none,
-                      ),
-                      leading: Icon(obscure.value ? LucideIcons.eyeOff : LucideIcons.eye),
-                      onPressed: () => obscure.toggle(),
-                    )
-                    : trailing,
+          child: Row(
+            children: [
+              Flexible(
+                child: ShadInput(
+                  initialValue: state.value,
+                  placeholder: hintText == null ? null : Text(hintText!),
+                  decoration: decoration.copyWith(hasError: state.hasError),
+                  onChanged: (v) {
+                    state.didChange(v);
+                    onChanged?.call(v);
+                  },
+                  onSubmitted: (v) => onSubmit?.call(v),
+                  readOnly: readOnly,
+                  maxLength: maxLength,
+                  maxLines: maxLines,
+                  minLines: minLines,
+                  keyboardType: keyboardType,
+                  textInputAction: textInputAction,
+                  textAlign: textAlign,
+                  inputFormatters: inputFormatters,
+                  onPressed: onTap,
+                  enabled: enabled,
+                  obscureText: isPassField ? obscure.value : false,
+                  expands: expands,
+                  leading: leading,
+                  padding: padding,
+                  trailing:
+                      isPassField
+                          ? ShadButton.ghost(
+                            width: 24,
+                            height: 24,
+                            padding: Pads.zero,
+                            decoration: const ShadDecoration(
+                              secondaryBorder: ShadBorder.none,
+                              secondaryFocusedBorder: ShadBorder.none,
+                            ),
+                            leading: Icon(obscure.value ? LucideIcons.eyeOff : LucideIcons.eye),
+                            onPressed: () => obscure.toggle(),
+                          )
+                          : trailing,
+                ),
+              ),
+              if (outsideTrailing != null) outsideTrailing!,
+            ],
           ),
         );
       },
