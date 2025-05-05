@@ -23,7 +23,7 @@ class InventoryRepo with AwHandler {
     //! update account amount
     final acc = record.account;
     final (accErr, accData) = await _updateAccountAmount(acc, record.amount).toRecord();
-    if (accErr != null || accData == null) return left(detailErr ?? Failure(_updateAccountFailure));
+    if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
 
     //! update Due
     Parti? parti = record.parti;

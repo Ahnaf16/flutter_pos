@@ -21,7 +21,7 @@ class AWConst {
 
 class $AWCollections {
   AwId get config => ('6805c476002d4333ccb1', 'config');
-  AwId get expanse => ('6806529f0034aec8d975', 'expanse');
+  AwId get expense => ('6806529f0034aec8d975', 'expense');
   AwId get inventoryDetails => ('68064a58002fe1687f71', 'inventoryDetails');
   AwId get inventoryRecord => ('680628f40031fda735e1', 'inventoryRecord');
   AwId get parties => ('680629bf003151f6f6ad', 'parties');
@@ -34,10 +34,11 @@ class $AWCollections {
   AwId get users => ('680536a4003be2a282af', 'users');
   AwId get warehouse => ('6805bdcd00107f585ff2', 'warehouse');
   AwId get dueLog => ('68130121000d796dd775', 'due_adjustment_log');
+  AwId get expenseCategory => ('6818e28a0011fa58a4be', 'expense_category');
 
   List<AwId> get values => [
     config,
-    expanse,
+    expense,
     inventoryDetails,
     inventoryRecord,
     parties,

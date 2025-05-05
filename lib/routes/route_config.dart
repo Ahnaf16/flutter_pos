@@ -4,6 +4,7 @@ import 'package:pos/app_root.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/auth/view/login_view.dart';
 import 'package:pos/features/due/view/due_view.dart';
+import 'package:pos/features/expense/view/expense_category_view.dart';
 import 'package:pos/features/expense/view/expense_view.dart';
 import 'package:pos/features/home/view/home_view.dart';
 import 'package:pos/features/inventory_record/view/create_record_view.dart';
@@ -129,6 +130,8 @@ class AppRouter extends Notifier<GoRouter> {
           AppRoute(RPaths.stockTransfer, (_) => const StockTransferView()),
           //! expense
           AppRoute(RPaths.expense, (_) => const ExpenseView()),
+          //! expense category
+          AppRoute(RPaths.expenseCategory, (_) => const ExpenseCategoryView()),
           //! due
           AppRoute(RPaths.due, (_) => const DueView()),
           //! moneyTransfer

@@ -7,7 +7,7 @@ const _headings = [
   ('From', double.nan),
   ('Amount', 200.0),
   ('Account', 200.0),
-  ('Type', 80.0),
+  ('Type', 110.0),
   ('Date', 150.0),
   ('Action', 100.0),
 ];
@@ -141,63 +141,64 @@ class _PartiViewDialog extends HookConsumerWidget {
           spacing: Insets.med,
           children: [
             //! parti
-            ShadCard(
-              title: Text('Transacted to', style: context.text.muted),
-              childPadding: Pads.sm('t'),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: Insets.med,
-                children: [
-                  if (parti?.photo != null) HostedImage.square(parti!.getPhoto, dimension: 80, radius: Corners.med),
+            if (parti != null || transactTo != null)
+              ShadCard(
+                title: Text('To', style: context.text.muted),
+                childPadding: Pads.sm('t'),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: Insets.med,
+                  children: [
+                    if (parti?.photo != null) HostedImage.square(parti!.getPhoto, dimension: 80, radius: Corners.med),
 
-                  Flexible(
-                    child: Column(
-                      spacing: Insets.sm,
-                      children: [
-                        SpacedText(
-                          left: 'Name',
-                          right: parti?.name ?? transactTo ?? '--',
-                          styleBuilder: (l, r) => (l, r.bold),
-                          spaced: false,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                        ),
-                        if (parti != null) ...[
+                    Flexible(
+                      child: Column(
+                        spacing: Insets.sm,
+                        children: [
                           SpacedText(
-                            left: 'Phone Number',
-                            right: parti.phone,
-                            styleBuilder: (l, r) => (l, r.bold),
-                            spaced: false,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            onTap: (left, right) => Copier.copy(right),
-                          ),
-
-                          SpacedText(
-                            left: 'Email',
-                            right: parti.email ?? '--',
-                            styleBuilder: (l, r) => (l, r.bold),
-                            spaced: false,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            onTap: (left, right) => Copier.copy(right),
-                          ),
-
-                          SpacedText(
-                            left: 'Address',
-                            right: parti.address ?? '--',
+                            left: 'Name',
+                            right: parti?.name ?? transactTo ?? '--',
                             styleBuilder: (l, r) => (l, r.bold),
                             spaced: false,
                             crossAxisAlignment: CrossAxisAlignment.center,
                           ),
+                          if (parti != null) ...[
+                            SpacedText(
+                              left: 'Phone Number',
+                              right: parti.phone,
+                              styleBuilder: (l, r) => (l, r.bold),
+                              spaced: false,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              onTap: (left, right) => Copier.copy(right),
+                            ),
+
+                            SpacedText(
+                              left: 'Email',
+                              right: parti.email ?? '--',
+                              styleBuilder: (l, r) => (l, r.bold),
+                              spaced: false,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              onTap: (left, right) => Copier.copy(right),
+                            ),
+
+                            SpacedText(
+                              left: 'Address',
+                              right: parti.address ?? '--',
+                              styleBuilder: (l, r) => (l, r.bold),
+                              spaced: false,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
             //! user
             ShadCard(
-              title: Text('Transaction By', style: context.text.muted),
+              title: Text('By', style: context.text.muted),
               childPadding: Pads.sm('t'),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

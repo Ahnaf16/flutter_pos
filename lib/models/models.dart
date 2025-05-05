@@ -9,6 +9,7 @@ export 'product/product.dart';
 export 'product/product_unit.dart';
 export 'product/stock.dart';
 export 'states/inventory_record_state.dart';
+export 'transaction/expense.dart';
 export 'transaction/transaction_log.dart';
 export 'user/app_user.dart';
 export 'user/role_permissions.dart';

@@ -1,5 +1,4 @@
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
-import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -36,7 +35,7 @@ class InventoryRecordView extends HookConsumerWidget {
       ],
       body: inventoryList.when(
         loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
+        error: (e, s) => ErrorView(e, s, prov: inventoryCtrlProvider),
         data: (inventories) {
           return DataTableBuilder<InventoryRecord, (String, double)>(
             rowHeight: 150,

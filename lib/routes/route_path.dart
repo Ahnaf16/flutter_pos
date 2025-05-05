@@ -66,6 +66,7 @@ class RPaths {
 
   // expense
   static RPath expense = const RPath('/expense');
+  static RPath expenseCategory = const RPath('/expense_category');
 
   // due
   static RPath due = const RPath('/due');

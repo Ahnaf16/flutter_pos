@@ -1,7 +1,6 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
-import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -30,7 +29,7 @@ class PartiesView extends HookConsumerWidget {
       ],
       body: partiList.when(
         loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
+        error: (e, s) => ErrorView(e, s, prov: partiesCtrlProvider),
         data: (parties) {
           return DataTableBuilder<Parti, (String, double)>(
             rowHeight: 100,

@@ -56,6 +56,17 @@ class AppUser {
     );
   }
 
+  static AppUser? tryParse(dynamic map) {
+    try {
+      if (map case final AppUser a) return a;
+      if (map case final Document doc) return AppUser.fromDoc(doc);
+      if (map case final Map m) return AppUser.fromMap(m.toStringKey());
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   AppUser marge(Map<String, dynamic> map) {
     return AppUser(
       id: map.tryParseAwField() ?? id,

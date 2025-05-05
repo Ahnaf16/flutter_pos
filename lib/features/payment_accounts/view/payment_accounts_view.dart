@@ -1,6 +1,5 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
-import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -25,7 +24,7 @@ class PaymentAccountsView extends HookConsumerWidget {
       ],
       body: productList.when(
         loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
+        error: (e, s) => ErrorView(e, s, prov: paymentAccountsCtrlProvider),
         data: (products) {
           return DataTableBuilder<PaymentAccount, (String, double)>(
             rowHeight: 70,

@@ -73,7 +73,7 @@ class ShadField extends HookWidget {
     final obscure = useState<bool>(true);
     final decoration = context.theme.decoration.mergeWith(this.decoration);
 
-    return FormBuilderField(
+    return FormBuilderField<String>(
       key: _key,
       name: name ?? label?.snakeCase ?? hintText?.snakeCase ?? 'field',
       initialValue: initialValue,

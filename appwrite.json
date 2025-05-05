@@ -12,9 +12,9 @@
         {
             "$id": "6805c476002d4333ccb1",
             "$permissions": [
+                "read(\"any\")",
                 "read(\"users\")",
-                "update(\"users\")",
-                "read(\"any\")"
+                "update(\"users\")"
             ],
             "databaseId": "6805362c0032bd189cd2",
             "name": "config",
@@ -74,7 +74,7 @@
                 "update(\"users\")"
             ],
             "databaseId": "6805362c0032bd189cd2",
-            "name": "expanse",
+            "name": "expense",
             "enabled": true,
             "documentSecurity": false,
             "attributes": [
@@ -134,6 +134,18 @@
                     "array": false,
                     "size": 300,
                     "default": null
+                },
+                {
+                    "key": "expanseCategory",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6818e28a0011fa58a4be",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "6818e43a0013400d0b3f",
+                    "onDelete": "setNull",
+                    "side": "parent"
                 }
             ],
             "indexes": []
@@ -542,10 +554,10 @@
         {
             "$id": "6805c0c30020316ea3e6",
             "$permissions": [
+                "read(\"any\")",
                 "create(\"users\")",
                 "read(\"users\")",
-                "update(\"users\")",
-                "read(\"any\")"
+                "update(\"users\")"
             ],
             "databaseId": "6805362c0032bd189cd2",
             "name": "role",
@@ -601,8 +613,7 @@
             "$permissions": [
                 "create(\"users\")",
                 "read(\"users\")",
-                "update(\"users\")",
-                "read(\"any\")"
+                "update(\"users\")"
             ],
             "databaseId": "6805362c0032bd189cd2",
             "name": "stock",
@@ -780,8 +791,7 @@
             "$permissions": [
                 "create(\"users\")",
                 "read(\"users\")",
-                "update(\"users\")",
-                "read(\"any\")"
+                "update(\"users\")"
             ],
             "databaseId": "6805362c0032bd189cd2",
             "name": "unit",
@@ -817,11 +827,11 @@
         {
             "$id": "680536a4003be2a282af",
             "$permissions": [
+                "read(\"any\")",
+                "update(\"any\")",
                 "create(\"users\")",
                 "read(\"users\")",
-                "update(\"users\")",
-                "read(\"any\")",
-                "update(\"any\")"
+                "update(\"users\")"
             ],
             "databaseId": "6805362c0032bd189cd2",
             "name": "users",
@@ -905,13 +915,13 @@
         {
             "$id": "6805bdcd00107f585ff2",
             "$permissions": [
+                "read(\"any\")",
                 "create(\"users\")",
                 "read(\"users\")",
-                "update(\"users\")",
-                "read(\"any\")"
+                "update(\"users\")"
             ],
             "databaseId": "6805362c0032bd189cd2",
-            "name": "warehouse",
+            "name": "warehouses",
             "enabled": true,
             "documentSecurity": false,
             "attributes": [
@@ -1020,6 +1030,32 @@
                     "min": -1.7976931348623157e+308,
                     "max": 1.7976931348623157e+308,
                     "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "6818e28a0011fa58a4be",
+            "$permissions": [],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "expense_category",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "enabled",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": true
                 }
             ],
             "indexes": []

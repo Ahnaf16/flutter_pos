@@ -100,11 +100,33 @@ class TransactionLog {
       transactionBy: user,
       date: dateNow.run(),
       type: record.type == RecordType.sale ? TransactionType.sale : TransactionType.purchase,
-      note: _note(record),
+      note: _noteInv(record),
     );
   }
 
-  static String _note(InventoryRecord record) {
+  static TransactionLog fromExpense(Expense ex) {
+    return TransactionLog(
+      id: '',
+      amount: ex.amount,
+      usedDueBalance: 0,
+      account: ex.account,
+      parti: null,
+      transactTo: null,
+      transactionBy: ex.expenseBy,
+      date: dateNow.run(),
+      type: TransactionType.expanse,
+      note: _noteEx(ex),
+    );
+  }
+
+  static String _noteEx(Expense record) {
+    final amount = record.amount;
+    final account = record.account.name;
+    final date = record.date.formatDate();
+    return ['spent $amount', 'from $account', 'for "${record.expanseFor}"', 'on $date'].join(' ');
+  }
+
+  static String _noteInv(InventoryRecord record) {
     final isSale = record.type == RecordType.sale;
     final type = isSale ? 'Sold' : 'Bought';
     final length = record.details.length;

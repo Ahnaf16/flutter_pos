@@ -1,5 +1,4 @@
 import 'package:pos/features/products/controller/products_ctrl.dart';
-import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
@@ -31,7 +30,7 @@ class StockView extends HookConsumerWidget {
             useActualWidth: true,
             child: productList.when(
               loading: () => const Loading(),
-              error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
+              error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
               data: (products) {
                 return CustomScrollView(
                   slivers: [

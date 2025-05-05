@@ -1,5 +1,4 @@
 import 'package:pos/features/due/controller/due_ctrl.dart';
-import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -16,7 +15,7 @@ class DueView extends HookConsumerWidget {
 
       body: partiList.when(
         loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
+        error: (e, s) => ErrorView(e, s, prov: dueLogCtrlProvider),
         data: (dues) {
           return DataTableBuilder<DueLog, (String, double)>(
             rowHeight: 100,
