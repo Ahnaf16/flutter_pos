@@ -7,7 +7,7 @@ part of 'payment_accounts_ctrl.dart';
 // **************************************************************************
 
 String _$paymentAccountsCtrlHash() =>
-    r'2e60edac444d7109bd4b3befa90fdf119b85124c';
+    r'0cb4e1738f9dd049dc38d7e8d1fd1e1949fce2c8';
 
 /// See also [PaymentAccountsCtrl].
 @ProviderFor(PaymentAccountsCtrl)

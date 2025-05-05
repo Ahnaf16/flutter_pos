@@ -28,13 +28,13 @@ class InventoryRepo with AwHandler {
     //! update Due
     Parti? parti = record.parti;
     if (inventory.hasDue || inventory.hasBalance) {
-      final (partiErr, partiData) = await _updateDue(parti, inventory.due, record.type).toRecord();
+      final (partiErr, partiData) = await _updateDue(parti, inventory.dueSale, record.type).toRecord();
       if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
       parti = Parti.fromDoc(partiData);
     }
 
     if (inventory.hasDue && inventory.partiHasBalance) {
-      record = record.copyWith(dueBalance: record.dueBalance + inventory.due);
+      record = record.copyWith(dueBalance: record.dueBalance + inventory.dueSale);
     }
 
     if (inventory.partiHasBalance && inventory.dueBalance > 0) {

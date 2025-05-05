@@ -56,7 +56,6 @@ class ProductsCtrl extends _$ProductsCtrl {
 
   FutureReport<Document> _createFirstStock(QMap stockData) async {
     final repo = locate<StockRepo>();
-    stockData.addAll({'createdAt': DateTime.now().toIso8601String()});
     return await repo.createStock(stockData);
   }
 }

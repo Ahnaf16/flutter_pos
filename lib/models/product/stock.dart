@@ -36,6 +36,17 @@ class Stock {
     );
   }
 
+  static Stock empty() => Stock(
+    id: '',
+    purchasePrice: 0,
+    salesPrice: 0,
+    wholesalePrice: 0,
+    dealerPrice: 0,
+    quantity: 0,
+    warehouse: null,
+    createdAt: DateTime.now(),
+  );
+
   num get getProfitLoss {
     return (salesPrice - purchasePrice) * quantity;
   }

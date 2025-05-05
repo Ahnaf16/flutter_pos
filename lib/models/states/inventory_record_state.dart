@@ -47,16 +47,17 @@ class InventoryRecordState {
     );
   }
 
-  num calculateDiscount() => discountType == DiscountType.flat ? discount : (subtotalSale() * discount) / 100;
+  num calculateDiscount(RecordType type) =>
+      discountType == DiscountType.flat ? discount : (subtotal(type) * discount) / 100;
 
-  num subtotalSale() => details.map((e) => e.totalPriceSale()).sum;
+  num subtotal(RecordType type) => details.map((e) => e.totalPriceByType(type)).sum;
 
-  num totalPriceSale() => (subtotalSale() + shipping + vat) - calculateDiscount();
+  num totalPriceSale(RecordType type) => (subtotal(type) + shipping + vat) - calculateDiscount(type);
 
-  num get due => totalPriceSale() - amount - dueBalance;
+  num get dueSale => totalPriceSale(RecordType.sale) - amount - dueBalance;
 
-  bool get hasDue => due > 0;
-  bool get hasBalance => due < 0;
+  bool get hasDue => dueSale > 0;
+  bool get hasBalance => dueSale < 0;
 
   bool get partiHasBalance => parti?.due.isNegative ?? false;
 

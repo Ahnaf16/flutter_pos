@@ -6,7 +6,7 @@ part of 'update_role_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$updateRoleCtrlHash() => r'bcb14366289046f39cbe153c4ab8ab11ca2c71cd';
+String _$updateRoleCtrlHash() => r'a845457ebeee8439ce2dc1b26d6a49d6178e741d';
 
 /// Copied from Dart SDK
 class _SystemHash {

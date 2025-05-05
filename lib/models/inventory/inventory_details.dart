@@ -60,9 +60,11 @@ class InventoryDetails {
     );
   }
 
-  num totalPriceByType(RecordType type) =>
-      quantity * (type == RecordType.sale ? stock.salesPrice : stock.purchasePrice);
+  num totalPriceByType(RecordType type) {
+    if (type == RecordType.sale) return totalPriceSale();
+    return totalPricePurchase();
+  }
 
-  num totalPriceSale() => quantity * (stock.salesPrice);
-  num totalPricePurchase() => quantity * (stock.purchasePrice);
+  num totalPriceSale() => quantity * stock.salesPrice;
+  num totalPricePurchase() => stock.quantity * stock.purchasePrice;
 }

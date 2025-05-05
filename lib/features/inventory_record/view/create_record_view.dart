@@ -7,6 +7,7 @@ import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
+import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class CreateRecordView extends HookConsumerWidget {
@@ -15,14 +16,14 @@ class CreateRecordView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final record = ref.watch(recordEditingCtrlProvider);
-    final recordCtrl = useCallback(() => ref.read(recordEditingCtrlProvider.notifier));
+    final record = ref.watch(recordEditingCtrlProvider(type));
+    final recordCtrl = useCallback(() => ref.read(recordEditingCtrlProvider(type).notifier));
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
 
     // final isSale = type == RecordType.sale;
 
     return BaseBody(
-      title: type.name.up,
+      title: type.name.titleCase,
       padding: context.layout.pagePadding.copyWith(top: 5, bottom: 15),
       body: FormBuilder(
         key: formKey,
@@ -112,7 +113,7 @@ class CreateRecordView extends HookConsumerWidget {
                                       record: record,
                                       type: type,
                                       onSubmit: () async {
-                                        final res = await recordCtrl().submitSale();
+                                        final res = await recordCtrl().submit();
 
                                         if (context.mounted) res.showToast(context);
 
@@ -140,7 +141,7 @@ class CreateRecordView extends HookConsumerWidget {
                 defaultSize: .2,
                 minSize: .2,
                 maxSize: .4,
-                child: _ProductsPanel(onProductSelect: (p) => recordCtrl().addProduct(p)),
+                child: _ProductsPanel(onProductSelect: (p, s) => recordCtrl().addProduct(p, s), type: type),
               ),
             ],
           ),
@@ -256,15 +257,15 @@ class _Summary extends StatelessWidget {
       child: Column(
         spacing: Insets.sm,
         children: [
-          SpacedText(left: 'Subtotal', right: record.subtotalSale().currency(), styleBuilder: (l, r) => (l, r.bold)),
+          SpacedText(left: 'Subtotal', right: record.subtotal(type).currency(), styleBuilder: (l, r) => (l, r.bold)),
           SpacedText(
             left: 'Total',
-            right: record.totalPriceSale().currency(),
+            right: record.totalPriceSale(type).currency(),
             styleBuilder: (l, r) => (l, context.text.large),
           ),
           SpacedText(
             left: 'Due',
-            right: record.due.currency(),
+            right: record.dueSale.currency(),
             styleBuilder: (l, r) {
               return (l, r.textColor(record.hasDue ? context.colors.destructive : null));
             },
@@ -284,7 +285,7 @@ class _Summary extends StatelessWidget {
               childPadding: Pads.sm('l'),
               rowCrossAxisAlignment: CrossAxisAlignment.center,
               child: Text(
-                'The due amount ${record.due.abs().currency()} will be added to balance',
+                'The due amount ${record.dueSale.abs().currency()} will be added to balance',
                 style: context.text.muted.error(context),
               ),
             ),
@@ -376,6 +377,9 @@ class _ProductTile extends StatelessWidget {
     final InventoryDetails(:product, :stock, :quantity) = detail;
 
     final availableQty = stock.quantity - quantity;
+
+    final qty = isSale ? quantity : stock.quantity;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       spacing: Insets.sm,
@@ -405,10 +409,11 @@ class _ProductTile extends StatelessWidget {
             spacing: Insets.xs,
             children: [
               ShadBadge.secondary(child: Text('${stock.warehouse?.name}')),
-              Text(
-                '$availableQty${product.unitName}',
-                style: context.text.muted.textColor(availableQty > 0 ? null : context.colors.destructive),
-              ),
+              if (isSale)
+                Text(
+                  '$availableQty${product.unitName}',
+                  style: context.text.muted.textColor(availableQty > 0 ? null : context.colors.destructive),
+                ),
             ],
           ),
         ),
@@ -422,18 +427,18 @@ class _ProductTile extends StatelessWidget {
                 height: 30,
                 width: 30,
                 onPressed: () {
-                  if (quantity == 1) return;
-                  onQtyChange(quantity - 1);
+                  if (qty == 1) return;
+                  onQtyChange(qty - 1);
                 },
               ),
-              Text('$quantity'),
+              Text('$qty'),
               ShadIconButton.outline(
                 icon: const Icon(LuIcons.plus),
                 height: 30,
                 width: 30,
                 onPressed: () {
-                  if (availableQty == 0) return;
-                  onQtyChange(quantity + 1);
+                  if (availableQty == 0 && isSale) return;
+                  onQtyChange(qty + 1);
                 },
               ),
             ],
@@ -641,9 +646,10 @@ class _PartiSection extends HookConsumerWidget {
 }
 
 class _ProductsPanel extends HookConsumerWidget {
-  const _ProductsPanel({required this.onProductSelect});
+  const _ProductsPanel({required this.onProductSelect, required this.type});
 
-  final Function(Product product) onProductSelect;
+  final Function(Product product, Stock? stock) onProductSelect;
+  final RecordType type;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -720,7 +726,18 @@ class _ProductsPanel extends HookConsumerWidget {
                     ),
                     builder: (hovering, child) {
                       return GestureDetector(
-                        onTap: () => onProductSelect(product),
+                        onTap: () async {
+                          if (type == RecordType.sale) {
+                            onProductSelect(product, null);
+                          } else {
+                            final res = await showShadDialog<Stock>(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) => const _AddStockDialog(),
+                            );
+                            onProductSelect(product, res);
+                          }
+                        },
                         child: Stack(
                           children: [
                             child,
@@ -752,6 +769,159 @@ class _ProductsPanel extends HookConsumerWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class _AddStockDialog extends HookConsumerWidget {
+  const _AddStockDialog();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final warehouseList = ref.watch(warehouseCtrlProvider);
+    final searchWarehouse = useState('');
+
+    final stock = useState<Stock>(Stock.empty());
+
+    return ShadDialog(
+      title: const Text('Stock'),
+      description: const Text('Add stock details'),
+
+      actions: [
+        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton(
+          onPressed: () {
+            context.nPop(stock.value);
+          },
+          child: const Text('Add'),
+        ),
+      ],
+      child: Container(
+        padding: Pads.padding(v: Insets.med),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: Insets.sm,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: ShadField(
+                    name: 'purchase_price',
+                    label: 'Purchase Price',
+                    hintText: 'Enter purchase price',
+                    isRequired: true,
+                    inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                    onChanged: (value) {
+                      stock.value = stock.value.copyWith(purchasePrice: Parser.toNum(value));
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: ShadField(
+                    name: 'sales_price',
+                    label: 'Sales Price',
+                    hintText: 'Enter sale price',
+                    isRequired: true,
+                    inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                    onChanged: (value) {
+                      stock.value = stock.value.copyWith(salesPrice: Parser.toNum(value));
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: ShadField(
+                    name: 'wholesale_price',
+                    label: 'Wholesale Price',
+                    hintText: 'Enter wholesale price',
+                    inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                    onChanged: (value) {
+                      stock.value = stock.value.copyWith(wholesalePrice: Parser.toNum(value));
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: ShadField(
+                    name: 'dealer_price',
+                    label: 'Dealer Price',
+                    hintText: 'Enter dealer price',
+                    inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                    onChanged: (value) {
+                      stock.value = stock.value.copyWith(dealerPrice: Parser.toNum(value));
+                    },
+                  ),
+                ),
+                if (!context.layout.isMobile)
+                  Expanded(
+                    child: ShadField(
+                      name: 'quantity',
+                      label: 'Quantity',
+                      hintText: 'Enter Stock quantity',
+                      isRequired: true,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      onChanged: (value) {
+                        stock.value = stock.value.copyWith(quantity: Parser.toInt(value));
+                      },
+                    ),
+                  ),
+              ],
+            ),
+            Row(
+              children: [
+                if (context.layout.isMobile)
+                  Expanded(
+                    child: ShadField(
+                      name: 'quantity',
+                      label: 'Quantity',
+                      hintText: 'Enter Stock quantity',
+                      isRequired: true,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      onChanged: (value) {
+                        stock.value = stock.value.copyWith(quantity: Parser.toInt(value));
+                      },
+                    ),
+                  ),
+                Expanded(
+                  flex: 2,
+                  child: ShadInputDecorator(
+                    label: const Text('Choose warehouse').required(),
+                    child: warehouseList.maybeWhen(
+                      orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                      data: (warehouses) {
+                        final filtered = warehouses.where((e) => e.name.low.contains(searchWarehouse.value.low));
+                        return LimitedWidthBox(
+                          child: ShadSelect<WareHouse>.withSearch(
+                            placeholder: const Text('Warehouse'),
+                            options: [
+                              if (filtered.isEmpty)
+                                Padding(padding: Pads.padding(v: 24), child: const Text('No warehouses found')),
+                              ...filtered.map((house) {
+                                return ShadOption(value: house, child: Text(house.name));
+                              }),
+                            ],
+                            selectedOptionBuilder: (context, v) => Text(v.name),
+                            onSearchChanged: searchWarehouse.set,
+                            allowDeselection: true,
+                            onChanged: (value) {
+                              stock.value = stock.value.copyWith(warehouse: () => value);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

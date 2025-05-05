@@ -18,10 +18,10 @@ class CreateProductView extends HookConsumerWidget {
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
 
     // final warehouseList = ref.watch(warehouseCtrlProvider);
-    final unitList = ref.watch(unitCtrlProvider);
-
-    final searchUnit = useState('');
     // final searchWarehouse = useState('');
+
+    final unitList = ref.watch(unitCtrlProvider);
+    final searchUnit = useState('');
 
     final selectedFile = useState<PFile?>(null);
 
@@ -37,7 +37,7 @@ class CreateProductView extends HookConsumerWidget {
           onPressed: (l) async {
             final state = formKey.currentState!;
             if (!state.saveAndValidate()) return;
-            final data = state.value.unflattened();
+            final data = state.value;
 
             (bool, String)? result;
 
@@ -243,135 +243,135 @@ class CreateProductView extends HookConsumerWidget {
                   ),
                 ),
                 // if (updatingId == null)
-                //   ShadCard(
-                //     border: const Border(),
-                //     shadows: const [],
-                //     padding: Pads.med(),
-                //     childPadding: Pads.med('t'),
-                //     title: const Text('Stock Details'),
-                //     description: const Text('Add stock quantity and price'),
-                //     childSeparator: const SizedBox(width: 700, child: ShadSeparator.horizontal(thickness: 1)),
-                //     child: LimitedWidthBox(
-                //       maxWidth: 700,
-                //       center: false,
-                //       child: Column(
-                //         crossAxisAlignment: CrossAxisAlignment.start,
-                //         spacing: Insets.med,
-                //         children: [
-                //           Row(
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
+                // ShadCard(
+                //   border: const Border(),
+                //   shadows: const [],
+                //   padding: Pads.med(),
+                //   childPadding: Pads.med('t'),
+                //   title: const Text('Stock Details'),
+                //   description: const Text('Add stock quantity and price'),
+                //   childSeparator: const SizedBox(width: 700, child: ShadSeparator.horizontal(thickness: 1)),
+                //   child: LimitedWidthBox(
+                //     maxWidth: 700,
+                //     center: false,
+                //     child: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       spacing: Insets.med,
+                //       children: [
+                //         Row(
+                //           crossAxisAlignment: CrossAxisAlignment.start,
+                //           children: [
+                //             Expanded(
+                //               child: ShadField(
+                //                 name: 'stock.purchase_price',
+                //                 label: 'Purchase Price',
+                //                 hintText: 'Enter purchase price',
+                //                 isRequired: true,
+                //                 inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                //               ),
+                //             ),
+                //             Expanded(
+                //               child: ShadField(
+                //                 name: 'stock.sales_price',
+                //                 label: 'Sales Price',
+                //                 hintText: 'Enter sale price',
+                //                 isRequired: true,
+                //                 inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                //               ),
+                //             ),
+                //           ],
+                //         ),
+                //         Row(
+                //           crossAxisAlignment: CrossAxisAlignment.start,
+                //           children: [
+                //             Expanded(
+                //               child: ShadField(
+                //                 name: 'stock.wholesale_price',
+                //                 label: 'Wholesale Price',
+                //                 hintText: 'Enter wholesale price',
+                //                 inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                //               ),
+                //             ),
+                //             Expanded(
+                //               child: ShadField(
+                //                 name: 'stock.dealer_price',
+                //                 label: 'Dealer Price',
+                //                 hintText: 'Enter dealer price',
+                //                 inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                //               ),
+                //             ),
+                //             if (!context.layout.isMobile)
                 //               Expanded(
                 //                 child: ShadField(
-                //                   name: 'stock.purchase_price',
-                //                   label: 'Purchase Price',
-                //                   hintText: 'Enter purchase price',
+                //                   name: 'stock.quantity',
+                //                   label: 'Quantity',
+                //                   hintText: 'Enter Stock quantity',
                 //                   isRequired: true,
-                //                   inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                //                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 //                 ),
                 //               ),
+                //           ],
+                //         ),
+                //         Row(
+                //           children: [
+                //             if (context.layout.isMobile)
                 //               Expanded(
                 //                 child: ShadField(
-                //                   name: 'stock.sales_price',
-                //                   label: 'Sales Price',
-                //                   hintText: 'Enter sale price',
+                //                   name: 'stock.quantity',
+                //                   label: 'Quantity',
+                //                   hintText: 'Enter Stock quantity',
                 //                   isRequired: true,
-                //                   inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                //                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 //                 ),
                 //               ),
-                //             ],
-                //           ),
-                //           Row(
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               Expanded(
-                //                 child: ShadField(
-                //                   name: 'stock.wholesale_price',
-                //                   label: 'Wholesale Price',
-                //                   hintText: 'Enter wholesale price',
-                //                   inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
-                //                 ),
+                //             Expanded(
+                //               flex: 2,
+                //               child: FormBuilderField<QMap>(
+                //                 name: 'stock.warehouse',
+                //                 validator: FormBuilderValidators.required(),
+                //                 builder: (form) {
+                //                   return ShadInputDecorator(
+                //                     label: const Text('Choose warehouse').required(),
+                //                     error: form.errorText == null ? null : Text(form.errorText!),
+                //                     decoration: context.theme.decoration.copyWith(hasError: form.hasError),
+                //                     child: warehouseList.maybeWhen(
+                //                       orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                //                       data: (warehouses) {
+                //                         final filtered = warehouses.where(
+                //                           (e) => e.name.low.contains(searchWarehouse.value.low),
+                //                         );
+                //                         return LimitedWidthBox(
+                //                           child: ShadSelect<WareHouse>.withSearch(
+                //                             initialValue: WareHouse.tyrParse(form.value),
+                //                             placeholder: const Text('Warehouse'),
+                //                             options: [
+                //                               if (filtered.isEmpty)
+                //                                 Padding(
+                //                                   padding: Pads.padding(v: 24),
+                //                                   child: const Text('No warehouses found'),
+                //                                 ),
+                //                               ...filtered.map((house) {
+                //                                 return ShadOption(value: house, child: Text(house.name));
+                //                               }),
+                //                             ],
+                //                             selectedOptionBuilder: (context, v) => Text(v.name),
+                //                             onSearchChanged: searchWarehouse.set,
+                //                             allowDeselection: true,
+                //                             onChanged: (v) => form.didChange(v?.toMap()),
+                //                           ),
+                //                         );
+                //                       },
+                //                     ),
+                //                   );
+                //                 },
                 //               ),
-                //               Expanded(
-                //                 child: ShadField(
-                //                   name: 'stock.dealer_price',
-                //                   label: 'Dealer Price',
-                //                   hintText: 'Enter dealer price',
-                //                   inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
-                //                 ),
-                //               ),
-                //               if (!context.layout.isMobile)
-                //                 Expanded(
-                //                   child: ShadField(
-                //                     name: 'stock.quantity',
-                //                     label: 'Quantity',
-                //                     hintText: 'Enter Stock quantity',
-                //                     isRequired: true,
-                //                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                //                   ),
-                //                 ),
-                //             ],
-                //           ),
-                //           Row(
-                //             children: [
-                //               if (context.layout.isMobile)
-                //                 Expanded(
-                //                   child: ShadField(
-                //                     name: 'stock.quantity',
-                //                     label: 'Quantity',
-                //                     hintText: 'Enter Stock quantity',
-                //                     isRequired: true,
-                //                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                //                   ),
-                //                 ),
-                //               Expanded(
-                //                 flex: 2,
-                //                 child: FormBuilderField<QMap>(
-                //                   name: 'stock.warehouse',
-                //                   validator: FormBuilderValidators.required(),
-                //                   builder: (form) {
-                //                     return ShadInputDecorator(
-                //                       label: const Text('Choose warehouse').required(),
-                //                       error: form.errorText == null ? null : Text(form.errorText!),
-                //                       decoration: context.theme.decoration.copyWith(hasError: form.hasError),
-                //                       child: warehouseList.maybeWhen(
-                //                         orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                //                         data: (warehouses) {
-                //                           final filtered = warehouses.where(
-                //                             (e) => e.name.low.contains(searchWarehouse.value.low),
-                //                           );
-                //                           return LimitedWidthBox(
-                //                             child: ShadSelect<WareHouse>.withSearch(
-                //                               initialValue: WareHouse.tyrParse(form.value),
-                //                               placeholder: const Text('Warehouse'),
-                //                               options: [
-                //                                 if (filtered.isEmpty)
-                //                                   Padding(
-                //                                     padding: Pads.padding(v: 24),
-                //                                     child: const Text('No warehouses found'),
-                //                                   ),
-                //                                 ...filtered.map((house) {
-                //                                   return ShadOption(value: house, child: Text(house.name));
-                //                                 }),
-                //                               ],
-                //                               selectedOptionBuilder: (context, v) => Text(v.name),
-                //                               onSearchChanged: searchWarehouse.set,
-                //                               allowDeselection: true,
-                //                               onChanged: (v) => form.didChange(v?.toMap()),
-                //                             ),
-                //                           );
-                //                         },
-                //                       ),
-                //                     );
-                //                   },
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ],
-                //       ),
+                //             ),
+                //           ],
+                //         ),
+                //       ],
                 //     ),
                 //   ),
+                // ),
                 const Gap(Insets.xl),
               ],
             ),

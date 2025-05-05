@@ -6,7 +6,7 @@ part of 'parties_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$partiesCtrlHash() => r'995a1470045025097d4ac9e563f09bd125b79662';
+String _$partiesCtrlHash() => r'1d6b229a0ec0dab5696615089b24b3813e188e49';
 
 /// Copied from Dart SDK
 class _SystemHash {

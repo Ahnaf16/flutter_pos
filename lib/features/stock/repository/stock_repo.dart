@@ -3,6 +3,8 @@ import 'package:pos/main.export.dart';
 
 class StockRepo with AwHandler {
   FutureReport<Document> createStock(QMap form) async {
+    form.addAll({'createdAt': DateTime.now().toIso8601String()});
+
     final stock = Stock.fromMap(form);
     final doc = await db.create(AWConst.collections.stock, data: stock.toAwPost());
     return doc;
