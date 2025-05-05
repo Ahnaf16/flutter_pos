@@ -17,30 +17,55 @@ class HomeView extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 20,
             children: [
-              const ShadField(
+              ShadFormField(
                 name: 'name',
                 label: 'Name',
                 hintText: 'Enter your name',
-                helperText: 'This is a helper text',
                 isRequired: true,
                 initialValue: 'initial',
+                showClearButton: true,
+                buttonVariant: ShadButtonVariant.outline,
               ),
-              const TextArea(
-                expandableHeight: true,
-                isRequired: true,
-                name: 'test',
-                label: 'Name',
-                hintText: 'Enter your name',
-                helperText: 'This is a helper text',
+              ShadFormField(
+                name: 'name2',
+                label: 'Name 2',
+                hintText: 'Enter your name 2',
+                helperText: 'This is a helper text 2',
               ),
-              ShadButton(
-                onPressed: () {
-                  final state = formKey.currentState!;
-                  if (!state.saveAndValidate()) return;
-                  final data = state.value;
-                  cat(data, 'Form Data');
-                },
-                child: const Text('Submit'),
+              ShadFormField(name: 'pass', label: 'pass', hintText: 'Enter your pass', isPassField: true),
+
+              const ShadTextarea(),
+
+              Row(
+                children: [
+                  ShadButton(
+                    onPressed: () {
+                      final state = formKey.currentState!;
+                      if (!state.saveAndValidate()) return;
+                      final data = state.value;
+                      cat(data, 'Form Data');
+                    },
+                    child: const Text('Submit'),
+                  ),
+                  ShadButton(
+                    onPressed: () {
+                      formKey.currentState!.reset();
+                    },
+                    child: const Text('reset'),
+                  ),
+                  ShadButton(
+                    onPressed: () {
+                      formKey.currentState!.patchValue({'name': '', 'name2': '', 'pass': ''});
+                    },
+                    child: const Text('clear'),
+                  ),
+                  ShadButton(
+                    onPressed: () {
+                      formKey.currentState!.patchValue({'name': 'name', 'name2': 'name2', 'pass': 'pass'});
+                    },
+                    child: const Text('set'),
+                  ),
+                ],
               ),
             ],
           ),

@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/main.export.dart';
 
+@Deprecated('Use ShadFormField')
 class ShadField extends HookWidget {
   const ShadField({
     Key? key,
@@ -15,7 +16,6 @@ class ShadField extends HookWidget {
     this.initialValue,
     this.validators,
     this.keyboardType,
-    // this.controller,
     this.maxLength,
     this.maxLines = 1,
     this.minLines,
@@ -50,8 +50,6 @@ class ShadField extends HookWidget {
   final void Function(String value)? onChanged;
   final void Function(String value)? onSubmit;
   // final TextEditingController? controller;
-  final int? maxLength;
-  final int? maxLines;
   final bool readOnly;
   final bool enabled;
   final Function()? onTap;
@@ -66,6 +64,8 @@ class ShadField extends HookWidget {
   final FocusNode? focusNode;
   final bool expands;
   final int? minLines;
+  final int? maxLength;
+  final int? maxLines;
   final EdgeInsets? padding;
 
   @override
