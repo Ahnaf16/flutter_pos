@@ -6,6 +6,7 @@ export 'data_table_builder.dart';
 export 'error_view.dart';
 export 'flex/flex.dart';
 export 'flex/separated_flex.dart';
+export 'form/shad_file_field.dart';
 export 'form/shad_form_decoration.dart';
 export 'form/shad_select_field.dart';
 export 'form/shad_text_area_field.dart';

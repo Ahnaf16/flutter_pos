@@ -15,6 +15,7 @@ class HomeView extends HookConsumerWidget {
           key: formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 20,
             children: [
               ShadTextField(
@@ -51,6 +52,8 @@ class HomeView extends HookConsumerWidget {
                 optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name)),
                 selectedBuilder: (context, value) => Text(value.name),
               ),
+
+              SizedBox(width: 700, child: ShadFileField()),
 
               Row(
                 children: [
