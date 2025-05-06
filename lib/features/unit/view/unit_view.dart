@@ -146,13 +146,13 @@ class _UnitAddDialog extends HookConsumerWidget {
         child: FormBuilder(
           key: formKey,
           initialValue: unit?.toMap() ?? {},
-          child: const Column(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: Insets.med,
             children: [
-              ShadField(name: 'name', label: 'Name', isRequired: true),
-              ShadField(name: 'unit_name', label: 'Unit Name', isRequired: true),
+              ShadFormField(name: 'name', label: 'Name', isRequired: true),
+              ShadFormField(name: 'unit_name', label: 'Unit Name', isRequired: true),
             ],
           ),
         ),

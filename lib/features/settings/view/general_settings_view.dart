@@ -46,8 +46,8 @@ class GeneralSettingsView extends HookConsumerWidget {
 
                 Row(
                   children: [
-                    const Expanded(
-                      child: ShadField(
+                    Expanded(
+                      child: ShadFormField(
                         name: 'currency_symbol',
                         label: 'Currency symbol',
                         hintText: 'Enter currency symbol',

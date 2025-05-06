@@ -76,7 +76,7 @@ class CreateUserRoleView extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: Insets.med,
                         children: [
-                          const ShadField(
+                          ShadFormField(
                             name: 'name',
                             label: 'Role Name',
                             hintText: 'Enter role name',

@@ -82,9 +82,9 @@ class ProfileView extends HookConsumerWidget {
                         ],
                       ],
                     ),
-                    const ShadField(name: 'name', label: 'Name', hintText: 'Enter your name', isRequired: true),
+                    ShadFormField(name: 'name', label: 'Name', hintText: 'Enter your name', isRequired: true),
 
-                    const ShadField(
+                    ShadFormField(
                       name: 'email',
                       label: 'Email',
                       hintText: 'Enter your email',
@@ -93,7 +93,7 @@ class ProfileView extends HookConsumerWidget {
                       helperText: 'Email is not editable',
                     ),
 
-                    const ShadField(name: 'phone', label: 'Phone', hintText: 'Enter your phone', isRequired: true),
+                    ShadFormField(name: 'phone', label: 'Phone', hintText: 'Enter your phone', isRequired: true),
 
                     const Gap(Insets.med),
                     SubmitButton(

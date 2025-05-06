@@ -244,7 +244,7 @@ class _ExpenseAddDialog extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: Insets.med,
             children: [
-              ShadField(
+              ShadFormField(
                 name: 'amount',
                 label: 'Amount',
                 isRequired: true,
@@ -252,7 +252,7 @@ class _ExpenseAddDialog extends HookConsumerWidget {
               ),
               Row(
                 children: [
-                  const Flexible(child: ShadField(name: 'expanse_for', label: 'Expanse For', isRequired: true)),
+                  Flexible(child: ShadFormField(name: 'expanse_for', label: 'Expanse For', isRequired: true)),
                   Flexible(
                     child: FormBuilderField<QMap>(
                       name: 'expanseCategory',

@@ -150,7 +150,7 @@ class _CategoryAddDialog extends HookConsumerWidget {
         child: FormBuilder(
           key: formKey,
           initialValue: category?.toMap() ?? {},
-          child: const ShadField(name: 'name', label: 'Name', isRequired: true),
+          child: ShadFormField(name: 'name', label: 'Name', isRequired: true),
         ),
       ),
     );

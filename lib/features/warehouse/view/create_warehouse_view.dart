@@ -71,31 +71,31 @@ class CreateWarehouseView extends HookConsumerWidget {
                     title: const Text('Warehouse Details'),
                     description: const Text('Add warehouse names, address and contact details'),
                     childSeparator: const SizedBox(width: 750, child: ShadSeparator.horizontal(thickness: 1)),
-                    child: const LimitedWidthBox(
+                    child: LimitedWidthBox(
                       maxWidth: 700,
                       center: false,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: Insets.med,
                         children: [
-                          ShadField(
+                          ShadFormField(
                             name: 'name',
                             label: 'Warehouse Name',
                             hintText: 'Enter warehouse name',
                             isRequired: true,
                           ),
-                          ShadField(
+                          ShadFormField(
                             name: 'address',
                             label: 'Warehouse address',
                             hintText: 'Enter warehouse name',
                             isRequired: true,
                           ),
-                          ShadField(
+                          ShadFormField(
                             name: 'contact_person',
                             label: 'Contact Person',
                             hintText: 'Enter contact persons name',
                           ),
-                          ShadField(
+                          ShadFormField(
                             name: 'contact_number',
                             label: 'Contact Number',
                             hintText: 'Enter contact persons number',

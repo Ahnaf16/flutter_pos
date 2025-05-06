@@ -101,9 +101,9 @@ class CreateStaffView extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: Insets.med,
                         children: [
-                          const ShadField(name: 'name', label: 'Name', hintText: 'Enter your name', isRequired: true),
+                          ShadFormField(name: 'name', label: 'Name', hintText: 'Enter your name', isRequired: true),
 
-                          ShadField(
+                          ShadFormField(
                             name: 'email',
                             label: 'Email',
                             hintText: 'Enter your email',
@@ -112,12 +112,7 @@ class CreateStaffView extends HookConsumerWidget {
                             helperText: updatingId == null ? null : 'Email is not editable',
                           ),
 
-                          const ShadField(
-                            name: 'phone',
-                            label: 'Phone',
-                            hintText: 'Enter your phone',
-                            isRequired: true,
-                          ),
+                          ShadFormField(name: 'phone', label: 'Phone', hintText: 'Enter your phone', isRequired: true),
                           FormBuilderField<QMap>(
                             name: 'warehouse',
                             validator: FormBuilderValidators.required(),
@@ -313,7 +308,7 @@ class _CreateStaffDialog extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: Insets.med,
             children: [
-              ShadField(
+              ShadFormField(
                 name: 'pass',
                 label: 'Password',
                 hintText: 'Enter a password',
@@ -321,7 +316,7 @@ class _CreateStaffDialog extends HookConsumerWidget {
                 isPassField: true,
                 validators: [FormBuilderValidators.minLength(8)],
               ),
-              ShadField(
+              ShadFormField(
                 name: 'confirm_pass',
                 label: 'Confirm Password',
                 hintText: 'Confirm your password',
