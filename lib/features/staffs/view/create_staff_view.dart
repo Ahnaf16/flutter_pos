@@ -101,9 +101,9 @@ class CreateStaffView extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: Insets.med,
                         children: [
-                          ShadFormField(name: 'name', label: 'Name', hintText: 'Enter your name', isRequired: true),
+                          ShadTextField(name: 'name', label: 'Name', hintText: 'Enter your name', isRequired: true),
 
-                          ShadFormField(
+                          ShadTextField(
                             name: 'email',
                             label: 'Email',
                             hintText: 'Enter your email',
@@ -112,7 +112,7 @@ class CreateStaffView extends HookConsumerWidget {
                             helperText: updatingId == null ? null : 'Email is not editable',
                           ),
 
-                          ShadFormField(name: 'phone', label: 'Phone', hintText: 'Enter your phone', isRequired: true),
+                          ShadTextField(name: 'phone', label: 'Phone', hintText: 'Enter your phone', isRequired: true),
                           FormBuilderField<QMap>(
                             name: 'warehouse',
                             validator: FormBuilderValidators.required(),
@@ -308,7 +308,7 @@ class _CreateStaffDialog extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: Insets.med,
             children: [
-              ShadFormField(
+              ShadTextField(
                 name: 'pass',
                 label: 'Password',
                 hintText: 'Enter a password',
@@ -316,7 +316,7 @@ class _CreateStaffDialog extends HookConsumerWidget {
                 isPassField: true,
                 validators: [FormBuilderValidators.minLength(8)],
               ),
-              ShadFormField(
+              ShadTextField(
                 name: 'confirm_pass',
                 label: 'Confirm Password',
                 hintText: 'Confirm your password',

@@ -179,7 +179,7 @@ class _Inputs extends HookConsumerWidget {
           children: [
             Expanded(
               flex: 2,
-              child: ShadFormField(
+              child: ShadTextField(
                 name: 'amount',
                 hintText: type.isSale ? 'Received' : 'Paid',
                 keyboardType: TextInputType.number,
@@ -187,7 +187,7 @@ class _Inputs extends HookConsumerWidget {
               ),
             ),
             Expanded(
-              child: ShadFormField(name: 'vat', hintText: 'Vat', keyboardType: TextInputType.number, numeric: true),
+              child: ShadTextField(name: 'vat', hintText: 'Vat', keyboardType: TextInputType.number, numeric: true),
             ),
           ],
         ),
@@ -196,7 +196,7 @@ class _Inputs extends HookConsumerWidget {
           children: [
             Expanded(
               flex: 4,
-              child: ShadFormField(
+              child: ShadTextField(
                 name: 'discount',
                 hintText: 'Discount',
                 padding: kDefInputPadding.copyWith(bottom: 0, top: 0, right: 5),
@@ -207,7 +207,7 @@ class _Inputs extends HookConsumerWidget {
             ),
             Expanded(
               flex: 3,
-              child: ShadFormField(
+              child: ShadTextField(
                 name: 'shipping',
                 hintText: 'Shipping',
                 keyboardType: TextInputType.number,
@@ -223,7 +223,7 @@ class _Inputs extends HookConsumerWidget {
                 flex: 4,
                 child: ShadInputDecorator(
                   label: const Text('Use Balance'),
-                  child: ShadFormField(
+                  child: ShadTextField(
                     name: 'due_balance',
                     hintText: 'Use Balance',
                     initialValue: '0',
@@ -245,7 +245,7 @@ class _Inputs extends HookConsumerWidget {
                 flex: 4,
                 child: ShadInputDecorator(
                   label: const Text('Use due'),
-                  child: ShadFormField(
+                  child: ShadTextField(
                     name: 'due_balance',
                     hintText: 'Use due',
                     keyboardType: TextInputType.number,
@@ -709,7 +709,7 @@ class _ProductsPanel extends HookConsumerWidget {
                 children: [
                   Padding(
                     padding: Pads.sm('lrt'),
-                    child: ShadFormField(
+                    child: ShadTextField(
                       controller: search,
                       hintText: 'Search',
                       onChanged: (v) => productCtrl().search(v ?? ''),
@@ -862,7 +862,7 @@ class _AddStockDialog extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: ShadFormField(
+                  child: ShadTextField(
                     name: 'purchase_price',
                     label: 'Purchase Price',
                     hintText: 'Enter purchase price',
@@ -874,7 +874,7 @@ class _AddStockDialog extends HookConsumerWidget {
                   ),
                 ),
                 Expanded(
-                  child: ShadFormField(
+                  child: ShadTextField(
                     name: 'sales_price',
                     label: 'Sales Price',
                     hintText: 'Enter sale price',
@@ -891,7 +891,7 @@ class _AddStockDialog extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: ShadFormField(
+                  child: ShadTextField(
                     name: 'wholesale_price',
                     label: 'Wholesale Price',
                     hintText: 'Enter wholesale price',
@@ -902,7 +902,7 @@ class _AddStockDialog extends HookConsumerWidget {
                   ),
                 ),
                 Expanded(
-                  child: ShadFormField(
+                  child: ShadTextField(
                     name: 'dealer_price',
                     label: 'Dealer Price',
                     hintText: 'Enter dealer price',
@@ -914,7 +914,7 @@ class _AddStockDialog extends HookConsumerWidget {
                 ),
                 if (!context.layout.isMobile)
                   Expanded(
-                    child: ShadFormField(
+                    child: ShadTextField(
                       name: 'quantity',
                       label: 'Quantity',
                       hintText: 'Enter Stock quantity',
@@ -931,7 +931,7 @@ class _AddStockDialog extends HookConsumerWidget {
               children: [
                 if (context.layout.isMobile)
                   Expanded(
-                    child: ShadFormField(
+                    child: ShadTextField(
                       name: 'quantity',
                       label: 'Quantity',
                       hintText: 'Enter Stock quantity',

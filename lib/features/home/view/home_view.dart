@@ -17,7 +17,7 @@ class HomeView extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 20,
             children: [
-              ShadFormField(
+              ShadTextField(
                 name: 'regular',
                 label: 'Regular',
                 hintText: 'Regular input',
@@ -25,14 +25,14 @@ class HomeView extends HookConsumerWidget {
                 initialValue: 'initial value',
                 showClearButton: true,
               ),
-              ShadFormField(
+              ShadTextField(
                 name: 'numeric',
                 label: 'numeric',
                 hintText: 'numeric input',
                 helperText: 'This is a numeric field',
                 numeric: true,
               ),
-              ShadFormField(name: 'pass', label: 'pass', hintText: 'Enter your pass', isPassField: true),
+              ShadTextField(name: 'pass', label: 'pass', hintText: 'Enter your pass', isPassField: true),
 
               ShadTextAreaField(
                 name: 'desc',

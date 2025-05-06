@@ -243,7 +243,7 @@ class _PartiAddDialog extends HookConsumerWidget {
                 ),
               Row(
                 children: [
-                  Expanded(flex: 2, child: ShadFormField(name: 'name', label: 'Name', isRequired: true)),
+                  Expanded(flex: 2, child: ShadTextField(name: 'name', label: 'Name', isRequired: true)),
                   if (!isCustomer || !walkInEnabled.value)
                     Flexible(
                       child: FormBuilderField<String>(
@@ -278,10 +278,10 @@ class _PartiAddDialog extends HookConsumerWidget {
                     ),
                 ],
               ),
-              ShadFormField(name: 'phone', label: 'Phone', isRequired: true),
+              ShadTextField(name: 'phone', label: 'Phone', isRequired: true),
               if (!walkInEnabled.value) ...[
-                ShadFormField(name: 'email', label: 'Email'),
-                ShadFormField(name: 'address', label: 'Address'),
+                ShadTextField(name: 'email', label: 'Email'),
+                ShadTextField(name: 'address', label: 'Address'),
 
                 ShadInputDecorator(
                   label: const Text('Profile image'),

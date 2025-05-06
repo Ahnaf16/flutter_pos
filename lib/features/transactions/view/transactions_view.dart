@@ -368,7 +368,7 @@ class _TrxAddDialog extends HookConsumerWidget {
               ),
               Row(
                 children: [
-                  Flexible(child: ShadFormField(name: 'amount', hintText: 'Amount', label: 'Amount', numeric: true)),
+                  Flexible(child: ShadTextField(name: 'amount', hintText: 'Amount', label: 'Amount', numeric: true)),
 
                   Flexible(
                     child: staffList.maybeWhen(
@@ -466,8 +466,8 @@ class _TrxAddDialog extends HookConsumerWidget {
                     const Text('OR'),
                     Row(
                       children: [
-                        Flexible(child: ShadFormField(name: 'transact_to', hintText: 'Name')),
-                        Flexible(child: ShadFormField(name: 'transact_to_phone', hintText: 'Phone')),
+                        Flexible(child: ShadTextField(name: 'transact_to', hintText: 'Name')),
+                        Flexible(child: ShadTextField(name: 'transact_to_phone', hintText: 'Phone')),
                       ],
                     ),
                   ],

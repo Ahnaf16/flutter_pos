@@ -78,24 +78,24 @@ class CreateWarehouseView extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: Insets.med,
                         children: [
-                          ShadFormField(
+                          ShadTextField(
                             name: 'name',
                             label: 'Warehouse Name',
                             hintText: 'Enter warehouse name',
                             isRequired: true,
                           ),
-                          ShadFormField(
+                          ShadTextField(
                             name: 'address',
                             label: 'Warehouse address',
                             hintText: 'Enter warehouse name',
                             isRequired: true,
                           ),
-                          ShadFormField(
+                          ShadTextField(
                             name: 'contact_person',
                             label: 'Contact Person',
                             hintText: 'Enter contact persons name',
                           ),
-                          ShadFormField(
+                          ShadTextField(
                             name: 'contact_number',
                             label: 'Contact Number',
                             hintText: 'Enter contact persons number',

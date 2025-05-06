@@ -161,9 +161,9 @@ class _AccountAddDialog extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: Insets.med,
             children: [
-              ShadFormField(name: 'name', label: 'Name', isRequired: true),
-              ShadFormField(name: 'description', label: 'description'),
-              if (acc == null) ShadFormField(name: 'amount', label: 'initial amount'),
+              ShadTextField(name: 'name', label: 'Name', isRequired: true),
+              ShadTextField(name: 'description', label: 'description'),
+              if (acc == null) ShadTextField(name: 'amount', label: 'initial amount'),
             ],
           ),
         ),

@@ -3,9 +3,9 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/main.export.dart';
 
 /// A Shad CN Design text field input.
-class ShadFormField extends ShadFormDecoration<String> {
+class ShadTextField extends ShadFormDecoration<String> {
   /// Creates a Shad CN Design text field input.
-  ShadFormField({
+  ShadTextField({
     super.key,
     super.decoration,
     super.onChanged,
@@ -141,10 +141,10 @@ class ShadFormField extends ShadFormDecoration<String> {
   final ShadButtonVariant buttonVariant;
 
   @override
-  ShadFormDecorationState<ShadFormField, String> createState() => _ShadTextFieldState();
+  ShadFormDecorationState<ShadTextField, String> createState() => _ShadTextFieldState();
 }
 
-class _ShadTextFieldState extends ShadFormDecorationState<ShadFormField, String> {
+class _ShadTextFieldState extends ShadFormDecorationState<ShadTextField, String> {
   TextEditingController? _controller;
   bool _obscure = true;
   bool get isObscure => _obscure;

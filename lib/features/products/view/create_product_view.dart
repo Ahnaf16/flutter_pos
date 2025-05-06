@@ -97,7 +97,7 @@ class CreateProductView extends HookConsumerWidget {
                         Row(
                           children: [
                             Expanded(
-                              child: ShadFormField(
+                              child: ShadTextField(
                                 name: 'name',
                                 label: 'Name',
                                 hintText: 'Enter your name',
@@ -209,14 +209,14 @@ class CreateProductView extends HookConsumerWidget {
                         Row(
                           children: [
                             Expanded(
-                              child: ShadFormField(
+                              child: ShadTextField(
                                 name: 'manufacturer',
                                 label: 'Manufacturer',
                                 hintText: 'Enter product Manufacturer',
                               ),
                             ),
                             Expanded(
-                              child: ShadFormField(
+                              child: ShadTextField(
                                 name: 'sku',
                                 label: 'SKU',
                                 hintText: 'Enter product SKU',
