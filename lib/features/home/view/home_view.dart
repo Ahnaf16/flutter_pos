@@ -41,6 +41,16 @@ class HomeView extends HookConsumerWidget {
                 isRequired: true,
                 initialValue: 'initial value',
               ),
+              ShadSelectField<TransactionType>(
+                name: 'select',
+                label: 'select',
+                hintText: 'select something',
+                minWidth: 300,
+                options: TransactionType.values,
+                initialValue: TransactionType.manual,
+                optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name)),
+                selectedBuilder: (context, value) => Text(value.name),
+              ),
 
               Row(
                 children: [
@@ -61,7 +71,13 @@ class HomeView extends HookConsumerWidget {
                   ),
                   ShadButton(
                     onPressed: () {
-                      formKey.currentState!.patchValue({'regular': '', 'numeric': '', 'pass': '', 'desc': ''});
+                      formKey.currentState!.patchValue({
+                        'regular': '',
+                        'numeric': '',
+                        'pass': '',
+                        'desc': '',
+                        'select': null,
+                      });
                     },
                     child: const Text('clear'),
                   ),
@@ -72,6 +88,7 @@ class HomeView extends HookConsumerWidget {
                         'numeric': '12587854',
                         'pass': 'password',
                         'desc': 'description',
+                        'select': TransactionType.purchase,
                       });
                     },
                     child: const Text('set'),
