@@ -117,6 +117,12 @@ class TableHeading {
     this.min = double.nan,
     this.alignment = Alignment.centerLeft,
   });
+  const TableHeading.positional(
+    this.name, [
+    this.max = double.nan,
+    this.alignment = Alignment.centerLeft,
+    this.min = double.nan,
+  ]);
 
   final String name;
   final double max;

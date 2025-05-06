@@ -5,6 +5,7 @@ class TransactionsRepo with AwHandler {
   final _coll = AWConst.collections.transactions;
 
   FutureReport<Document> addTransaction(TransactionLog log) async {
+    // TODO: update account
     return await db.create(_coll, data: log.toAwPost());
   }
 

@@ -17,4 +17,16 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
       return [];
     }, identity);
   }
+
+  Future<Result> createManual(QMap form) async {
+    final data = QMap.from(form);
+    data.addAll({'date': DateTime.now().toIso8601String()});
+    final log = TransactionLog.fromMap(data);
+
+    final res = await _repo.addTransaction(log);
+    return res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      return rightResult('Transaction created successfully');
+    });
+  }
 }
