@@ -365,7 +365,7 @@ class _ExpenseAddDialog extends HookConsumerWidget {
                   ),
                 ],
               ),
-              const TextArea(name: 'note', label: 'Expanse For'),
+              ShadTextAreaField(name: 'note', label: 'Expanse For'),
             ],
           ),
         ),

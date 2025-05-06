@@ -474,7 +474,7 @@ class _TrxAddDialog extends HookConsumerWidget {
                 ),
               ),
 
-              const TextArea(name: 'note', label: 'Note'),
+              ShadTextAreaField(name: 'note', label: 'Note'),
             ],
           ),
         ),

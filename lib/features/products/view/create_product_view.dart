@@ -233,11 +233,11 @@ class CreateProductView extends HookConsumerWidget {
                           ],
                         ),
 
-                        const TextArea(
+                        ShadTextAreaField(
                           name: 'description',
                           label: 'Description',
                           hintText: 'Enter product Description',
-                          expandableHeight: true,
+
                           maxHeight: 400,
                         ),
                       ],

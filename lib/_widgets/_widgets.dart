@@ -9,7 +9,7 @@ export 'flex/separated_flex.dart';
 export 'form/shad_field.dart';
 export 'form/shad_form_decoration.dart';
 export 'form/shad_form_field.dart';
-export 'form/shad_text_area.dart';
+export 'form/shad_text_area_field.dart';
 export 'hosted_image.dart';
 export 'hover_builder.dart';
 export 'image_picked_view.dart';

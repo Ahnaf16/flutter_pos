@@ -18,24 +18,29 @@ class HomeView extends HookConsumerWidget {
             spacing: 20,
             children: [
               ShadFormField(
-                name: 'name',
-                label: 'Name',
-                hintText: 'Enter your name',
+                name: 'regular',
+                label: 'Regular',
+                hintText: 'Regular input',
                 isRequired: true,
-                initialValue: 'initial',
+                initialValue: 'initial value',
                 showClearButton: true,
-                buttonVariant: ShadButtonVariant.outline,
               ),
               ShadFormField(
-                name: 'name2',
-                label: 'Name 2',
-                hintText: 'Enter your name 2',
-                helperText: 'This is a helper text 2',
+                name: 'numeric',
+                label: 'numeric',
+                hintText: 'numeric input',
+                helperText: 'This is a numeric field',
                 numeric: true,
               ),
               ShadFormField(name: 'pass', label: 'pass', hintText: 'Enter your pass', isPassField: true),
 
-              const ShadTextarea(),
+              ShadTextAreaField(
+                name: 'desc',
+                label: 'desc',
+                hintText: 'Enter your desc',
+                isRequired: true,
+                initialValue: 'initial value',
+              ),
 
               Row(
                 children: [
@@ -56,13 +61,18 @@ class HomeView extends HookConsumerWidget {
                   ),
                   ShadButton(
                     onPressed: () {
-                      formKey.currentState!.patchValue({'name': '', 'name2': '', 'pass': ''});
+                      formKey.currentState!.patchValue({'regular': '', 'numeric': '', 'pass': '', 'desc': ''});
                     },
                     child: const Text('clear'),
                   ),
                   ShadButton(
                     onPressed: () {
-                      formKey.currentState!.patchValue({'name': 'name', 'name2': 'name2', 'pass': 'pass'});
+                      formKey.currentState!.patchValue({
+                        'regular': 'Regular',
+                        'numeric': '12587854',
+                        'pass': 'password',
+                        'desc': 'description',
+                      });
                     },
                     child: const Text('set'),
                   ),
