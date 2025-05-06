@@ -335,6 +335,22 @@
                     "min": -1.7976931348623157e+308,
                     "max": 1.7976931348623157e+308,
                     "default": null
+                },
+                {
+                    "key": "walk_in_name",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 100,
+                    "default": null
+                },
+                {
+                    "key": "walk_in_phone",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 40,
+                    "default": null
                 }
             ],
             "indexes": []
@@ -1036,7 +1052,11 @@
         },
         {
             "$id": "6818e28a0011fa58a4be",
-            "$permissions": [],
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
             "databaseId": "6805362c0032bd189cd2",
             "name": "expense_category",
             "enabled": true,

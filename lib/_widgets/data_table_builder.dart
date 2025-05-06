@@ -112,16 +112,20 @@ class _DataSource<T, R> extends DataGridSource {
 
 class TableHeading {
   const TableHeading({
-    required this.cellWidget,
-    required this.columnName,
-    this.columnWidth,
-    this.cellAlignment,
-    this.headAlignment,
+    required this.name,
+    this.max = double.nan,
+    this.min = double.nan,
+    this.alignment = Alignment.centerLeft,
   });
 
-  final Widget cellWidget;
-  final String columnName;
-  final double? columnWidth;
-  final Alignment? cellAlignment;
-  final Alignment? headAlignment;
+  final String name;
+  final double max;
+  final double min;
+  final Alignment alignment;
+}
+
+extension TableHeadingEx on List<TableHeading> {
+  TableHeading operator [](int index) => this[index];
+
+  TableHeading fromName(String name) => firstWhere((e) => e.name == name);
 }

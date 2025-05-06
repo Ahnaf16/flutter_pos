@@ -79,8 +79,8 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     }
   }
 
-  void changeParti(Parti? parti) {
-    state = state.copyWith(parti: () => parti, dueBalance: 0);
+  void changeParti(Parti? parti, WalkIn? wi) {
+    state = state.copyWith(parti: () => parti, walkIn: () => wi, dueBalance: 0);
   }
 
   void changeAccount(PaymentAccount? account) {
@@ -102,9 +102,9 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
   }
 
   Future<Result> submit() async {
-    cat(state.toMap());
+    cat(state.toMap(), 'submit');
 
-    if (state.parti == null) {
+    if (state.parti == null && state.walkIn == null) {
       return (false, 'Please select a party');
     }
     if (state.account == null) {
@@ -120,6 +120,9 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       }
       return submitPurchase();
     } else {
+      if (state.isWalkIn && state.hasDue) return (false, 'Clear due for walk-in customer');
+      if (state.isWalkIn && state.hasBalance) return (false, 'Clear excess amount for walk-in customer');
+
       if (state.partiHasBalance && state.dueBalance > (state.parti?.due.abs() ?? 0)) {
         return (false, 'Given balance can\'t be more than available balance');
       }

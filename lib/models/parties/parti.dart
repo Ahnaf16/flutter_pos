@@ -23,6 +23,7 @@ class Parti {
     required this.due,
     required this.photo,
     required this.type,
+    this.isWalkIn = false,
   });
 
   final String name;
@@ -32,12 +33,16 @@ class Parti {
   final num due;
   final String? photo;
   final PartiType type;
+  final bool isWalkIn;
 
   Img get getPhoto => photo == null ? Img.icon(LuIcons.user) : Img.aw(photo!);
 
   bool get isCustomer => type == PartiType.customer;
 
-  Color get dueColor => due == 0 ? Colors.grey : (due > 0 ? Colors.green.shade500 : Colors.red.shade500);
+  Color get dueColor => due == 0 ? Colors.grey : (hasBalance() ? Colors.green.shade500 : Colors.red.shade500);
+
+  bool hasDue() => due > 0;
+  bool hasBalance() => due < 0;
 
   factory Parti.fromDoc(Document doc) {
     final map = doc.data;
@@ -73,6 +78,21 @@ class Parti {
     } catch (e) {
       return null;
     }
+  }
+
+  static Parti? fromWalkIn(WalkIn? wi) {
+    if (wi == null) return null;
+    return Parti(
+      id: '',
+      name: wi.name,
+      phone: wi.phone,
+      email: null,
+      address: null,
+      due: 0,
+      photo: null,
+      type: PartiType.customer,
+      isWalkIn: true,
+    );
   }
 
   Parti marge(Map<String, dynamic> map) {
@@ -122,4 +142,21 @@ class Parti {
       type: type ?? this.type,
     );
   }
+}
+
+class WalkIn {
+  const WalkIn({required this.name, required this.phone});
+
+  final String name;
+  final String phone;
+
+  static WalkIn? fromMap(Map<String, dynamic> map) {
+    final name = map['name'] ?? map['walk_in_name'];
+    final phone = map['phone'] ?? map['walk_in_phone'];
+    if (name == null || phone == null) return null;
+
+    return WalkIn(name: name, phone: phone);
+  }
+
+  QMap toMap() => {'walk_in_name': name, 'walk_in_phone': phone};
 }

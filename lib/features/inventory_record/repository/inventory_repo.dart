@@ -29,25 +29,28 @@ class InventoryRepo with AwHandler {
     //! update Due
     Parti? parti = record.parti;
     //only updates th e [DUE]
-    if (inventory.hasDue || inventory.hasBalance) {
-      // _updateDue adds the due with the parti.due. if due is (-) it will be subtracted
-      // when hasBalance, due is (-), so -due will subtract due. will be added as balance
-      // when hasDue, due is (+), so +due will add due. will be added as due
-      final (partiErr, partiData) = await _updateDue(parti, inventory.due, record.type).toRecord();
-      if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
-      parti = Parti.fromDoc(partiData);
-    }
+    // will be null if customer is walk-in
+    if (parti != null) {
+      if (inventory.hasDue || inventory.hasBalance) {
+        // _updateDue adds the due with the parti.due. if due is (-) it will be subtracted
+        // when hasBalance, due is (-), so -due will subtract due. will be added as balance
+        // when hasDue, due is (+), so +due will add due. will be added as due
+        final (partiErr, partiData) = await _updateDue(parti, inventory.due, record.type).toRecord();
+        if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
+        parti = Parti.fromDoc(partiData);
+      }
 
-    if (inventory.hasDue && inventory.partiHasBalance) {
-      // when sale has due but parti has balance, the due will be added to record.dueBalance.
-      // this due has been already deducted from parti.due
-      record = record.copyWith(dueBalance: record.dueBalance + inventory.due);
-    }
+      if (inventory.hasDue && inventory.partiHasBalance) {
+        // when sale has due but parti has balance, the due will be added to record.dueBalance.
+        // this due has been already deducted from parti.due
+        record = record.copyWith(dueBalance: record.dueBalance + inventory.due);
+      }
 
-    if (inventory.partiHasBalance && inventory.dueBalance > 0) {
-      // [Parti.Due] is already [-] in this case so adding dueBalance will subtract balance
-      final (partiErr, partiData) = await _updateDue(parti, inventory.dueBalance, record.type).toRecord();
-      if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
+      if (inventory.partiHasBalance && inventory.dueBalance > 0) {
+        // [Parti.Due] is already [-] in this case so adding dueBalance will subtract balance
+        final (partiErr, partiData) = await _updateDue(parti, inventory.dueBalance, record.type).toRecord();
+        if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
+      }
     }
 
     //! add transaction log
@@ -74,6 +77,8 @@ class InventoryRepo with AwHandler {
     //! update Due
     Parti? parti = record.parti;
     //only updates th e [DUE]
+    if (parti == null) return left(const Failure('Parti is required when purchasing'));
+
     if (inventory.hasDue || inventory.hasBalance) {
       // _updateDue adds the due with the parti.due. if due is (-) it will be subtracted
       // when hasBalance, due is (-), so -(-due) will add due. will be added as due

@@ -12,6 +12,7 @@ class TransactionLog {
     required this.account,
     required this.parti,
     required this.transactTo,
+    required this.transactToPhone,
     required this.transactionBy,
     required this.date,
     required this.type,
@@ -30,6 +31,7 @@ class TransactionLog {
 
   /// plain name of the person to whom the transaction was made
   final String? transactTo;
+  final String? transactToPhone;
 
   /// The user who made the transaction
   final AppUser transactionBy;
@@ -47,6 +49,7 @@ class TransactionLog {
     account: PaymentAccount.fromMap(map['payment_account']),
     parti: Parti.tyrParse(map['parties']),
     transactTo: map['transact_to'],
+    transactToPhone: map['transact_to_phone'],
     transactionBy: AppUser.fromMap(map['transaction_by']),
     date: DateTime.parse(map['date']),
     note: map['note'],
@@ -71,6 +74,7 @@ class TransactionLog {
     'payment_account': account.toMap(),
     'parties': parti?.toMap(),
     'transact_to': transactTo,
+    'transact_to_phone': transactToPhone,
     'transaction_by': transactionBy.toMap(),
     'date': date.toIso8601String(),
     'transaction_type': type.name,
@@ -83,20 +87,31 @@ class TransactionLog {
     'payment_account': account.id,
     'parties': parti?.id,
     'transact_to': transactTo,
+    'transact_to_phone': transactToPhone,
     'transaction_by': transactionBy.id,
     'date': date.toIso8601String(),
     'transaction_type': type.name,
     'note': note,
   };
 
+  Parti? get getParti {
+    if (parti != null) return parti;
+    final name = transactTo;
+    final phone = transactToPhone;
+    if (name == null || phone == null) return null;
+    return Parti.fromWalkIn(WalkIn(name: name, phone: phone));
+  }
+
   static TransactionLog fromInventoryRecord(InventoryRecord record, AppUser user) {
+    final parti = record.parti ?? Parti.fromWalkIn(record.walkIn);
     return TransactionLog(
       id: '',
       amount: record.amount,
       usedDueBalance: record.dueBalance,
       account: record.account,
-      parti: record.parti,
-      transactTo: record.parti.name,
+      parti: parti,
+      transactTo: parti?.name,
+      transactToPhone: parti?.phone,
       transactionBy: user,
       date: dateNow.run(),
       type: record.type == RecordType.sale ? TransactionType.sale : TransactionType.purchase,
@@ -112,6 +127,7 @@ class TransactionLog {
       account: ex.account,
       parti: null,
       transactTo: null,
+      transactToPhone: null,
       transactionBy: ex.expenseBy,
       date: dateNow.run(),
       type: TransactionType.expanse,
@@ -127,6 +143,8 @@ class TransactionLog {
   }
 
   static String _noteInv(InventoryRecord record) {
+    final parti = record.parti ?? Parti.fromWalkIn(record.walkIn);
+
     final isSale = record.type == RecordType.sale;
     final type = isSale ? 'Sold' : 'Bought';
     final length = record.details.length;
@@ -134,7 +152,7 @@ class TransactionLog {
     final amount = record.amount;
     final dueBalance = record.dueBalance;
     final preposition = isSale ? 'to' : 'from';
-    final name = record.parti.name;
+    final name = parti?.name;
     final date = record.date.formatDate();
     final account = record.account.name;
 
@@ -142,7 +160,7 @@ class TransactionLog {
       '$type $length $item',
       'for $amount',
       if (dueBalance > 0) 'and used $dueBalance from due balance',
-      '$preposition $name',
+      if (name != null) '$preposition $name',
       'on $date',
       'using $account',
     ].join(' ');

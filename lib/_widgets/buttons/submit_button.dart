@@ -15,6 +15,7 @@ class SubmitButton extends HookWidget {
     this.width,
     this.height,
     this.enabled = true,
+    this.variant = ShadButtonVariant.primary,
   });
 
   final Function(ValueNotifier<bool> isLoading)? onPressed;
@@ -26,6 +27,7 @@ class SubmitButton extends HookWidget {
   final double? width;
   final double? height;
   final bool enabled;
+  final ShadButtonVariant variant;
 
   final LoadingPosition loadingPosition;
 
@@ -35,10 +37,11 @@ class SubmitButton extends HookWidget {
 
     return Padding(
       padding: margin ?? EdgeInsets.zero,
-      child: ShadButton(
+      child: ShadButton.raw(
         size: size,
         width: width,
         height: height,
+        variant: variant,
         onPressed:
             (onPressed != null && !isLoading.value)
                 ? () async {

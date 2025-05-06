@@ -53,9 +53,8 @@ class CreateRecordView extends HookConsumerWidget {
                         //! Parti
                         _PartiSection(
                           record: record,
-
-                          onPartiSelect: (p) {
-                            recordCtrl().changeParti(p);
+                          onSelect: (p, wi) {
+                            recordCtrl().changeParti(p, wi);
                             formKey.currentState?.fields['due_balance']?.reset();
                           },
                         ),
@@ -92,7 +91,7 @@ class CreateRecordView extends HookConsumerWidget {
                               //! calculations
                               ShadResizablePanel(
                                 id: 3,
-                                defaultSize: 0.4,
+                                defaultSize: 0.3,
                                 minSize: 0.2,
                                 child: SingleChildScrollView(
                                   padding: Pads.sm(),
@@ -320,7 +319,7 @@ class _Summary extends StatelessWidget {
                 style: context.text.muted.error(context),
               ),
             ),
-          if (record.hasBalance)
+          if (record.hasBalance && record.walkIn == null)
             ShadCard(
               border: Border.all(color: context.colors.destructive),
               leading: Icon(LuIcons.triangleAlert, color: context.colors.destructive),
@@ -328,7 +327,7 @@ class _Summary extends StatelessWidget {
               rowCrossAxisAlignment: CrossAxisAlignment.center,
               child: Text(
                 type.isSale
-                    ? 'The due amount ${record.due.abs().currency()} will be added to balance'
+                    ? 'The due amount ${record.due.abs().currency()} will be added as balance'
                     : '${record.due.abs().currency()} will be added to parti\'s due',
                 style: context.text.muted.error(context),
               ),
@@ -494,14 +493,14 @@ class _ProductTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               SpacedText(
-                left: isSale ? 'Sale price' : 'Purchase price',
+                left: isSale ? 'Sale' : 'Purchase',
                 right: (isSale ? stock.salesPrice : stock.purchasePrice).currency(),
                 style: context.text.muted,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 styleBuilder: (l, r) => (l, context.text.small),
               ),
               SpacedText(
-                left: 'Total amount',
+                left: 'Total',
                 right: detail.totalPriceByType(type).currency(),
                 style: context.text.muted,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -535,7 +534,6 @@ class _AccountSelect extends HookConsumerWidget {
       loading: () => Padding(padding: Pads.sm('lrt'), child: const ShadCard(width: 300, child: Loading())),
       error: (e, s) => ErrorView(e, s, prov: paymentAccountsCtrlProvider),
       data: (accounts) {
-        // if (type == RecordType.purchase) accounts = accounts.where((e) => e.amount > 0).toList();
         return ShadInputDecorator(
           label: const Text('Account').required(),
           child: ShadSelect<PaymentAccount>(
@@ -579,9 +577,9 @@ class _AccountSelect extends HookConsumerWidget {
 }
 
 class _PartiSection extends HookConsumerWidget {
-  const _PartiSection({required this.onPartiSelect, required this.record});
+  const _PartiSection({required this.onSelect, required this.record});
 
-  final Function(Parti? parti) onPartiSelect;
+  final Function(Parti? parti, WalkIn? walkIn) onSelect;
   final InventoryRecordState record;
 
   @override
@@ -590,8 +588,9 @@ class _PartiSection extends HookConsumerWidget {
     final partiList = ref.watch(partiesCtrlProvider(null));
 
     final search = useState('');
+    final selectCtrl = useMemoized(ShadSelectController<Parti>.new);
 
-    final parti = record.parti;
+    final parti = record.getParti;
 
     return partiList.when(
       loading: () => Padding(padding: Pads.sm('lrt'), child: const ShadCard(width: 300, child: Loading())),
@@ -608,33 +607,18 @@ class _PartiSection extends HookConsumerWidget {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 ShadSelect<Parti>.withSearch(
+                  controller: selectCtrl,
                   maxWidth: 400,
                   minWidth: 300,
-                  placeholder: const Text('Select a parti '),
+                  placeholder: const Text('Select a parti'),
                   itemCount: filtered.length,
                   options: [
-                    if (filtered.isEmpty)
-                      Padding(
-                        padding: Pads.med('tb'),
-                        child: Column(
-                          spacing: Insets.sm,
-                          children: [
-                            const Text('No Parties found'),
-                            ShadButton.outline(
-                              size: ShadButtonSize.sm,
-                              padding: Pads.sm(),
-                              onPressed: () => PartiesView.showAddDialog(context, type == RecordType.sale),
-                              leading: const Icon(LuIcons.plus, size: 12),
-                              child: const Text('Add Parti'),
-                            ),
-                          ],
-                        ),
-                      ),
+                    if (filtered.isEmpty) Padding(padding: Pads.med('tb'), child: const Text('No Parties found')),
                     ...filtered.map((house) {
                       return ShadOption(value: house, child: Text(house.name));
                     }),
                   ],
-                  onChanged: (v) => onPartiSelect(v),
+                  onChanged: (v) => onSelect(v, null),
                   selectedOptionBuilder: (_, v) => Text(v.name),
                   onSearchChanged: search.set,
                 ),
@@ -642,7 +626,9 @@ class _PartiSection extends HookConsumerWidget {
                   height: 38,
                   icon: const Icon(LuIcons.plus),
                   onPressed: () async {
-                    await PartiesView.showAddDialog(context, type == RecordType.sale);
+                    final wi = await PartiesView.showAddDialog(context, type.isSale, type.isSale);
+                    onSelect(null, wi);
+                    if (wi != null) selectCtrl.set([]);
                   },
                 ),
                 if (parti != null)
@@ -661,20 +647,22 @@ class _PartiSection extends HookConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(parti.name),
-                            Text.rich(
-                              TextSpan(
-                                text: 'Due: ${parti.due.currency()}',
-                                children: [
-                                  if (record.dueBalance > 0)
-                                    TextSpan(
-                                      text: ' (-${record.dueBalance.currency()})',
-                                      style: context.text.p.size(12).textColor(Colors.green),
-                                    ),
-                                ],
+                            if (parti.due != 0)
+                              Text.rich(
+                                TextSpan(
+                                  text: '${parti.hasDue() ? 'Due' : 'Balance'}: ${parti.due.currency()}',
+                                  children: [
+                                    if (record.dueBalance > 0)
+                                      TextSpan(
+                                        text: ' (-${record.dueBalance.currency()})',
+                                        style: context.text.p.size(12).textColor(Colors.green),
+                                      ),
+                                  ],
+                                ),
+                                style: context.text.p.size(12),
                               ),
-                              style: context.text.p.size(12),
-                            ),
                             Text(parti.phone, style: context.text.muted.size(12)),
+                            if (parti.isWalkIn) const ShadBadge.secondary(child: Text('Walk-In')),
                           ],
                         ),
                       ],

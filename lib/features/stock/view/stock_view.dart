@@ -10,8 +10,14 @@ class StockView extends HookConsumerWidget {
     final productList = ref.watch(productsCtrlProvider);
     final scrCtrl = useScrollController();
     return BaseBody(
-      title: 'Products',
+      title: 'Stocks',
       actions: [
+        ShadButton(
+          child: const Text('Purchase'),
+          onPressed: () {
+            RPaths.purchases.pushNamed(context);
+          },
+        ),
         ShadButton(
           child: const Text('Add a Product'),
           onPressed: () {

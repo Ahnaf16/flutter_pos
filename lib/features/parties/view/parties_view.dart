@@ -4,14 +4,22 @@ import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('Name', double.nan), ('Phone', 200.0), ('Due', 100.0), ('Action', 200.0)];
+const _headings = [
+  TableHeading(name: 'Name'),
+  TableHeading(name: 'Phone', max: 300.0, alignment: Alignment.center),
+  TableHeading(name: 'Due/Balance', max: 200.0, alignment: Alignment.center),
+  TableHeading(name: 'Action', max: 200.0, alignment: Alignment.centerRight),
+];
 
 class PartiesView extends HookConsumerWidget {
   const PartiesView({super.key, this.isCustomer = false});
   final bool isCustomer;
 
-  static FVoid showAddDialog(BuildContext context, bool isCustomer) async {
-    await showShadDialog(context: context, builder: (context) => _PartiAddDialog(isCustomer: isCustomer));
+  static Future<WalkIn?> showAddDialog(BuildContext context, bool isCustomer, bool showWalkIn) async {
+    return showShadDialog<WalkIn>(
+      context: context,
+      builder: (context) => _PartiAddDialog(isCustomer: isCustomer, showWalkIn: showWalkIn),
+    );
   }
 
   @override
@@ -31,43 +39,58 @@ class PartiesView extends HookConsumerWidget {
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: partiesCtrlProvider),
         data: (parties) {
-          return DataTableBuilder<Parti, (String, double)>(
+          return DataTableBuilder<Parti, TableHeading>(
             rowHeight: 100,
             items: parties,
             headings: _headings,
             headingBuilder: (heading) {
               return GridColumn(
-                columnName: heading.$1,
+                columnName: heading.name,
                 columnWidthMode: ColumnWidthMode.fill,
-                maximumWidth: heading.$2,
+                maximumWidth: heading.max,
                 minimumWidth: 200,
-                label: Container(
-                  padding: Pads.med(),
-                  alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Text(heading.$1),
-                ),
+                label: Container(padding: Pads.med(), alignment: heading.alignment, child: Text(heading.name)),
               );
             },
-            cellAlignment: Alignment.centerLeft,
+            cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
             cellBuilder: (data, head) {
-              return switch (head.$1) {
-                'Name' => DataGridCell(columnName: head.$1, value: _PartyNameBuilder(data)),
+              return switch (head.name) {
+                'Name' => DataGridCell(columnName: head.name, value: _PartyNameBuilder(data)),
                 'Phone' => DataGridCell(
-                  columnName: head.$1,
+                  columnName: head.name,
                   value: Row(
                     spacing: Insets.xs,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(data.phone),
                       SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(data.phone)),
                     ],
                   ),
                 ),
-                'Due' => DataGridCell(
-                  columnName: head.$1,
-                  value: Text(data.due.currency(), style: context.text.small.textColor(data.dueColor)),
+                'Due/Balance' => DataGridCell(
+                  columnName: head.name,
+                  value: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (data.hasDue())
+                        SpacedText(
+                          left: 'Due',
+                          right: data.due.currency(),
+                          styleBuilder: (r, l) => (r, context.text.small.error(context)),
+                          spaced: false,
+                        )
+                      else
+                        SpacedText(
+                          left: 'Balance',
+                          right: data.due.abs().currency(),
+                          styleBuilder: (r, l) => (r, context.text.small.success()),
+                          spaced: false,
+                        ),
+                    ],
+                  ),
                 ),
                 'Action' => DataGridCell(
-                  columnName: head.$1,
+                  columnName: head.name,
                   value: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -90,7 +113,7 @@ class PartiesView extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
               };
             },
           );
@@ -135,19 +158,20 @@ class _PartyNameBuilder extends StatelessWidget {
 }
 
 class _PartiAddDialog extends HookConsumerWidget {
-  const _PartiAddDialog({this.parti, this.isCustomer = false});
+  const _PartiAddDialog({this.parti, this.isCustomer = false, this.showWalkIn = false});
 
   final Parti? parti;
   final bool isCustomer;
+  final bool showWalkIn;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
     final actionTxt = parti == null ? 'Add' : 'Update';
 
+    final walkInEnabled = useState<bool>(false);
     final selectedFile = useState<PFile?>(null);
 
-    cat(parti?.toMap());
     return ShadDialog(
       title: Text('$actionTxt Parti'),
       description: Text(
@@ -155,37 +179,49 @@ class _PartiAddDialog extends HookConsumerWidget {
       ),
       actions: [
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
-        SubmitButton(
-          onPressed: (l) async {
-            final state = formKey.currentState!;
-            if (!state.saveAndValidate()) return;
-            final data = QMap.from(state.value);
+        if (walkInEnabled.value)
+          SubmitButton(
+            onPressed: (l) async {
+              final state = formKey.currentState!;
+              if (!state.saveAndValidate()) return;
+              final data = QMap.from(state.value);
+              final wi = WalkIn.fromMap(data);
+              context.nPop(wi);
+            },
+            child: const Text('Add customer'),
+          )
+        else
+          SubmitButton(
+            onPressed: (l) async {
+              final state = formKey.currentState!;
+              if (!state.saveAndValidate()) return;
+              final data = QMap.from(state.value);
 
-            final ctrl = ref.read(partiesCtrlProvider(isCustomer).notifier);
-            (bool, String)? result;
+              final ctrl = ref.read(partiesCtrlProvider(isCustomer).notifier);
+              (bool, String)? result;
 
-            if (parti == null) {
-              l.truthy();
-              if (isCustomer) {
-                data.addAll({'type': PartiType.customer.name});
+              if (parti == null) {
+                l.truthy();
+                if (isCustomer) {
+                  data.addAll({'type': PartiType.customer.name});
+                }
+                result = await ctrl.createParti(data, selectedFile.value);
+                l.falsey();
+              } else {
+                final updated = parti?.marge(data);
+                if (updated == null) return;
+                l.truthy();
+                result = await ctrl.updateParti(updated, selectedFile.value);
+                l.falsey();
               }
-              result = await ctrl.createParti(data, selectedFile.value);
-              l.falsey();
-            } else {
-              final updated = parti?.marge(data);
-              if (updated == null) return;
-              l.truthy();
-              result = await ctrl.updateParti(updated, selectedFile.value);
-              l.falsey();
-            }
-            if (result case final Result r) {
-              if (!context.mounted) return;
-              r.showToast(context);
-              if (r.success) context.pop(true);
-            }
-          },
-          child: Text(actionTxt),
-        ),
+              if (result case final Result r) {
+                if (!context.mounted) return;
+                r.showToast(context);
+                if (r.success) context.pop(true);
+              }
+            },
+            child: Text(actionTxt),
+          ),
       ],
       child: Container(
         padding: Pads.padding(v: Insets.med),
@@ -197,10 +233,18 @@ class _PartiAddDialog extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: Insets.med,
             children: [
+              if (showWalkIn)
+                ShadCard(
+                  padding: Pads.med(),
+                  title: Text('Walk in customer', style: context.text.list),
+                  description: Text('When turned on, this customer will not be saved', style: context.text.muted),
+                  rowCrossAxisAlignment: CrossAxisAlignment.center,
+                  trailing: ShadSwitch(value: walkInEnabled.value, onChanged: walkInEnabled.set),
+                ),
               Row(
                 children: [
-                  const Expanded(flex: 2, child: ShadField(name: 'name', label: 'Name', isRequired: true)),
-                  if (!isCustomer)
+                  Expanded(flex: 2, child: ShadFormField(name: 'name', label: 'Name', isRequired: true)),
+                  if (!isCustomer || !walkInEnabled.value)
                     Flexible(
                       child: FormBuilderField<String>(
                         name: 'type',
@@ -234,69 +278,71 @@ class _PartiAddDialog extends HookConsumerWidget {
                     ),
                 ],
               ),
-              const ShadField(name: 'phone', label: 'Phone', isRequired: true),
-              const ShadField(name: 'email', label: 'Email'),
-              const ShadField(name: 'address', label: 'Address'),
+              ShadFormField(name: 'phone', label: 'Phone', isRequired: true),
+              if (!walkInEnabled.value) ...[
+                ShadFormField(name: 'email', label: 'Email'),
+                ShadFormField(name: 'address', label: 'Address'),
 
-              ShadInputDecorator(
-                label: const Text('Profile image'),
-                child: Padding(
-                  padding: Pads.padding(top: 5),
-                  child: GestureDetector(
-                    onTap: () async {
-                      if (selectedFile.value != null) return;
-                      final files = await fileUtil.pickImages(multi: false);
-                      final file = files.fold(identityNull, (r) => r.firstOrNull);
-                      selectedFile.set(file);
-                    },
-                    child: ShadCard(
-                      height: 150,
+                ShadInputDecorator(
+                  label: const Text('Profile image'),
+                  child: Padding(
+                    padding: Pads.padding(top: 5),
+                    child: GestureDetector(
+                      onTap: () async {
+                        if (selectedFile.value != null) return;
+                        final files = await fileUtil.pickImages(multi: false);
+                        final file = files.fold(identityNull, (r) => r.firstOrNull);
+                        selectedFile.set(file);
+                      },
+                      child: ShadCard(
+                        height: 150,
 
-                      padding: Pads.med(),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (parti?.photo case final String photo)
-                              Row(
-                                spacing: Insets.med,
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  HostedImage.square(AwImg(photo), dimension: 120, radius: Corners.med),
-                                  if (selectedFile.value != null) ...[
-                                    const Icon(LuIcons.arrowLeftRight, size: 40),
+                        padding: Pads.med(),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (parti?.photo case final String photo)
+                                Row(
+                                  spacing: Insets.med,
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    HostedImage.square(AwImg(photo), dimension: 120, radius: Corners.med),
+                                    if (selectedFile.value != null) ...[
+                                      const Icon(LuIcons.arrowLeftRight, size: 40),
+                                      ImagePickedView(
+                                        img: FileImg(selectedFile.value!),
+                                        size: 120,
+                                        onDelete: () => selectedFile.set(null),
+                                      ),
+                                    ] else
+                                      const Icon(LuIcons.cloudUpload, size: 40),
+                                  ],
+                                )
+                              else if (selectedFile.value != null)
+                                Row(
+                                  spacing: Insets.med,
+                                  children: [
                                     ImagePickedView(
                                       img: FileImg(selectedFile.value!),
                                       size: 120,
                                       onDelete: () => selectedFile.set(null),
                                     ),
-                                  ] else
-                                    const Icon(LuIcons.cloudUpload, size: 40),
-                                ],
-                              )
-                            else if (selectedFile.value != null)
-                              Row(
-                                spacing: Insets.med,
-                                children: [
-                                  ImagePickedView(
-                                    img: FileImg(selectedFile.value!),
-                                    size: 120,
-                                    onDelete: () => selectedFile.set(null),
-                                  ),
-                                  Text(selectedFile.value!.name, style: context.text.muted),
-                                ],
-                              )
-                            else ...[
-                              const Icon(LuIcons.cloudUpload, size: 40),
-                              Text('Drag and drop your image here', style: context.text.muted),
+                                    Text(selectedFile.value!.name, style: context.text.muted),
+                                  ],
+                                )
+                              else ...[
+                                const Icon(LuIcons.cloudUpload, size: 40),
+                                Text('Drag and drop your image here', style: context.text.muted),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
         ),
@@ -355,8 +401,8 @@ class _PartiViewDialog extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
             ),
             SpacedText(
-              left: 'Due',
-              right: parti.due.currency(),
+              left: parti.hasDue() ? 'Due' : 'Balance',
+              right: parti.due.abs().currency(),
               styleBuilder: (l, r) => (l, r.bold),
               spaced: false,
               builder: (r) => Text(r, style: context.text.small.textColor(parti.dueColor)),

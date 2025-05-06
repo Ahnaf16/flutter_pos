@@ -28,10 +28,11 @@ class InventoryRecord {
     required this.date,
     required this.type,
     required this.dueBalance,
+    this.walkIn,
   });
 
   final String id;
-  final Parti parti;
+  final Parti? parti;
   final List<InventoryDetails> details;
   final num amount;
   final PaymentAccount account;
@@ -39,6 +40,7 @@ class InventoryRecord {
   final num discount;
   final DiscountType discountType;
   final num shipping;
+  final WalkIn? walkIn;
 
   /// the amount covered by due_balance from parti
   final num dueBalance;
@@ -50,7 +52,7 @@ class InventoryRecord {
     final data = doc.data;
     return InventoryRecord(
       id: doc.$id,
-      parti: Parti.fromMap(data['parties']),
+      parti: Parti.tyrParse(data['parties']),
       details: switch (data['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
@@ -65,13 +67,14 @@ class InventoryRecord {
       date: DateTime.parse(data['date']),
       type: RecordType.values.byName(data['record_type']),
       dueBalance: data['due_balance'],
+      walkIn: WalkIn.fromMap(data),
     );
   }
 
   factory InventoryRecord.fromMap(Map<String, dynamic> map) {
     return InventoryRecord(
       id: map.parseAwField(),
-      parti: Parti.fromMap(map['parties']),
+      parti: Parti.tyrParse(map['parties']),
       details: switch (map['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
@@ -86,6 +89,7 @@ class InventoryRecord {
       date: DateTime.parse(map['date']),
       type: RecordType.values.byName(map['record_type']),
       dueBalance: map.parseNum('due_balance'),
+      walkIn: WalkIn.fromMap(map),
     );
   }
   static InventoryRecord? tryParse(dynamic value) {
@@ -101,7 +105,7 @@ class InventoryRecord {
   InventoryRecord marge(Map<String, dynamic> map) {
     return InventoryRecord(
       id: map.tryParseAwField() ?? id,
-      parti: map['parties'] == null ? parti : Parti.fromMap(map['parties']),
+      parti: map['parties'] == null ? parti : Parti.tyrParse(map['parties']) ?? parti,
       details: switch (map['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => details,
@@ -116,12 +120,13 @@ class InventoryRecord {
       date: map['date'] == null ? date : DateTime.parse(map['date']),
       type: map['record_type'] == null ? type : RecordType.values.byName(map['record_type']),
       dueBalance: map.parseNum('due_balance', fallBack: dueBalance),
+      walkIn: WalkIn.fromMap(map) ?? walkIn,
     );
   }
 
   Map<String, dynamic> toMap() => {
     'id': id,
-    'parties': parti.toMap(),
+    'parties': parti?.toMap(),
     'inventory_details': details.map((e) => e.toMap()).toList(),
     'amount': amount,
     'payment_account': account.toMap(),
@@ -133,10 +138,11 @@ class InventoryRecord {
     'date': date.toIso8601String(),
     'record_type': type.name,
     'due_balance': dueBalance,
+    ...?walkIn?.toMap(),
   };
 
   Map<String, dynamic> toAwPost() => {
-    'parties': parti.id,
+    'parties': parti?.id,
     'inventory_details': details.map((e) => e.id).toList(),
     'amount': amount,
     'payment_account': account.id,
@@ -148,16 +154,23 @@ class InventoryRecord {
     'date': date.toIso8601String(),
     'record_type': type.name,
     'due_balance': dueBalance,
+    ...?walkIn?.toMap(),
   };
+
+  Parti? get getParti => parti ?? Parti.fromWalkIn(walkIn);
 
   String discountString() => discountType == DiscountType.percentage ? '$discount%' : discount.currency();
 
-  num get total => details.map((e) => e.totalPriceByType(type)).sum;
+  num calculateDiscount() => discountType == DiscountType.flat ? discount : (subtotal * discount) / 100;
+
+  num get subtotal => details.map((e) => e.totalPriceByType(type)).sum;
+  num get total => (subtotal + shipping + vat) - calculateDiscount();
+
   num get due => total - amount - dueBalance;
 
   InventoryRecord copyWith({
     String? id,
-    Parti? parti,
+    ValueGetter<Parti?>? parti,
     List<InventoryDetails>? details,
     num? amount,
     PaymentAccount? account,
@@ -165,6 +178,7 @@ class InventoryRecord {
     num? discount,
     DiscountType? discountType,
     num? shipping,
+    ValueGetter<WalkIn?>? walkIn,
     num? dueBalance,
     InventoryStatus? status,
     DateTime? date,
@@ -172,7 +186,7 @@ class InventoryRecord {
   }) {
     return InventoryRecord(
       id: id ?? this.id,
-      parti: parti ?? this.parti,
+      parti: parti != null ? parti() : this.parti,
       details: details ?? this.details,
       amount: amount ?? this.amount,
       account: account ?? this.account,
@@ -180,6 +194,7 @@ class InventoryRecord {
       discount: discount ?? this.discount,
       discountType: discountType ?? this.discountType,
       shipping: shipping ?? this.shipping,
+      walkIn: walkIn != null ? walkIn() : this.walkIn,
       dueBalance: dueBalance ?? this.dueBalance,
       status: status ?? this.status,
       date: date ?? this.date,

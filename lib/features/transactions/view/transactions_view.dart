@@ -5,8 +5,8 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 const _headings = [
   ('To', double.nan),
   ('From', double.nan),
-  ('Amount', 200.0),
-  ('Account', 200.0),
+  ('Amount', 300.0),
+  ('Account', 150.0),
   ('Type', 110.0),
   ('Date', 150.0),
   ('Action', 100.0),
@@ -54,7 +54,10 @@ class TransactionsView extends HookConsumerWidget {
             },
             cellBuilder: (data, head) {
               return switch (head.$1) {
-                'To' => DataGridCell(columnName: head.$1, value: _NameBuilder(data.parti?.name, data.parti?.phone)),
+                'To' => DataGridCell(
+                  columnName: head.$1,
+                  value: _NameBuilder(data.getParti?.name, data.getParti?.phone),
+                ),
                 'From' => DataGridCell(
                   columnName: head.$1,
                   value: _NameBuilder(data.transactionBy.name, data.transactionBy.phone),
@@ -68,7 +71,11 @@ class TransactionsView extends HookConsumerWidget {
                     children: [
                       SpacedText(left: 'Amount', right: data.amount.currency(), spaced: false),
                       if (data.usedDueBalance > 0)
-                        SpacedText(left: 'Used due balance', right: data.usedDueBalance.currency(), spaced: false),
+                        SpacedText(
+                          left: data.type == TransactionType.sale ? 'Balance used' : 'Due used',
+                          right: data.usedDueBalance.currency(),
+                          spaced: false,
+                        ),
                     ],
                   ),
                 ),
@@ -124,7 +131,7 @@ class _PartiViewDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final TransactionLog(:parti, :transactTo, transactionBy: user) = trx;
+    final TransactionLog(getParti: parti, :transactTo, :transactToPhone, transactionBy: user) = trx;
     return ShadDialog(
       title: const Text('Transaction log'),
       description: Row(
@@ -141,18 +148,29 @@ class _PartiViewDialog extends HookConsumerWidget {
           spacing: Insets.med,
           children: [
             //! parti
-            if (parti != null || transactTo != null)
+            if (parti != null || transactTo != null || transactToPhone != null)
               ShadCard(
-                title: Text('To', style: context.text.muted),
+                title: Text('Transacted To', style: context.text.muted),
                 childPadding: Pads.sm('t'),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   spacing: Insets.med,
                   children: [
-                    if (parti?.photo != null) HostedImage.square(parti!.getPhoto, dimension: 80, radius: Corners.med),
+                    if (parti?.getPhoto != null)
+                      Flexible(
+                        child: ShadCard(
+                          height: 80,
+                          width: 80,
+                          padding: Pads.zero,
+                          child: FittedBox(
+                            child: HostedImage.square(parti!.getPhoto, dimension: 80, radius: Corners.med),
+                          ),
+                        ),
+                      ),
 
                     Flexible(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: Insets.sm,
                         children: [
                           SpacedText(
@@ -162,16 +180,18 @@ class _PartiViewDialog extends HookConsumerWidget {
                             spaced: false,
                             crossAxisAlignment: CrossAxisAlignment.center,
                           ),
-                          if (parti != null) ...[
-                            SpacedText(
-                              left: 'Phone Number',
-                              right: parti.phone,
-                              styleBuilder: (l, r) => (l, r.bold),
-                              spaced: false,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              onTap: (left, right) => Copier.copy(right),
-                            ),
 
+                          SpacedText(
+                            left: 'Phone Number',
+                            right: parti?.phone ?? transactToPhone ?? '--',
+                            styleBuilder: (l, r) => (l, r.bold),
+                            spaced: false,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            onTap: (left, right) => Copier.copy(right),
+                          ),
+                          if (parti?.isWalkIn ?? false)
+                            ShadBadge.secondary(child: Text('Walk-In', style: context.text.muted)),
+                          if (parti != null && !parti.isWalkIn) ...[
                             SpacedText(
                               left: 'Email',
                               right: parti.email ?? '--',
@@ -198,14 +218,22 @@ class _PartiViewDialog extends HookConsumerWidget {
 
             //! user
             ShadCard(
-              title: Text('By', style: context.text.muted),
+              title: Text(
+                trx.type == TransactionType.expanse ? 'Expense by' : 'Transacted By',
+                style: context.text.muted,
+              ),
               childPadding: Pads.sm('t'),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                // crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: Insets.med,
                 children: [
-                  HostedImage.square(user.getPhoto, dimension: 80, radius: Corners.med),
+                  ShadCard(
+                    expanded: false,
+                    height: 80,
+                    width: 80,
+                    padding: Pads.zero,
+                    child: FittedBox(child: HostedImage.square(user.getPhoto, dimension: 80)),
+                  ),
                   Flexible(
                     child: Column(
                       spacing: Insets.sm,

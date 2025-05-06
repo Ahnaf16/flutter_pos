@@ -11,6 +11,7 @@ class InventoryRecordState {
   final DiscountType discountType;
   final num dueBalance;
   final RecordType type;
+  final WalkIn? walkIn;
 
   const InventoryRecordState({
     required this.type,
@@ -23,6 +24,7 @@ class InventoryRecordState {
     this.discountType = DiscountType.flat,
     this.shipping = 0,
     this.dueBalance = 0,
+    this.walkIn,
   });
 
   QMap toMap() => {
@@ -36,6 +38,7 @@ class InventoryRecordState {
     'shipping': shipping,
     'dueBalance': dueBalance,
     'type': type.name,
+    'walkIn': walkIn?.toMap(),
   };
 
   InventoryRecordState copyWith({
@@ -49,6 +52,7 @@ class InventoryRecordState {
     DiscountType? discountType,
     num? dueBalance,
     RecordType? type,
+    ValueGetter<WalkIn?>? walkIn,
   }) {
     return InventoryRecordState(
       parti: parti != null ? parti() : this.parti,
@@ -61,6 +65,7 @@ class InventoryRecordState {
       discountType: discountType ?? this.discountType,
       dueBalance: dueBalance ?? this.dueBalance,
       type: type ?? this.type,
+      walkIn: walkIn != null ? walkIn() : this.walkIn,
     );
   }
 
@@ -78,13 +83,16 @@ class InventoryRecordState {
   bool get partiHasBalance => parti?.due.isNegative ?? false;
   bool get partiHasDue => (parti?.due ?? 0) > 0;
 
+  Parti? get getParti => parti ?? Parti.fromWalkIn(walkIn);
+
+  bool get isWalkIn => walkIn != null;
+
   InventoryRecord? toInventoryRecord() {
-    if (parti == null) return null;
     if (account == null) return null;
 
     return InventoryRecord(
       id: '',
-      parti: parti!,
+      parti: parti,
       details: details,
       account: account!,
       amount: amount,
@@ -96,6 +104,7 @@ class InventoryRecordState {
       date: DateTime.now(),
       type: type,
       dueBalance: dueBalance,
+      walkIn: walkIn,
     );
   }
 }

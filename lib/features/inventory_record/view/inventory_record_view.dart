@@ -3,12 +3,12 @@ import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
-  ('Parti', double.nan),
-  ('Product', 200.0),
-  ('Amount', 200.0),
-  ('Account', 150.0),
-  ('Status', 100.0),
-  ('Action', 150.0),
+  ('Parti', double.nan, Alignment.centerLeft),
+  ('Product', 400.0, Alignment.center),
+  ('Amount', 300.0, Alignment.center),
+  ('Account', 200.0, Alignment.center),
+  ('Status', 130.0, Alignment.center),
+  ('Action', 200.0, Alignment.centerRight),
 ];
 
 class InventoryRecordView extends HookConsumerWidget {
@@ -37,28 +37,24 @@ class InventoryRecordView extends HookConsumerWidget {
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: inventoryCtrlProvider),
         data: (inventories) {
-          return DataTableBuilder<InventoryRecord, (String, double)>(
+          return DataTableBuilder<InventoryRecord, (String, double, Alignment)>(
             rowHeight: 150,
             items: inventories,
             headings: _headings,
-
-            headingBuilder: (heading) {
+            headingBuilderIndexed: (heading, i) {
+              final alignment = heading.$3;
               return GridColumn(
                 columnName: heading.$1,
                 columnWidthMode: ColumnWidthMode.fill,
                 maximumWidth: heading.$2,
                 minimumWidth: heading.$1 == 'Status' ? 100 : 150,
-                label: Container(
-                  padding: Pads.med(),
-                  alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Text(heading.$1),
-                ),
+                label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.$1)),
               );
             },
-            cellAlignment: Alignment.centerLeft,
+            cellAlignmentBuilder: (h) => _headings.firstWhere((element) => element.$1 == h).$3,
             cellBuilder: (data, head) {
               return switch (head.$1) {
-                'Parti' => DataGridCell(columnName: head.$1, value: _nameCellBuilder(data.parti)),
+                'Parti' => DataGridCell(columnName: head.$1, value: _nameCellBuilder(data.getParti)),
                 'Product' => DataGridCell(columnName: head.$1, value: _productCellBuilder(data.details)),
                 'Amount' => DataGridCell(columnName: head.$1, value: _amountBuilder(data)),
                 'Account' => DataGridCell(columnName: head.$1, value: Text(data.account.name)),
@@ -100,16 +96,16 @@ class InventoryRecordView extends HookConsumerWidget {
     );
   }
 
-  Widget _nameCellBuilder(Parti staff) => Builder(
+  Widget _nameCellBuilder(Parti? parti) => Builder(
     builder: (context) {
       return Column(
         spacing: Insets.xs,
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          OverflowMarquee(child: Text(staff.name, style: context.text.list)),
-          OverflowMarquee(child: Text('Phone: ${staff.phone}')),
-          if (staff.email != null) OverflowMarquee(child: Text('Email: ${staff.email}')),
+          OverflowMarquee(child: Text(parti?.name ?? '--', style: context.text.list)),
+          if (parti != null) OverflowMarquee(child: Text('Phone: ${parti.phone}')),
+          if (parti != null) OverflowMarquee(child: Text('Email: ${parti.email}')),
         ],
       );
     },
@@ -149,7 +145,7 @@ class InventoryRecordView extends HookConsumerWidget {
           ),
           if (data.dueBalance != 0)
             SpacedText(
-              left: 'Balance used',
+              left: data.type.isSale ? 'Balance used' : 'Due used',
               right: data.dueBalance.currency(),
               crossAxisAlignment: CrossAxisAlignment.center,
               styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
