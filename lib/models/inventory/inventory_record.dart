@@ -1,7 +1,13 @@
 import 'package:appwrite/models.dart';
 import 'package:pos/main.export.dart';
 
-enum RecordType { sale, purchase }
+enum RecordType {
+  sale,
+  purchase;
+
+  bool get isSale => this == RecordType.sale;
+  bool get isPurchase => this == RecordType.purchase;
+}
 
 enum InventoryStatus { paid, unpaid, returned }
 

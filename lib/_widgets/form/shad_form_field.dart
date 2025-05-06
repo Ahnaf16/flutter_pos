@@ -50,7 +50,7 @@ class ShadFormField extends ShadFormDecoration<String> {
          initialValue: controller != null ? controller.text : initialValue,
          validator: FormBuilderValidators.compose([
            if (isRequired) FormBuilderValidators.required(),
-           if (numeric) FormBuilderValidators.numeric(),
+           if (numeric) FormBuilderValidators.numeric(checkNullOrEmpty: false),
            ...?validators,
          ]),
 

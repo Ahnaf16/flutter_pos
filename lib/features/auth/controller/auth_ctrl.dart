@@ -43,7 +43,7 @@ class AuthStateSync extends _$AuthStateSync {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 FutureOr<AppUser?> currentUser(Ref ref) async {
   final repo = locate<AuthRepo>();
   final user = await repo.currentUser();

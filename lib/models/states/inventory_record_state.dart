@@ -10,8 +10,10 @@ class InventoryRecordState {
   final num discount;
   final DiscountType discountType;
   final num dueBalance;
+  final RecordType type;
 
   const InventoryRecordState({
+    required this.type,
     this.parti,
     this.details = const [],
     this.account,
@@ -23,6 +25,19 @@ class InventoryRecordState {
     this.dueBalance = 0,
   });
 
+  QMap toMap() => {
+    'parti': parti?.toMap(),
+    'details': details.map((e) => e.toMap()).toList(),
+    'account': account?.toMap(),
+    'amount': amount,
+    'vat': vat,
+    'discount': discount,
+    'discountType': discountType.name,
+    'shipping': shipping,
+    'dueBalance': dueBalance,
+    'type': type.name,
+  };
+
   InventoryRecordState copyWith({
     ValueGetter<Parti?>? parti,
     List<InventoryDetails>? details,
@@ -33,6 +48,7 @@ class InventoryRecordState {
     num? discount,
     DiscountType? discountType,
     num? dueBalance,
+    RecordType? type,
   }) {
     return InventoryRecordState(
       parti: parti != null ? parti() : this.parti,
@@ -44,24 +60,25 @@ class InventoryRecordState {
       discount: discount ?? this.discount,
       discountType: discountType ?? this.discountType,
       dueBalance: dueBalance ?? this.dueBalance,
+      type: type ?? this.type,
     );
   }
 
-  num calculateDiscount(RecordType type) =>
-      discountType == DiscountType.flat ? discount : (subtotal(type) * discount) / 100;
+  num calculateDiscount() => discountType == DiscountType.flat ? discount : (subtotal() * discount) / 100;
 
-  num subtotal(RecordType type) => details.map((e) => e.totalPriceByType(type)).sum;
+  num subtotal() => details.map((e) => e.totalPriceByType(type)).sum;
 
-  num totalPriceSale(RecordType type) => (subtotal(type) + shipping + vat) - calculateDiscount(type);
+  num totalPrice() => (subtotal() + shipping + vat) - calculateDiscount();
 
-  num get dueSale => totalPriceSale(RecordType.sale) - amount - dueBalance;
+  num get due => totalPrice() - amount - dueBalance;
 
-  bool get hasDue => dueSale > 0;
-  bool get hasBalance => dueSale < 0;
+  bool get hasDue => due > 0;
+  bool get hasBalance => due < 0;
 
   bool get partiHasBalance => parti?.due.isNegative ?? false;
+  bool get partiHasDue => (parti?.due ?? 0) > 0;
 
-  InventoryRecord? toInventoryRecord(RecordType type) {
+  InventoryRecord? toInventoryRecord() {
     if (parti == null) return null;
     if (account == null) return null;
 

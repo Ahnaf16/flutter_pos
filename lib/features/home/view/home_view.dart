@@ -31,6 +31,7 @@ class HomeView extends HookConsumerWidget {
                 label: 'Name 2',
                 hintText: 'Enter your name 2',
                 helperText: 'This is a helper text 2',
+                numeric: true,
               ),
               ShadFormField(name: 'pass', label: 'pass', hintText: 'Enter your pass', isPassField: true),
 

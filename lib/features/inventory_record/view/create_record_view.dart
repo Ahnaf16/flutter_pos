@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:pos/_widgets/hover_builder.dart';
+import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
@@ -16,6 +16,7 @@ class CreateRecordView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(currentUserProvider);
     final record = ref.watch(recordEditingCtrlProvider(type));
     final recordCtrl = useCallback(() => ref.read(recordEditingCtrlProvider(type).notifier));
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
@@ -33,118 +34,128 @@ class CreateRecordView extends HookConsumerWidget {
             recordCtrl().setInputsFromMap(state.instantValue);
           });
         },
-        child: ShadCard(
-          padding: Pads.zero,
-          child: ShadResizablePanelGroup(
-            showHandle: true,
-            children: [
-              ShadResizablePanel(
-                id: 0,
-                defaultSize: .8,
-                child: Column(
-                  spacing: Insets.sm,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //! Parti
-                    _PartiSection(
-                      record: record,
+        child: user.when(
+          loading: () => const Loading(),
+          error: (e, s) => ErrorView(e, s, prov: currentUserProvider),
+          data: (user) {
+            return ShadCard(
+              padding: Pads.zero,
+              child: ShadResizablePanelGroup(
+                showHandle: true,
+                children: [
+                  ShadResizablePanel(
+                    id: 0,
+                    defaultSize: .65,
+                    child: Column(
+                      spacing: Insets.sm,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        //! Parti
+                        _PartiSection(
+                          record: record,
+
+                          onPartiSelect: (p) {
+                            recordCtrl().changeParti(p);
+                            formKey.currentState?.fields['due_balance']?.reset();
+                          },
+                        ),
+                        const ShadSeparator.horizontal(margin: Pads.zero),
+                        Expanded(
+                          child: ShadResizablePanelGroup(
+                            axis: Axis.vertical,
+                            showHandle: true,
+                            children: [
+                              //! selected products
+                              ShadResizablePanel(
+                                id: 2,
+                                defaultSize: 0.7,
+                                child: Padding(
+                                  padding: Pads.sm('b'),
+                                  child: ListView.separated(
+                                    padding: Pads.med('blr'),
+                                    itemCount: record.details.length,
+                                    separatorBuilder: (_, _) => const ShadSeparator.horizontal(),
+                                    itemBuilder: (BuildContext context, int index) {
+                                      final detail = record.details[index];
+                                      return _ProductTile(
+                                        detail: detail,
+                                        index: index,
+                                        type: type,
+                                        onQtyChange: (q) => recordCtrl().changeQuantity(detail.product.id, (_) => q),
+                                        onProductRemove: (pId) => recordCtrl().removeProduct(pId),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+
+                              //! calculations
+                              ShadResizablePanel(
+                                id: 3,
+                                defaultSize: 0.4,
+                                minSize: 0.2,
+                                child: SingleChildScrollView(
+                                  padding: Pads.sm(),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    spacing: Insets.sm,
+                                    children: [
+                                      //! inputs
+                                      Expanded(
+                                        flex: 2,
+                                        child: _Inputs(
+                                          record: record,
+
+                                          onTypeChange: recordCtrl().changeDiscountType,
+                                          onAccountSelect: recordCtrl().changeAccount,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 200, child: ShadSeparator.vertical(margin: Pads.zero)),
+
+                                      //! summary
+                                      Expanded(
+                                        child: _Summary(
+                                          record: record,
+
+                                          onSubmit: () async {
+                                            final res = await recordCtrl().submit();
+
+                                            if (context.mounted) res.showToast(context);
+
+                                            if (res.success) {
+                                              formKey.currentState?.reset();
+                                              if (context.mounted) context.nPop();
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  //! Products list
+                  ShadResizablePanel(
+                    id: 1,
+                    defaultSize: .35,
+                    minSize: .2,
+                    maxSize: .4,
+                    child: _ProductsPanel(
+                      onProductSelect: (p, s) => recordCtrl().addProduct(p, s),
                       type: type,
-                      onPartiSelect: (p) {
-                        recordCtrl().changeParti(p);
-                        formKey.currentState?.fields['due_balance']?.reset();
-                      },
+                      userHouse: user?.warehouse,
                     ),
-                    const ShadSeparator.horizontal(margin: Pads.zero),
-                    Expanded(
-                      child: ShadResizablePanelGroup(
-                        axis: Axis.vertical,
-                        showHandle: true,
-                        children: [
-                          //! selected products
-                          ShadResizablePanel(
-                            id: 2,
-                            defaultSize: 0.7,
-                            child: Padding(
-                              padding: Pads.sm('b'),
-                              child: ListView.separated(
-                                padding: Pads.med('blr'),
-                                itemCount: record.details.length,
-                                separatorBuilder: (_, _) => const ShadSeparator.horizontal(),
-                                itemBuilder: (BuildContext context, int index) {
-                                  final detail = record.details[index];
-                                  return _ProductTile(
-                                    detail: detail,
-                                    index: index,
-                                    type: type,
-                                    onQtyChange: (q) => recordCtrl().changeQuantity(detail.product.id, (_) => q),
-                                    onProductRemove: (pId) => recordCtrl().removeProduct(pId),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-
-                          //! calculations
-                          ShadResizablePanel(
-                            id: 3,
-                            defaultSize: 0.4,
-                            minSize: 0.2,
-                            child: SingleChildScrollView(
-                              padding: Pads.sm(),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                spacing: Insets.sm,
-                                children: [
-                                  //! inputs
-                                  Expanded(
-                                    flex: 2,
-                                    child: _Inputs(
-                                      record: record,
-                                      type: type,
-                                      onTypeChange: recordCtrl().changeDiscountType,
-                                      onAccountSelect: recordCtrl().changeAccount,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 200, child: ShadSeparator.vertical(margin: Pads.zero)),
-
-                                  //! summary
-                                  Expanded(
-                                    child: _Summary(
-                                      record: record,
-                                      type: type,
-                                      onSubmit: () async {
-                                        final res = await recordCtrl().submit();
-
-                                        if (context.mounted) res.showToast(context);
-
-                                        if (res.success) {
-                                          formKey.currentState?.reset();
-                                          if (context.mounted) context.nPop();
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-
-              //! Products list
-              ShadResizablePanel(
-                id: 1,
-                defaultSize: .2,
-                minSize: .2,
-                maxSize: .4,
-                child: _ProductsPanel(onProductSelect: (p, s) => recordCtrl().addProduct(p, s), type: type),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -152,15 +163,15 @@ class CreateRecordView extends HookConsumerWidget {
 }
 
 class _Inputs extends HookConsumerWidget {
-  const _Inputs({required this.onTypeChange, required this.record, required this.type, required this.onAccountSelect});
+  const _Inputs({required this.onTypeChange, required this.record, required this.onAccountSelect});
 
   final InventoryRecordState record;
-  final RecordType type;
   final Function(DiscountType type) onTypeChange;
   final Function(PaymentAccount? acc) onAccountSelect;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final type = record.type;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: Insets.sm,
@@ -169,20 +180,15 @@ class _Inputs extends HookConsumerWidget {
           children: [
             Expanded(
               flex: 2,
-              child: ShadField(
+              child: ShadFormField(
                 name: 'amount',
-                hintText: 'Amount',
+                hintText: type.isSale ? 'Received' : 'Paid',
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                numeric: true,
               ),
             ),
             Expanded(
-              child: ShadField(
-                name: 'vat',
-                hintText: 'Vat',
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
-              ),
+              child: ShadFormField(name: 'vat', hintText: 'Vat', keyboardType: TextInputType.number, numeric: true),
             ),
           ],
         ),
@@ -191,44 +197,65 @@ class _Inputs extends HookConsumerWidget {
           children: [
             Expanded(
               flex: 4,
-              child: ShadField(
+              child: ShadFormField(
                 name: 'discount',
                 hintText: 'Discount',
                 padding: kDefInputPadding.copyWith(bottom: 0, top: 0, right: 5),
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                numeric: true,
                 trailing: _DiscountTypePopOver(onTypeChange: onTypeChange, type: record.discountType),
               ),
             ),
             Expanded(
               flex: 3,
-              child: ShadField(
+              child: ShadFormField(
                 name: 'shipping',
                 hintText: 'Shipping',
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                numeric: true,
               ),
             ),
           ],
         ),
         Row(
           children: [
-            if (record.partiHasBalance)
+            if (type.isSale && record.partiHasBalance)
               Expanded(
                 flex: 4,
                 child: ShadInputDecorator(
-                  label: const Text('Due/Balance'),
-                  child: ShadField(
+                  label: const Text('Use Balance'),
+                  child: ShadFormField(
                     name: 'due_balance',
-                    hintText: 'Use due/balance',
+                    hintText: 'Use Balance',
                     initialValue: '0',
                     keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                    numeric: true,
                     validators: [
                       if (record.partiHasBalance)
                         FormBuilderValidators.max(
                           record.parti?.due.abs() ?? 0,
                           errorText: 'This can\'t be more than available balance',
+                          checkNullOrEmpty: false,
+                        ),
+                    ],
+                  ),
+                ),
+              )
+            else if (type.isPurchase && record.partiHasDue)
+              Expanded(
+                flex: 4,
+                child: ShadInputDecorator(
+                  label: const Text('Use due'),
+                  child: ShadFormField(
+                    name: 'due_balance',
+                    hintText: 'Use due',
+                    keyboardType: TextInputType.number,
+                    numeric: true,
+                    validators: [
+                      if (record.partiHasDue)
+                        FormBuilderValidators.max(
+                          record.parti?.due.abs() ?? 0,
+                          errorText: 'This can\'t be more than parti\'s due',
                           checkNullOrEmpty: false,
                         ),
                     ],
@@ -244,39 +271,54 @@ class _Inputs extends HookConsumerWidget {
 }
 
 class _Summary extends StatelessWidget {
-  const _Summary({required this.record, required this.type, required this.onSubmit});
+  const _Summary({required this.record, required this.onSubmit});
 
   final InventoryRecordState record;
-  final RecordType type;
   final FVoid Function() onSubmit;
 
   @override
   Widget build(BuildContext context) {
+    final type = record.type;
     return Padding(
       padding: Pads.sm('tl'),
       child: Column(
         spacing: Insets.sm,
         children: [
-          SpacedText(left: 'Subtotal', right: record.subtotal(type).currency(), styleBuilder: (l, r) => (l, r.bold)),
+          SpacedText(left: 'Subtotal', right: record.subtotal().currency(), styleBuilder: (l, r) => (l, r.bold)),
           SpacedText(
             left: 'Total',
-            right: record.totalPriceSale(type).currency(),
+            right: record.totalPrice().currency(),
             styleBuilder: (l, r) => (l, context.text.large),
           ),
           SpacedText(
             left: 'Due',
-            right: record.dueSale.currency(),
+            right: record.due.currency(),
             styleBuilder: (l, r) {
               return (l, r.textColor(record.hasDue ? context.colors.destructive : null));
             },
           ),
-          if (record.hasDue && record.partiHasBalance)
+          // record have due but parti have balance (-parti.due) and can be used to clear due [when sale]
+          //b: -20, d: 10 = -10 final
+          if (record.hasDue && record.partiHasBalance && type.isSale)
             ShadCard(
               border: Border.all(color: context.colors.destructive),
               leading: Icon(LuIcons.triangleAlert, color: context.colors.destructive),
               childPadding: Pads.sm('l'),
               rowCrossAxisAlignment: CrossAxisAlignment.center,
               child: Text('The due amount will be deducted from balance', style: context.text.muted.error(context)),
+            ),
+          // record have due and parti also have due (parti.due) which can be used to clear due [when purchase]
+          //b: 20, d: (-)10 = 10 final
+          if (record.hasDue && record.partiHasDue)
+            ShadCard(
+              border: Border.all(color: context.colors.destructive),
+              leading: Icon(LuIcons.triangleAlert, color: context.colors.destructive),
+              childPadding: Pads.sm('l'),
+              rowCrossAxisAlignment: CrossAxisAlignment.center,
+              child: Text(
+                'The due amount will be deducted from parti\'s due',
+                style: context.text.muted.error(context),
+              ),
             ),
           if (record.hasBalance)
             ShadCard(
@@ -285,7 +327,9 @@ class _Summary extends StatelessWidget {
               childPadding: Pads.sm('l'),
               rowCrossAxisAlignment: CrossAxisAlignment.center,
               child: Text(
-                'The due amount ${record.dueSale.abs().currency()} will be added to balance',
+                type.isSale
+                    ? 'The due amount ${record.due.abs().currency()} will be added to balance'
+                    : '${record.due.abs().currency()} will be added to parti\'s due',
                 style: context.text.muted.error(context),
               ),
             ),
@@ -489,9 +533,9 @@ class _AccountSelect extends HookConsumerWidget {
 
     return accList.when(
       loading: () => Padding(padding: Pads.sm('lrt'), child: const ShadCard(width: 300, child: Loading())),
-      error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
+      error: (e, s) => ErrorView(e, s, prov: paymentAccountsCtrlProvider),
       data: (accounts) {
-        if (type == RecordType.purchase) accounts = accounts.where((e) => e.amount > 0).toList();
+        // if (type == RecordType.purchase) accounts = accounts.where((e) => e.amount > 0).toList();
         return ShadInputDecorator(
           label: const Text('Account').required(),
           child: ShadSelect<PaymentAccount>(
@@ -508,7 +552,7 @@ class _AccountSelect extends HookConsumerWidget {
                       Text(acc.name),
                       Text(
                         ' (${acc.amount.currency()})',
-                        style: context.text.muted.textColor(acc.amount == 0 ? context.colors.destructive : null),
+                        style: context.text.muted.textColor(acc.amount <= 0 ? context.colors.destructive : null),
                       ),
                     ],
                   ),
@@ -520,7 +564,7 @@ class _AccountSelect extends HookConsumerWidget {
                   Text(v.name),
                   Text(
                     ' (${v.amount.currency()})',
-                    style: context.text.muted.textColor(v.amount == 0 ? context.colors.destructive : null),
+                    style: context.text.muted.textColor(v.amount <= 0 ? context.colors.destructive : null),
                   ),
                 ],
               );
@@ -535,14 +579,14 @@ class _AccountSelect extends HookConsumerWidget {
 }
 
 class _PartiSection extends HookConsumerWidget {
-  const _PartiSection({required this.onPartiSelect, required this.record, required this.type});
+  const _PartiSection({required this.onPartiSelect, required this.record});
 
   final Function(Parti? parti) onPartiSelect;
   final InventoryRecordState record;
-  final RecordType type;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final type = record.type;
     final partiList = ref.watch(partiesCtrlProvider(null));
 
     final search = useState('');
@@ -646,127 +690,150 @@ class _PartiSection extends HookConsumerWidget {
 }
 
 class _ProductsPanel extends HookConsumerWidget {
-  const _ProductsPanel({required this.onProductSelect, required this.type});
+  const _ProductsPanel({required this.onProductSelect, required this.type, required this.userHouse});
 
   final Function(Product product, Stock? stock) onProductSelect;
   final RecordType type;
+  final WareHouse? userHouse;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productList = ref.watch(productsCtrlProvider);
+    final houseList = ref.watch(warehouseCtrlProvider);
     final productCtrl = useCallback(() => ref.read(productsCtrlProvider.notifier));
     final search = useTextEditingController();
+    final warehouse = useState<WareHouse?>(userHouse);
+
     return productList.when(
       loading: () => const Loading(),
       error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
       data: (products) {
-        return Column(
-          spacing: Insets.med,
-          children: [
-            Padding(
-              padding: Pads.sm('lrt'),
-              child: ShadInput(
-                controller: search,
-                padding: Pads.sm(),
-                placeholder: const Text('Search'),
-                onChanged: (v) => productCtrl().search(v),
-                trailing: ShadButton.outline(
-                  width: 24,
-                  height: 24,
-                  padding: Pads.zero,
-                  leading: const Icon(LuIcons.x),
-                  onPressed: () => search.clear(),
-                ),
-              ),
-            ),
-            const ShadSeparator.horizontal(margin: Pads.zero),
-            Expanded(
-              child: GridView.builder(
-                padding: Pads.med('blr'),
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 150,
-                  mainAxisSpacing: Insets.sm,
-                  crossAxisSpacing: Insets.sm,
-                ),
-                itemCount: products.length,
-                itemBuilder: (context, index) {
-                  final product = products[index];
-                  return HoverBuilder(
-                    child: ShadCard(
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          DecoContainer(
-                            color: context.colors.border,
-                            borderRadius: Corners.sm,
-                            alignment: Alignment.center,
-                            child: HostedImage.square(product.getPhoto, radius: Corners.sm),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: -1,
-                            right: -1,
-                            child: DecoContainer(
-                              color: context.colors.border.op8,
-                              alignment: Alignment.center,
-                              child: Text(product.name, maxLines: 3),
-                            ),
-                          ),
-                          Positioned(
-                            top: 3,
-                            right: 3,
-                            child: ShadBadge.raw(
-                              variant:
-                                  product.quantity == 0 ? ShadBadgeVariant.destructive : ShadBadgeVariant.secondary,
-                              child: Text('${product.quantity}${product.unitName}'),
-                            ),
-                          ),
-                        ],
-                      ),
+        return houseList.when(
+          loading: () => const Loading(),
+          error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
+          data: (houses) {
+            if (!(warehouse.value?.isDefault ?? true)) {
+              products = products.where((e) => e.stock.map((e) => e.warehouse).contains(warehouse.value)).toList();
+            }
+            return IntrinsicWidth(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: Pads.sm('lrt'),
+                    child: ShadFormField(
+                      controller: search,
+                      hintText: 'Search',
+                      onChanged: (v) => productCtrl().search(v ?? ''),
+                      showClearButton: true,
                     ),
-                    builder: (hovering, child) {
-                      return GestureDetector(
-                        onTap: () async {
-                          if (type == RecordType.sale) {
-                            onProductSelect(product, null);
-                          } else {
-                            final res = await showShadDialog<Stock>(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (context) => const _AddStockDialog(),
-                            );
-                            onProductSelect(product, res);
-                          }
-                        },
-                        child: Stack(
-                          children: [
-                            child,
-                            Positioned.fill(
-                              child: DecoContainer.animated(
-                                duration: 250.ms,
-                                color: hovering ? context.colors.border.op7 : Colors.transparent,
-                                alignment: Alignment.center,
-                                borderRadius: Corners.med,
-                                child:
-                                    hovering
-                                        ? DecoContainer(
-                                          color: context.colors.primary.op9,
-                                          borderRadius: Corners.circle,
-                                          padding: Pads.sm(),
-                                          child: Icon(LuIcons.plus, color: context.colors.primaryForeground),
-                                        )
-                                        : null,
-                              ),
+                  ),
+                  Padding(
+                    padding: Pads.sm('lr'),
+                    child: ShadSelect<WareHouse>(
+                      initialValue: warehouse.value,
+                      placeholder: const Text('Select a warehouse'),
+                      selectedOptionBuilder: (_, v) => Text(v.name),
+                      itemCount: houses.length,
+                      options: [
+                        for (final house in houses) ShadOption<WareHouse>(value: house, child: Text(house.name)),
+                      ],
+                      onChanged: (v) => warehouse.value = v,
+                    ),
+                  ),
+                  const ShadSeparator.horizontal(),
+                  Expanded(
+                    child: GridView.builder(
+                      padding: Pads.med('blr'),
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 150,
+                        mainAxisSpacing: Insets.sm,
+                        crossAxisSpacing: Insets.sm,
+                      ),
+                      itemCount: products.length,
+                      itemBuilder: (context, index) {
+                        final product = products[index];
+                        return HoverBuilder(
+                          child: ShadCard(
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                DecoContainer(
+                                  color: context.colors.border,
+                                  borderRadius: Corners.sm,
+                                  alignment: Alignment.center,
+                                  child: HostedImage.square(product.getPhoto, radius: Corners.sm),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  left: -1,
+                                  right: -1,
+                                  child: DecoContainer(
+                                    color: context.colors.border.op8,
+                                    alignment: Alignment.center,
+                                    child: Text(product.name, maxLines: 3),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 3,
+                                  right: 3,
+                                  child: ShadBadge.raw(
+                                    variant:
+                                        product.quantity <= 0
+                                            ? ShadBadgeVariant.destructive
+                                            : ShadBadgeVariant.secondary,
+                                    child: Text('${product.quantity}${product.unitName}'),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
+                          ),
+                          builder: (hovering, child) {
+                            return GestureDetector(
+                              onTap: () async {
+                                if (type.isSale) {
+                                  onProductSelect(product, null);
+                                } else {
+                                  final res = await showShadDialog<Stock>(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (context) => const _AddStockDialog(),
+                                  );
+                                  onProductSelect(product, res);
+                                }
+                              },
+                              child: Stack(
+                                children: [
+                                  child,
+                                  Positioned.fill(
+                                    child: DecoContainer.animated(
+                                      duration: 250.ms,
+                                      color: hovering ? context.colors.border.op7 : Colors.transparent,
+                                      alignment: Alignment.center,
+                                      borderRadius: Corners.med,
+                                      child:
+                                          hovering
+                                              ? DecoContainer(
+                                                color: context.colors.primary.op9,
+                                                borderRadius: Corners.circle,
+                                                padding: Pads.sm(),
+                                                child: Icon(LuIcons.plus, color: context.colors.primaryForeground),
+                                              )
+                                              : null,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -807,24 +874,24 @@ class _AddStockDialog extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: ShadField(
+                  child: ShadFormField(
                     name: 'purchase_price',
                     label: 'Purchase Price',
                     hintText: 'Enter purchase price',
                     isRequired: true,
-                    inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                    numeric: true,
                     onChanged: (value) {
                       stock.value = stock.value.copyWith(purchasePrice: Parser.toNum(value));
                     },
                   ),
                 ),
                 Expanded(
-                  child: ShadField(
+                  child: ShadFormField(
                     name: 'sales_price',
                     label: 'Sales Price',
                     hintText: 'Enter sale price',
                     isRequired: true,
-                    inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                    numeric: true,
                     onChanged: (value) {
                       stock.value = stock.value.copyWith(salesPrice: Parser.toNum(value));
                     },
@@ -836,22 +903,22 @@ class _AddStockDialog extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: ShadField(
+                  child: ShadFormField(
                     name: 'wholesale_price',
                     label: 'Wholesale Price',
                     hintText: 'Enter wholesale price',
-                    inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                    numeric: true,
                     onChanged: (value) {
                       stock.value = stock.value.copyWith(wholesalePrice: Parser.toNum(value));
                     },
                   ),
                 ),
                 Expanded(
-                  child: ShadField(
+                  child: ShadFormField(
                     name: 'dealer_price',
                     label: 'Dealer Price',
                     hintText: 'Enter dealer price',
-                    inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                    numeric: true,
                     onChanged: (value) {
                       stock.value = stock.value.copyWith(dealerPrice: Parser.toNum(value));
                     },
@@ -859,7 +926,7 @@ class _AddStockDialog extends HookConsumerWidget {
                 ),
                 if (!context.layout.isMobile)
                   Expanded(
-                    child: ShadField(
+                    child: ShadFormField(
                       name: 'quantity',
                       label: 'Quantity',
                       hintText: 'Enter Stock quantity',
@@ -876,7 +943,7 @@ class _AddStockDialog extends HookConsumerWidget {
               children: [
                 if (context.layout.isMobile)
                   Expanded(
-                    child: ShadField(
+                    child: ShadFormField(
                       name: 'quantity',
                       label: 'Quantity',
                       hintText: 'Enter Stock quantity',

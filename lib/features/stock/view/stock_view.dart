@@ -61,7 +61,10 @@ class _ProductSection extends StatelessWidget {
           children: [
             const SliverPositioned.fill(top: _ProductHeader.topInset, child: ShadCard()),
             MultiSliver(
-              children: [SliverPinnedHeader(child: _ProductHeader(product: model)), SliverClip(child: _stockList())],
+              children: [
+                SliverPinnedHeader(child: _ProductHeader(product: model)),
+                SliverClip(child: _stockList(context)),
+              ],
             ),
           ],
         ),
@@ -69,7 +72,15 @@ class _ProductSection extends StatelessWidget {
     );
   }
 
-  Widget _stockList() {
+  Widget _stockList(BuildContext ctx) {
+    if (model.stock.isEmpty) {
+      return SliverPadding(
+        padding: Pads.xl(),
+        sliver: SliverToBoxAdapter(
+          child: Center(child: Text('This product does not have any stock', style: ctx.text.list.error(ctx))),
+        ),
+      );
+    }
     final list = SliverPadding(
       padding: Pads.padding(padding: _ProductHeader.topInset),
       sliver: SliverList.separated(

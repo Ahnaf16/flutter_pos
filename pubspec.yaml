@@ -53,6 +53,7 @@ dependencies:
   syncfusion_flutter_datagrid: ^29.1.39
   syncfusion_flutter_core: ^29.1.39
   sliver_tools: ^0.2.12
+  nanoid2: ^2.0.1
 
 dev_dependencies:
   flutter_test:

@@ -69,7 +69,7 @@ class AwDatabase {
         final list = await _db.listDocuments(
           databaseId: AWConst.databaseId.id,
           collectionId: collId.id,
-          queries: queries,
+          queries: [...?queries, Query.orderDesc(r'$createdAt')],
         );
         catAw(list.toMap(), '${collId.name} list');
         return list;

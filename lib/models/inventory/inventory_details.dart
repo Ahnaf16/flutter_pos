@@ -66,5 +66,5 @@ class InventoryDetails {
   }
 
   num totalPriceSale() => quantity * stock.salesPrice;
-  num totalPricePurchase() => stock.quantity * stock.purchasePrice;
+  num totalPricePurchase() => quantity * stock.purchasePrice;
 }

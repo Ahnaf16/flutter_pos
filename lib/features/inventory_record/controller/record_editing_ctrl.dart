@@ -14,26 +14,26 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
   @override
   InventoryRecordState build(RecordType type) {
     _config = ref.watch(configCtrlProvider);
-    return const InventoryRecordState();
+    return InventoryRecordState(type: type);
   }
 
   void addProduct(Product product, Stock? newStock) {
     Stock? stock = newStock;
 
-    if (type == RecordType.sale) {
+    if (type.isSale) {
       stock = product.getEffectiveStock(_config.stockDistPolicy);
     }
     if (stock == null) {
-      final msg = type == RecordType.sale ? 'Product out of stock' : 'Add a stock first';
+      final msg = type.isSale ? 'Product out of stock' : 'Add a stock first';
       Toast.showErr(Ctx.context, msg);
       return;
     }
 
-    if (state.details.map((e) => e.product.id).contains(product.id) && type == RecordType.sale) {
+    if (state.details.map((e) => e.product.id).contains(product.id) && type.isSale) {
       return changeProductQuantity(product.id, (q) => q + 1);
     }
-
-    final details = InventoryDetails(id: '', product: product, stock: stock, quantity: 1);
+    final qty = type.isSale ? 1 : stock.quantity;
+    final details = InventoryDetails(id: '', product: product, stock: stock, quantity: qty);
 
     state = state.copyWith(details: [...state.details, details]);
   }
@@ -43,34 +43,36 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     if (state.details.isEmpty) {}
   }
 
-  void changeProductQuantity(String pId, int Function(int old) qty) {
+  void changeProductQuantity(String pId, int Function(int oldQty) update) {
     if (type == RecordType.purchase) return;
 
-    final list = state.details.toList();
+    final updatedDetails = [
+      for (final item in state.details)
+        if (item.product.id == pId) item.copyWith(quantity: update(item.quantity)) else item,
+    ];
 
-    final index = list.indexWhere((e) => e.product.id == pId);
-    if (index == -1) return;
-
-    list[index] = list[index].copyWith(quantity: qty(list[index].quantity));
-
-    state = state.copyWith(details: list);
+    state = state.copyWith(details: updatedDetails);
   }
 
-  void updateStockQuantity(String pId, int Function(int old) qty) {
+  void updateStockQuantity(String pId, int Function(int oldQty) update) {
     if (type == RecordType.sale) return;
 
-    final list = state.details.toList();
+    final updatedDetails = [
+      for (final item in state.details)
+        if (item.product.id == pId)
+          item.copyWith(
+            quantity: update(item.quantity),
+            stock: item.stock.copyWith(quantity: update(item.stock.quantity)),
+          )
+        else
+          item,
+    ];
 
-    final index = list.indexWhere((e) => e.product.id == pId);
-    if (index == -1) return;
-
-    list[index] = list[index].copyWith(stock: list[index].stock.copyWith(quantity: qty(list[index].stock.quantity)));
-
-    state = state.copyWith(details: list);
+    state = state.copyWith(details: updatedDetails);
   }
 
   void changeQuantity(String pId, int Function(int old) qty) {
-    if (type == RecordType.purchase) {
+    if (type.isPurchase) {
       updateStockQuantity(pId, qty);
     } else {
       changeProductQuantity(pId, qty);
@@ -100,40 +102,42 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
   }
 
   Future<Result> submit() async {
-    if (type == RecordType.purchase) {
+    cat(state.toMap());
+
+    if (state.parti == null) {
+      return (false, 'Please select a party');
+    }
+    if (state.account == null) {
+      return (false, 'Please select a payment account');
+    }
+    if (state.details.isEmpty) {
+      return (false, 'Please select at least one product');
+    }
+
+    if (type.isPurchase) {
+      if (state.partiHasDue && state.dueBalance > (state.parti?.due.abs() ?? 0)) {
+        return (false, 'Given due can\'t be more than parti\'s due');
+      }
       return submitPurchase();
     } else {
+      if (state.partiHasBalance && state.dueBalance > (state.parti?.due.abs() ?? 0)) {
+        return (false, 'Given balance can\'t be more than available balance');
+      }
       return submitSale();
     }
   }
 
   Future<Result> submitPurchase() async {
-    if (state.parti == null) {
-      return (false, 'Please select a party');
-    }
-    if (state.account == null) {
-      return (false, 'Please select a payment account');
-    }
-    if (state.details.isEmpty) {
-      return (false, 'Please select at least one product');
-    }
-    return (false, 'WIP');
+    final res = await _repo.createPurchase(state);
+
+    return res.fold(leftResult, (r) {
+      ref.invalidate(inventoryCtrlProvider);
+      ref.invalidateSelf();
+      return (true, 'Record created successfully');
+    });
   }
 
   Future<Result> submitSale() async {
-    if (state.parti == null) {
-      return (false, 'Please select a party');
-    }
-    if (state.account == null) {
-      return (false, 'Please select a payment account');
-    }
-    if (state.details.isEmpty) {
-      return (false, 'Please select at least one product');
-    }
-    if (state.partiHasBalance && state.dueBalance > (state.parti?.due.abs() ?? 0)) {
-      return (false, 'Given balance can\'t be more than available balance');
-    }
-
     final res = await _repo.createSale(state);
 
     return res.fold(leftResult, (r) {

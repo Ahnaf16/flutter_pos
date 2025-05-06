@@ -1,5 +1,6 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:nanoid2/nanoid2.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/features/products/controller/update_product_ctrl.dart';
 import 'package:pos/features/staffs/controller/update_staff_ctrl.dart';
@@ -95,8 +96,8 @@ class CreateProductView extends HookConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            const Expanded(
-                              child: ShadField(
+                            Expanded(
+                              child: ShadFormField(
                                 name: 'name',
                                 label: 'Name',
                                 hintText: 'Enter your name',
@@ -205,27 +206,28 @@ class CreateProductView extends HookConsumerWidget {
                           ),
                         ),
 
-                        const Row(
+                        Row(
                           children: [
                             Expanded(
-                              child: ShadField(
+                              child: ShadFormField(
                                 name: 'manufacturer',
                                 label: 'Manufacturer',
                                 hintText: 'Enter product Manufacturer',
                               ),
                             ),
                             Expanded(
-                              child: ShadField(
+                              child: ShadFormField(
                                 name: 'sku',
                                 label: 'SKU',
                                 hintText: 'Enter product SKU',
-                                // outsideTrailing: SmallButton(
-                                //   icon: LuIcons.refreshCcw,
-                                //   onPressed: () {
-                                //     final field = formKey.currentState!.fields['sku']!;
-                                //     field.didChange('ID.unique()');
-                                //   },
-                                // ),
+                                outsideTrailing: SmallButton(
+                                  variant: ShadButtonVariant.outline,
+                                  icon: LuIcons.refreshCcw,
+                                  onPressed: () {
+                                    final field = formKey.currentState!.fields['sku']!;
+                                    field.didChange(nanoid(length: 12));
+                                  },
+                                ),
                               ),
                             ),
                           ],
