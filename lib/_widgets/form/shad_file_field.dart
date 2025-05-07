@@ -30,7 +30,6 @@ class ShadFileField<T> extends ShadFormDecoration<T> {
     super.restorationId,
     String? name,
     super.initialValue,
-
     this.label,
     this.hintText,
     this.isRequired = false,
@@ -40,7 +39,7 @@ class ShadFileField<T> extends ShadFormDecoration<T> {
          name: name ?? label?.snakeCase ?? hintText?.snakeCase ?? 'field',
          validator: FormBuilderValidators.compose([if (isRequired) FormBuilderValidators.required(), ...?validators]),
          builder: (FormFieldState<T?> field) {
-           final state = field as _ShadFileFieldState<T>;
+           //  final state = field as _ShadFileFieldState<T>;
            return Builder(
              builder: (context) {
                return ShadCard(
@@ -48,25 +47,23 @@ class ShadFileField<T> extends ShadFormDecoration<T> {
                  description: Text('Select a file to upload', style: context.text.muted),
                  padding: Pads.xl().copyWith(top: Insets.med),
                  childPadding: Pads.med('t'),
+                 width: 700,
                  child: ShadDottedBorder(
-                   child: Row(
-                     mainAxisAlignment: MainAxisAlignment.center,
-                     children: [
-                       Column(
-                         children: [
-                           const ShadAvatar(LuIcons.upload),
-                           const Gap(Insets.med),
-                           const Text('Drag and drop files here'),
-                           Text('Or click browse (max 3MB)', style: context.text.muted.size(12)),
-                           const Gap(Insets.med),
-                           ShadButton.outline(
-                             size: ShadButtonSize.sm,
-                             child: const Text('Browse Files'),
-                             onPressed: () {},
-                           ),
-                         ],
-                       ),
-                     ],
+                   child: Center(
+                     child: Column(
+                       children: [
+                         const ShadAvatar(LuIcons.upload),
+                         const Gap(Insets.med),
+                         const Text('Drag and drop files here'),
+                         Text('Or click browse (max 3MB)', style: context.text.muted.size(12)),
+                         const Gap(Insets.med),
+                         ShadButton.outline(
+                           size: ShadButtonSize.sm,
+                           child: const Text('Browse Files'),
+                           onPressed: () {},
+                         ),
+                       ],
+                     ),
                    ),
                  ),
                );

@@ -22,7 +22,7 @@ final expenseCtrlProvider =
 
 typedef _$ExpenseCtrl = AutoDisposeAsyncNotifier<List<Expense>>;
 String _$expenseCategoryCtrlHash() =>
-    r'cfc094f4f1fe91813703a5ed7c68b5b3e5f2890a';
+    r'8e7bb6583ff5c1b2bf0ae4b699e08c2a46ac1299';
 
 /// See also [ExpenseCategoryCtrl].
 @ProviderFor(ExpenseCategoryCtrl)

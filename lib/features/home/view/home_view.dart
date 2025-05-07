@@ -53,7 +53,7 @@ class HomeView extends HookConsumerWidget {
                 selectedBuilder: (context, value) => Text(value.name),
               ),
 
-              SizedBox(width: 700, child: ShadFileField()),
+              ShadFileField(),
 
               Row(
                 children: [

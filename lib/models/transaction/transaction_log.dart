@@ -2,7 +2,7 @@ import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 
-enum TransactionType { manual, sale, purchase, expanse }
+enum TransactionType { manual, sale, purchase, expanse, transfer }
 
 class TransactionLog {
   const TransactionLog({
@@ -10,13 +10,15 @@ class TransactionLog {
     required this.amount,
     required this.usedDueBalance,
     required this.account,
-    required this.parti,
+    required this.transactedTo,
+    required this.transactionFormParti,
     required this.transactTo,
     required this.transactToPhone,
     required this.transactionBy,
     required this.date,
     required this.type,
     required this.note,
+    required this.adjustBalance,
   });
 
   final String id;
@@ -27,18 +29,24 @@ class TransactionLog {
   final PaymentAccount account;
 
   /// to whom the transaction was made. can be null when type is manual
-  final Parti? parti;
+  final Parti? transactedTo;
+
+  ///on whose behalf the transaction was made
+  final Parti? transactionFormParti;
 
   /// plain name of the person to whom the transaction was made
   final String? transactTo;
   final String? transactToPhone;
 
   /// The user who made the transaction
-  final AppUser transactionBy;
+  final AppUser? transactionBy;
 
   final DateTime date;
   final TransactionType type;
   final String? note;
+  final bool adjustBalance;
+
+  // final bool transactionFromMe;
 
   factory TransactionLog.fromDoc(Document doc) => TransactionLog.fromMap(doc.data);
 
@@ -47,13 +55,15 @@ class TransactionLog {
     amount: map.parseNum('amount'),
     usedDueBalance: map.parseNum('used_due_balance'),
     account: PaymentAccount.fromMap(map['payment_account']),
-    parti: Parti.tyrParse(map['parties']),
+    transactedTo: Parti.tyrParse(map['parties']),
+    transactionFormParti: Parti.tyrParse(map['transaction_for']),
     transactTo: map['transact_to'],
     transactToPhone: map['transact_to_phone'],
-    transactionBy: AppUser.fromMap(map['transaction_by']),
+    transactionBy: AppUser.tryParse(map['transaction_by']),
     date: DateTime.parse(map['date']),
     note: map['note'],
     type: TransactionType.values.byName(map['transaction_type']),
+    adjustBalance: map.parseBool('adjust_balance'),
   );
 
   static TransactionLog? tyrParse(dynamic value) {
@@ -72,30 +82,46 @@ class TransactionLog {
     'amount': amount,
     'used_due_balance': usedDueBalance,
     'payment_account': account.toMap(),
-    'parties': parti?.toMap(),
+    'parties': transactedTo?.toMap(),
     'transact_to': transactTo,
     'transact_to_phone': transactToPhone,
-    'transaction_by': transactionBy.toMap(),
+    'transaction_by': transactionBy?.toMap(),
     'date': date.toIso8601String(),
     'transaction_type': type.name,
     'note': note,
+    'adjust_balance': adjustBalance,
+    'transaction_for': transactionFormParti?.toMap(),
   };
 
   QMap toAwPost() => {
     'amount': amount,
     'used_due_balance': usedDueBalance,
     'payment_account': account.id,
-    'parties': parti?.id,
+    'parties': transactedTo?.id,
     'transact_to': transactTo,
     'transact_to_phone': transactToPhone,
-    'transaction_by': transactionBy.id,
+    'transaction_by': transactionBy?.id,
     'date': date.toIso8601String(),
     'transaction_type': type.name,
     'note': note,
+    'transaction_for': transactionFormParti?.id,
   };
 
+  bool _trxToOther() =>
+      (transactTo != null && transactTo!.isNotEmpty) || (transactToPhone != null && transactToPhone!.isNotEmpty);
+
+  String? validate(bool fromMe) {
+    final from = transactionFormParti;
+    if (!fromMe) {
+      if (from == null) return 'Please select a parti to transfer from';
+      if (from.hasBalance() && from.due.abs() < amount) return 'Transfer amount can\'t be more than available balance';
+    }
+    if (transactedTo == null && !_trxToOther()) return 'Please select a parti or put their name and phone number';
+    return null;
+  }
+
   Parti? get getParti {
-    if (parti != null) return parti;
+    if (transactedTo != null) return transactedTo;
     final name = transactTo;
     final phone = transactToPhone;
     if (name == null || phone == null) return null;
@@ -109,13 +135,15 @@ class TransactionLog {
       amount: record.amount,
       usedDueBalance: record.dueBalance,
       account: record.account,
-      parti: parti,
+      transactedTo: parti,
       transactTo: parti?.name,
       transactToPhone: parti?.phone,
       transactionBy: user,
       date: dateNow.run(),
       type: record.type == RecordType.sale ? TransactionType.sale : TransactionType.purchase,
       note: _noteInv(record),
+      adjustBalance: false,
+      transactionFormParti: null,
     );
   }
 
@@ -125,13 +153,15 @@ class TransactionLog {
       amount: ex.amount,
       usedDueBalance: 0,
       account: ex.account,
-      parti: null,
+      transactedTo: null,
       transactTo: null,
       transactToPhone: null,
       transactionBy: ex.expenseBy,
       date: dateNow.run(),
       type: TransactionType.expanse,
       note: _noteEx(ex),
+      adjustBalance: false,
+      transactionFormParti: null,
     );
   }
 

@@ -10,20 +10,16 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
   final _repo = locate<TransactionsRepo>();
 
   @override
-  FutureOr<List<TransactionLog>> build() async {
-    final staffs = await _repo.getTransactionLogs();
+  FutureOr<List<TransactionLog>> build([TransactionType? type]) async {
+    final staffs = await _repo.getTransactionLogs(type);
     return staffs.fold((l) {
       Toast.showErr(Ctx.context, l);
       return [];
     }, identity);
   }
 
-  Future<Result> createManual(QMap form) async {
-    final data = QMap.from(form);
-    data.addAll({'date': DateTime.now().toIso8601String()});
-    final log = TransactionLog.fromMap(data);
-
-    final res = await _repo.addTransaction(log);
+  Future<Result> createManual(QMap form, [bool formMe = true]) async {
+    final res = await _repo.addManual(form, formMe);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       return rightResult('Transaction created successfully');

@@ -23,7 +23,7 @@ class InventoryRepo with AwHandler {
 
     //! update account amount
     final acc = record.account;
-    final (accErr, accData) = await _updateAccountAmount(acc, record.amount).toRecord();
+    final (accErr, accData) = await _updateAccountAmount(acc.id, record.amount).toRecord();
     if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
 
     //! update Due
@@ -35,7 +35,7 @@ class InventoryRepo with AwHandler {
         // _updateDue adds the due with the parti.due. if due is (-) it will be subtracted
         // when hasBalance, due is (-), so -due will subtract due. will be added as balance
         // when hasDue, due is (+), so +due will add due. will be added as due
-        final (partiErr, partiData) = await _updateDue(parti, inventory.due, record.type).toRecord();
+        final (partiErr, partiData) = await _updateDue(parti.id, inventory.due, record.type).toRecord();
         if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
         parti = Parti.fromDoc(partiData);
       }
@@ -48,7 +48,7 @@ class InventoryRepo with AwHandler {
 
       if (inventory.partiHasBalance && inventory.dueBalance > 0) {
         // [Parti.Due] is already [-] in this case so adding dueBalance will subtract balance
-        final (partiErr, partiData) = await _updateDue(parti, inventory.dueBalance, record.type).toRecord();
+        final (partiErr, partiData) = await _updateDue(parti.id, inventory.dueBalance, record.type).toRecord();
         if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
       }
     }
@@ -71,7 +71,7 @@ class InventoryRepo with AwHandler {
     //! update account amount
     final acc = record.account;
     // (-) amount because it is a purchase and _updateAccountAmount adds the amount.
-    final (accErr, accData) = await _updateAccountAmount(acc, -record.amount).toRecord();
+    final (accErr, accData) = await _updateAccountAmount(acc.id, -record.amount).toRecord();
     if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
 
     //! update Due
@@ -83,7 +83,7 @@ class InventoryRepo with AwHandler {
       // _updateDue adds the due with the parti.due. if due is (-) it will be subtracted
       // when hasBalance, due is (-), so -(-due) will add due. will be added as due
       // when hasDue, due is (+), so -(+due) will subtract due. will be added as balance
-      final (partiErr, partiData) = await _updateDue(parti, -inventory.due, record.type).toRecord();
+      final (partiErr, partiData) = await _updateDue(parti.id, -inventory.due, record.type).toRecord();
       if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
       parti = Parti.fromDoc(partiData);
     }
@@ -96,7 +96,7 @@ class InventoryRepo with AwHandler {
 
     if (inventory.partiHasDue && inventory.dueBalance > 0) {
       // [Parti.Due] is [+] in this case so subtracting dueBalance will subtract due
-      final (partiErr, partiData) = await _updateDue(parti, -inventory.dueBalance, record.type).toRecord();
+      final (partiErr, partiData) = await _updateDue(parti.id, -inventory.dueBalance, record.type).toRecord();
       if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
     }
 
@@ -161,13 +161,20 @@ class InventoryRepo with AwHandler {
     return await repo.updateStock(stock.copyWith(quantity: stock.quantity - qty));
   }
 
-  FutureReport<Document> _updateAccountAmount(PaymentAccount account, num amount) async {
+  FutureReport<Document> _updateAccountAmount(String id, num amount) async {
     final repo = locate<PaymentAccountsRepo>();
-    return await repo.updateAccount(account.copyWith(amount: account.amount + amount));
+    final (err, acc) = await repo.getAccountById(id).toRecord();
+
+    if (err != null || acc == null) return left(err ?? const Failure('Unable to get account'));
+
+    return await repo.updateAccount(acc.copyWith(amount: acc.amount + amount));
   }
 
-  FutureReport<Document> _updateDue(Parti parti, num due, RecordType type) async {
+  FutureReport<Document> _updateDue(String id, num due, RecordType type) async {
     final repo = locate<PartiesRepo>();
+    final (err, parti) = await repo.getPartiById(id).toRecord();
+
+    if (err != null || parti == null) return left(err ?? const Failure('Unable to get account'));
     return await repo.updateDue(parti, due, !due.isNegative, 'Due created from ${type.name}');
   }
 

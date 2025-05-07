@@ -6,11 +6,11 @@ part of 'auth_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$currentUserHash() => r'5543be9bfa0548506fb27927e2693fc65dd08a63';
+String _$currentUserHash() => r'b68c6fdc63371fc9828588165247221dc332cf97';
 
 /// See also [currentUser].
 @ProviderFor(currentUser)
-final currentUserProvider = AutoDisposeFutureProvider<AppUser?>.internal(
+final currentUserProvider = FutureProvider<AppUser?>.internal(
   currentUser,
   name: r'currentUserProvider',
   debugGetCreateSourceHash:
@@ -21,7 +21,7 @@ final currentUserProvider = AutoDisposeFutureProvider<AppUser?>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef CurrentUserRef = AutoDisposeFutureProviderRef<AppUser?>;
+typedef CurrentUserRef = FutureProviderRef<AppUser?>;
 String _$authCtrlHash() => r'1228180bf817ef7c7e2d91500ca41ec49659f026';
 
 /// See also [AuthCtrl].
@@ -37,12 +37,12 @@ final authCtrlProvider =
 );
 
 typedef _$AuthCtrl = AutoDisposeAsyncNotifier<AppUser?>;
-String _$authStateSyncHash() => r'444c52ae4aacf8ed327889c961715e0b62297227';
+String _$authStateSyncHash() => r'20f2b07d48f1ddcf38d07946a93e4e2c5de6107c';
 
 /// See also [AuthStateSync].
 @ProviderFor(AuthStateSync)
 final authStateSyncProvider =
-    AutoDisposeNotifierProvider<AuthStateSync, Option<AppUser>>.internal(
+    NotifierProvider<AuthStateSync, Option<AppUser>>.internal(
   AuthStateSync.new,
   name: r'authStateSyncProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -52,6 +52,6 @@ final authStateSyncProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$AuthStateSync = AutoDisposeNotifier<Option<AppUser>>;
+typedef _$AuthStateSync = Notifier<Option<AppUser>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

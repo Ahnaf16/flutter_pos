@@ -48,7 +48,7 @@ class ShadSelectField<T> extends ShadFormDecoration<T> {
              decoration: state.decoration,
              child: Row(
                children: [
-                 Flexible(
+                 Expanded(
                    child: Builder(
                      builder: (context) {
                        return ShadSelect<T>.raw(

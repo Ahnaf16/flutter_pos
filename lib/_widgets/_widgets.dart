@@ -11,6 +11,7 @@ export 'form/shad_form_decoration.dart';
 export 'form/shad_select_field.dart';
 export 'form/shad_text_area_field.dart';
 export 'form/shad_text_field.dart';
+export 'form/visibility_field.dart';
 export 'hosted_image.dart';
 export 'hover_builder.dart';
 export 'image_picked_view.dart';

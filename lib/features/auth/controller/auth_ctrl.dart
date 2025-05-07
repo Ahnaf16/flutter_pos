@@ -33,9 +33,11 @@ class AuthCtrl extends _$AuthCtrl {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class AuthStateSync extends _$AuthStateSync {
-  void _set(AppUser user) => state = some(user);
+  void _set(AppUser user) {
+    state = some(user);
+  }
 
   @override
   Option<AppUser> build() {

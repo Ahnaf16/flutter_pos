@@ -19,7 +19,7 @@ class PaymentAccountsRepo with AwHandler {
         .convert((docs) => docs.convertDoc(PaymentAccount.fromDoc));
   }
 
-  FutureReport<PaymentAccount> getUnitById(String id) async {
+  FutureReport<PaymentAccount> getAccountById(String id) async {
     return await db.get(AWConst.collections.paymentAccount, id).convert(PaymentAccount.fromDoc);
   }
 }
