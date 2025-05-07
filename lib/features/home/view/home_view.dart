@@ -48,7 +48,6 @@ class HomeView extends HookConsumerWidget {
                 hintText: 'select something',
                 minWidth: 300,
                 options: TransactionType.values,
-                initialValue: TransactionType.manual,
                 optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name)),
                 selectedBuilder: (context, value) => Text(value.name),
               ),

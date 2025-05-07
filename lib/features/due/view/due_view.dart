@@ -12,7 +12,6 @@ class DueView extends HookConsumerWidget {
     final partiList = ref.watch(dueLogCtrlProvider);
     return BaseBody(
       title: 'Due logs',
-
       body: partiList.when(
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: dueLogCtrlProvider),

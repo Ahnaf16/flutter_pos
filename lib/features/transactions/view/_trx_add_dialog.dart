@@ -9,6 +9,7 @@ class _TransferDialog extends HookConsumerWidget {
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
 
     final fromMe = useState(true);
+    final toParti = useState(true);
 
     final accountList = ref.watch(paymentAccountsCtrlProvider);
     final partiList = ref.watch(partiesCtrlProvider(null));
@@ -84,24 +85,60 @@ class _TransferDialog extends HookConsumerWidget {
                         else
                           _TransactionForParti(parties: parties),
 
-                        ShadSeparator.horizontal(margin: Pads.xs()),
-                        ShadSelectField<Parti>(
-                          name: 'parties',
-                          hintText: 'To whom?',
-                          label: 'Transfer to',
-                          options: parties,
-                          allowDeselection: true,
-                          valueTransformer: (value) => value?.toMap(),
-                          optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name)),
-                          selectedBuilder: (context, v) => Text(v.name),
-                        ),
-
-                        const Text('OR'),
-
                         Row(
                           children: [
-                            Flexible(child: ShadTextField(name: 'transact_to', hintText: 'Name')),
-                            Flexible(child: ShadTextField(name: 'transact_to_phone', hintText: 'Phone')),
+                            Flexible(child: ShadSeparator.horizontal(margin: Pads.lg('tb'))),
+                            Padding(padding: Pads.lg('lr'), child: const Text('TO')),
+                            Flexible(child: ShadSeparator.horizontal(margin: Pads.lg('tb'))),
+                          ],
+                        ),
+
+                        ShadTabs<bool>(
+                          value: toParti.value,
+                          onChanged: (v) {
+                            toParti.value = v;
+                            formKey.currentState?.fields['transaction_for']?.reset();
+                          },
+                          tabs: [
+                            ShadTab(
+                              value: true,
+                              content: ShadSelectField<Parti>(
+                                name: 'parties',
+                                hintText: 'To whom?',
+                                label: 'Transfer to',
+                                options: parties,
+                                allowDeselection: true,
+                                isRequired: true,
+                                valueTransformer: (value) => value?.toMap(),
+                                optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name)),
+                                selectedBuilder: (context, v) => Text(v.name),
+                              ),
+                              child: const Text('Parti'),
+                            ),
+                            ShadTab(
+                              value: false,
+                              content: Row(
+                                children: [
+                                  Flexible(
+                                    child: ShadTextField(
+                                      name: 'transact_to',
+                                      label: 'Name',
+                                      hintText: 'Enter name',
+                                      isRequired: true,
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: ShadTextField(
+                                      name: 'transact_to_phone',
+                                      label: 'Phone',
+                                      hintText: 'Enter phone',
+                                      isRequired: true,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              child: const Text('Custom'),
+                            ),
                           ],
                         ),
                       ],

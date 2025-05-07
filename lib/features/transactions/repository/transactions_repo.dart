@@ -1,6 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:pos/features/auth/repository/auth_repo.dart';
 import 'package:pos/features/parties/repository/parties_repo.dart';
 import 'package:pos/features/payment_accounts/repository/payment_accounts_repo.dart';
 import 'package:pos/main.export.dart';
@@ -15,7 +16,7 @@ class TransactionsRepo with AwHandler {
   FutureReport<Document> addManual(QMap form, [bool fromMe = true]) async {
     final data = QMap.from(form);
     data.addAll({'date': DateTime.now().toIso8601String()});
-    final log = TransactionLog.fromMap(data);
+    TransactionLog log = TransactionLog.fromMap(data);
 
     if (log.validate(fromMe) != null) return left(Failure(log.validate(fromMe)!));
 
@@ -31,6 +32,12 @@ class TransactionsRepo with AwHandler {
       final (err, parti) = await _updateDue(toParti.id, -log.amount).toRecord();
       if (err != null || parti == null) return left(err ?? const Failure('Unable to update due'));
       toParti = Parti.fromDoc(parti);
+    }
+
+    if (log.transactionBy == null) {
+      final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
+      if (err != null || user == null) return left(err ?? const Failure('Unable to getting current user'));
+      log = log.copyWith(transactionBy: () => user);
     }
 
     final (err, acc) = await _updateAccountAmount(log.account.id, -log.amount).toRecord();

@@ -2,7 +2,7 @@ import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 
-enum TransactionType { manual, sale, purchase, expanse, transfer }
+enum TransactionType { sale, purchase, expanse, transfer }
 
 class TransactionLog {
   const TransactionLog({
@@ -194,5 +194,37 @@ class TransactionLog {
       'on $date',
       'using $account',
     ].join(' ');
+  }
+
+  TransactionLog copyWith({
+    String? id,
+    num? amount,
+    num? usedDueBalance,
+    PaymentAccount? account,
+    ValueGetter<Parti?>? transactedTo,
+    ValueGetter<Parti?>? transactionFormParti,
+    ValueGetter<String?>? transactTo,
+    ValueGetter<String?>? transactToPhone,
+    ValueGetter<AppUser?>? transactionBy,
+    DateTime? date,
+    TransactionType? type,
+    ValueGetter<String?>? note,
+    bool? adjustBalance,
+  }) {
+    return TransactionLog(
+      id: id ?? this.id,
+      amount: amount ?? this.amount,
+      usedDueBalance: usedDueBalance ?? this.usedDueBalance,
+      account: account ?? this.account,
+      transactedTo: transactedTo != null ? transactedTo() : this.transactedTo,
+      transactionFormParti: transactionFormParti != null ? transactionFormParti() : this.transactionFormParti,
+      transactTo: transactTo != null ? transactTo() : this.transactTo,
+      transactToPhone: transactToPhone != null ? transactToPhone() : this.transactToPhone,
+      transactionBy: transactionBy != null ? transactionBy() : this.transactionBy,
+      date: date ?? this.date,
+      type: type ?? this.type,
+      note: note != null ? note() : this.note,
+      adjustBalance: adjustBalance ?? this.adjustBalance,
+    );
   }
 }
