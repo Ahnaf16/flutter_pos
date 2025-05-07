@@ -80,7 +80,7 @@ class _PartyNameBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       spacing: Insets.med,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      // crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         CircleImage(parti.getPhoto, borderWidth: 1, radius: 20),
@@ -98,7 +98,7 @@ class _PartyNameBuilder extends StatelessWidget {
                   if (!parti.isCustomer) ShadBadge.outline(child: Text(parti.type.name)),
                 ],
               ),
-              Text(parti.address ?? '--', maxLines: 2, overflow: TextOverflow.ellipsis),
+              if (parti.address != null) Text(parti.address ?? '--', maxLines: 2, overflow: TextOverflow.ellipsis),
             ],
           ),
         ),
