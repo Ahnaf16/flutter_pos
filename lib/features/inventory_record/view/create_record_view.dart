@@ -146,9 +146,9 @@ class CreateRecordView extends HookConsumerWidget {
                     minSize: .2,
                     maxSize: .4,
                     child: _ProductsPanel(
-                      onProductSelect: (p, s) => recordCtrl().addProduct(p, s),
                       type: type,
                       userHouse: user?.warehouse,
+                      onProductSelect: recordCtrl().addProduct,
                     ),
                   ),
                 ],
@@ -220,7 +220,6 @@ class _Inputs extends HookConsumerWidget {
           children: [
             if (type.isSale && record.partiHasBalance)
               Expanded(
-                flex: 4,
                 child: ShadInputDecorator(
                   label: const Text('Use Balance'),
                   child: ShadTextField(
@@ -242,7 +241,6 @@ class _Inputs extends HookConsumerWidget {
               )
             else if (type.isPurchase && record.partiHasDue)
               Expanded(
-                flex: 4,
                 child: ShadInputDecorator(
                   label: const Text('Use due'),
                   child: ShadTextField(
@@ -261,7 +259,7 @@ class _Inputs extends HookConsumerWidget {
                   ),
                 ),
               ),
-            _AccountSelect(onAccountSelect: onAccountSelect, type: type),
+            Expanded(child: _AccountSelect(onAccountSelect: onAccountSelect, type: type)),
           ],
         ),
       ],
@@ -534,42 +532,39 @@ class _AccountSelect extends HookConsumerWidget {
       loading: () => Padding(padding: Pads.sm('lrt'), child: const ShadCard(width: 300, child: Loading())),
       error: (e, s) => ErrorView(e, s, prov: paymentAccountsCtrlProvider),
       data: (accounts) {
-        return ShadInputDecorator(
-          label: const Text('Account').required(),
-          child: ShadSelect<PaymentAccount>(
-            maxWidth: 300,
-            minWidth: 300,
-            placeholder: const Text('Select a payment account'),
-            itemCount: accounts.length,
-            options: [
-              for (final acc in accounts)
-                ShadOption<PaymentAccount>(
-                  value: acc,
-                  child: Row(
-                    children: [
-                      Text(acc.name),
-                      Text(
-                        ' (${acc.amount.currency()})',
-                        style: context.text.muted.textColor(acc.amount <= 0 ? context.colors.destructive : null),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-            selectedOptionBuilder: (_, v) {
-              return Row(
+        return ShadSelectField<PaymentAccount>(
+          label: 'Account',
+          minWidth: 300,
+          hintText: 'Select a payment account',
+          // isRequired: true,
+          optionBuilder: (context, acc, _) {
+            return ShadOption<PaymentAccount>(
+              value: acc,
+              child: Row(
                 children: [
-                  Text(v.name),
+                  Text(acc.name),
                   Text(
-                    ' (${v.amount.currency()})',
-                    style: context.text.muted.textColor(v.amount <= 0 ? context.colors.destructive : null),
+                    ' (${acc.amount.currency()})',
+                    style: context.text.muted.textColor(acc.amount <= 0 ? context.colors.destructive : null),
                   ),
                 ],
-              );
-            },
-            onChanged: onAccountSelect,
-            anchor: const ShadAnchorAuto(targetAnchor: Alignment.topRight, followerAnchor: Alignment.topCenter),
-          ),
+              ),
+            );
+          },
+          options: accounts,
+          selectedBuilder: (_, v) {
+            return Row(
+              children: [
+                Text(v.name),
+                Text(
+                  ' (${v.amount.currency()})',
+                  style: context.text.muted.textColor(v.amount <= 0 ? context.colors.destructive : null),
+                ),
+              ],
+            );
+          },
+          onChanged: onAccountSelect,
+          anchor: const ShadAnchorAuto(targetAnchor: Alignment.topRight, followerAnchor: Alignment.topCenter),
         );
       },
     );
@@ -680,7 +675,7 @@ class _PartiSection extends HookConsumerWidget {
 class _ProductsPanel extends HookConsumerWidget {
   const _ProductsPanel({required this.onProductSelect, required this.type, required this.userHouse});
 
-  final Function(Product product, Stock? stock) onProductSelect;
+  final Function(Product product, Stock? stock, String? warehouseId) onProductSelect;
   final RecordType type;
   final WareHouse? userHouse;
 
@@ -700,9 +695,7 @@ class _ProductsPanel extends HookConsumerWidget {
           loading: () => const Loading(),
           error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
           data: (houses) {
-            if (!(warehouse.value?.isDefault ?? true)) {
-              products = products.where((e) => e.stock.map((e) => e.warehouse).contains(warehouse.value)).toList();
-            }
+            products = products.filterHouse(warehouse.value);
             return IntrinsicWidth(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -716,19 +709,21 @@ class _ProductsPanel extends HookConsumerWidget {
                       showClearButton: true,
                     ),
                   ),
-                  Padding(
-                    padding: Pads.sm('lr'),
-                    child: ShadSelect<WareHouse>(
-                      initialValue: warehouse.value,
-                      placeholder: const Text('Select a warehouse'),
-                      selectedOptionBuilder: (_, v) => Text(v.name),
-                      itemCount: houses.length,
-                      options: [
-                        for (final house in houses) ShadOption<WareHouse>(value: house, child: Text(house.name)),
-                      ],
-                      onChanged: (v) => warehouse.value = v,
+                  if (userHouse?.isDefault == true)
+                    Padding(
+                      padding: Pads.sm('lr'),
+                      child: ShadSelect<WareHouse>(
+                        initialValue: warehouse.value,
+                        placeholder: const Text('All'),
+                        selectedOptionBuilder: (_, v) => Text(v.name),
+                        itemCount: houses.length,
+                        options: [
+                          for (final house in houses) ShadOption<WareHouse>(value: house, child: Text(house.name)),
+                        ],
+                        onChanged: (v) => warehouse.value = v,
+                        allowDeselection: true,
+                      ),
                     ),
-                  ),
                   const ShadSeparator.horizontal(),
                   Expanded(
                     child: GridView.builder(
@@ -741,6 +736,8 @@ class _ProductsPanel extends HookConsumerWidget {
                       itemCount: products.length,
                       itemBuilder: (context, index) {
                         final product = products[index];
+                        final qty =
+                            warehouse.value == null ? product.quantity : product.quantityByHouse(warehouse.value!.id);
                         return HoverBuilder(
                           child: ShadCard(
                             child: Stack(
@@ -770,7 +767,7 @@ class _ProductsPanel extends HookConsumerWidget {
                                         product.quantity <= 0
                                             ? ShadBadgeVariant.destructive
                                             : ShadBadgeVariant.secondary,
-                                    child: Text('${product.quantity}${product.unitName}'),
+                                    child: Text('$qty${product.unitName}'),
                                   ),
                                 ),
                               ],
@@ -780,14 +777,14 @@ class _ProductsPanel extends HookConsumerWidget {
                             return GestureDetector(
                               onTap: () async {
                                 if (type.isSale) {
-                                  onProductSelect(product, null);
+                                  onProductSelect(product, null, warehouse.value?.id);
                                 } else {
                                   final res = await showShadDialog<Stock>(
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (context) => const _AddStockDialog(),
                                   );
-                                  onProductSelect(product, res);
+                                  onProductSelect(product, res, null);
                                 }
                               },
                               child: Stack(

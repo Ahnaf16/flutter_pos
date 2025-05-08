@@ -17,11 +17,11 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     return InventoryRecordState(type: type);
   }
 
-  void addProduct(Product product, Stock? newStock) {
+  void addProduct(Product product, Stock? newStock, String? warehouseId) {
     Stock? stock = newStock;
 
     if (type.isSale) {
-      stock = product.getEffectiveStock(_config.stockDistPolicy);
+      stock = product.getEffectiveStock(_config.stockDistPolicy, warehouseId);
     }
     if (stock == null) {
       final msg = type.isSale ? 'Product out of stock' : 'Add a stock first';
@@ -30,6 +30,8 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     }
 
     if (state.details.map((e) => e.product.id).contains(product.id) && type.isSale) {
+      final existing = state.details.firstWhere((e) => e.product.id == product.id).stock.id;
+      if (existing != stock.id) return;
       return changeProductQuantity(product.id, (q) => q + 1);
     }
     final qty = type.isSale ? 1 : stock.quantity;

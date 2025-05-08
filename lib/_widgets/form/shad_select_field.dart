@@ -32,6 +32,7 @@ class ShadSelectField<T> extends ShadFormDecoration<T> {
     this.maxWidth,
     this.minWidth,
     this.searchBuilder,
+    this.anchor,
   }) : assert(initialValue == null || controller == null, 'Cannot provide both initialValue and controller'),
        super(
          name: name ?? label?.snakeCase ?? hintText?.snakeCase ?? 'field',
@@ -56,6 +57,7 @@ class ShadSelectField<T> extends ShadFormDecoration<T> {
                          enabled: enabled,
                          placeholder: Text(hintText ?? ''),
                          controller: state._effectiveController,
+                         anchor: anchor,
                          selectedOptionBuilder: selectedBuilder ?? _defSelectedBuilder<T>,
                          options: [
                            for (int i = 0; i < options.length; i++)
@@ -106,6 +108,7 @@ class ShadSelectField<T> extends ShadFormDecoration<T> {
   final double? maxWidth;
   final double? minWidth;
   final String Function(T item)? searchBuilder;
+  final ShadAnchorBase? anchor;
 
   static Widget _defSelectedBuilder<T>(BuildContext context, T value) => Text(value.toString());
 

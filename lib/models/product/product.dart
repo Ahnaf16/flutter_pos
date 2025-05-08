@@ -137,24 +137,49 @@ class Product {
 
   int get quantity => stock.map((e) => e.quantity).sum;
 
+  int quantityByHouse(String houseId) => stocksByHouse(houseId).map((e) => e.quantity).sum;
+
   String get unitName => unit?.unitName ?? '';
 
   WareHouse? get warehouse => stock.map((e) => e.warehouse).firstOrNull;
 
-  Stock? getLatestStock() {
-    if (stock.isEmpty) return null;
-    return stock.reduce((a, b) => a.createdAt.isAfter(b.createdAt) ? a : b);
+  List<Stock> stocksByHouse(String houseId) => stock.where((e) => e.warehouse?.id == houseId).toList();
+
+  Stock? getLatestStock([String? warehouseId]) {
+    List<Stock> filteredStock = stock;
+
+    if (warehouseId != null) {
+      filteredStock = stocksByHouse(warehouseId);
+    }
+
+    if (filteredStock.isEmpty) return null;
+
+    return filteredStock.reduce((a, b) => a.createdAt.isAfter(b.createdAt) ? a : b);
   }
 
-  Stock? getOldestStock() {
-    if (stock.isEmpty) return null;
-    return stock.reduce((a, b) => a.createdAt.isBefore(b.createdAt) ? a : b);
+  Stock? getOldestStock([String? warehouseId]) {
+    List<Stock> filteredStock = stock;
+
+    if (warehouseId != null) {
+      filteredStock = stocksByHouse(warehouseId);
+    }
+
+    if (filteredStock.isEmpty) return null;
+
+    return filteredStock.reduce((a, b) => a.createdAt.isBefore(b.createdAt) ? a : b);
   }
 
-  Stock? getEffectiveStock(StockDistPolicy policy) {
+  Stock? getEffectiveStock(StockDistPolicy policy, String? warehouseId) {
     return switch (policy) {
-      StockDistPolicy.newerFirst => getLatestStock(),
-      StockDistPolicy.olderFirst => getOldestStock(),
+      StockDistPolicy.newerFirst => getLatestStock(warehouseId),
+      StockDistPolicy.olderFirst => getOldestStock(warehouseId),
     };
+  }
+}
+
+extension ProductEx on List<Product> {
+  List<Product> filterHouse(WareHouse? house) {
+    if (house == null) return this;
+    return where((e) => e.stock.any((s) => s.warehouse?.id == house.id)).toList();
   }
 }
