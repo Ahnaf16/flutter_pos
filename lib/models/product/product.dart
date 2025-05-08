@@ -137,13 +137,17 @@ class Product {
 
   int get quantity => stock.map((e) => e.quantity).sum;
 
-  int quantityByHouse(String houseId) => stocksByHouse(houseId).map((e) => e.quantity).sum;
+  int quantityByHouse(String? houseId) => stocksByHouse(houseId).map((e) => e.quantity).sum;
+
+  num valueByHouse(String? houseId) => stocksByHouse(houseId).map((e) => e.salesPrice).sum;
+  num totalValueByHouse(String? houseId) => stocksByHouse(houseId).map((e) => e.salesPrice * e.quantity).sum;
 
   String get unitName => unit?.unitName ?? '';
 
   WareHouse? get warehouse => stock.map((e) => e.warehouse).firstOrNull;
 
-  List<Stock> stocksByHouse(String houseId) => stock.where((e) => e.warehouse?.id == houseId).toList();
+  List<Stock> stocksByHouse(String? houseId) =>
+      houseId == null ? stock : stock.where((e) => e.warehouse?.id == houseId).toList();
 
   Stock? getLatestStock([String? warehouseId]) {
     List<Stock> filteredStock = stock;

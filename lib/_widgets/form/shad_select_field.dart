@@ -71,7 +71,6 @@ class ShadSelectField<T> extends ShadFormDecoration<T> {
                          ],
                          onChanged: (value) {
                            state.didChange(value);
-                           onChanged?.call(value);
                          },
                          decoration: state.decoration,
                          allowDeselection: allowDeselection,

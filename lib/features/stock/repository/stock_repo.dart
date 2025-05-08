@@ -20,4 +20,15 @@ class StockRepo with AwHandler {
   FutureReport<Stock> getStockById(String id) async {
     return await db.get(AWConst.collections.stock, id).convert(Stock.fromDoc);
   }
+
+  FutureReport<Document> transferStock(StockTransferState tState) async {
+    cat(tState.toMap());
+
+    final vErr = tState.validate();
+    if (vErr != null) return failure(vErr);
+
+    throw Exception('Not implemented');
+    // final doc = await db.create(AWConst.collections.stock, data: stock.toAwPost());
+    // return doc;
+  }
 }

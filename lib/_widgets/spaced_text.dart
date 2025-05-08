@@ -17,6 +17,7 @@ class SpacedText extends StatelessWidget {
     this.crossAxisAlignment,
     this.builder,
     this.enableSelection = true,
+    this.mainAxisAlignment,
   });
 
   static (TextStyle?, TextStyle?) buildStye(left, right) => (left, right);
@@ -36,6 +37,7 @@ class SpacedText extends StatelessWidget {
 
   final bool spaced;
   final CrossAxisAlignment? crossAxisAlignment;
+  final MainAxisAlignment? mainAxisAlignment;
 
   final Widget Function(String right)? builder;
   final bool enableSelection;
@@ -50,7 +52,7 @@ class SpacedText extends StatelessWidget {
     return GestureDetector(
       onTap: onTap == null ? null : () => onTap?.call(left, right),
       child: Row(
-        mainAxisAlignment: spaced ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+        mainAxisAlignment: spaced ? MainAxisAlignment.spaceBetween : (mainAxisAlignment ?? MainAxisAlignment.start),
         crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.start,
         children: [
           Text('$left$separator', style: lSty),

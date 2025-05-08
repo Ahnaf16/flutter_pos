@@ -17,11 +17,11 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     return InventoryRecordState(type: type);
   }
 
-  void addProduct(Product product, Stock? newStock, String? warehouseId) {
+  void addProduct(Product product, Stock? newStock, WareHouse? warehouse) {
     Stock? stock = newStock;
 
     if (type.isSale) {
-      stock = product.getEffectiveStock(_config.stockDistPolicy, warehouseId);
+      stock = product.getEffectiveStock(_config.stockDistPolicy, warehouse?.id);
     }
     if (stock == null) {
       final msg = type.isSale ? 'Product out of stock' : 'Add a stock first';

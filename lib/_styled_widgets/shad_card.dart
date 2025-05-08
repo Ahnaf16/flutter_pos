@@ -33,6 +33,7 @@ class ShadCard extends StatelessWidget {
     this.childPadding,
     this.childSeparator,
     this.expanded = true,
+    this.rowGap = 0,
   });
 
   /// {@template ShadCard.title}
@@ -159,6 +160,7 @@ class ShadCard extends StatelessWidget {
   /// {@endtemplate}
   final Clip? clipBehavior;
   final bool expanded;
+  final double rowGap;
 
   @override
   Widget build(BuildContext context) {
@@ -203,6 +205,7 @@ class ShadCard extends StatelessWidget {
         mainAxisSize: effectiveRowMainAxisSize,
         mainAxisAlignment: effectiveRowMainAxisAlignment,
         crossAxisAlignment: effectiveRowCrossAxisAlignment,
+        spacing: rowGap,
         children: [
           if (leading != null) leading!,
           Column(

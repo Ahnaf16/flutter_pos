@@ -145,7 +145,7 @@ class CreateRecordView extends HookConsumerWidget {
                     defaultSize: .35,
                     minSize: .2,
                     maxSize: .4,
-                    child: _ProductsPanel(
+                    child: ProductsPanel(
                       type: type,
                       userHouse: user?.warehouse,
                       onProductSelect: recordCtrl().addProduct,
@@ -436,7 +436,8 @@ class _ProductTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(product.name),
-                    Text('${product.manufacturer}', style: context.text.muted.size(12).textHeight(1)),
+                    if (product.manufacturer != null)
+                      Text('${product.manufacturer}', style: context.text.muted.size(12).textHeight(1)),
                     const Gap(Insets.xs),
                     Text('SKU: ${product.sku}', style: context.text.muted.size(12).textHeight(1)),
                   ],
@@ -672,10 +673,10 @@ class _PartiSection extends HookConsumerWidget {
   }
 }
 
-class _ProductsPanel extends HookConsumerWidget {
-  const _ProductsPanel({required this.onProductSelect, required this.type, required this.userHouse});
+class ProductsPanel extends HookConsumerWidget {
+  const ProductsPanel({super.key, required this.onProductSelect, required this.type, required this.userHouse});
 
-  final Function(Product product, Stock? stock, String? warehouseId) onProductSelect;
+  final Function(Product product, Stock? stock, WareHouse? warehouseId) onProductSelect;
   final RecordType type;
   final WareHouse? userHouse;
 
@@ -777,7 +778,7 @@ class _ProductsPanel extends HookConsumerWidget {
                             return GestureDetector(
                               onTap: () async {
                                 if (type.isSale) {
-                                  onProductSelect(product, null, warehouse.value?.id);
+                                  onProductSelect(product, null, warehouse.value);
                                 } else {
                                   final res = await showShadDialog<Stock>(
                                     barrierDismissible: false,
