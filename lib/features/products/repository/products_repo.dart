@@ -1,4 +1,5 @@
 import 'package:appwrite/models.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 
 class ProductRepo with AwHandler {
@@ -22,7 +23,7 @@ class ProductRepo with AwHandler {
     return doc;
   }
 
-  FutureReport<Document> updateProduct(Product product, [PFile? photo]) async {
+  FutureReport<Document> updateProduct(Product product, {PFile? photo, List<String>? include}) async {
     String? oldPhoto;
 
     if (photo != null) {
@@ -38,9 +39,15 @@ class ProductRepo with AwHandler {
       if (error != null) return failure(error ?? 'Error uploading photo');
     }
 
-    final doc = await db.update(AWConst.collections.products, product.id, data: product.toAwPost());
+    final doc = await db.update(AWConst.collections.products, product.id, data: product.toAwPost(include));
     if (oldPhoto != null) await storage.deleteFile(oldPhoto!);
     return doc;
+  }
+
+  FutureReport<Document> linkStockToProduct(Stock stock, String productId) async {
+    final (err, product) = await getProductById(productId).toRecord();
+    if (err != null || product == null) return left(err ?? const Failure('Unable to get product'));
+    return await updateProduct(product.copyWith(stock: [...product.stock, stock]), include: [Product.fields.stock]);
   }
 
   FutureReport<List<Product>> getProducts() async {

@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/inventory_record/view/create_record_view.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/stockTransfer/controller/stock_transfer_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
@@ -14,6 +15,8 @@ class StockTransferView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final user = ref.watch(authStateSyncProvider).toNullable();
+    final policy = ref.watch(configCtrlProvider.select((e) => e.stockDistPolicy));
+
     final warehouseList = ref.watch(warehouseCtrlProvider);
 
     final transferState = ref.watch(stockTransferCtrlProvider);
@@ -130,14 +133,14 @@ class StockTransferView extends HookConsumerWidget {
                                           separator: const ShadSeparator.horizontal(margin: Pads.zero),
                                           title: const Text('Stocks'),
                                           child: ListView.separated(
-                                            itemCount: product.stocksByHouse(from?.id).length,
+                                            itemCount: transferState.sortedStocks(policy).length,
                                             shrinkWrap: true,
                                             physics: const NeverScrollableScrollPhysics(),
                                             separatorBuilder: (_, __) {
                                               return const ShadSeparator.horizontal(margin: Pads.zero);
                                             },
                                             itemBuilder: (BuildContext context, int index) {
-                                              final stock = product.stocksByHouse(from?.id)[index];
+                                              final stock = transferState.sortedStocks(policy)[index];
                                               return Padding(
                                                 padding: Pads.med(),
                                                 child: Row(
@@ -173,6 +176,7 @@ class StockTransferView extends HookConsumerWidget {
                                                         spaced: false,
                                                       ),
                                                     ),
+                                                    Expanded(child: Text(stock.createdAt.formatDate('dd/MMM hh:mm a'))),
                                                     Expanded(
                                                       child: CenterRight(
                                                         child: Text('${stock.quantity} ${product.unitName}'),

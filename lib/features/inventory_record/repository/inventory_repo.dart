@@ -153,12 +153,12 @@ class InventoryRepo with AwHandler {
 
   FutureReport<Document> _linkStockToProduct(Stock stock, Product product) async {
     final repo = locate<ProductRepo>();
-    return await repo.updateProduct(product.copyWith(stock: [...product.stock, stock]));
+    return await repo.linkStockToProduct(stock, product.id);
   }
 
   FutureReport<Document> _updateStockQty(Stock stock, int qty) async {
     final repo = locate<StockRepo>();
-    return await repo.updateStock(stock.copyWith(quantity: stock.quantity - qty));
+    return await repo.updateStock(stock.copyWith(quantity: stock.quantity - qty), [Stock.fields.quantity]);
   }
 
   FutureReport<Document> _updateAccountAmount(String id, num amount) async {

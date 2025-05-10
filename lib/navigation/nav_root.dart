@@ -7,7 +7,7 @@ class NavigationRoot extends HookConsumerWidget {
   final Widget child;
 
   static double expandedPaneSize = 200.0;
-  static double collapsedPaneSize = 60.0;
+  static double collapsedPaneSize = 40.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,12 +18,28 @@ class NavigationRoot extends HookConsumerWidget {
 
     final index = useState(0);
     final expanded = useState(true);
+    final showLabel = useState(true);
     final drawerOpen = useState(false);
 
     useEffect(() {
       index.value = getIndex;
       return null;
     }, [rootPath]);
+
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.layout.isDesktop) {
+          expanded.value = true;
+        } else {
+          expanded.value = false;
+        }
+        Future.delayed(expanded.value ? 250.ms : 0.ms, () {
+          showLabel.value = expanded.value;
+        });
+      });
+
+      return null;
+    }, [context.layout.isDesktop]);
 
     return authUser.when(
       error: (e, s) => ErrorView(e, s, prov: authCtrlProvider),
@@ -35,9 +51,12 @@ class NavigationRoot extends HookConsumerWidget {
             onLeadingPressed: () {
               if (context.layout.isMobile) drawerOpen.toggle();
               if (!context.layout.isMobile) expanded.toggle();
+              Future.delayed(expanded.value ? 250.ms : 0.ms, () {
+                showLabel.toggle();
+              });
             },
           ),
-          body: _BODY(expanded: expanded, drawerOpen: drawerOpen, index: index, child: child),
+          body: _BODY(expanded: expanded, showLabel: showLabel, drawerOpen: drawerOpen, index: index, child: child),
         );
       },
     );
@@ -136,9 +155,16 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
 }
 
 class _BODY extends HookWidget {
-  const _BODY({required this.expanded, required this.drawerOpen, required this.index, required this.child});
+  const _BODY({
+    required this.expanded,
+    required this.showLabel,
+    required this.drawerOpen,
+    required this.index,
+    required this.child,
+  });
 
   final ValueNotifier<bool> expanded;
+  final ValueNotifier<bool> showLabel;
   final ValueNotifier<bool> drawerOpen;
   final ValueNotifier<int> index;
   final Widget child;
@@ -149,18 +175,21 @@ class _BODY extends HookWidget {
       padding: Pads.med(),
       child: LimitedWidthBox(
         maxWidth: expanded.value ? NavigationRoot.expandedPaneSize : NavigationRoot.collapsedPaneSize,
+        center: false,
         child: IntrinsicWidth(
           child: Column(
             spacing: Insets.xs,
             crossAxisAlignment: CrossAxisAlignment.stretch,
+
             children: [
               for (final (text, icon, path) in _items)
                 if (!expanded.value && icon == null)
                   const SizedBox.shrink()
                 else
                   NavButton(
-                    text: text,
+                    label: text,
                     icon: icon,
+                    showLabel: showLabel.value,
                     expanded: expanded.value,
                     selected: index.value == _items.indexOf((text, icon, path)),
                     onPressed: () {
@@ -181,6 +210,7 @@ class _BODY extends HookWidget {
             const ShadSeparator.horizontal(margin: Pads.zero),
             Expanded(
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (!context.layout.isMobile) navItems,
                   if (!context.layout.isMobile) const ShadSeparator.vertical(margin: Pads.zero),
@@ -199,42 +229,76 @@ class _BODY extends HookWidget {
 class NavButton extends HookWidget {
   const NavButton({
     super.key,
-    required this.text,
+    required this.label,
     this.icon,
     this.onPressed,
     this.selected = false,
-    this.expanded = true,
+    this.showLabel = true,
+    this.expanded = false,
   });
 
-  final String text;
+  final String label;
   final IconData? icon;
   final bool selected;
+  final bool showLabel;
   final bool expanded;
   final Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    if (icon == null && expanded) return DecoContainer(padding: Pads.padding(top: Insets.sm), child: Text(text));
+    if (icon == null && expanded) {
+      return DecoContainer(
+        padding: Pads.padding(top: Insets.sm),
+        child: Text(label, maxLines: 1).animate().fadeIn(duration: 250.ms),
+      );
+    }
 
-    return ShadButton(
-      key: ValueKey(text),
-      mainAxisAlignment: expanded ? MainAxisAlignment.start : null,
-      backgroundColor: selected ? context.colors.primary.op2 : Colors.transparent,
-      hoverBackgroundColor: context.colors.primary.op1,
-      hoverForegroundColor: context.colors.foreground,
-      foregroundColor: context.colors.foreground,
-      onPressed: onPressed,
-      leading: Icon(icon),
-      child:
-          !expanded
-              ? null
-              : Flexible(
-                child: OverflowMarquee(
-                  step: 50,
-                  delayDuration: 2.seconds,
-                  child: Text(text, overflow: TextOverflow.ellipsis, maxLines: 1),
-                ),
-              ),
+    Widget? child;
+
+    if (showLabel) {
+      child = OverflowMarquee(
+        step: 50,
+        delayDuration: 2.seconds,
+        child: Text(label, overflow: TextOverflow.ellipsis, maxLines: 1),
+      ).animate().fadeIn(duration: 100.ms);
+    } else {
+      child = null;
+    }
+
+    final hovered = useState(false);
+    final tapDown = useState(false);
+
+    Color color = selected ? context.colors.primary.op2 : Colors.transparent;
+
+    if (hovered.value) {
+      color = selected ? context.colors.primary.op3 : context.colors.border;
+    }
+    if (tapDown.value) {
+      color = context.colors.primary.op3;
+    }
+
+    return MouseRegion(
+      onEnter: (_) => hovered.value = true,
+      onExit: (_) => hovered.value = false,
+      child: GestureDetector(
+        onTap: onPressed,
+        onTapDown: (_) => tapDown.value = true,
+        onTapCancel: () => tapDown.value = false,
+        onTapUp: (_) => tapDown.value = false,
+        child: ShadCard(
+          height: 45,
+          padding: Pads.med(),
+          backgroundColor: color,
+          expanded: false,
+          border: const Border(),
+          shadows: const [],
+          rowCrossAxisAlignment: CrossAxisAlignment.center,
+          columnMainAxisAlignment: MainAxisAlignment.center,
+          childPadding: Pads.med('l'),
+          leading: Icon(icon),
+          child: child,
+        ),
+      ),
     );
   }
 }

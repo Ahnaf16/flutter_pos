@@ -23,6 +23,7 @@ class AuthCtrl extends _$AuthCtrl {
 
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
+      ref.invalidate(currentUserProvider);
       return rightResult('Login successful');
     });
   }
@@ -49,8 +50,5 @@ class AuthStateSync extends _$AuthStateSync {
 FutureOr<AppUser?> currentUser(Ref ref) async {
   final repo = locate<AuthRepo>();
   final user = await repo.currentUser();
-  return user.fold((l) => null, (r) {
-    ref.read(authStateSyncProvider.notifier)._set(r);
-    return r;
-  });
+  return user.fold(identityNull, identity);
 }

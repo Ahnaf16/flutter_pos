@@ -48,7 +48,7 @@ class StockTransferCtrl extends _$StockTransferCtrl {
   }
 
   Future<Result> submit() async {
-    final res = await _repo.transferStock(state);
+    final res = await _repo.transferStock(state, _config.stockDistPolicy);
 
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();

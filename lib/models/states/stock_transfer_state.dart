@@ -66,4 +66,31 @@ class StockTransferState {
     'dealer_price': dealerPrice,
     'quantity': quantity,
   };
+
+  List<Stock> sortedStocks(StockDistPolicy p) {
+    if (product == null) return [];
+    if (from == null) return [];
+
+    final list = switch (p) {
+      StockDistPolicy.newerFirst => product!.sortByNewest(from!.id),
+      StockDistPolicy.olderFirst => product!.sortByOldest(from!.id),
+    };
+
+    return list;
+  }
+
+  Stock? constrictStockToSend() {
+    if (to == null) return null;
+    final stock = Stock(
+      id: '',
+      purchasePrice: purchasePrice ?? 0,
+      salesPrice: salesPrice ?? 0,
+      wholesalePrice: wholesalePrice ?? 0,
+      dealerPrice: dealerPrice ?? 0,
+      quantity: quantity,
+      warehouse: to,
+      createdAt: DateTime.now(),
+    );
+    return stock;
+  }
 }

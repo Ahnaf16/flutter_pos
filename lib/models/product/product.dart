@@ -100,16 +100,36 @@ class Product {
     'manufacturer': manufacturer,
   };
 
-  QMap toAwPost() => {
-    'name': name,
-    'description': description,
-    'sku': sku,
-    'photo': photo,
-    'unit': unit?.id,
-    'stock': stock.map((e) => e.id).toList(),
-    'manage_stock': manageStock,
-    'manufacturer': manufacturer,
-  };
+  // QMap toAwPost() => {
+  //   'name': name,
+  //   'description': description,
+  //   'sku': sku,
+  //   'photo': photo,
+  //   'unit': unit?.id,
+  //   'stock': stock.map((e) => e.id).toList(),
+  //   'manage_stock': manageStock,
+  //   'manufacturer': manufacturer,
+  // };
+  Map<String, dynamic> toAwPost([List<String>? include]) {
+    final map = <String, dynamic>{};
+
+    void add(String key, dynamic value) {
+      if (include == null || include.contains(key)) {
+        map[key] = value;
+      }
+    }
+
+    add(fields.name, name);
+    add(fields.description, description);
+    add(fields.sku, sku);
+    add(fields.photo, photo);
+    add(fields.unit, unit?.id);
+    add(fields.stock, stock.map((e) => e.id).toList());
+    add(fields.manageStock, manageStock);
+    add(fields.manufacturer, manufacturer);
+
+    return map;
+  }
 
   Product copyWith({
     String? id,
@@ -134,6 +154,8 @@ class Product {
       manufacturer: manufacturer ?? this.manufacturer,
     );
   }
+
+  static final fields = _ProductFiled();
 
   int get quantity => stock.map((e) => e.quantity).sum;
 
@@ -179,6 +201,41 @@ class Product {
       StockDistPolicy.olderFirst => getOldestStock(warehouseId),
     };
   }
+
+  List<Stock> sortByNewest([String? warehouseId]) {
+    List<Stock> filteredStock = stock;
+
+    if (warehouseId != null) {
+      filteredStock = stocksByHouse(warehouseId);
+    }
+
+    filteredStock.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    return filteredStock;
+  }
+
+  List<Stock> sortByOldest([String? warehouseId]) {
+    List<Stock> filteredStock = stock;
+
+    if (warehouseId != null) {
+      filteredStock = stocksByHouse(warehouseId);
+    }
+
+    filteredStock.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+    return filteredStock;
+  }
+}
+
+class _ProductFiled {
+  final String name = 'name';
+  final String description = 'description';
+  final String sku = 'sku';
+  final String photo = 'photo';
+  final String unit = 'unit';
+  final String stock = 'stock';
+  final String manageStock = 'manage_stock';
+  final String manufacturer = 'manufacturer';
 }
 
 extension ProductEx on List<Product> {

@@ -36,17 +36,6 @@ class Stock {
     );
   }
 
-  static Stock empty() => Stock(
-    id: '',
-    purchasePrice: 0,
-    salesPrice: 0,
-    wholesalePrice: 0,
-    dealerPrice: 0,
-    quantity: 0,
-    warehouse: null,
-    createdAt: DateTime.now(),
-  );
-
   num get getProfitLoss {
     return (salesPrice - purchasePrice) * quantity;
   }
@@ -101,14 +90,25 @@ class Stock {
     'createdAt': createdAt.toString(),
   };
 
-  Map<String, dynamic> toAwPost() => {
-    'purchase_price': purchasePrice,
-    'sales_price': salesPrice,
-    'wholesale_price': wholesalePrice,
-    'dealer_price': dealerPrice,
-    'quantity': quantity,
-    'warehouse': warehouse?.id,
-  };
+  // if include is null, all fields will be included
+  Map<String, dynamic> toAwPost([List<String>? include]) {
+    final map = <String, dynamic>{};
+
+    void add(String key, dynamic value) {
+      if (include == null || include.contains(key)) {
+        map[key] = value;
+      }
+    }
+
+    add(fields.purchasePrice, purchasePrice);
+    add(fields.salesPrice, salesPrice);
+    add(fields.wholesalePrice, wholesalePrice);
+    add(fields.dealerPrice, dealerPrice);
+    add(fields.quantity, quantity);
+    add(fields.warehouse, warehouse?.id);
+
+    return map;
+  }
 
   Stock copyWith({
     String? id,
@@ -131,4 +131,28 @@ class Stock {
       createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  static final fields = _StockFields();
+
+  static Stock empty() => Stock(
+    id: '',
+    purchasePrice: 0,
+    salesPrice: 0,
+    wholesalePrice: 0,
+    dealerPrice: 0,
+    quantity: 0,
+    warehouse: null,
+    createdAt: DateTime.now(),
+  );
+}
+
+class _StockFields {
+  final purchasePrice = 'purchase_price';
+  final salesPrice = 'sales_price';
+  final wholesalePrice = 'wholesale_price';
+  final dealerPrice = 'dealer_price';
+  final quantity = 'quantity';
+  final warehouse = 'warehouse';
+
+  List<String> get all => [purchasePrice, salesPrice, wholesalePrice, dealerPrice, quantity, warehouse];
 }

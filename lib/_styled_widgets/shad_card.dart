@@ -34,6 +34,7 @@ class ShadCard extends StatelessWidget {
     this.childSeparator,
     this.expanded = true,
     this.rowGap = 0,
+    this.animated = false,
   });
 
   /// {@template ShadCard.title}
@@ -161,6 +162,7 @@ class ShadCard extends StatelessWidget {
   final Clip? clipBehavior;
   final bool expanded;
   final double rowGap;
+  final bool animated;
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +192,8 @@ class ShadCard extends StatelessWidget {
 
     final effectiveClipBehavior = clipBehavior ?? theme.cardTheme.clipBehavior ?? Clip.antiAlias;
 
-    return Container(
+    return AnimatedContainer(
+      duration: animated ? 250.ms : 0.ms,
       width: width,
       height: height,
       padding: effectivePadding,

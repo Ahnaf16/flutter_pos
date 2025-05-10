@@ -28,7 +28,7 @@ class UpdateProductCtrl extends _$UpdateProductCtrl {
 
     if (product == null) return (false, 'Product not found');
 
-    final res = await _repo.updateProduct(product, file);
+    final res = await _repo.updateProduct(product, photo: file);
     return res.fold(leftResult, (r) {
       ref.invalidate(productsCtrlProvider);
       return rightResult('Product updated successfully');
