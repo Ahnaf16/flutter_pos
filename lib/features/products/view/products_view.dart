@@ -1,3 +1,4 @@
+import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -10,6 +11,8 @@ class ProductsView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productList = ref.watch(productsCtrlProvider);
+    final viewingWh = ref.watch(viewingWHProvider);
+
     return BaseBody(
       title: 'Products',
       actions: [
@@ -43,13 +46,19 @@ class ProductsView extends HookConsumerWidget {
             },
             cellAlignment: Alignment.centerLeft,
             cellBuilder: (data, head) {
+              final hId = (viewingWh == null) ? null : viewingWh.id;
               return switch (head.$1) {
                 'Name' => DataGridCell(columnName: head.$1, value: nameCellBuilder(data)),
                 'Warehouse' => DataGridCell(
                   columnName: head.$1,
-                  value: Text(data.stock.firstWhereOrNull((e) => e.warehouse != null)?.warehouse?.name ?? '--'),
+                  value: Text(
+                    data.stocksByHouse(hId).firstWhereOrNull((e) => e.warehouse != null)?.warehouse?.name ?? '--',
+                  ),
                 ),
-                'Stock' => DataGridCell(columnName: head.$1, value: Text('${data.quantity}${data.unitName}')),
+                'Stock' => DataGridCell(
+                  columnName: head.$1,
+                  value: Text('${data.quantityByHouse(hId)}${data.unitName}'),
+                ),
                 'Pricing' => DataGridCell(columnName: head.$1, value: _priceCellBuilder(data)),
                 'Action' => DataGridCell(
                   columnName: head.$1,

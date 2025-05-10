@@ -105,7 +105,7 @@ class InventoryRecordView extends HookConsumerWidget {
         children: [
           OverflowMarquee(child: Text(parti?.name ?? '--', style: context.text.list)),
           if (parti != null) OverflowMarquee(child: Text('Phone: ${parti.phone}')),
-          if (parti != null) OverflowMarquee(child: Text('Email: ${parti.email}')),
+          if (parti?.email != null) OverflowMarquee(child: Text('Email: ${parti!.email}')),
         ],
       );
     },

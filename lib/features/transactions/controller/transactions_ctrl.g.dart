@@ -7,7 +7,7 @@ part of 'transactions_ctrl.dart';
 // **************************************************************************
 
 String _$transactionLogCtrlHash() =>
-    r'83535700d865d58abf685f15b1fcc251ffce8d80';
+    r'd962c30db1f85437f523d622f34d9dc83fdcfa40';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -1,4 +1,3 @@
-import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/warehouse/repository/warehouse_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -11,10 +10,16 @@ class WarehouseCtrl extends _$WarehouseCtrl {
   @override
   Future<List<WareHouse>> build() async {
     final staffs = await _repo.getWareHouses();
-    return staffs.fold((l) {
-      Toast.showErr(Ctx.context, l);
-      return [];
-    }, identity);
+    return staffs.fold(
+      (l) {
+        Toast.showErr(Ctx.context, l);
+        return [];
+      },
+      (r) {
+        r.sort((a, b) => a.isDefault ? -1 : 1);
+        return r;
+      },
+    );
   }
 
   Future<Result> createWarehouse(QMap formData) async {

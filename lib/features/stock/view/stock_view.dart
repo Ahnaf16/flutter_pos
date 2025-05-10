@@ -1,3 +1,4 @@
+import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -8,6 +9,8 @@ class StockView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productList = ref.watch(productsCtrlProvider);
+    final viewingWh = ref.watch(viewingWHProvider);
+
     final scrCtrl = useScrollController();
     return BaseBody(
       title: 'Stocks',
@@ -40,7 +43,9 @@ class StockView extends HookConsumerWidget {
               data: (products) {
                 return CustomScrollView(
                   slivers: [
-                    MultiSliver(children: [for (final product in products) _ProductSection(model: product)]),
+                    MultiSliver(
+                      children: [for (final product in products) _ProductSection(model: product, wh: viewingWh)],
+                    ),
                   ],
                 );
               },
@@ -53,9 +58,10 @@ class StockView extends HookConsumerWidget {
 }
 
 class _ProductSection extends StatelessWidget {
-  const _ProductSection({required this.model});
+  const _ProductSection({required this.model, this.wh});
 
   final Product model;
+  final WareHouse? wh;
 
   @override
   Widget build(BuildContext context) {
@@ -87,13 +93,14 @@ class _ProductSection extends StatelessWidget {
         ),
       );
     }
+    final stocks = wh == null ? model.stock : model.stock.where((s) => s.warehouse?.id == wh?.id).toList();
     final list = SliverPadding(
       padding: Pads.padding(padding: _ProductHeader.topInset),
       sliver: SliverList.separated(
-        itemCount: model.stock.length,
+        itemCount: stocks.length,
         separatorBuilder: (_, _) => const ShadSeparator.horizontal(margin: Pads.zero),
         itemBuilder: (context, index) {
-          final stock = model.stock[index];
+          final stock = stocks[index];
           return Padding(
             padding: Pads.sm(),
             child: Row(

@@ -50,7 +50,7 @@ class ProductRepo with AwHandler {
     return await updateProduct(product.copyWith(stock: [...product.stock, stock]), include: [Product.fields.stock]);
   }
 
-  FutureReport<List<Product>> getProducts() async {
+  FutureReport<List<Product>> getProducts({WareHouse? warehouse}) async {
     return await db.getList(AWConst.collections.products).convert((docs) => docs.convertDoc(Product.fromDoc));
   }
 

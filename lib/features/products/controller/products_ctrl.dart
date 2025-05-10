@@ -1,4 +1,5 @@
 import 'package:appwrite/models.dart';
+import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/products/repository/products_repo.dart';
 import 'package:pos/features/stock/repository/stock_repo.dart';
 import 'package:pos/main.export.dart';
@@ -9,19 +10,25 @@ part 'products_ctrl.g.dart';
 @riverpod
 class ProductsCtrl extends _$ProductsCtrl {
   final _repo = locate<ProductRepo>();
+
   final List<Product> _searchFrom = [];
+
   @override
   Future<List<Product>> build() async {
+    final viewingWh = ref.watch(viewingWHProvider);
+
     final staffs = await _repo.getProducts();
+
     return staffs.fold(
       (l) {
         Toast.showErr(Ctx.context, l);
         return [];
       },
       (r) {
+        final p = r.filterHouse(viewingWh);
         _searchFrom.clear();
-        _searchFrom.addAll(r);
-        return r;
+        _searchFrom.addAll(p);
+        return p;
       },
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
+import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
@@ -683,143 +684,119 @@ class ProductsPanel extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productList = ref.watch(productsCtrlProvider);
-    final houseList = ref.watch(warehouseCtrlProvider);
+    final viewingWh = ref.watch(viewingWHProvider);
     final productCtrl = useCallback(() => ref.read(productsCtrlProvider.notifier));
     final search = useTextEditingController();
-    final warehouse = useState<WareHouse?>(userHouse);
 
     return productList.when(
       loading: () => const Loading(),
       error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
       data: (products) {
-        return houseList.when(
-          loading: () => const Loading(),
-          error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
-          data: (houses) {
-            products = products.filterHouse(warehouse.value);
-            return IntrinsicWidth(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: Pads.sm('lrt'),
-                    child: ShadTextField(
-                      controller: search,
-                      hintText: 'Search',
-                      onChanged: (v) => productCtrl().search(v ?? ''),
-                      showClearButton: true,
-                    ),
+        final hId = (viewingWh == null) ? null : viewingWh.id;
+        return IntrinsicWidth(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: Pads.sm('lrt'),
+                child: ShadTextField(
+                  controller: search,
+                  hintText: 'Search',
+                  onChanged: (v) => productCtrl().search(v ?? ''),
+                  showClearButton: true,
+                ),
+              ),
+
+              const ShadSeparator.horizontal(),
+              Expanded(
+                child: GridView.builder(
+                  padding: Pads.med('blr'),
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 150,
+                    mainAxisSpacing: Insets.sm,
+                    crossAxisSpacing: Insets.sm,
                   ),
-                  if (userHouse?.isDefault == true)
-                    Padding(
-                      padding: Pads.sm('lr'),
-                      child: ShadSelect<WareHouse>(
-                        initialValue: warehouse.value,
-                        placeholder: const Text('All'),
-                        selectedOptionBuilder: (_, v) => Text(v.name),
-                        itemCount: houses.length,
-                        options: [
-                          for (final house in houses) ShadOption<WareHouse>(value: house, child: Text(house.name)),
-                        ],
-                        onChanged: (v) => warehouse.value = v,
-                        allowDeselection: true,
-                      ),
-                    ),
-                  const ShadSeparator.horizontal(),
-                  Expanded(
-                    child: GridView.builder(
-                      padding: Pads.med('blr'),
-                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 150,
-                        mainAxisSpacing: Insets.sm,
-                        crossAxisSpacing: Insets.sm,
-                      ),
-                      itemCount: products.length,
-                      itemBuilder: (context, index) {
-                        final product = products[index];
-                        final qty =
-                            warehouse.value == null ? product.quantity : product.quantityByHouse(warehouse.value!.id);
-                        return HoverBuilder(
-                          child: ShadCard(
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                DecoContainer(
-                                  color: context.colors.border,
-                                  borderRadius: Corners.sm,
-                                  alignment: Alignment.center,
-                                  child: HostedImage.square(product.getPhoto, radius: Corners.sm),
-                                ),
-                                Positioned(
-                                  bottom: 0,
-                                  left: -1,
-                                  right: -1,
-                                  child: DecoContainer(
-                                    color: context.colors.border.op8,
-                                    alignment: Alignment.center,
-                                    child: Text(product.name, maxLines: 3),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 3,
-                                  right: 3,
-                                  child: ShadBadge.raw(
-                                    variant:
-                                        product.quantity <= 0
-                                            ? ShadBadgeVariant.destructive
-                                            : ShadBadgeVariant.secondary,
-                                    child: Text('$qty${product.unitName}'),
-                                  ),
-                                ),
-                              ],
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    final qty = product.quantityByHouse(hId);
+                    return HoverBuilder(
+                      child: ShadCard(
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            DecoContainer(
+                              color: context.colors.border,
+                              borderRadius: Corners.sm,
+                              alignment: Alignment.center,
+                              child: HostedImage.square(product.getPhoto, radius: Corners.sm),
                             ),
-                          ),
-                          builder: (hovering, child) {
-                            return GestureDetector(
-                              onTap: () async {
-                                if (type.isSale) {
-                                  onProductSelect(product, null, warehouse.value);
-                                } else {
-                                  final res = await showShadDialog<Stock>(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (context) => const _AddStockDialog(),
-                                  );
-                                  onProductSelect(product, res, null);
-                                }
-                              },
-                              child: Stack(
-                                children: [
-                                  child,
-                                  Positioned.fill(
-                                    child: DecoContainer.animated(
-                                      duration: 250.ms,
-                                      color: hovering ? context.colors.border.op7 : Colors.transparent,
-                                      alignment: Alignment.center,
-                                      borderRadius: Corners.med,
-                                      child:
-                                          hovering
-                                              ? DecoContainer(
-                                                color: context.colors.primary.op9,
-                                                borderRadius: Corners.circle,
-                                                padding: Pads.sm(),
-                                                child: Icon(LuIcons.plus, color: context.colors.primaryForeground),
-                                              )
-                                              : null,
-                                    ),
-                                  ),
-                                ],
+                            Positioned(
+                              bottom: 0,
+                              left: -1,
+                              right: -1,
+                              child: DecoContainer(
+                                color: context.colors.border.op8,
+                                alignment: Alignment.center,
+                                child: Text(product.name, maxLines: 3),
                               ),
-                            );
+                            ),
+                            Positioned(
+                              top: 3,
+                              right: 3,
+                              child: ShadBadge.raw(
+                                variant:
+                                    product.quantity <= 0 ? ShadBadgeVariant.destructive : ShadBadgeVariant.secondary,
+                                child: Text('$qty${product.unitName}'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      builder: (hovering, child) {
+                        return GestureDetector(
+                          onTap: () async {
+                            if (type.isSale) {
+                              onProductSelect(product, null, viewingWh);
+                            } else {
+                              final res = await showShadDialog<Stock>(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) => const _AddStockDialog(),
+                              );
+                              onProductSelect(product, res, null);
+                            }
                           },
+                          child: Stack(
+                            children: [
+                              child,
+                              Positioned.fill(
+                                child: DecoContainer.animated(
+                                  duration: 250.ms,
+                                  color: hovering ? context.colors.border.op7 : Colors.transparent,
+                                  alignment: Alignment.center,
+                                  borderRadius: Corners.med,
+                                  child:
+                                      hovering
+                                          ? DecoContainer(
+                                            color: context.colors.primary.op9,
+                                            borderRadius: Corners.circle,
+                                            padding: Pads.sm(),
+                                            child: Icon(LuIcons.plus, color: context.colors.primaryForeground),
+                                          )
+                                          : null,
+                                ),
+                              ),
+                            ],
+                          ),
                         );
                       },
-                    ),
-                  ),
-                ],
+                    );
+                  },
+                ),
               ),
-            );
-          },
+            ],
+          ),
         );
       },
     );

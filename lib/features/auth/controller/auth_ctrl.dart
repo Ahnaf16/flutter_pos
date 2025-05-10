@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/auth/repository/auth_repo.dart';
+import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -14,6 +15,7 @@ class AuthCtrl extends _$AuthCtrl {
     final user = await _repo.currentUser();
     return user.fold((l) => null, (r) {
       ref.read(authStateSyncProvider.notifier)._set(r);
+
       return r;
     });
   }
@@ -50,5 +52,8 @@ class AuthStateSync extends _$AuthStateSync {
 FutureOr<AppUser?> currentUser(Ref ref) async {
   final repo = locate<AuthRepo>();
   final user = await repo.currentUser();
-  return user.fold(identityNull, identity);
+  return user.fold(identityNull, (r) {
+    ref.read(viewingWHProvider.notifier).updateHouse(r.warehouse);
+    return r;
+  });
 }

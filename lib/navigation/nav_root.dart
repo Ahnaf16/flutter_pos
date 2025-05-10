@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
+import 'package:pos/features/home/controller/home_ctrl.dart';
+import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class NavigationRoot extends HookConsumerWidget {
@@ -73,10 +75,21 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeCtrl = useCallback(() => ref.read(themeProvider.notifier));
     final themeMode = ref.watch(themeProvider).mode;
-
     final popCtrl = useMemoized(ShadPopoverController.new);
-
     final user = this.user;
+    final viewingWh = ref.watch(viewingWHProvider);
+    final houseList = useState(<WareHouse>[]);
+
+    void fetchHouses() async {
+      if (user?.warehouse?.isDefault != true) return;
+      final houses = await ref.read(warehouseCtrlProvider.future);
+      houseList.value = houses;
+    }
+
+    useEffect(() {
+      fetchHouses();
+      return null;
+    }, const []);
 
     return AppBar(
       title: const Text(kAppName),
@@ -101,6 +114,27 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
           ),
           const Gap(Insets.lg),
         ],
+        if (houseList.value.isNotEmpty)
+          ShadSelect<WareHouse>(
+            maxWidth: 200,
+            initialValue: viewingWh,
+            placeholder: const Text('All'),
+            decoration: ShadDecoration(
+              border: ShadBorder.all(),
+              secondaryFocusedBorder: ShadBorder.all(color: Colors.transparent),
+            ),
+            selectedOptionBuilder: (_, v) => Text(v.name),
+            options: [
+              ...houseList.value.map(
+                (e) => ShadOption(value: e, orderPolicy: const OrderPolicy.reverse(), child: Text(e.name)),
+              ),
+            ],
+            onChanged: (v) {
+              ref.read(viewingWHProvider.notifier).updateHouse(v);
+            },
+            allowDeselection: true,
+          ),
+        const Gap(Insets.lg),
         ShadPopover(
           controller: popCtrl,
           padding: Pads.padding(v: Insets.med, h: Insets.lg),

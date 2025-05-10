@@ -6,7 +6,7 @@ part of 'record_editing_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$recordEditingCtrlHash() => r'aa9e831aa97a531382b6a95497a42629ad2d0b0e';
+String _$recordEditingCtrlHash() => r'13cf0a0f4620a32b7d0a4699fc36cc5f81b54ba0';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -71,4 +71,14 @@ class StaffRepo with AwHandler {
 
     return users.convert((r) => r.firstOrNull);
   }
+
+  FutureReport<AppUser?> updateWarehouse(AppUser user, WareHouse house) async {
+    final doc = await db.update(
+      AWConst.collections.users,
+      user.id,
+      data: user.copyWith(warehouse: () => house).toAwPost(),
+    );
+
+    return doc.convert(AppUser.fromDoc);
+  }
 }
