@@ -108,6 +108,50 @@ class InventoryRepo with AwHandler {
     return doc;
   }
 
+  FutureReport<Document> returnSale(InventoryRecord record, Map<String, int> data, {bool coverVatShip = false}) async {
+    num totalPrice = 0;
+    // //! update stock qty
+    for (final MapEntry(:key, :value) in data.entries) {
+      final detail = record.details.firstWhere((e) => e.id == key);
+      totalPrice = totalPrice + detail.totalPrice(value);
+
+      // final (stockErr, stockData) = await _updateStockQty(detail.stock, -value).toRecord();
+      // if (stockErr != null || stockData == null) return left(stockErr ?? Failure(_generalFailure));
+    }
+
+    final vatShip = coverVatShip ? (record.vat + record.shipping) : 0;
+
+    totalPrice = (totalPrice + vatShip) - record.discount;
+
+    //! update account amount
+    final acc = record.account;
+    final minAmount = totalPrice < record.amount ? record.amount : totalPrice;
+    cat('minAmount:: $minAmount');
+
+    // final (accErr, accData) = await _updateAccountAmount(acc.id, -minAmount).toRecord();
+    // if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
+
+    final remaining = totalPrice - minAmount;
+
+    //! update Due
+    final Parti? parti = record.parti;
+    if (parti != null) {
+      final due = record.due + record.dueBalance;
+      cat('due:: $due');
+      cat('remaining:: $remaining');
+
+      if (due >= remaining) {
+        cat('${(parti.due) + (-remaining)}');
+
+        // final (partiErr, partiData) = await _updateDue(parti.id, -remaining, record.type).toRecord();
+        // if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
+        // parti = Parti.fromDoc(partiData);
+      }
+    }
+
+    return failure('---WIP---');
+  }
+
   /// For sale: stock exist, so just create details and update stock qty
   /// For purchase: stock not exist, so create stock and link it the product and details
   FutureReport<List<InventoryDetails>> _createRecordDetails(List<InventoryDetails> details, bool isSale) async {

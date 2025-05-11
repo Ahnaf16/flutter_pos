@@ -1,4 +1,7 @@
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
+import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -223,74 +226,52 @@ class _ReturnDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isSale = inventory.type.isSale;
-    final InventoryRecord(:account, :amount, :dueBalance, :parti) = inventory;
+    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     return ShadDialog(
       title: const Text('Return'),
       description: const Text('Do you want to return this inventory?'),
 
       actions: [
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
-        SubmitButton(onPressed: (l) {}, child: const Text('Return')),
+        SubmitButton(
+          onPressed: (l) {
+            final state = formKey.currentState!;
+            if (!state.saveAndValidate()) return;
+
+            final data = state.value;
+            final ctrl = ref.read(recordEditingCtrlProvider(inventory.type).notifier);
+            ctrl.returnInventory(inventory, data);
+          },
+          child: const Text('Return'),
+        ),
       ],
       child: Container(
         padding: Pads.padding(v: Insets.med),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: Insets.sm,
-          children: [
-            const Text('After return: '),
-
-            SpacedText(
-              left: 'Account',
-              right: account.name,
-              styleBuilder: (l, r) => (l, r.bold),
-              spaced: false,
-              crossAxisAlignment: CrossAxisAlignment.center,
-            ),
-            SpacedText(
-              left: isSale ? 'Received' : 'Paid',
-              right: amount.currency(),
-              styleBuilder: (l, r) => (l, r.bold),
-              spaced: false,
-              crossAxisAlignment: CrossAxisAlignment.center,
-            ),
-            SpacedText(
-              left: 'Account balance',
-              right: '${(account.amount).currency()} (${isSale ? '-' : '+'} ${amount.currency()})',
-              styleBuilder: (l, r) => (l, r.bold),
-              spaced: false,
-              crossAxisAlignment: CrossAxisAlignment.center,
-            ),
-            if (parti != null) ...[
-              SpacedText(
-                left: 'Parti',
-                right: '${parti.name} (${parti.phone})',
-                styleBuilder: (l, r) => (l, r.bold),
-                spaced: false,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                trailing: SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(parti.phone)),
-              ),
-              if (dueBalance != 0) ...[
-                SpacedText(
-                  left: isSale ? 'Balance used' : 'Due used',
-                  right: dueBalance.currency(),
-                  styleBuilder: (l, r) => (l, r.bold),
-                  spaced: false,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                ),
-                SpacedText(
-                  left: isSale ? 'Parti balance' : 'Parti due',
-                  right:
-                      '${parti.due.abs().currency()} (${dueBalance.isNegative ? '-' : '+'} ${dueBalance.currency()})',
-                  styleBuilder: (l, r) => (l, r.bold),
-                  spaced: false,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+        child: FormBuilder(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: Insets.sm,
+            children: [
+              for (final p in inventory.details) ...[
+                Text(p.product.name, style: context.text.list),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ShadTextField(
+                        name: p.id,
+                        label: 'Return Quantity',
+                        initialValue: p.quantity.toString(),
+                        numeric: true,
+                        validators: [FormBuilderValidators.min(1), FormBuilderValidators.max(p.quantity)],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ],
-          ],
+          ),
         ),
       ),
     );

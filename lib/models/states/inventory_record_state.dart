@@ -71,7 +71,7 @@ class InventoryRecordState {
 
   num calculateDiscount() => discountType == DiscountType.flat ? discount : (subtotal() * discount) / 100;
 
-  num subtotal() => details.map((e) => e.totalPriceByType(type)).sum;
+  num subtotal() => details.map((e) => e.totalPrice()).sum;
 
   num totalPrice() => (subtotal() + shipping + vat) - calculateDiscount();
 

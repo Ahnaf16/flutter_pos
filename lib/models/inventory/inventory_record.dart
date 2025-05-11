@@ -163,7 +163,7 @@ class InventoryRecord {
 
   num calculateDiscount() => discountType == DiscountType.flat ? discount : (subtotal * discount) / 100;
 
-  num get subtotal => details.map((e) => e.totalPriceByType(type)).sum;
+  num get subtotal => details.map((e) => e.totalPrice()).sum;
   num get total => (subtotal + shipping + vat) - calculateDiscount();
 
   num get due => total - amount - dueBalance;
@@ -202,3 +202,9 @@ class InventoryRecord {
     );
   }
 }
+
+
+// class  ReturnRecord {
+//   final InventoryRecord record;
+//   final Map<String, int> data;
+// }

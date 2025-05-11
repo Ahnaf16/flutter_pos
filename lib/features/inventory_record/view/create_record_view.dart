@@ -81,7 +81,10 @@ class CreateRecordView extends HookConsumerWidget {
                                         detail: detail,
                                         index: index,
                                         type: type,
-                                        onQtyChange: (q) => recordCtrl().changeQuantity(detail, (_) => q),
+                                        onChange: (p, q) {
+                                          recordCtrl().changeQuantity(detail, (_) => q);
+                                          recordCtrl().updatePrice(detail, p);
+                                        },
                                         onProductRemove: (pId) => recordCtrl().removeProduct(pId, detail.stock.id),
                                       );
                                     },
@@ -402,21 +405,22 @@ class _ProductTile extends StatelessWidget {
   const _ProductTile({
     required this.detail,
     required this.index,
-    required this.onQtyChange,
+    required this.onChange,
     required this.onProductRemove,
     required this.type,
   });
 
   final InventoryDetails detail;
   final int index;
-  final Function(int qty) onQtyChange;
+  final Function(num price, int qty) onChange;
+
   final Function(String pId) onProductRemove;
   final RecordType type;
 
   @override
   Widget build(BuildContext context) {
     final isSale = type == RecordType.sale;
-    final InventoryDetails(:product, :stock, :quantity) = detail;
+    final InventoryDetails(:product, :stock, :quantity, :price) = detail;
 
     final availableQty = stock.quantity - quantity;
 
@@ -471,7 +475,7 @@ class _ProductTile extends StatelessWidget {
                 width: 30,
                 onPressed: () {
                   if (qty == 1) return;
-                  onQtyChange(qty - 1);
+                  onChange(price, qty - 1);
                 },
               ),
               Text('$qty'),
@@ -481,7 +485,7 @@ class _ProductTile extends StatelessWidget {
                 width: 30,
                 onPressed: () {
                   if (availableQty == 0 && isSale) return;
-                  onQtyChange(qty + 1);
+                  onChange(price, qty + 1);
                 },
               ),
             ],
@@ -494,26 +498,46 @@ class _ProductTile extends StatelessWidget {
             children: [
               SpacedText(
                 left: isSale ? 'Sale' : 'Purchase',
-                right: (isSale ? stock.salesPrice : stock.purchasePrice).currency(),
+                right: (price).currency(),
                 style: context.text.muted,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 styleBuilder: (l, r) => (l, context.text.small),
+                spaced: false,
               ),
               SpacedText(
                 left: 'Total',
-                right: detail.totalPriceByType(type).currency(),
+                right: detail.totalPrice().currency(),
                 style: context.text.muted,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 styleBuilder: (l, r) => (l, context.text.small),
+                spaced: false,
               ),
             ],
           ),
         ),
-        ShadIconButton.destructive(
-          icon: const Icon(LuIcons.x),
-          onPressed: () => onProductRemove(product.id),
-          height: 30,
-          width: 30,
+        Row(
+          children: [
+            if (type.isSale)
+              ShadIconButton(
+                icon: const Icon(LuIcons.pen, size: 15),
+                height: 30,
+                width: 30,
+                onPressed: () async {
+                  final result = await showShadDialog<(num, int)>(
+                    context: context,
+                    builder: (context) => _ChangePriceDialog(detail, type),
+                  );
+                  if (result == null) return;
+                  onChange(result.$1, result.$2);
+                },
+              ),
+            ShadIconButton.destructive(
+              icon: const Icon(LuIcons.x),
+              onPressed: () => onProductRemove(product.id),
+              height: 30,
+              width: 30,
+            ),
+          ],
         ),
       ],
     );
@@ -862,61 +886,21 @@ class _AddStockDialog extends HookConsumerWidget {
                 ),
               ],
             ),
+
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: ShadTextField(
-                    name: 'wholesale_price',
-                    label: 'Wholesale Price',
-                    hintText: 'Enter wholesale price',
-                    numeric: true,
+                    name: 'quantity',
+                    label: 'Quantity',
+                    hintText: 'Enter Stock quantity',
+                    isRequired: true,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     onChanged: (value) {
-                      stock.value = stock.value.copyWith(wholesalePrice: Parser.toNum(value));
+                      stock.value = stock.value.copyWith(quantity: Parser.toInt(value));
                     },
                   ),
                 ),
-                Expanded(
-                  child: ShadTextField(
-                    name: 'dealer_price',
-                    label: 'Dealer Price',
-                    hintText: 'Enter dealer price',
-                    numeric: true,
-                    onChanged: (value) {
-                      stock.value = stock.value.copyWith(dealerPrice: Parser.toNum(value));
-                    },
-                  ),
-                ),
-                if (!context.layout.isMobile)
-                  Expanded(
-                    child: ShadTextField(
-                      name: 'quantity',
-                      label: 'Quantity',
-                      hintText: 'Enter Stock quantity',
-                      isRequired: true,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      onChanged: (value) {
-                        stock.value = stock.value.copyWith(quantity: Parser.toInt(value));
-                      },
-                    ),
-                  ),
-              ],
-            ),
-            Row(
-              children: [
-                if (context.layout.isMobile)
-                  Expanded(
-                    child: ShadTextField(
-                      name: 'quantity',
-                      label: 'Quantity',
-                      hintText: 'Enter Stock quantity',
-                      isRequired: true,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      onChanged: (value) {
-                        stock.value = stock.value.copyWith(quantity: Parser.toInt(value));
-                      },
-                    ),
-                  ),
                 Expanded(
                   flex: 2,
                   child: ShadInputDecorator(
@@ -945,6 +929,73 @@ class _AddStockDialog extends HookConsumerWidget {
                         );
                       },
                     ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ChangePriceDialog extends HookConsumerWidget {
+  const _ChangePriceDialog(this.details, this.type);
+
+  final InventoryDetails details;
+  final RecordType type;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final price = useState<num>(details.price);
+    final qty = useState(details.quantity);
+    return ShadDialog(
+      title: const Text('Adjust price'),
+      description: const Text('Adjust stock price'),
+      actions: [
+        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton(
+          onPressed: () {
+            if (price.value <= 0) return Toast.showErr(context, 'Price must be greater than zero');
+            if (qty.value <= 0) return Toast.showErr(context, 'Quantity must be greater than zero');
+            if (qty.value > details.stock.quantity && type.isSale) {
+              return Toast.showErr(context, 'Quantity exceeds stock quantity');
+            }
+            context.nPop((price.value, qty.value));
+          },
+          child: const Text('Submit'),
+        ),
+      ],
+      child: Container(
+        padding: Pads.padding(v: Insets.med),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: Insets.sm,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: ShadTextField(
+                    name: 'price',
+                    initialValue: details.price.toString(),
+                    label: 'Price',
+                    hintText: 'Enter price',
+                    isRequired: true,
+                    numeric: true,
+                    onChanged: (v) => price.value = Parser.toNum(v) ?? 0,
+                  ),
+                ),
+                Expanded(
+                  child: ShadTextField(
+                    name: 'quantity',
+                    label: 'Quantity',
+                    initialValue: details.quantity.toString(),
+                    hintText: 'Enter quantity',
+                    isRequired: true,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    onChanged: (v) => qty.value = Parser.toInt(v) ?? 0,
                   ),
                 ),
               ],

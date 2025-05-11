@@ -246,6 +246,6 @@ class _ProductFiled {
 extension ProductEx on List<Product> {
   List<Product> filterHouse(WareHouse? house) {
     if (house == null) return this;
-    return where((e) => e.stock.any((s) => s.warehouse?.id == house.id)).toList();
+    return where((e) => e.stock.isEmpty ? true : e.stock.any((s) => s.warehouse?.id == house.id)).toList();
   }
 }

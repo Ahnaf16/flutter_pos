@@ -40,7 +40,13 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       });
     }
     final qty = type.isSale ? 1 : stock.quantity;
-    final details = InventoryDetails(id: '', product: product, stock: stock, quantity: qty);
+    final details = InventoryDetails(
+      id: '',
+      product: product,
+      stock: stock,
+      price: type.isSale ? stock.salesPrice : stock.purchasePrice,
+      quantity: qty,
+    );
 
     state = state.copyWith(details: [...state.details, details]);
   }
@@ -71,6 +77,18 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
             quantity: update(item.quantity),
             stock: item.stock.copyWith(quantity: update(item.stock.quantity)),
           )
+        else
+          item,
+    ];
+
+    state = state.copyWith(details: updatedDetails);
+  }
+
+  void updatePrice(InventoryDetails detail, num price) {
+    final updatedDetails = [
+      for (final item in state.details)
+        if (item.product.id == detail.product.id && item.stock.id == detail.stock.id)
+          item.copyWith(price: price)
         else
           item,
     ];
@@ -154,6 +172,16 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       ref.invalidate(inventoryCtrlProvider);
       ref.invalidateSelf();
       return (true, 'Record created successfully');
+    });
+  }
+
+  Future<Result> returnInventory(InventoryRecord rec, QMap data) async {
+    final res = await _repo.returnSale(rec, data.transformValues((_, v) => Parser.toInt(v) ?? 0));
+
+    return res.fold(leftResult, (r) {
+      ref.invalidate(inventoryCtrlProvider);
+      ref.invalidateSelf();
+      return (true, 'Record returned successfully');
     });
   }
 }
