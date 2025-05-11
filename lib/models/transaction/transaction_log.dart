@@ -2,7 +2,7 @@ import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 
-enum TransactionType { sale, purchase, expanse, transfer }
+enum TransactionType { sale, purchase, returned, expanse, transfer }
 
 class TransactionLog {
   const TransactionLog({
@@ -140,7 +140,10 @@ class TransactionLog {
       transactToPhone: parti?.phone,
       transactionBy: user,
       date: dateNow.run(),
-      type: record.type == RecordType.sale ? TransactionType.sale : TransactionType.purchase,
+      type: switch (record.type) {
+        RecordType.purchase => TransactionType.purchase,
+        RecordType.sale => TransactionType.sale,
+      },
       note: _noteInv(record),
       adjustBalance: false,
       transactionFormParti: null,
@@ -165,6 +168,31 @@ class TransactionLog {
     );
   }
 
+  static TransactionLog fromReturn(ReturnRecord rec) {
+    return TransactionLog(
+      id: '',
+      amount: rec.deductedFromAccount,
+      usedDueBalance: rec.deductedFromParty,
+      account: rec.returnedRec.account,
+      transactedTo: null,
+      transactTo: null,
+      transactToPhone: null,
+      transactionBy: rec.returnedBy,
+      date: dateNow.run(),
+      type: TransactionType.returned,
+      note: _noteRe(rec),
+      adjustBalance: false,
+      transactionFormParti: null,
+    );
+  }
+
+  static String _noteRe(ReturnRecord rec) {
+    final amount = rec.deductedFromAccount;
+    final account = rec.returnedRec.account.name;
+    final date = rec.returnDate.formatDate();
+    return ['returned $amount', 'from $account', 'on $date'].join(' ');
+  }
+
   static String _noteEx(Expense record) {
     final amount = record.amount;
     final account = record.account.name;
@@ -176,7 +204,11 @@ class TransactionLog {
     final parti = record.parti ?? Parti.fromWalkIn(record.walkIn);
 
     final isSale = record.type == RecordType.sale;
-    final type = isSale ? 'Sold' : 'Bought';
+    final type = switch (record.type) {
+      RecordType.purchase => 'Bought',
+      RecordType.sale => 'Sold',
+    };
+
     final length = record.details.length;
     final item = length == 1 ? 'item' : 'items';
     final amount = record.amount;

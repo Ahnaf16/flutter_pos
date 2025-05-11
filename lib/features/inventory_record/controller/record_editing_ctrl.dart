@@ -1,5 +1,6 @@
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
+import 'package:pos/features/inventory_record/repository/return_repo.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -176,7 +177,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
   }
 
   Future<Result> returnInventory(InventoryRecord rec, QMap data) async {
-    final res = await _repo.returnSale(rec, data.transformValues((_, v) => Parser.toInt(v) ?? 0));
+    final res = await locate<ReturnRepo>().returnSale(rec, data.transformValues((_, v) => Parser.toInt(v) ?? 0));
 
     return res.fold(leftResult, (r) {
       ref.invalidate(inventoryCtrlProvider);

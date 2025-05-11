@@ -30,9 +30,15 @@ class RPaths {
   static RPath sales = const RPath('/sales');
   static RPath createSales = const RPath('/create_sales');
 
+  // sales return
+  static RPath salesReturn = const RPath('/sales_return');
+
   // purchases
   static RPath purchases = const RPath('/purchases');
   static RPath createPurchases = const RPath('/create_purchases');
+
+  // purchases return
+  static RPath purchasesReturn = const RPath('/purchases_return');
 
   // customer
   static RPath customer = const RPath('/customer');

@@ -9,6 +9,7 @@ import 'package:pos/features/expense/view/expense_view.dart';
 import 'package:pos/features/home/view/home_view.dart';
 import 'package:pos/features/inventory_record/view/create_record_view.dart';
 import 'package:pos/features/inventory_record/view/inventory_record_view.dart';
+import 'package:pos/features/inventory_record/view/return_view.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
 import 'package:pos/features/products/view/create_product_view.dart';
@@ -84,9 +85,13 @@ class AppRouter extends Notifier<GoRouter> {
           //! sales
           AppRoute(RPaths.sales, (_) => const InventoryRecordView(type: RecordType.sale)),
           AppRoute(RPaths.createSales, (_) => const CreateRecordView(type: RecordType.sale)),
+          //! sales_return
+          AppRoute(RPaths.salesReturn, (_) => const ReturnView(isSale: true)),
           //! purchases
           AppRoute(RPaths.purchases, (_) => const InventoryRecordView(type: RecordType.purchase)),
           AppRoute(RPaths.createPurchases, (_) => const CreateRecordView(type: RecordType.purchase)),
+          //! purchases_return
+          AppRoute(RPaths.purchasesReturn, (_) => const ReturnView(isSale: false)),
           //! customer
           AppRoute(RPaths.customer, (_) => const PartiesView(isCustomer: true)),
           //! supplier

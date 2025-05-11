@@ -6,7 +6,7 @@ part of 'inventory_record_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$inventoryCtrlHash() => r'903c88d7251a5b808ddd6d1d9ccf4db083054a54';
+String _$inventoryCtrlHash() => r'2c3e91db5f8d006cb70d08230ec93c53e1b7a8c8';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -172,6 +172,154 @@ class _InventoryCtrlProviderElement
 
   @override
   RecordType get type => (origin as InventoryCtrlProvider).type;
+}
+
+String _$inventoryReturnCtrlHash() =>
+    r'2fed3030fe89a6e9e3b821ac4d32497f0124437e';
+
+abstract class _$InventoryReturnCtrl
+    extends BuildlessAutoDisposeAsyncNotifier<List<ReturnRecord>> {
+  late final bool isSale;
+
+  FutureOr<List<ReturnRecord>> build(
+    bool isSale,
+  );
+}
+
+/// See also [InventoryReturnCtrl].
+@ProviderFor(InventoryReturnCtrl)
+const inventoryReturnCtrlProvider = InventoryReturnCtrlFamily();
+
+/// See also [InventoryReturnCtrl].
+class InventoryReturnCtrlFamily extends Family<AsyncValue<List<ReturnRecord>>> {
+  /// See also [InventoryReturnCtrl].
+  const InventoryReturnCtrlFamily();
+
+  /// See also [InventoryReturnCtrl].
+  InventoryReturnCtrlProvider call(
+    bool isSale,
+  ) {
+    return InventoryReturnCtrlProvider(
+      isSale,
+    );
+  }
+
+  @override
+  InventoryReturnCtrlProvider getProviderOverride(
+    covariant InventoryReturnCtrlProvider provider,
+  ) {
+    return call(
+      provider.isSale,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'inventoryReturnCtrlProvider';
+}
+
+/// See also [InventoryReturnCtrl].
+class InventoryReturnCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
+    InventoryReturnCtrl, List<ReturnRecord>> {
+  /// See also [InventoryReturnCtrl].
+  InventoryReturnCtrlProvider(
+    bool isSale,
+  ) : this._internal(
+          () => InventoryReturnCtrl()..isSale = isSale,
+          from: inventoryReturnCtrlProvider,
+          name: r'inventoryReturnCtrlProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$inventoryReturnCtrlHash,
+          dependencies: InventoryReturnCtrlFamily._dependencies,
+          allTransitiveDependencies:
+              InventoryReturnCtrlFamily._allTransitiveDependencies,
+          isSale: isSale,
+        );
+
+  InventoryReturnCtrlProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.isSale,
+  }) : super.internal();
+
+  final bool isSale;
+
+  @override
+  FutureOr<List<ReturnRecord>> runNotifierBuild(
+    covariant InventoryReturnCtrl notifier,
+  ) {
+    return notifier.build(
+      isSale,
+    );
+  }
+
+  @override
+  Override overrideWith(InventoryReturnCtrl Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: InventoryReturnCtrlProvider._internal(
+        () => create()..isSale = isSale,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        isSale: isSale,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeAsyncNotifierProviderElement<InventoryReturnCtrl,
+      List<ReturnRecord>> createElement() {
+    return _InventoryReturnCtrlProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is InventoryReturnCtrlProvider && other.isSale == isSale;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, isSale.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin InventoryReturnCtrlRef
+    on AutoDisposeAsyncNotifierProviderRef<List<ReturnRecord>> {
+  /// The parameter `isSale` of this provider.
+  bool get isSale;
+}
+
+class _InventoryReturnCtrlProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<InventoryReturnCtrl,
+        List<ReturnRecord>> with InventoryReturnCtrlRef {
+  _InventoryReturnCtrlProviderElement(super.provider);
+
+  @override
+  bool get isSale => (origin as InventoryReturnCtrlProvider).isSale;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

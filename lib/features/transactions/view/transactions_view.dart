@@ -62,11 +62,11 @@ class TransactionsView extends HookConsumerWidget {
               return switch (head.name) {
                 'To' => DataGridCell(
                   columnName: head.name,
-                  value: _NameBuilder(data.getParti?.name, data.getParti?.phone),
+                  value: NameCellBuilder(data.getParti?.name, data.getParti?.phone),
                 ),
                 'From' => DataGridCell(
                   columnName: head.name,
-                  value: _NameBuilder(
+                  value: NameCellBuilder(
                     data.transactionBy?.name ?? data.transactionFormParti?.name,
                     data.transactionFormParti?.phone,
                   ),
@@ -120,8 +120,8 @@ class TransactionsView extends HookConsumerWidget {
   }
 }
 
-class _NameBuilder extends StatelessWidget {
-  const _NameBuilder(this.name, this.phone);
+class NameCellBuilder extends StatelessWidget {
+  const NameCellBuilder(this.name, this.phone, {super.key});
   final String? name;
   final String? phone;
   @override

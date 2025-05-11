@@ -82,13 +82,14 @@ class InventoryRecordView extends HookConsumerWidget {
                             );
                           },
                         ),
-                        ShadButton.destructive(
-                          size: ShadButtonSize.sm,
-                          leading: const Icon(LuIcons.undo2),
-                          onPressed: () {
-                            showShadDialog(context: context, builder: (context) => _ReturnDialog(inventory: data));
-                          },
-                        ),
+                        if (data.status != InventoryStatus.returned)
+                          ShadButton.destructive(
+                            size: ShadButtonSize.sm,
+                            leading: const Icon(LuIcons.undo2),
+                            onPressed: () {
+                              showShadDialog(context: context, builder: (context) => _ReturnDialog(inventory: data));
+                            },
+                          ),
                       ],
                     ),
                   ),
@@ -234,13 +235,19 @@ class _ReturnDialog extends HookConsumerWidget {
       actions: [
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         SubmitButton(
-          onPressed: (l) {
+          onPressed: (l) async {
             final state = formKey.currentState!;
             if (!state.saveAndValidate()) return;
 
             final data = state.value;
             final ctrl = ref.read(recordEditingCtrlProvider(inventory.type).notifier);
-            ctrl.returnInventory(inventory, data);
+            l.truthy();
+            final res = await ctrl.returnInventory(inventory, data);
+            l.falsey();
+
+            if (!context.mounted) return;
+            res.showToast(context);
+            if (res.success) context.pop(true);
           },
           child: const Text('Return'),
         ),
@@ -262,9 +269,13 @@ class _ReturnDialog extends HookConsumerWidget {
                       child: ShadTextField(
                         name: p.id,
                         label: 'Return Quantity',
-                        initialValue: p.quantity.toString(),
+                        initialValue: inventory.type.isSale ? p.quantity.toString() : p.stock.quantity.toString(),
                         numeric: true,
-                        validators: [FormBuilderValidators.min(1), FormBuilderValidators.max(p.quantity)],
+                        validators: [
+                          FormBuilderValidators.min(1),
+                          if (inventory.type.isSale) FormBuilderValidators.max(p.quantity),
+                          if (inventory.type.isPurchase) FormBuilderValidators.max(p.stock.quantity),
+                        ],
                       ),
                     ),
                   ],

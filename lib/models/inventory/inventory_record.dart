@@ -202,9 +202,3 @@ class InventoryRecord {
     );
   }
 }
-
-
-// class  ReturnRecord {
-//   final InventoryRecord record;
-//   final Map<String, int> data;
-// }

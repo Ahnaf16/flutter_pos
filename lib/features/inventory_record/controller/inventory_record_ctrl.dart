@@ -1,4 +1,5 @@
 import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
+import 'package:pos/features/inventory_record/repository/return_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -19,5 +20,18 @@ class InventoryCtrl extends _$InventoryCtrl {
         return r;
       },
     );
+  }
+}
+
+@riverpod
+class InventoryReturnCtrl extends _$InventoryReturnCtrl {
+  final _repo = locate<ReturnRepo>();
+  @override
+  Future<List<ReturnRecord>> build(bool isSale) async {
+    final staffs = await _repo.getRecords(isSale);
+    return staffs.fold((l) {
+      Toast.showErr(Ctx.context, l);
+      return [];
+    }, (r) => r);
   }
 }

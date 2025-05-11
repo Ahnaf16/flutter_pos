@@ -2,6 +2,7 @@ export 'config/config.dart';
 export 'inventory/inventory_details.dart';
 export 'inventory/inventory_record.dart';
 export 'inventory/payment_account.dart';
+export 'inventory/return_record.dart';
 export 'misc/result.dart';
 export 'parties/due_log.dart';
 export 'parties/parti.dart';

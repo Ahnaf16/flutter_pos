@@ -354,10 +354,12 @@ List<(String text, IconData? icon, RPath? path)> get _items => [
   // ('', null, null),
   ('Sales', null, null),
   ('Sales History', LuIcons.shoppingCart, RPaths.sales),
+  ('Sales Return', LuIcons.shoppingCart, RPaths.salesReturn),
 
   // ('', null, null),
   ('Purchases', null, null),
   ('Purchase History', LuIcons.scrollText, RPaths.purchases),
+  ('Purchase Return', LuIcons.scrollText, RPaths.purchasesReturn),
 
   // ('', null, null),
   ('People', null, null),
