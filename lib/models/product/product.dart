@@ -180,7 +180,9 @@ class Product {
 
     if (filteredStock.isEmpty) return null;
 
-    return filteredStock.reduce((a, b) => a.createdAt.isAfter(b.createdAt) ? a : b);
+    final s = filteredStock.reduce((a, b) => a.createdAt.isAfter(b.createdAt) ? a : b);
+    if (s.quantity <= 0) return null;
+    return s;
   }
 
   Stock? getOldestStock([String? warehouseId]) {
@@ -192,7 +194,10 @@ class Product {
 
     if (filteredStock.isEmpty) return null;
 
-    return filteredStock.reduce((a, b) => a.createdAt.isBefore(b.createdAt) ? a : b);
+    final s = filteredStock.reduce((a, b) => a.createdAt.isBefore(b.createdAt) ? a : b);
+    if (s.quantity <= 0) return null;
+
+    return s;
   }
 
   Stock? getEffectiveStock(StockDistPolicy policy, String? warehouseId) {

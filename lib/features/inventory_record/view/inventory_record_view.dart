@@ -72,17 +72,20 @@ class InventoryRecordView extends HookConsumerWidget {
                         ShadButton.secondary(
                           size: ShadButtonSize.sm,
                           leading: const Icon(LuIcons.eye),
-                          onPressed:
-                              () => showShadDialog(
-                                context: context,
-                                builder: (context) => _InventoryViewDialog(inventory: data),
-                              ),
+                          onPressed: () {
+                            showShadDialog(
+                              context: context,
+                              builder: (context) => _InventoryViewDialog(inventory: data),
+                            );
+                          },
                         ),
-                        // ShadButton.secondary(
-                        //   size: ShadButtonSize.sm,
-                        //   leading: const Icon(LuIcons.pen),
-                        //   onPressed: () => RPaths.editStaffs(data.id).pushNamed(context),
-                        // ),
+                        ShadButton.destructive(
+                          size: ShadButtonSize.sm,
+                          leading: const Icon(LuIcons.undo2),
+                          onPressed: () {
+                            showShadDialog(context: context, builder: (context) => _ReturnDialog(inventory: data));
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -207,6 +210,87 @@ class _InventoryViewDialog extends HookConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: Insets.sm,
+        ),
+      ),
+    );
+  }
+}
+
+class _ReturnDialog extends HookConsumerWidget {
+  const _ReturnDialog({required this.inventory});
+
+  final InventoryRecord inventory;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isSale = inventory.type.isSale;
+    final InventoryRecord(:account, :amount, :dueBalance, :parti) = inventory;
+    return ShadDialog(
+      title: const Text('Return'),
+      description: const Text('Do you want to return this inventory?'),
+
+      actions: [
+        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        SubmitButton(onPressed: (l) {}, child: const Text('Return')),
+      ],
+      child: Container(
+        padding: Pads.padding(v: Insets.med),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: Insets.sm,
+          children: [
+            const Text('After return: '),
+
+            SpacedText(
+              left: 'Account',
+              right: account.name,
+              styleBuilder: (l, r) => (l, r.bold),
+              spaced: false,
+              crossAxisAlignment: CrossAxisAlignment.center,
+            ),
+            SpacedText(
+              left: isSale ? 'Received' : 'Paid',
+              right: amount.currency(),
+              styleBuilder: (l, r) => (l, r.bold),
+              spaced: false,
+              crossAxisAlignment: CrossAxisAlignment.center,
+            ),
+            SpacedText(
+              left: 'Account balance',
+              right: '${(account.amount).currency()} (${isSale ? '-' : '+'} ${amount.currency()})',
+              styleBuilder: (l, r) => (l, r.bold),
+              spaced: false,
+              crossAxisAlignment: CrossAxisAlignment.center,
+            ),
+            if (parti != null) ...[
+              SpacedText(
+                left: 'Parti',
+                right: '${parti.name} (${parti.phone})',
+                styleBuilder: (l, r) => (l, r.bold),
+                spaced: false,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                trailing: SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(parti.phone)),
+              ),
+              if (dueBalance != 0) ...[
+                SpacedText(
+                  left: isSale ? 'Balance used' : 'Due used',
+                  right: dueBalance.currency(),
+                  styleBuilder: (l, r) => (l, r.bold),
+                  spaced: false,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                ),
+                SpacedText(
+                  left: isSale ? 'Parti balance' : 'Parti due',
+                  right:
+                      '${parti.due.abs().currency()} (${dueBalance.isNegative ? '-' : '+'} ${dueBalance.currency()})',
+                  styleBuilder: (l, r) => (l, r.bold),
+                  spaced: false,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                ),
+              ],
+            ],
+          ],
         ),
       ),
     );

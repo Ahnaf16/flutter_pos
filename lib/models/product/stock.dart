@@ -134,8 +134,8 @@ class Stock {
 
   static final fields = _StockFields();
 
-  static Stock empty() => Stock(
-    id: '',
+  static Stock empty([String? id]) => Stock(
+    id: id ?? '',
     purchasePrice: 0,
     salesPrice: 0,
     wholesalePrice: 0,

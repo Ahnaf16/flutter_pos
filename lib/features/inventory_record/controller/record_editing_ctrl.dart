@@ -30,9 +30,14 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     }
 
     if (state.details.map((e) => e.product.id).contains(product.id) && type.isSale) {
-      final existing = state.details.firstWhere((e) => e.product.id == product.id).stock.id;
-      if (existing != stock.id) return;
-      return changeProductQuantity(product.id, (q) => q + 1);
+      final existing = state.details.firstWhere((e) => e.product.id == product.id).stock;
+      if (existing.id != stock.id) return;
+      // if (stock.quantity <= 0) return;
+
+      return changeProductQuantity(product.id, (q) {
+        if (q >= existing.quantity) return q;
+        return q + 1;
+      });
     }
     final qty = type.isSale ? 1 : stock.quantity;
     final details = InventoryDetails(id: '', product: product, stock: stock, quantity: qty);
@@ -40,8 +45,8 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     state = state.copyWith(details: [...state.details, details]);
   }
 
-  void removeProduct(String pId) {
-    state = state.copyWith(details: state.details.where((e) => e.product.id != pId).toList());
+  void removeProduct(String pId, String sid) {
+    state = state.copyWith(details: state.details.where((e) => e.product.id != pId || e.stock.id != sid).toList());
     if (state.details.isEmpty) {}
   }
 
@@ -56,12 +61,12 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     state = state.copyWith(details: updatedDetails);
   }
 
-  void updateStockQuantity(String pId, int Function(int oldQty) update) {
+  void updateStockQuantity(String pId, String sId, int Function(int oldQty) update) {
     if (type == RecordType.sale) return;
 
     final updatedDetails = [
       for (final item in state.details)
-        if (item.product.id == pId)
+        if (item.product.id == pId && item.stock.id == sId)
           item.copyWith(
             quantity: update(item.quantity),
             stock: item.stock.copyWith(quantity: update(item.stock.quantity)),
@@ -73,11 +78,11 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     state = state.copyWith(details: updatedDetails);
   }
 
-  void changeQuantity(String pId, int Function(int old) qty) {
+  void changeQuantity(InventoryDetails detail, int Function(int old) qty) {
     if (type.isPurchase) {
-      updateStockQuantity(pId, qty);
+      updateStockQuantity(detail.product.id, detail.stock.id, qty);
     } else {
-      changeProductQuantity(pId, qty);
+      changeProductQuantity(detail.product.id, qty);
     }
   }
 

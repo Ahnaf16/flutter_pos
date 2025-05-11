@@ -81,8 +81,8 @@ class CreateRecordView extends HookConsumerWidget {
                                         detail: detail,
                                         index: index,
                                         type: type,
-                                        onQtyChange: (q) => recordCtrl().changeQuantity(detail.product.id, (_) => q),
-                                        onProductRemove: (pId) => recordCtrl().removeProduct(pId),
+                                        onQtyChange: (q) => recordCtrl().changeQuantity(detail, (_) => q),
+                                        onProductRemove: (pId) => recordCtrl().removeProduct(pId, detail.stock.id),
                                       );
                                     },
                                   ),
@@ -811,7 +811,7 @@ class _AddStockDialog extends HookConsumerWidget {
     final warehouseList = ref.watch(warehouseCtrlProvider);
     final searchWarehouse = useState('');
 
-    final stock = useState<Stock>(Stock.empty());
+    final stock = useState<Stock>(Stock.empty(ID.unique()));
 
     return ShadDialog(
       title: const Text('Stock'),

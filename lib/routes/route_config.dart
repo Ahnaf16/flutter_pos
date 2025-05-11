@@ -13,8 +13,6 @@ import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
 import 'package:pos/features/products/view/create_product_view.dart';
 import 'package:pos/features/products/view/products_view.dart';
-import 'package:pos/features/returnPurchases/view/return_purchases_view.dart';
-import 'package:pos/features/returnSales/view/return_sales_view.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/settings/view/settings_view.dart';
 import 'package:pos/features/staffs/view/create_staff_view.dart';
@@ -86,13 +84,9 @@ class AppRouter extends Notifier<GoRouter> {
           //! sales
           AppRoute(RPaths.sales, (_) => const InventoryRecordView(type: RecordType.sale)),
           AppRoute(RPaths.createSales, (_) => const CreateRecordView(type: RecordType.sale)),
-          //! returnSales
-          AppRoute(RPaths.returnSales, (_) => const ReturnSalesView()),
           //! purchases
           AppRoute(RPaths.purchases, (_) => const InventoryRecordView(type: RecordType.purchase)),
           AppRoute(RPaths.createPurchases, (_) => const CreateRecordView(type: RecordType.purchase)),
-          //! returnPurchases
-          AppRoute(RPaths.returnPurchases, (_) => const ReturnPurchasesView()),
           //! customer
           AppRoute(RPaths.customer, (_) => const PartiesView(isCustomer: true)),
           //! supplier

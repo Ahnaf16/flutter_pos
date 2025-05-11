@@ -81,15 +81,19 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
     final houseList = useState(<WareHouse>[]);
 
     void fetchHouses() async {
-      if (user?.warehouse?.isDefault != true) return;
-      final houses = await ref.read(warehouseCtrlProvider.future);
-      houseList.value = houses;
+      cat(user?.name ?? 'NA');
+      if (user?.warehouse?.isDefault == true) {
+        final houses = await ref.read(warehouseCtrlProvider.future);
+        houseList.value = houses;
+      } else {
+        houseList.value = [];
+      }
     }
 
     useEffect(() {
       fetchHouses();
       return null;
-    }, const []);
+    }, [user?.id]);
 
     return AppBar(
       title: const Text(kAppName),
@@ -126,6 +130,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
             selectedOptionBuilder: (_, v) => Text(v.name),
             options: [
               ...houseList.value.map(
+                // ignore: deprecated_member_use
                 (e) => ShadOption(value: e, orderPolicy: const OrderPolicy.reverse(), child: Text(e.name)),
               ),
             ],
@@ -349,12 +354,10 @@ List<(String text, IconData? icon, RPath? path)> get _items => [
   // ('', null, null),
   ('Sales', null, null),
   ('Sales History', LuIcons.shoppingCart, RPaths.sales),
-  ('Return sales', LuIcons.archiveRestore, RPaths.returnSales),
 
   // ('', null, null),
   ('Purchases', null, null),
   ('Purchase History', LuIcons.scrollText, RPaths.purchases),
-  ('Return purchase', LuIcons.panelBottomClose, RPaths.returnPurchases),
 
   // ('', null, null),
   ('People', null, null),

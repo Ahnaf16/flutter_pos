@@ -130,7 +130,10 @@ class _NameBuilder extends StatelessWidget {
       spacing: Insets.xs,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      children: [OverflowMarquee(child: Text(name ?? '--', style: context.text.list)), Text(phone ?? '--')],
+      children: [
+        OverflowMarquee(child: Text(name ?? '--', style: context.text.list)),
+        if (phone != null) Text(phone ?? '--'),
+      ],
     );
   }
 }
