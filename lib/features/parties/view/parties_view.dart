@@ -16,7 +16,7 @@ class PartiesView extends HookConsumerWidget {
   final bool isCustomer;
 
   static Future<WalkIn?> showAddDialog(BuildContext context, bool isCustomer) async {
-    return showShadDialog<WalkIn>(context: context, builder: (context) => _PartiAddDialog(isCustomer: isCustomer));
+    return showShadDialog(context: context, builder: (context) => _PartiAddDialog(isCustomer: isCustomer));
   }
 
   @override
@@ -199,10 +199,13 @@ class _PartiAddDialog extends HookConsumerWidget {
               result = await ctrl.updateParti(updated, selectedFile.value);
               l.falsey();
             }
+
+            cat(result);
+            cat(context.mounted);
             if (result case final Result r) {
               if (!context.mounted) return;
               r.showToast(context);
-              if (r.success) context.pop(true);
+              if (r.success) context.pop();
             }
           },
           child: Text(actionTxt),

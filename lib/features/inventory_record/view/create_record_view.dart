@@ -186,7 +186,7 @@ class _Inputs extends HookConsumerWidget {
               flex: 2,
               child: ShadTextField(
                 name: 'amount',
-                hintText: type.isSale ? 'Received' : 'Paid',
+                hintText: type.isSale ? 'Payment amount' : 'Paid',
                 keyboardType: TextInputType.number,
                 numeric: true,
               ),
@@ -636,7 +636,7 @@ class _PartiSection extends HookConsumerWidget {
                   placeholder: const Text('Select a parti'),
                   itemCount: filtered.length,
                   options: [
-                    ShadOption(value: Parti.fromWalkIn(const WalkIn()), child: const Text('As walk-in')),
+                    ShadOption(value: Parti.fromWalkIn(const WalkIn()), child: const Text('Walk-in customer')),
                     if (filtered.isEmpty) Padding(padding: Pads.med('tb'), child: const Text('No Parties found')),
                     ...filtered.map((house) {
                       return ShadOption(value: house, child: Text(house.name));

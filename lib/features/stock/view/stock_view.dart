@@ -21,7 +21,7 @@ class StockView extends HookConsumerWidget {
           ShadButton(
             child: const Text('Purchase'),
             onPressed: () {
-              RPaths.purchases.pushNamed(context);
+              RPaths.createPurchases.pushNamed(context);
             },
           ),
         if (permissions.contains(RolePermissions.manageProduct))
@@ -139,23 +139,12 @@ class _ProductSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SpacedText(
-                        left: stock.isProfitable ? 'Profit' : 'Loss',
-                        right: (stock.getProfitLoss).currency(),
-                        spaced: false,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        styleBuilder: (_, _) {
-                          final c = stock.isProfitable ? Colors.green.shade500 : context.colors.destructive;
-                          return (context.text.muted.textColor(c), context.text.small.textColor(c));
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                // Expanded(
+                //   child: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.end,
+                //     children: [Text('Supplier: ${stock.supplier?.name ?? '--'}', style: context.text.muted)],
+                //   ),
+                // ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,

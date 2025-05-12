@@ -124,6 +124,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
           ),
           const Gap(Insets.lg),
         ],
+
         if (houseList.value.isNotEmpty)
           ShadSelect<WareHouse>(
             maxWidth: 200,
@@ -145,6 +146,13 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
             },
             allowDeselection: true,
           ),
+        if (!context.routeState.matchedLocation.contains(RPaths.sales.path))
+          ShadButton(
+            leading: const Icon(LuIcons.calculator),
+            onPressed: () => RPaths.createSales.pushNamed(context),
+            child: const Text('POS'),
+          ),
+
         const Gap(Insets.lg),
         ShadPopover(
           controller: popCtrl,
