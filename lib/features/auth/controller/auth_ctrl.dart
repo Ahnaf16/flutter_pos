@@ -20,6 +20,15 @@ class AuthCtrl extends _$AuthCtrl {
     });
   }
 
+  FVoid reload() async {
+    final user = await _repo.currentUser();
+
+    return user.fold((l) => null, (r) {
+      ref.read(authStateSyncProvider.notifier)._set(r);
+      state = AsyncValue.data(r);
+    });
+  }
+
   Future<Result> signIn(String email, String password) async {
     final res = await _repo.signIn(email, password);
 

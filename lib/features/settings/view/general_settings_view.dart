@@ -31,19 +31,6 @@ class GeneralSettingsView extends HookConsumerWidget {
               children: [
                 const Gap(Insets.sm),
 
-                FormBuilderField<bool>(
-                  name: 'maintenance_mode',
-                  builder: (state) {
-                    return ShadCard(
-                      title: const Text('Maintenance mode'),
-                      description: const Text('Turn on maintenance mode'),
-                      trailing: ShadSwitch(value: state.value ?? false, onChanged: state.didChange),
-                      rowCrossAxisAlignment: CrossAxisAlignment.center,
-                    );
-                  },
-                ),
-                const Gap(Insets.sm),
-
                 Row(
                   children: [
                     Expanded(

@@ -82,18 +82,18 @@ class CreateUserRoleView extends HookConsumerWidget {
                             hintText: 'Enter role name',
                             isRequired: true,
                           ),
-
-                          FormBuilderField<bool>(
-                            name: 'enabled',
-                            builder: (state) {
-                              return ShadCard(
-                                title: const Text('Enabled'),
-                                description: const Text('Is this role enabled?'),
-                                trailing: ShadSwitch(value: state.value ?? true, onChanged: state.didChange),
-                                rowCrossAxisAlignment: CrossAxisAlignment.center,
-                              );
-                            },
-                          ),
+                          if (updatingId == null)
+                            FormBuilderField<bool>(
+                              name: 'enabled',
+                              builder: (state) {
+                                return ShadCard(
+                                  title: const Text('Enabled'),
+                                  description: const Text('Is this role enabled?'),
+                                  trailing: ShadSwitch(value: state.value ?? true, onChanged: state.didChange),
+                                  rowCrossAxisAlignment: CrossAxisAlignment.center,
+                                );
+                              },
+                            ),
                           FormBuilderField<List<String>>(
                             name: 'permissions',
                             builder: (state) {
@@ -105,6 +105,17 @@ class CreateUserRoleView extends HookConsumerWidget {
                                   spacing: Insets.med,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    ShadCheckbox(
+                                      value: (state.value?.length ?? 0) == RolePermissions.values.length,
+                                      label: const Text('All'),
+                                      onChanged: (value) {
+                                        if (value) {
+                                          state.didChange(RolePermissions.values.map((e) => e.name).toList());
+                                        } else {
+                                          state.didChange([]);
+                                        }
+                                      },
+                                    ),
                                     for (final permission in RolePermissions.values)
                                       ShadCheckbox(
                                         value: state.value?.contains(permission.name) ?? false,

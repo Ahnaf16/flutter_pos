@@ -26,7 +26,7 @@ class UserRolesCtrl extends _$UserRolesCtrl {
   }
 
   Future<Result> toggleEnable(bool isEnabled, UserRole role) async {
-    final res = await _repo.updateRole(role.copyWith(isEnabled: isEnabled));
+    final res = await _repo.updateRole(role.copyWith(isEnabled: isEnabled), true);
     return await res.fold(leftResult, (r) async {
       state = await AsyncValue.guard(() async => build());
       return rightResult('Role updated successfully');

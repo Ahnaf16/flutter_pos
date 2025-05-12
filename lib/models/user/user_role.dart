@@ -9,6 +9,8 @@ class UserRole {
   final bool isEnabled;
   final List<RolePermissions> permissions;
 
+  List<RolePermissions> get getPermissions => isEnabled ? permissions : [];
+
   factory UserRole.fromDoc(Document doc) {
     final data = doc.data;
 

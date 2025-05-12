@@ -33,6 +33,7 @@ class UpdateRoleCtrl extends _$UpdateRoleCtrl {
     return res.fold(leftResult, (r) {
       ref.invalidate(userRolesCtrlProvider);
       ref.invalidate(currentUserProvider);
+      ref.read(authCtrlProvider.notifier).reload();
       return rightResult('Role updated successfully');
     });
   }

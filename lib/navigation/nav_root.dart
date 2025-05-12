@@ -16,7 +16,6 @@ class NavigationRoot extends HookConsumerWidget {
     final authUser = ref.watch(currentUserProvider);
 
     final rootPath = context.routeState.uri.pathSegments.first;
-    final getIndex = _items.indexWhere((item) => item.$3?.path.contains(rootPath) ?? false);
 
     final index = useState(0);
     final expanded = useState(true);
@@ -24,9 +23,10 @@ class NavigationRoot extends HookConsumerWidget {
     final drawerOpen = useState(false);
 
     useEffect(() {
-      index.value = getIndex;
+      final items = _items(authUser.valueOrNull?.role?.getPermissions ?? []);
+      index.value = items.indexWhere((item) => item.$3?.path.contains(rootPath) ?? false);
       return null;
-    }, [rootPath]);
+    }, [rootPath, authUser.value]);
 
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -58,7 +58,14 @@ class NavigationRoot extends HookConsumerWidget {
               });
             },
           ),
-          body: _BODY(expanded: expanded, showLabel: showLabel, drawerOpen: drawerOpen, index: index, child: child),
+          body: _BODY(
+            expanded: expanded,
+            showLabel: showLabel,
+            drawerOpen: drawerOpen,
+            index: index,
+            permissions: user?.role?.getPermissions ?? [],
+            child: child,
+          ),
         );
       },
     );
@@ -199,6 +206,7 @@ class _BODY extends HookWidget {
     required this.showLabel,
     required this.drawerOpen,
     required this.index,
+    required this.permissions,
     required this.child,
   });
 
@@ -207,9 +215,11 @@ class _BODY extends HookWidget {
   final ValueNotifier<bool> drawerOpen;
   final ValueNotifier<int> index;
   final Widget child;
+  final List<RolePermissions> permissions;
 
   @override
   Widget build(BuildContext context) {
+    final items = _items(permissions);
     final navItems = SingleChildScrollView(
       padding: Pads.med(),
       child: LimitedWidthBox(
@@ -221,7 +231,7 @@ class _BODY extends HookWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
 
             children: [
-              for (final (text, icon, path) in _items)
+              for (final (text, icon, path) in items)
                 if (!expanded.value && icon == null)
                   const SizedBox.shrink()
                 else
@@ -230,9 +240,9 @@ class _BODY extends HookWidget {
                     icon: icon,
                     showLabel: showLabel.value,
                     expanded: expanded.value,
-                    selected: index.value == _items.indexOf((text, icon, path)),
+                    selected: index.value == items.indexOf((text, icon, path)),
                     onPressed: () {
-                      index.value = _items.indexOf((text, icon, path));
+                      index.value = items.indexOf((text, icon, path));
                       if (path != null) path.go(context);
                     },
                   ),
@@ -342,47 +352,48 @@ class NavButton extends HookWidget {
   }
 }
 
-List<(String text, IconData? icon, RPath? path)> get _items => [
-  ('Home', LuIcons.house, RPaths.home),
-  ('Inventory', null, null),
-  ('Products', LuIcons.box, RPaths.products),
-  ('Stock', LuIcons.arrowUp01, RPaths.stock),
-  ('Unit', LuIcons.ruler, RPaths.unit),
-  // ('Category', LuIcons.group, RPaths.home),
-  // ('Brand', LuIcons.group, RPaths.home),
+List<(String text, IconData? icon, RPath? path)> _items(List<RolePermissions> p) {
+  return [
+    ('Home', LuIcons.house, RPaths.home),
+    if (RolePermissions.isInGroup(p, RolePermissions.inventoryGroup)) ...[
+      ('Inventory', null, null),
+      if (p.contains(RolePermissions.manageProduct)) ('Products', LuIcons.box, RPaths.products),
+      if (p.contains(RolePermissions.manageStock)) ('Stock', LuIcons.arrowUp01, RPaths.stock),
+      if (p.contains(RolePermissions.manageUnit)) ('Unit', LuIcons.ruler, RPaths.unit),
+    ],
+    if (RolePermissions.isInGroup(p, RolePermissions.salesGroup)) ...[
+      ('Sales', null, null),
+      if (p.contains(RolePermissions.makeSale)) ('Sales History', LuIcons.shoppingCart, RPaths.sales),
+      if (p.contains(RolePermissions.returnSale)) ('Sales Return', LuIcons.undo, RPaths.salesReturn),
+    ],
+    if (RolePermissions.isInGroup(p, RolePermissions.purchasesGroup)) ...[
+      ('Purchases', null, null),
+      if (p.contains(RolePermissions.makePurchase)) ('Purchase History', LuIcons.scrollText, RPaths.purchases),
+      if (p.contains(RolePermissions.returnPurchase)) ('Purchase Return', LuIcons.undo, RPaths.purchasesReturn),
+    ],
+    if (RolePermissions.isInGroup(p, RolePermissions.peopleGroup)) ...[
+      ('People', null, null),
+      if (p.contains(RolePermissions.manageCustomer)) ('Customer', LuIcons.users, RPaths.customer),
+      if (p.contains(RolePermissions.manageSupplier)) ('Supplier', LuIcons.usersRound, RPaths.supplier),
+      if (p.contains(RolePermissions.manageStaff)) ('Staff', LuIcons.userCog, RPaths.staffs),
+      if (p.contains(RolePermissions.manageRole)) ('Roles', LuIcons.shield, RPaths.roles),
+    ],
+    if (RolePermissions.isInGroup(p, RolePermissions.logisticsGroup)) ...[
+      ('Logistics', null, null),
+      if (p.contains(RolePermissions.manageWarehouse)) ('Warehouse', LuIcons.gitBranch, RPaths.warehouse),
+      if (p.contains(RolePermissions.transferStock)) ('Stock Transfer', LuIcons.arrowUpDown, RPaths.stockTransfer),
+    ],
+    if (RolePermissions.isInGroup(p, RolePermissions.accountingGroup)) ...[
+      ('Accounting', null, null),
+      if (p.contains(RolePermissions.manageAccounts)) ('Payment Accounts', LuIcons.creditCard, RPaths.paymentAccount),
+      if (p.contains(RolePermissions.manageExpanse)) ('Expense', LuIcons.wallet, RPaths.expense),
+      if (p.contains(RolePermissions.manageExpanse)) ('Expense Category', LuIcons.variable, RPaths.expenseCategory),
+      if (p.contains(RolePermissions.transferMoney)) ('Money transfer', LuIcons.arrowsUpFromLine, RPaths.moneyTransfer),
+      if (p.contains(RolePermissions.transactions)) ('Transactions', LuIcons.landmark, RPaths.transactions),
+      if (p.contains(RolePermissions.due)) ('Due', LuIcons.coins, RPaths.due),
+    ],
 
-  // ('', null, null),
-  ('Sales', null, null),
-  ('Sales History', LuIcons.shoppingCart, RPaths.sales),
-  ('Sales Return', LuIcons.shoppingCart, RPaths.salesReturn),
-
-  // ('', null, null),
-  ('Purchases', null, null),
-  ('Purchase History', LuIcons.scrollText, RPaths.purchases),
-  ('Purchase Return', LuIcons.scrollText, RPaths.purchasesReturn),
-
-  // ('', null, null),
-  ('People', null, null),
-  ('Customer', LuIcons.users, RPaths.customer),
-  ('Supplier', LuIcons.usersRound, RPaths.supplier),
-  ('Staff', LuIcons.userCog, RPaths.staffs),
-  ('Roles', LuIcons.shield, RPaths.roles),
-
-  // ('', null, null),
-  ('Inventory', null, null),
-  ('Warehouse', LuIcons.gitBranch, RPaths.warehouse),
-  ('Stock Transfer', LuIcons.arrowUpDown, RPaths.stockTransfer),
-
-  // ('', null, null),
-  ('Accounting', null, null),
-  ('Expense', LuIcons.wallet, RPaths.expense),
-  ('Expense Category', LuIcons.variable, RPaths.expenseCategory),
-  ('Due', LuIcons.coins, RPaths.due),
-  ('Money transfer', LuIcons.arrowsUpFromLine, RPaths.moneyTransfer),
-  ('Transactions', LuIcons.landmark, RPaths.transactions),
-  ('Payment Accounts', LuIcons.creditCard, RPaths.paymentAccount),
-
-  // ('', null, null),
-  ('Configuration', null, null),
-  ('Settings', LuIcons.settings2, RPaths.settings),
-];
+    ('Configuration', null, null),
+    ('Settings', LuIcons.settings2, RPaths.settings),
+  ];
+}

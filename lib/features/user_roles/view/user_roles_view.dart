@@ -59,7 +59,8 @@ class UserRolesView extends HookConsumerWidget {
                             if (loading.value) return;
                             final ctrl = ref.read(userRolesCtrlProvider.notifier);
                             loading.truthy();
-                            await ctrl.toggleEnable(v, data);
+                            final result = await ctrl.toggleEnable(v, data);
+                            if (context.mounted) result.showToast(context);
                             loading.falsey();
                           } catch (e) {
                             loading.falsey();
@@ -77,8 +78,9 @@ class UserRolesView extends HookConsumerWidget {
                       ShadButton.secondary(
                         size: ShadButtonSize.sm,
                         leading: const Icon(LuIcons.eye),
-                        onPressed:
-                            () => showShadDialog(context: context, builder: (context) => _RoleViewDialog(role: data)),
+                        onPressed: () {
+                          showShadDialog(context: context, builder: (context) => _RoleViewDialog(role: data));
+                        },
                       ),
                       ShadButton.secondary(
                         size: ShadButtonSize.sm,
@@ -101,12 +103,12 @@ class UserRolesView extends HookConsumerWidget {
     builder: (context) {
       const limit = 2;
       final limitedRoles = role.permissions.take(limit).map((e) => e.name.titleCase).join(', ');
-      final more = role.permissions.length > limit ? ' +${role.permissions.length - limit} more' : '';
+      final more = role.getPermissions.length > limit ? ' +${role.getPermissions.length - limit} more' : '';
       return Column(
         spacing: Insets.xs,
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [Text('Permissions: ${role.permissions.length}'), Text(limitedRoles + more)],
+        children: [Text('Permissions: ${role.getPermissions.length}'), Text(limitedRoles + more)],
       );
     },
   );
@@ -130,7 +132,7 @@ class _RoleViewDialog extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: Insets.med,
           children: [
-            for (final permission in role.permissions)
+            for (final permission in role.getPermissions)
               Row(
                 spacing: Insets.med,
                 children: [

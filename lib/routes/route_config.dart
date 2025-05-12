@@ -14,7 +14,6 @@ import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
 import 'package:pos/features/products/view/create_product_view.dart';
 import 'package:pos/features/products/view/products_view.dart';
-import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/settings/view/settings_view.dart';
 import 'package:pos/features/staffs/view/create_staff_view.dart';
 import 'package:pos/features/staffs/view/staffs_view.dart';
@@ -42,18 +41,8 @@ class AppRouter extends Notifier<GoRouter> {
 
   final _shell = GlobalKey<NavigatorState>(debugLabel: 'shell');
 
-  GoRouter _appRouter(RouteRedirect? redirect) {
-    return GoRouter(
-      navigatorKey: _root,
-      redirect: redirect,
-      initialLocation: rootPath,
-      routes: [ShellRoute(routes: _routes, builder: (_, s, c) => AppRoot(key: s.pageKey, child: c))],
-      errorBuilder: (_, state) => ErrorRoutePage(error: state.error?.message),
-    );
-  }
-
   /// The app router list
-  List<RouteBase> get _routes {
+  List<RouteBase> _routes(List<RolePermissions> p) {
     return [
       AppRoute(RPaths.splash, (_) => const SplashPage()),
       AppRoute(RPaths.protected, (_) => const ProtectedPage()),
@@ -73,32 +62,75 @@ class AppRouter extends Notifier<GoRouter> {
           AppRoute(
             RPaths.products,
             (_) => const ProductsView(),
+            redirect: (_, _) => RolePermissions.manageProduct.redirect(p),
             routes: [
               AppRoute(RPaths.createProduct, (_) => const CreateProductView(), parentKey: _shell),
               AppRoute(RPaths.editProduct(':id'), (_) => const CreateProductView(), parentKey: _shell),
             ],
           ),
           //! stock
-          AppRoute(RPaths.stock, (_) => const StockView()),
+          AppRoute(RPaths.stock, redirect: (_, _) => RolePermissions.manageStock.redirect(p), (_) => const StockView()),
           //! unit
-          AppRoute(RPaths.unit, (_) => const UnitView()),
+          AppRoute(RPaths.unit, redirect: (_, _) => RolePermissions.manageUnit.redirect(p), (_) => const UnitView()),
+
           //! sales
-          AppRoute(RPaths.sales, (_) => const InventoryRecordView(type: RecordType.sale)),
-          AppRoute(RPaths.createSales, (_) => const CreateRecordView(type: RecordType.sale)),
+          AppRoute(
+            RPaths.sales,
+            redirect: (_, _) => RolePermissions.makeSale.redirect(p),
+            (_) => const InventoryRecordView(type: RecordType.sale),
+            routes: [
+              AppRoute(
+                RPaths.createSales,
+                redirect: (_, _) => RolePermissions.makeSale.redirect(p),
+                (_) => const CreateRecordView(type: RecordType.sale),
+              ),
+            ],
+          ),
+
           //! sales_return
-          AppRoute(RPaths.salesReturn, (_) => const ReturnView(isSale: true)),
+          AppRoute(
+            RPaths.salesReturn,
+            redirect: (_, _) => RolePermissions.returnSale.redirect(p),
+            (_) => const ReturnView(isSale: true),
+          ),
+
           //! purchases
-          AppRoute(RPaths.purchases, (_) => const InventoryRecordView(type: RecordType.purchase)),
-          AppRoute(RPaths.createPurchases, (_) => const CreateRecordView(type: RecordType.purchase)),
+          AppRoute(
+            RPaths.purchases,
+            redirect: (_, _) => RolePermissions.makePurchase.redirect(p),
+            (_) => const InventoryRecordView(type: RecordType.purchase),
+            routes: [
+              AppRoute(
+                RPaths.createPurchases,
+                redirect: (_, _) => RolePermissions.manageProduct.redirect(p),
+                (_) => const CreateRecordView(type: RecordType.purchase),
+              ),
+            ],
+          ),
+
           //! purchases_return
-          AppRoute(RPaths.purchasesReturn, (_) => const ReturnView(isSale: false)),
+          AppRoute(
+            RPaths.purchasesReturn,
+            redirect: (_, _) => RolePermissions.returnPurchase.redirect(p),
+            (_) => const ReturnView(isSale: false),
+          ),
+
           //! customer
-          AppRoute(RPaths.customer, (_) => const PartiesView(isCustomer: true)),
+          AppRoute(
+            RPaths.customer,
+            redirect: (_, _) => RolePermissions.manageCustomer.redirect(p),
+            (_) => const PartiesView(isCustomer: true),
+          ),
           //! supplier
-          AppRoute(RPaths.supplier, (_) => const PartiesView()),
+          AppRoute(
+            RPaths.supplier,
+            redirect: (_, _) => RolePermissions.manageSupplier.redirect(p),
+            (_) => const PartiesView(),
+          ),
           //! staffs
           AppRoute(
             RPaths.staffs,
+            redirect: (_, _) => RolePermissions.manageStaff.redirect(p),
             (_) => const StaffsView(),
             routes: [
               AppRoute(RPaths.createStaffs, (_) => const CreateStaffView(), parentKey: _shell),
@@ -108,36 +140,64 @@ class AppRouter extends Notifier<GoRouter> {
           //! roles
           AppRoute(
             RPaths.roles,
+            redirect: (_, _) => RolePermissions.manageRole.redirect(p),
             (_) => const UserRolesView(),
             routes: [
               AppRoute(RPaths.createRole, (_) => const CreateUserRoleView(), parentKey: _shell),
               AppRoute(RPaths.editRole(':id'), (_) => const CreateUserRoleView(), parentKey: _shell),
             ],
           ),
+
           //! warehouse
           AppRoute(
             RPaths.warehouse,
+            redirect: (_, _) => RolePermissions.manageWarehouse.redirect(p),
             (_) => const WarehouseView(),
             routes: [
               AppRoute(RPaths.createWarehouse, (_) => const CreateWarehouseView(), parentKey: _shell),
               AppRoute(RPaths.editWarehouse(':id'), (_) => const CreateWarehouseView(), parentKey: _shell),
             ],
           ),
-
           //! stockTransfer
-          AppRoute(RPaths.stockTransfer, (_) => const StockTransferView()),
-          //! expense
-          AppRoute(RPaths.expense, (_) => const ExpenseView()),
-          //! expense category
-          AppRoute(RPaths.expenseCategory, (_) => const ExpenseCategoryView()),
-          //! due
-          AppRoute(RPaths.due, (_) => const DueView()),
-          //! moneyTransfer
-          AppRoute(RPaths.moneyTransfer, (_) => const TransactionsView(type: TransactionType.transfer)),
-          //! transactions
-          AppRoute(RPaths.transactions, (_) => const TransactionsView()),
+          AppRoute(
+            RPaths.stockTransfer,
+            redirect: (_, _) => RolePermissions.transferStock.redirect(p),
+            (_) => const StockTransferView(),
+          ),
+
           //! payment accounts
-          AppRoute(RPaths.paymentAccount, (_) => const PaymentAccountsView()),
+          AppRoute(
+            RPaths.paymentAccount,
+            redirect: (_, _) => RolePermissions.manageAccounts.redirect(p),
+            (_) => const PaymentAccountsView(),
+          ),
+          //! expense
+          AppRoute(
+            RPaths.expense,
+            redirect: (_, _) => RolePermissions.manageExpanse.redirect(p),
+            (_) => const ExpenseView(),
+          ),
+          //! expense category
+          AppRoute(
+            RPaths.expenseCategory,
+            redirect: (_, _) => RolePermissions.manageExpanse.redirect(p),
+            (_) => const ExpenseCategoryView(),
+          ),
+          //! moneyTransfer
+          AppRoute(
+            RPaths.moneyTransfer,
+            redirect: (_, _) => RolePermissions.transferMoney.redirect(p),
+            (_) => const TransactionsView(type: TransactionType.transfer),
+          ),
+          //! transactions
+          AppRoute(
+            RPaths.transactions,
+            redirect: (_, _) => RolePermissions.transactions.redirect(p),
+            (_) => const TransactionsView(),
+          ),
+          //! due
+          AppRoute(RPaths.due, redirect: (_, _) => RolePermissions.due.redirect(p), (_) => const DueView()),
+
           //! settings
           AppRoute(RPaths.settings, (_) => const SettingsView()),
         ],
@@ -145,32 +205,42 @@ class AppRouter extends Notifier<GoRouter> {
     ];
   }
 
+  GoRouter _appRouter(RouteRedirect? redirect, List<RolePermissions> permissions) {
+    return GoRouter(
+      navigatorKey: _root,
+      redirect: redirect,
+      initialLocation: rootPath,
+      routes: [ShellRoute(routes: _routes(permissions), builder: (_, s, c) => AppRoot(key: s.pageKey, child: c))],
+      errorBuilder: (_, state) => ErrorRoutePage(error: state.error?.message),
+    );
+  }
+
   @override
   GoRouter build() {
     Ctx._key = _root;
     final auth = ref.watch(authCtrlProvider);
 
-    final maintenanceMode = ref.watch(configCtrlProvider.select((s) => s.maintenanceMode));
+    // final maintenanceMode = ref.watch(configCtrlProvider.select((s) => s.maintenanceMode));
 
     FutureOr<String?> redirectLogic(ctx, GoRouterState state) async {
       final current = state.uri.toString();
       cat(current, 'route');
 
-      if (maintenanceMode == true) {
-        return RPaths.maintenance.path;
-      }
+      final user = await ref.read(authCtrlProvider.future);
 
-      if (auth.isLoading) {
-        return RPaths.splash.path;
-      } else if ((auth.value == null || auth.hasError) && !current.contains(RPaths.login.path)) {
+      if (user == null && !current.contains(RPaths.login.path)) {
+        cat('redirect to login');
         return RPaths.login.path;
-      } else if (auth.value != null && current.contains(RPaths.login.path)) {
+      }
+      if (user != null && current.contains(RPaths.login.path)) {
+        cat('redirect to home');
         return RPaths.home.path;
       }
+
       return null;
     }
 
-    return _appRouter(redirectLogic);
+    return _appRouter(redirectLogic, auth.valueOrNull?.role?.getPermissions ?? []);
   }
 }
 
