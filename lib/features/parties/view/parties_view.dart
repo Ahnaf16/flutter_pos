@@ -15,11 +15,8 @@ class PartiesView extends HookConsumerWidget {
   const PartiesView({super.key, this.isCustomer = false});
   final bool isCustomer;
 
-  static Future<WalkIn?> showAddDialog(BuildContext context, bool isCustomer, bool showWalkIn) async {
-    return showShadDialog<WalkIn>(
-      context: context,
-      builder: (context) => _PartiAddDialog(isCustomer: isCustomer, showWalkIn: showWalkIn),
-    );
+  static Future<WalkIn?> showAddDialog(BuildContext context, bool isCustomer) async {
+    return showShadDialog<WalkIn>(context: context, builder: (context) => _PartiAddDialog(isCustomer: isCustomer));
   }
 
   @override
@@ -158,11 +155,10 @@ class _PartyNameBuilder extends StatelessWidget {
 }
 
 class _PartiAddDialog extends HookConsumerWidget {
-  const _PartiAddDialog({this.parti, this.isCustomer = false, this.showWalkIn = false});
+  const _PartiAddDialog({this.parti, this.isCustomer = false});
 
   final Parti? parti;
   final bool isCustomer;
-  final bool showWalkIn;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -179,49 +175,38 @@ class _PartiAddDialog extends HookConsumerWidget {
       ),
       actions: [
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
-        if (walkInEnabled.value)
-          SubmitButton(
-            onPressed: (l) async {
-              final state = formKey.currentState!;
-              if (!state.saveAndValidate()) return;
-              final data = QMap.from(state.value);
-              final wi = WalkIn.fromMap(data);
-              context.nPop(wi);
-            },
-            child: const Text('Add customer'),
-          )
-        else
-          SubmitButton(
-            onPressed: (l) async {
-              final state = formKey.currentState!;
-              if (!state.saveAndValidate()) return;
-              final data = QMap.from(state.value);
 
-              final ctrl = ref.read(partiesCtrlProvider(isCustomer).notifier);
-              (bool, String)? result;
+        SubmitButton(
+          onPressed: (l) async {
+            final state = formKey.currentState!;
+            if (!state.saveAndValidate()) return;
+            final data = QMap.from(state.value);
 
-              if (parti == null) {
-                l.truthy();
-                if (isCustomer) {
-                  data.addAll({'type': PartiType.customer.name});
-                }
-                result = await ctrl.createParti(data, selectedFile.value);
-                l.falsey();
-              } else {
-                final updated = parti?.marge(data);
-                if (updated == null) return;
-                l.truthy();
-                result = await ctrl.updateParti(updated, selectedFile.value);
-                l.falsey();
+            final ctrl = ref.read(partiesCtrlProvider(isCustomer).notifier);
+            (bool, String)? result;
+
+            if (parti == null) {
+              l.truthy();
+              if (isCustomer) {
+                data.addAll({'type': PartiType.customer.name});
               }
-              if (result case final Result r) {
-                if (!context.mounted) return;
-                r.showToast(context);
-                if (r.success) context.pop(true);
-              }
-            },
-            child: Text(actionTxt),
-          ),
+              result = await ctrl.createParti(data, selectedFile.value);
+              l.falsey();
+            } else {
+              final updated = parti?.marge(data);
+              if (updated == null) return;
+              l.truthy();
+              result = await ctrl.updateParti(updated, selectedFile.value);
+              l.falsey();
+            }
+            if (result case final Result r) {
+              if (!context.mounted) return;
+              r.showToast(context);
+              if (r.success) context.pop(true);
+            }
+          },
+          child: Text(actionTxt),
+        ),
       ],
       child: Container(
         padding: Pads.padding(v: Insets.med),
@@ -233,18 +218,10 @@ class _PartiAddDialog extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: Insets.med,
             children: [
-              if (showWalkIn)
-                ShadCard(
-                  padding: Pads.med(),
-                  title: Text('Walk in customer', style: context.text.list),
-                  description: Text('When turned on, this customer will not be saved', style: context.text.muted),
-                  rowCrossAxisAlignment: CrossAxisAlignment.center,
-                  trailing: ShadSwitch(value: walkInEnabled.value, onChanged: walkInEnabled.set),
-                ),
               Row(
                 children: [
                   Expanded(flex: 2, child: ShadTextField(name: 'name', label: 'Name', isRequired: true)),
-                  if (!isCustomer || !walkInEnabled.value)
+                  if (!isCustomer)
                     Flexible(
                       child: FormBuilderField<String>(
                         name: 'type',

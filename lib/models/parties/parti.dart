@@ -84,8 +84,8 @@ class Parti {
     if (wi == null) return null;
     return Parti(
       id: '',
-      name: wi.name,
-      phone: wi.phone,
+      name: wi.name ?? 'Walk In',
+      phone: wi.phone ?? '',
       email: null,
       address: null,
       due: 0,
@@ -145,10 +145,10 @@ class Parti {
 }
 
 class WalkIn {
-  const WalkIn({required this.name, required this.phone});
+  const WalkIn({this.name, this.phone});
 
-  final String name;
-  final String phone;
+  final String? name;
+  final String? phone;
 
   static WalkIn? fromMap(Map<String, dynamic> map) {
     final name = map['name'] ?? map['walk_in_name'];

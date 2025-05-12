@@ -322,7 +322,7 @@ class _Summary extends StatelessWidget {
                 style: context.text.muted.error(context),
               ),
             ),
-          if (record.hasBalance && record.walkIn == null)
+          if (record.hasBalance && !record.isWalkIn)
             ShadCard(
               border: Border.all(color: context.colors.destructive),
               leading: Icon(LuIcons.triangleAlert, color: context.colors.destructive),
@@ -636,6 +636,7 @@ class _PartiSection extends HookConsumerWidget {
                   placeholder: const Text('Select a parti'),
                   itemCount: filtered.length,
                   options: [
+                    ShadOption(value: Parti.fromWalkIn(const WalkIn()), child: const Text('As walk-in')),
                     if (filtered.isEmpty) Padding(padding: Pads.med('tb'), child: const Text('No Parties found')),
                     ...filtered.map((house) {
                       return ShadOption(value: house, child: Text(house.name));
@@ -649,9 +650,7 @@ class _PartiSection extends HookConsumerWidget {
                   height: 38,
                   icon: const Icon(LuIcons.plus),
                   onPressed: () async {
-                    final wi = await PartiesView.showAddDialog(context, type.isSale, type.isSale);
-                    onSelect(null, wi);
-                    if (wi != null) selectCtrl.set([]);
+                    await PartiesView.showAddDialog(context, type.isSale);
                   },
                 ),
                 if (parti != null)
@@ -669,23 +668,26 @@ class _PartiSection extends HookConsumerWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(parti.name),
-                            if (parti.due != 0)
-                              Text.rich(
-                                TextSpan(
-                                  text: '${parti.hasDue() ? 'Due' : 'Balance'}: ${parti.due.currency()}',
-                                  children: [
-                                    if (record.dueBalance > 0)
-                                      TextSpan(
-                                        text: ' (-${record.dueBalance.currency()})',
-                                        style: context.text.p.size(12).textColor(Colors.green),
-                                      ),
-                                  ],
+                            if (parti.isWalkIn)
+                              const ShadBadge.secondary(child: Text('Walk-In'))
+                            else ...[
+                              Text(parti.name),
+                              if (parti.due != 0)
+                                Text.rich(
+                                  TextSpan(
+                                    text: '${parti.hasDue() ? 'Due' : 'Balance'}: ${parti.due.currency()}',
+                                    children: [
+                                      if (record.dueBalance > 0)
+                                        TextSpan(
+                                          text: ' (-${record.dueBalance.currency()})',
+                                          style: context.text.p.size(12).textColor(Colors.green),
+                                        ),
+                                    ],
+                                  ),
+                                  style: context.text.p.size(12),
                                 ),
-                                style: context.text.p.size(12),
-                              ),
-                            Text(parti.phone, style: context.text.muted.size(12)),
-                            if (parti.isWalkIn) const ShadBadge.secondary(child: Text('Walk-In')),
+                              Text(parti.phone, style: context.text.muted.size(12)),
+                            ],
                           ],
                         ),
                       ],

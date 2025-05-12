@@ -130,10 +130,10 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
   Future<Result> submit() async {
     cat(state.toMap(), 'submit');
 
-    if (state.parti == null && state.walkIn == null) {
-      return (false, 'Please select a party');
+    if (state.parti == null) {
+      return (false, 'Please select a ${type.isSale ? 'customer' : 'supplier'}');
     }
-    if (state.account == null) {
+    if (state.account == null && state.amount > 0) {
       return (false, 'Please select a payment account');
     }
     if (state.details.isEmpty) {
