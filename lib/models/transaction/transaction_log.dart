@@ -113,10 +113,11 @@ class TransactionLog {
   String? validate(bool fromMe) {
     final from = transactionFormParti;
     if (!fromMe) {
-      if (from == null) return 'Please select a parti to transfer from';
+      if (from == null) return 'Please select a party to transfer from';
+      if (from.id == transactedTo?.id) return 'Can\'t transfer to same party';
       if (from.hasBalance() && from.due.abs() < amount) return 'Transfer amount can\'t be more than available balance';
     }
-    if (transactedTo == null && !_trxToOther()) return 'Please select a parti or put their name and phone number';
+    if (transactedTo == null && !_trxToOther()) return 'Please select a party or put their name and phone number';
     return null;
   }
 

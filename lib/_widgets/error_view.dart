@@ -74,39 +74,6 @@ class ErrorDisplay extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Widget? child;
-
-    // child = Center(
-    //   child: ShadCard(
-    //     rowMainAxisSize: MainAxisSize.min,
-    //     columnMainAxisSize: MainAxisSize.min,
-    //     childPadding: Pads.xxxl(),
-    //     child: Center(
-    //       child: Column(
-    //         spacing: Insets.lg,
-    //         mainAxisAlignment: MainAxisAlignment.center,
-    //         children: [
-    //           Text(error, style: context.text.h4),
-    //           if (description != null) Text(description!, style: context.text.muted),
-    //           const Gap(Insets.med),
-    //           ShadButton.outline(
-    //             onPressed: () {
-    //               HapticFeedback.mediumImpact();
-    //               if (prov != null) {
-    //                 ref.invalidate(prov!);
-    //               } else {
-    //                 RPaths.home.go(context);
-    //               }
-    //             },
-
-    //             child: Text(prov == null ? 'Go Back' : 'Retry'),
-    //           ),
-    //         ],
-    //       ),
-    //     ),
-    //   ),
-    // );
-
     return ShadDialog(
       title: Text(error),
       description: description == null ? null : Text(description!, style: context.text.muted),
@@ -122,6 +89,38 @@ class ErrorDisplay extends HookConsumerWidget {
             child: const Text('Retry'),
           ),
       ],
+    );
+  }
+}
+
+class EmptyWidget extends HookConsumerWidget {
+  const EmptyWidget(this.title, {super.key, this.description, this.dense = false, this.bordered = true});
+
+  final String? title;
+  final String? description;
+  final bool dense;
+  final bool bordered;
+
+  Widget withSF() => Scaffold(appBar: AppBar(), body: this);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ShadCard(
+      childPadding: Pads.med(),
+      border: bordered ? null : const Border(),
+      shadows: bordered ? null : [],
+      child: Center(
+        child: Flex(
+          direction: dense ? Axis.horizontal : Axis.vertical,
+          spacing: Insets.med,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(LuIcons.triangleAlert200, color: context.colors.destructive.op6, size: dense ? 25 : 40),
+            Text(title ?? 'No Item Found', style: dense ? context.text.list : context.text.lead),
+            if (description != null) Text(description!, style: context.text.muted),
+          ],
+        ),
+      ),
     );
   }
 }

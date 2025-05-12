@@ -108,10 +108,38 @@ class _TransferDialog extends HookConsumerWidget {
                                 label: 'Transfer to',
                                 options: parties,
                                 allowDeselection: true,
-                                isRequired: true,
                                 valueTransformer: (value) => value?.toMap(),
-                                optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name)),
-                                selectedBuilder: (context, v) => Text(v.name),
+                                optionBuilder: (_, v, i) {
+                                  return ShadOption(
+                                    value: v,
+                                    child: Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          TextSpan(text: v.name),
+                                          TextSpan(text: ' (${v.type.name})', style: context.text.muted.size(12)),
+                                          // TextSpan(
+                                          //   text: ' ${v.hasDue() ? 'Due: ' : 'Balance: '}${v.due.abs().currency()}',
+                                          //   style: context.text.muted.textColor(v.dueColor),
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                selectedBuilder: (context, v) {
+                                  return Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(text: v.name),
+                                        TextSpan(text: ' (${v.type.name})', style: context.text.muted.size(12)),
+                                        // TextSpan(
+                                        //   text: ' ${v.hasDue() ? 'Due: ' : 'Balance: '}${v.due.abs().currency()}',
+                                        //   style: context.text.muted.textColor(v.dueColor),
+                                        // ),
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
                               child: const Text('Parti'),
                             ),
@@ -120,19 +148,13 @@ class _TransferDialog extends HookConsumerWidget {
                               content: Row(
                                 children: [
                                   Flexible(
-                                    child: ShadTextField(
-                                      name: 'transact_to',
-                                      label: 'Name',
-                                      hintText: 'Enter name',
-                                      isRequired: true,
-                                    ),
+                                    child: ShadTextField(name: 'transact_to', label: 'Name', hintText: 'Enter name'),
                                   ),
                                   Flexible(
                                     child: ShadTextField(
                                       name: 'transact_to_phone',
                                       label: 'Phone',
                                       hintText: 'Enter phone',
-                                      isRequired: true,
                                     ),
                                   ),
                                 ],
@@ -243,7 +265,11 @@ class _TransactionForParti extends StatelessWidget {
             TextSpan(
               children: [
                 TextSpan(text: v.name),
-                TextSpan(text: ' (${v.due.currency()})', style: context.text.muted.textColor(v.dueColor)),
+                TextSpan(text: ' (${v.type.name})', style: context.text.muted.size(12)),
+                // TextSpan(
+                //   text: ' ${v.hasDue() ? 'Due: ' : 'Balance: '}${v.due.abs().currency()}',
+                //   style: context.text.muted.textColor(v.dueColor),
+                // ),
               ],
             ),
           ),
@@ -254,7 +280,11 @@ class _TransactionForParti extends StatelessWidget {
           TextSpan(
             children: [
               TextSpan(text: v.name),
-              TextSpan(text: ' (${v.due.currency()})', style: context.text.muted.textColor(v.dueColor)),
+              TextSpan(text: ' (${v.type.name})', style: context.text.muted.size(12)),
+              // TextSpan(
+              //   text: ' ${v.hasDue() ? 'Due: ' : 'Balance: '}${v.due.abs().currency()}',
+              //   style: context.text.muted.textColor(v.dueColor),
+              // ),
             ],
           ),
         );

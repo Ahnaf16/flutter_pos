@@ -88,8 +88,8 @@ class _ProductSection extends StatelessWidget {
     if (model.stock.isEmpty) {
       return SliverPadding(
         padding: Pads.xl(),
-        sliver: SliverToBoxAdapter(
-          child: Center(child: Text('This product does not have any stock', style: ctx.text.list.error(ctx))),
+        sliver: const SliverToBoxAdapter(
+          child: EmptyWidget('This product does not have any stock', dense: true, bordered: false),
         ),
       );
     }
@@ -157,12 +157,6 @@ class _ProductSection extends StatelessWidget {
                     children: [Text('Date: ${stock.createdAt.formatDate()}', style: context.text.muted)],
                   ),
                 ),
-                // const Expanded(
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.end,
-                //     children: [ShadButton.secondary(size: ShadButtonSize.sm, leading: Icon(LuIcons.eye))],
-                //   ),
-                // ),
               ],
             ),
           );

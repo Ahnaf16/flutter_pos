@@ -41,6 +41,7 @@ class DataTableBuilder<T, R> extends StatefulWidget {
 class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
   @override
   Widget build(BuildContext context) {
+    if (widget.items.isEmpty) return const EmptyWidget('No Item Found');
     return ClipRRect(
       borderRadius: Corners.medBorder,
       child: SfDataGridTheme(
@@ -54,6 +55,7 @@ class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
             alignment: widget.cellAlignment,
             alignmentBuilder: widget.cellAlignmentBuilder,
           ),
+
           allowExpandCollapseGroup: true,
           headerGridLinesVisibility: GridLinesVisibility.both,
           highlightRowOnHover: false,

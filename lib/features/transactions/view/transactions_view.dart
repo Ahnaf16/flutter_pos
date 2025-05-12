@@ -28,7 +28,7 @@ class TransactionsView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final partiList = ref.watch(transactionLogCtrlProvider(type));
     return BaseBody(
-      title: 'Transaction logs',
+      title: type == TransactionType.transfer ? 'Money transfer' : 'Transaction logs',
       actions: [
         if (type == TransactionType.transfer)
           ShadButton(
