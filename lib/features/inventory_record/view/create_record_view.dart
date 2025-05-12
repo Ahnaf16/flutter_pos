@@ -8,6 +8,7 @@ import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
 
@@ -552,7 +553,8 @@ class _AccountSelect extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final accList = ref.watch(paymentAccountsCtrlProvider);
+    final accList = ref.watch(paymentAccountsCtrlProvider());
+    final config = ref.watch(configCtrlProvider);
 
     return accList.when(
       loading: () => Padding(padding: Pads.sm('lrt'), child: const ShadCard(width: 300, child: Loading())),
@@ -562,7 +564,7 @@ class _AccountSelect extends HookConsumerWidget {
           label: 'Account',
           minWidth: 300,
           hintText: 'Select a payment account',
-          // isRequired: true,
+          initialValue: config.defaultAccount,
           optionBuilder: (context, acc, _) {
             return ShadOption<PaymentAccount>(
               value: acc,
@@ -590,7 +592,7 @@ class _AccountSelect extends HookConsumerWidget {
             );
           },
           onChanged: onAccountSelect,
-          anchor: const ShadAnchorAuto(targetAnchor: Alignment.topRight, followerAnchor: Alignment.topCenter),
+          anchor: const ShadAnchorAuto(targetAnchor: Alignment.topCenter, followerAnchor: Alignment.topCenter),
         );
       },
     );

@@ -1,4 +1,5 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/main.export.dart';
 
@@ -10,6 +11,8 @@ class GeneralSettingsView extends HookConsumerWidget {
     final config = ref.watch(configCtrlProvider);
 
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
+
+    final accountList = ref.watch(paymentAccountsCtrlProvider());
 
     return ShadCard(
       border: const Border(),
@@ -65,6 +68,23 @@ class GeneralSettingsView extends HookConsumerWidget {
                   ],
                 ),
 
+                accountList.maybeWhen(
+                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                  data: (accounts) {
+                    return ShadSelectField<PaymentAccount>(
+                      name: 'default_account',
+                      hintText: 'Set a default payment account',
+                      label: 'Default payment account',
+                      initialValue: config.defaultAccount,
+                      options: accounts,
+                      valueTransformer: (value) => value?.toMap(),
+                      optionBuilder: (_, v, i) {
+                        return ShadOption(value: v, child: Text(v.name));
+                      },
+                      selectedBuilder: (_, v) => Text(v.name),
+                    );
+                  },
+                ),
                 FormBuilderField<String>(
                   name: 'stock_distribution_policy',
                   builder: (form) {

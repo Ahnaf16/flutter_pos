@@ -42,7 +42,7 @@ class StockTransferView extends HookConsumerWidget {
             children: [
               ShadResizablePanel(
                 id: 0,
-                defaultSize: .60,
+                defaultSize: .7,
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: product == null ? MainAxisAlignment.center : MainAxisAlignment.start,
@@ -176,7 +176,6 @@ class StockTransferView extends HookConsumerWidget {
                                                         spaced: false,
                                                       ),
                                                     ),
-                                                    Expanded(child: Text(stock.createdAt.formatDate('dd/MMM hh:mm a'))),
                                                     Expanded(
                                                       child: CenterRight(
                                                         child: Text('${stock.quantity} ${product.unitName}'),
@@ -323,9 +322,9 @@ class StockTransferView extends HookConsumerWidget {
               ),
               ShadResizablePanel(
                 id: 1,
-                defaultSize: .4,
+                defaultSize: .3,
                 minSize: .2,
-                maxSize: .5,
+                maxSize: .4,
                 child: ProductsPanel(
                   type: RecordType.sale,
                   userHouse: user?.warehouse,

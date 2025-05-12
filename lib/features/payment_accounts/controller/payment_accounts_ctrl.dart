@@ -9,15 +9,15 @@ part 'payment_accounts_ctrl.g.dart';
 class PaymentAccountsCtrl extends _$PaymentAccountsCtrl {
   final _repo = locate<PaymentAccountsRepo>();
   @override
-  Future<List<PaymentAccount>> build() async {
-    final staffs = await _repo.getAccount();
+  Future<List<PaymentAccount>> build([bool onlyActive = true]) async {
+    final staffs = await _repo.getAccounts(onlyActive);
     return staffs.fold((l) {
       Toast.showErr(Ctx.context, l);
       return [];
     }, identity);
   }
 
-  Future<Result> createUnit(QMap form) async {
+  Future<Result> createAccount(QMap form) async {
     final res = await _repo.createAccount(form);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
@@ -36,7 +36,7 @@ class PaymentAccountsCtrl extends _$PaymentAccountsCtrl {
   Future<Result> toggleEnable(bool isActive, PaymentAccount acc) async {
     final res = await _repo.updateAccount(acc.copyWith(isActive: isActive));
     return await res.fold(leftResult, (r) async {
-      state = await AsyncValue.guard(() async => build());
+      state = await AsyncValue.guard(() async => build(onlyActive));
       return rightResult('Unit updated successfully');
     });
   }

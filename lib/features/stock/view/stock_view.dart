@@ -1,3 +1,4 @@
+import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/main.export.dart';
@@ -10,23 +11,26 @@ class StockView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final productList = ref.watch(productsCtrlProvider);
     final viewingWh = ref.watch(viewingWHProvider);
+    final permissions = ref.watch(authStateSyncProvider).toNullable()?.role?.permissions ?? [];
 
     final scrCtrl = useScrollController();
     return BaseBody(
       title: 'Stocks',
       actions: [
-        ShadButton(
-          child: const Text('Purchase'),
-          onPressed: () {
-            RPaths.purchases.pushNamed(context);
-          },
-        ),
-        ShadButton(
-          child: const Text('Add a Product'),
-          onPressed: () {
-            RPaths.createProduct.pushNamed(context);
-          },
-        ),
+        if (permissions.contains(RolePermissions.makePurchase))
+          ShadButton(
+            child: const Text('Purchase'),
+            onPressed: () {
+              RPaths.purchases.pushNamed(context);
+            },
+          ),
+        if (permissions.contains(RolePermissions.manageProduct))
+          ShadButton(
+            child: const Text('Add a Product'),
+            onPressed: () {
+              RPaths.createProduct.pushNamed(context);
+            },
+          ),
       ],
       body: Scrollbar(
         controller: scrCtrl,
@@ -41,6 +45,7 @@ class StockView extends HookConsumerWidget {
               loading: () => const Loading(),
               error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
               data: (products) {
+                if (products.isEmpty) return const EmptyWidget('No Products Found');
                 return CustomScrollView(
                   slivers: [
                     MultiSliver(

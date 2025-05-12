@@ -60,6 +60,8 @@ class ShadSelectField<T> extends ShadFormDecoration<T> {
                          anchor: anchor,
                          selectedOptionBuilder: selectedBuilder ?? _defSelectedBuilder<T>,
                          options: [
+                           if (options.isEmpty)
+                             Padding(padding: Pads.padding(v: 24), child: const Text('No Item Found')),
                            for (int i = 0; i < options.length; i++)
                              Offstage(
                                offstage: !state.filtered.contains(options[i]),

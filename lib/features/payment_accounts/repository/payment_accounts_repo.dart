@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:pos/main.export.dart';
 
@@ -13,9 +14,9 @@ class PaymentAccountsRepo with AwHandler {
     return doc;
   }
 
-  FutureReport<List<PaymentAccount>> getAccount() async {
+  FutureReport<List<PaymentAccount>> getAccounts([bool onlyActive = true]) async {
     return await db
-        .getList(AWConst.collections.paymentAccount)
+        .getList(AWConst.collections.paymentAccount, queries: [if (onlyActive) Query.equal('is_active', true)])
         .convert((docs) => docs.convertDoc(PaymentAccount.fromDoc));
   }
 

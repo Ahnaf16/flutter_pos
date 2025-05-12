@@ -2,7 +2,7 @@ import 'package:pos/features/due/controller/due_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('Name', double.nan), ('Amount', 250.0), ('Date', 250.0), ('Action', 100.0)];
+const _headings = [('Name', double.nan), ('Amount', 350.0), ('Date', 250.0), ('Action', 100.0)];
 
 class DueView extends HookConsumerWidget {
   const DueView({super.key});
@@ -97,6 +97,7 @@ class _PartyNameBuilder extends StatelessWidget {
                   if (!parti.isCustomer) ShadBadge.outline(child: Text(parti.type.name)),
                 ],
               ),
+              Text(parti.phone),
               if (parti.address != null) Text(parti.address ?? '--', maxLines: 2, overflow: TextOverflow.ellipsis),
             ],
           ),

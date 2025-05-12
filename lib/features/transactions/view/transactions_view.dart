@@ -3,6 +3,7 @@ import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/auth/view/user_card.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/transactions/controller/transactions_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';

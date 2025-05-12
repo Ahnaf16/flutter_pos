@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/features/expense/controller/expense_ctrl.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -191,8 +192,10 @@ class _ExpenseAddDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final config = ref.watch(configCtrlProvider);
+
     final staffList = ref.watch(staffsCtrlProvider);
-    final accountList = ref.watch(paymentAccountsCtrlProvider);
+    final accountList = ref.watch(paymentAccountsCtrlProvider());
     final categoryList = ref.watch(expenseCategoryCtrlProvider);
 
     final searchUser = useState('');
@@ -332,6 +335,7 @@ class _ExpenseAddDialog extends HookConsumerWidget {
                     child: FormBuilderField<QMap>(
                       name: 'payment_account',
                       validator: FormBuilderValidators.required(),
+                      initialValue: config.defaultAccount?.toMap(),
                       builder: (form) {
                         return ShadInputDecorator(
                           label: const Text('Payment Account').required(),
@@ -347,7 +351,7 @@ class _ExpenseAddDialog extends HookConsumerWidget {
                                   placeholder: const Text('Select a payment account'),
                                   options: [
                                     if (filtered.isEmpty)
-                                      Padding(padding: Pads.padding(v: 24), child: const Text('Not found')),
+                                      Padding(padding: Pads.padding(v: 24), child: const Text('Not Item found')),
 
                                     ...filtered.map((role) {
                                       return ShadOption(value: role, child: Text(role.name));

@@ -10,7 +10,7 @@ class PaymentAccountsView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final productList = ref.watch(paymentAccountsCtrlProvider);
+    final productList = ref.watch(paymentAccountsCtrlProvider(false));
 
     return BaseBody(
       title: 'Payment Accounts',
@@ -93,7 +93,7 @@ class PaymentAccountsView extends HookConsumerWidget {
           value: acc.isActive,
           onChanged: (v) async {
             try {
-              final ctrl = ref.read(paymentAccountsCtrlProvider.notifier);
+              final ctrl = ref.read(paymentAccountsCtrlProvider(false).notifier);
               loading.truthy();
               await ctrl.toggleEnable(v, acc);
               loading.falsey();
@@ -127,12 +127,12 @@ class _AccountAddDialog extends HookConsumerWidget {
             if (!state.saveAndValidate()) return;
             final data = state.value;
 
-            final ctrl = ref.read(paymentAccountsCtrlProvider.notifier);
+            final ctrl = ref.read(paymentAccountsCtrlProvider(false).notifier);
             (bool, String)? result;
 
             if (acc == null) {
               l.truthy();
-              result = await ctrl.createUnit(data);
+              result = await ctrl.createAccount(data);
               l.falsey();
             } else {
               final updated = acc?.marge(data);

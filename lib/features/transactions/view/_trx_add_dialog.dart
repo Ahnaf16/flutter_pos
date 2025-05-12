@@ -10,8 +10,9 @@ class _TransferDialog extends HookConsumerWidget {
 
     final fromMe = useState(true);
     final toParti = useState(true);
+    final config = ref.watch(configCtrlProvider);
 
-    final accountList = ref.watch(paymentAccountsCtrlProvider);
+    final accountList = ref.watch(paymentAccountsCtrlProvider());
     final partiList = ref.watch(partiesCtrlProvider(null));
     final user = ref.watch(authStateSyncProvider).toNullable();
     return ShadDialog(
@@ -189,6 +190,7 @@ class _TransferDialog extends HookConsumerWidget {
                                 name: 'payment_account',
                                 hintText: 'Payment account',
                                 label: 'Payment account',
+                                initialValue: config.defaultAccount,
                                 options: accounts,
                                 isRequired: true,
                                 valueTransformer: (value) => value?.toMap(),
