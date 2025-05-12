@@ -190,7 +190,7 @@ class TransactionLog {
     final amount = rec.deductedFromAccount;
     final account = rec.returnedRec.account.name;
     final date = rec.returnDate.formatDate();
-    return ['returned $amount', 'from $account', 'on $date'].join(' ');
+    return ['Returned $amount', rec.isSale ? ' from' : ' to', ' $account', 'on $date'].join(' ');
   }
 
   static String _noteEx(Expense record) {

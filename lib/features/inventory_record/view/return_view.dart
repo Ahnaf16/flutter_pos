@@ -61,8 +61,6 @@ class ReturnView extends HookConsumerWidget {
                         left: 'Amount',
                         right: '${data.isSale ? '-' : '+'}${data.deductedFromAccount.currency()}',
                       ),
-                      if (data.deductedFromParty > 0)
-                        SpacedText(left: 'Party', right: data.deductedFromParty.currency()),
                     ],
                   ),
                 ),
