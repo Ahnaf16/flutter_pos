@@ -1,4 +1,5 @@
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class HomeView extends HookConsumerWidget {
@@ -6,100 +7,29 @@ class HomeView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
-    return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
-        padding: context.layout.pagePadding,
-        child: FormBuilder(
-          key: formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 20,
+    final accounts = ref.watch(paymentAccountsCtrlProvider(false)).maybeWhen(data: identity, orElse: () => null);
+
+    return BaseBody(
+      scrollable: true,
+      noAPPBar: true,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: Insets.lg,
+        children: [
+          if (accounts != null && accounts.isEmpty)
+            const ShadAlert.destructive(
+              title: Text('Setup payment account'),
+              description: Text('No payment account has been added'),
+              iconData: LuIcons.triangleAlert,
+            ),
+          const Row(
+            spacing: Insets.lg,
             children: [
-              ShadTextField(
-                name: 'regular',
-                label: 'Regular',
-                hintText: 'Regular input',
-                isRequired: true,
-                initialValue: 'initial value',
-                showClearButton: true,
-              ),
-              ShadTextField(
-                name: 'numeric',
-                label: 'numeric',
-                hintText: 'numeric input',
-                helperText: 'This is a numeric field',
-                numeric: true,
-              ),
-              ShadTextField(name: 'pass', label: 'pass', hintText: 'Enter your pass', isPassField: true),
-
-              ShadTextAreaField(
-                name: 'desc',
-                label: 'desc',
-                hintText: 'Enter your desc',
-                isRequired: true,
-                initialValue: 'initial value',
-              ),
-              ShadSelectField<TransactionType>(
-                name: 'select',
-                label: 'select',
-                hintText: 'select something',
-                minWidth: 300,
-                options: TransactionType.values,
-                optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name)),
-                selectedBuilder: (context, value) => Text(value.name),
-              ),
-
-              ShadFileField(),
-
-              Row(
-                children: [
-                  ShadButton(
-                    onPressed: () {
-                      final state = formKey.currentState!;
-                      if (!state.saveAndValidate()) return;
-                      final data = state.value;
-                      cat(data, 'Form Data');
-                    },
-                    child: const Text('Submit'),
-                  ),
-                  ShadButton(
-                    onPressed: () {
-                      formKey.currentState!.reset();
-                    },
-                    child: const Text('reset'),
-                  ),
-                  ShadButton(
-                    onPressed: () {
-                      formKey.currentState!.patchValue({
-                        'regular': '',
-                        'numeric': '',
-                        'pass': '',
-                        'desc': '',
-                        'select': null,
-                      });
-                    },
-                    child: const Text('clear'),
-                  ),
-                  ShadButton(
-                    onPressed: () {
-                      formKey.currentState!.patchValue({
-                        'regular': 'Regular',
-                        'numeric': '12587854',
-                        'pass': 'password',
-                        'desc': 'description',
-                        'select': TransactionType.purchase,
-                      });
-                    },
-                    child: const Text('set'),
-                  ),
-                ],
-              ),
+              ShadCard(expanded: false, height: 200, width: 300),
+              ShadCard(expanded: false, height: 200, width: 300),
             ],
           ),
-        ),
+        ],
       ),
     );
   }

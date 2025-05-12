@@ -17,6 +17,7 @@ class BaseBody extends StatelessWidget {
     this.padding,
     this.alignment = Alignment.topCenter,
     this.scrollable = false,
+    this.noAPPBar = false,
     required this.body,
   });
 
@@ -35,6 +36,7 @@ class BaseBody extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final AlignmentGeometry alignment;
   final bool scrollable;
+  final bool noAPPBar;
 
   @override
   Widget build(BuildContext context) {
@@ -44,15 +46,18 @@ class BaseBody extends StatelessWidget {
       child = SingleChildScrollView(child: child);
     }
     return Scaffold(
-      appBar: KAppBar(
-        title: title,
-        actions: actions,
-        leading: leading,
-        bottom: bottom,
-        bottomHeight: bottomHeight,
-        actionGap: actionGap,
-        actionGapEnd: actionGapEnd,
-      ),
+      appBar:
+          noAPPBar
+              ? null
+              : KAppBar(
+                title: title,
+                actions: actions,
+                leading: leading,
+                bottom: bottom,
+                bottomHeight: bottomHeight,
+                actionGap: actionGap,
+                actionGapEnd: actionGapEnd,
+              ),
       floatingActionButton: floatingActionButton,
       body: Column(
         children: [
