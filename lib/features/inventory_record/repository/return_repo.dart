@@ -19,6 +19,7 @@ class ReturnRepo with AwHandler {
     num effectiveOp(num value) => isSale ? value : -value;
 
     num totalPrice = 0;
+    final detailsQtyPair = <String>[];
 
     final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
     if (err != null || user == null) return left(err ?? const Failure('Unable to getting current user'));
@@ -29,6 +30,7 @@ class ReturnRepo with AwHandler {
       totalPrice = totalPrice + detail.totalPrice(value);
 
       final qty = effectiveOp(value).toInt();
+      detailsQtyPair.add('$key::$qty');
       final (stockErr, stockData) = await _updateStockQty(detail.stock, qty).toRecord();
       if (stockErr != null || stockData == null) return left(stockErr ?? Failure(_generalFailure));
     }
@@ -66,6 +68,7 @@ class ReturnRepo with AwHandler {
       deductedFromAccount: effectiveAccBal,
       deductedFromParty: remaining,
       isSale: isSale,
+      detailsQtyPair: detailsQtyPair,
     );
 
     //! update record

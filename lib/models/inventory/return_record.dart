@@ -11,6 +11,7 @@ class ReturnRecord {
     required this.deductedFromAccount,
     required this.deductedFromParty,
     required this.isSale,
+    this.detailsQtyPair = const [],
   });
 
   final String id;
@@ -22,6 +23,10 @@ class ReturnRecord {
   final String? note;
   final bool isSale;
 
+  /// this stores the [InventoryDetails.id] and ReturnQty in pair
+  /// example: [InventoryDetails.id]::[ReturnQty]
+  final List<String> detailsQtyPair;
+
   factory ReturnRecord.fromDoc(Document doc) => ReturnRecord(
     id: doc.$id,
     returnedRec: InventoryRecord.fromMap(doc.data['inventoryRecord']),
@@ -31,6 +36,7 @@ class ReturnRecord {
     deductedFromAccount: doc.data['deductedFromAccount'],
     deductedFromParty: doc.data['deductedFromParty'],
     isSale: doc.data['isSale'],
+    detailsQtyPair: List<String>.from(doc.data['stock_qty_pair']),
   );
 
   factory ReturnRecord.fromMap(Map<String, dynamic> map) => ReturnRecord(
@@ -42,6 +48,7 @@ class ReturnRecord {
     deductedFromAccount: map.parseNum('deductedFromAccount'),
     deductedFromParty: map.parseNum('deductedFromParty'),
     isSale: map.parseBool('isSale'),
+    detailsQtyPair: List<String>.from(map['stock_qty_pair']),
   );
 
   QMap toMap() => {
@@ -53,6 +60,7 @@ class ReturnRecord {
     'deductedFromAccount': deductedFromAccount,
     'deductedFromParty': deductedFromParty,
     'isSale': isSale,
+    'stock_qty_pair': detailsQtyPair,
   };
 
   QMap toAwPost() => {
@@ -62,5 +70,6 @@ class ReturnRecord {
     'deductedFromAccount': deductedFromAccount,
     'deductedFromParty': deductedFromParty,
     'isSale': isSale,
+    'stock_qty_pair': detailsQtyPair,
   };
 }
