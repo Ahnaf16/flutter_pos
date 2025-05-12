@@ -88,7 +88,6 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
     final houseList = useState(<WareHouse>[]);
 
     void fetchHouses() async {
-      cat(user?.name ?? 'NA');
       if (user?.warehouse?.isDefault == true) {
         final houses = await ref.read(warehouseCtrlProvider.future);
         houseList.value = houses;
@@ -100,7 +99,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
     useEffect(() {
       fetchHouses();
       return null;
-    }, [user?.id]);
+    }, [user?.id, user?.warehouse?.isDefault]);
 
     return AppBar(
       title: const Text(kAppName),

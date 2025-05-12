@@ -1,3 +1,4 @@
+import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/warehouse/repository/warehouse_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -27,6 +28,15 @@ class WarehouseCtrl extends _$WarehouseCtrl {
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       return rightResult('Warehouse created successfully');
+    });
+  }
+
+  Future<Result> changeDefault(WareHouse newDefault) async {
+    final res = await _repo.changeDefault(newDefault);
+    return res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      ref.invalidate(currentUserProvider);
+      return rightResult('Default warehouse changed');
     });
   }
 }

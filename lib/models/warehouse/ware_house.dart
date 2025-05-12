@@ -22,37 +22,38 @@ class WareHouse {
     final data = doc.data;
     return WareHouse(
       id: doc.$id,
-      name: data['name'] ?? '',
-      address: data['address'] ?? '',
-      isDefault: data['is_default'] ?? false,
-      contactNumber: data['contact_number'] ?? '',
-      contactPerson: data['contact_person'],
+      name: data[fields.name] ?? '',
+      address: data[fields.address] ?? '',
+      isDefault: data[fields.isDefault] ?? false,
+      contactNumber: data[fields.contactNumber] ?? '',
+      contactPerson: data[fields.contactPerson],
     );
   }
 
   factory WareHouse.fromMap(Map<String, dynamic> map) {
     return WareHouse(
       id: map.parseAwField(),
-      name: map['name'] ?? '',
-      address: map['address'] ?? '',
-      isDefault: map['is_default'] ?? false,
-      contactNumber: map['contact_number'] ?? '',
-      contactPerson: map['contact_person'],
+      name: map[fields.name] ?? '',
+      address: map[fields.address] ?? '',
+      isDefault: map[fields.isDefault] ?? false,
+      contactNumber: map[fields.contactNumber] ?? '',
+      contactPerson: map[fields.contactPerson],
     );
   }
   WareHouse marge(Map<String, dynamic> map) {
     return WareHouse(
       id: map.tryParseAwField() ?? id,
-      name: map['name'] ?? name,
-      address: map['address'] ?? address,
-      isDefault: map['is_default'] ?? isDefault,
-      contactNumber: map['contact_number'] ?? contactNumber,
-      contactPerson: map['contact_person'] ?? contactPerson,
+      name: map[fields.name] ?? name,
+      address: map[fields.address] ?? address,
+      isDefault: map[fields.isDefault] ?? isDefault,
+      contactNumber: map[fields.contactNumber] ?? contactNumber,
+      contactPerson: map[fields.contactPerson] ?? contactPerson,
     );
   }
 
   static WareHouse? tyrParse(dynamic value) {
     try {
+      if (value case final WareHouse wh) return wh;
       if (value case final Document doc) return WareHouse.fromDoc(doc);
       if (value case final Map map) return WareHouse.fromMap(map.toStringKey());
       return null;
@@ -63,18 +64,57 @@ class WareHouse {
 
   Map<String, dynamic> toMap() => {
     'id': id,
-    'name': name,
-    'address': address,
-    'is_default': isDefault,
-    'contact_number': contactNumber,
-    'contact_person': contactPerson,
+    fields.name: name,
+    fields.address: address,
+    fields.isDefault: isDefault,
+    fields.contactNumber: contactNumber,
+    fields.contactPerson: contactPerson,
   };
 
-  Map<String, dynamic> toAwPost() => {
-    'name': name,
-    'address': address,
-    'is_default': isDefault,
-    'contact_number': contactNumber,
-    'contact_person': contactPerson,
-  };
+  // if include is null, all fields will be included
+  Map<String, dynamic> toAwPost([List<String>? include]) {
+    final map = <String, dynamic>{};
+
+    void add(String key, dynamic value) {
+      if (include == null || include.contains(key)) {
+        map[key] = value;
+      }
+    }
+
+    add(fields.name, name);
+    add(fields.address, address);
+    add(fields.isDefault, isDefault);
+    add(fields.contactNumber, contactNumber);
+    add(fields.contactPerson, contactPerson);
+
+    return map;
+  }
+
+  static final fields = _WarehouseFields();
+
+  WareHouse copyWith({
+    String? address,
+    String? contactNumber,
+    ValueGetter<String?>? contactPerson,
+    String? id,
+    bool? isDefault,
+    String? name,
+  }) {
+    return WareHouse(
+      address: address ?? this.address,
+      contactNumber: contactNumber ?? this.contactNumber,
+      contactPerson: contactPerson != null ? contactPerson() : this.contactPerson,
+      id: id ?? this.id,
+      isDefault: isDefault ?? this.isDefault,
+      name: name ?? this.name,
+    );
+  }
+}
+
+class _WarehouseFields {
+  final name = 'name';
+  final address = 'address';
+  final isDefault = 'is_default';
+  final contactNumber = 'contact_number';
+  final contactPerson = 'contact_person';
 }

@@ -50,6 +50,10 @@ class WarehouseView extends HookConsumerWidget {
                   columnName: head.$1,
                   value: ShadBadge.raw(
                     variant: data.isDefault ? ShadBadgeVariant.primary : ShadBadgeVariant.secondary,
+                    onPressed: () {
+                      if (data.isDefault) return;
+                      showShadDialog(context: context, builder: (context) => _WarehouseDefaultDialog(house: data));
+                    },
                     child: Text(data.isDefault ? 'Default' : 'Not Default'),
                   ),
                 ),
@@ -142,6 +146,36 @@ class _WarehouseViewDialog extends HookConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _WarehouseDefaultDialog extends HookConsumerWidget {
+  const _WarehouseDefaultDialog({required this.house});
+
+  final WareHouse house;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ShadDialog(
+      title: const Text('Set as Default?'),
+      description: Text('"${house.name}" will be set as default warehouse'),
+      constraints: const BoxConstraints(maxWidth: 500),
+      gap: 20,
+      actions: [
+        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        SubmitButton(
+          onPressed: (l) async {
+            final ctrl = ref.read(warehouseCtrlProvider.notifier);
+            final result = await ctrl.changeDefault(house);
+            if (context.mounted) {
+              result.showToast(context);
+              context.nPop();
+            }
+          },
+          child: const Text('Make Default'),
+        ),
+      ],
     );
   }
 }
