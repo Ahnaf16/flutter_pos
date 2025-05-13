@@ -41,8 +41,7 @@ class DataTableBuilder<T, R> extends StatefulWidget {
 class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
   @override
   Widget build(BuildContext context) {
-    if (widget.items.isEmpty) return const EmptyWidget('No Item Found');
-    return ClipRRect(
+    final sfDataGrid = ClipRRect(
       borderRadius: Corners.medBorder,
       child: SfDataGridTheme(
         data: SfDataGridThemeData(headerColor: context.colors.border, gridLineColor: context.colors.border),
@@ -69,6 +68,13 @@ class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
         ),
       ),
     );
+    if (widget.items.isEmpty) {
+      return Column(
+        children: [SizedBox(height: 60, child: sfDataGrid), const Flexible(child: EmptyWidget('No Item Found'))],
+      );
+    }
+
+    return sfDataGrid;
   }
 }
 
