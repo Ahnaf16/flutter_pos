@@ -5,7 +5,7 @@ import 'package:pos/main.export.dart';
 class DueRepo with AwHandler {
   final _coll = AWConst.collections.dueLog;
 
-  FutureReport<Document> addDueLog(Parti parti, num amount, bool isAdd, [String? note]) async {
+  FutureReport<Document> addDueLog(Party parti, num amount, bool isAdd, [String? note]) async {
     final data = DueLog(
       amount: amount,
       postAmount: parti.due + amount,

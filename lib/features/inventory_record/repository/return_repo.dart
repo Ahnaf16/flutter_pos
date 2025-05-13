@@ -51,7 +51,7 @@ class ReturnRepo with AwHandler {
     final remaining = totalPrice - effectiveAccBal;
 
     //! update Due
-    final Parti? parti = record.parti;
+    final Party? parti = record.parti;
     if (parti != null) {
       if (remaining != 0) {
         final (partiErr, partiData) = await _updateDue(parti.id, effectiveOp(-remaining), record.type).toRecord();

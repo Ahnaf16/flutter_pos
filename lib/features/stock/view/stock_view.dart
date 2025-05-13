@@ -125,17 +125,16 @@ class _ProductSection extends StatelessWidget {
                       SpacedText(
                         left: 'Purchase',
                         right: stock.purchasePrice.currency(),
-                        spaced: false,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         styleBuilder: (_, _) => (context.text.muted, context.text.small),
                       ),
-                      SpacedText(
-                        left: 'Sale',
-                        right: stock.salesPrice.currency(),
-                        spaced: false,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        styleBuilder: (_, _) => (context.text.muted, context.text.small),
-                      ),
+                      // SpacedText(
+                      //   left: 'Sale',
+                      //   right: stock.salesPrice.currency(),
+                      //   spaced: false,
+                      //   crossAxisAlignment: CrossAxisAlignment.center,
+                      //   styleBuilder: (_, _) => (context.text.muted, context.text.small),
+                      // ),
                     ],
                   ),
                 ),
@@ -191,6 +190,8 @@ class _ProductHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   OverflowMarquee(child: Text(product.name, style: context.text.list)),
+                  Text('Sale: ${product.salePrice.currency()}'),
+                  const Gap(Insets.xs),
 
                   Row(
                     spacing: Insets.med,

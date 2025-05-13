@@ -8,7 +8,7 @@ class PartiesRepo with AwHandler {
   final _coll = AWConst.collections.parties;
 
   FutureReport<Document> createParti(QMap form, PFile? xfile) async {
-    Parti parti = Parti.fromMap(form);
+    Party parti = Party.fromMap(form);
 
     if (xfile != null) {
       final file = await storage.createFile(xfile);
@@ -27,7 +27,7 @@ class PartiesRepo with AwHandler {
     return doc;
   }
 
-  FutureReport<Document> updateParti(Parti parti, [PFile? photo]) async {
+  FutureReport<Document> updateParti(Party parti, [PFile? photo]) async {
     String? oldPhoto;
     if (photo != null) {
       final file = await storage.createFile(photo);
@@ -45,20 +45,29 @@ class PartiesRepo with AwHandler {
     return doc;
   }
 
-  FutureReport<Document> updateDue(Parti parti, num amount, bool isAdd, [String? note]) async {
+  FutureReport<Document> updateDue(Party parti, num amount, bool isAdd, [String? note]) async {
     final (err, doc) = await updateParti(parti.copyWith(due: parti.due + amount)).toRecord();
     if (err != null || doc == null) return left(err ?? const Failure('Error updating due'));
     await locate<DueRepo>().addDueLog(parti, amount, isAdd, note);
     return right(doc);
   }
 
-  FutureReport<List<Parti>> getParties(List<PartiType>? type) async {
+  FutureReport<List<Party>> getParties(List<PartiType>? type) async {
     return await db
         .getList(_coll, queries: [if (type != null) Query.equal('type', type.map((e) => e.name).toList())])
-        .convert((docs) => docs.convertDoc(Parti.fromDoc));
+        .convert((docs) => docs.convertDoc(Party.fromDoc));
   }
 
-  FutureReport<Parti> getPartiById(String id) async {
-    return await db.get(_coll, id).convert(Parti.fromDoc);
+  FutureReport<Party> getPartiById(String id) async {
+    return await db.get(_coll, id).convert(Party.fromDoc);
+  }
+
+  FutureReport<Unit> checkAvailability(String phone) async {
+    final (err, docs) = await db.getList(_coll, queries: [Query.equal('phone', phone)]).toRecord();
+
+    if (err != null || docs == null) return left(err ?? const Failure('Error checking phone availability'));
+
+    if (docs.total > 0) return failure('This phone number already exists');
+    return right(unit);
   }
 }

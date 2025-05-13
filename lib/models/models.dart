@@ -5,7 +5,7 @@ export 'inventory/payment_account.dart';
 export 'inventory/return_record.dart';
 export 'misc/result.dart';
 export 'parties/due_log.dart';
-export 'parties/parti.dart';
+export 'parties/party.dart';
 export 'product/product.dart';
 export 'product/product_unit.dart';
 export 'product/stock.dart';

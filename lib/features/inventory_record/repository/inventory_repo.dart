@@ -18,7 +18,7 @@ class InventoryRepo with AwHandler {
     //! add details
     final (detailErr, detailsData) = await _createRecordDetails(inventory.details, true).toRecord();
     if (detailErr != null || detailsData == null) return left(detailErr ?? Failure(_generalFailure));
-    InventoryRecord? record = inventory.copyWith(details: detailsData).toInventoryRecord();
+    final InventoryRecord? record = inventory.copyWith(details: detailsData).toInventoryRecord();
     if (record == null) return left(Failure(_emptyFields));
 
     //! update account amount
@@ -27,7 +27,7 @@ class InventoryRepo with AwHandler {
     if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
 
     //! update Due
-    Parti? parti = record.parti;
+    Party? parti = record.parti;
     //only updates th e [DUE]
     // will be null if customer is walk-in
     if (parti != null) {
@@ -37,20 +37,20 @@ class InventoryRepo with AwHandler {
         // when hasDue, due is (+), so +due will add due. will be added as due
         final (partiErr, partiData) = await _updateDue(parti.id, inventory.due, record.type).toRecord();
         if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
-        parti = Parti.fromDoc(partiData);
+        parti = Party.fromDoc(partiData);
       }
 
-      if (inventory.hasDue && inventory.partiHasBalance) {
-        // when sale has due but parti has balance, the due will be added to record.dueBalance.
-        // this due has been already deducted from parti.due
-        record = record.copyWith(dueBalance: record.dueBalance + inventory.due);
-      }
+      // if (inventory.hasDue && inventory.partiHasBalance) {
+      //   // when sale has due but parti has balance, the due will be added to record.dueBalance.
+      //   // this due has been already deducted from parti.due
+      //   record = record.copyWith(dueBalance: record.dueBalance + inventory.due);
+      // }
 
-      if (inventory.partiHasBalance && inventory.dueBalance > 0) {
-        // [Parti.Due] is already [-] in this case so adding dueBalance will subtract balance
-        final (partiErr, partiData) = await _updateDue(parti.id, inventory.dueBalance, record.type).toRecord();
-        if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
-      }
+      // if (inventory.partiHasBalance && inventory.dueBalance > 0) {
+      //   // [Parti.Due] is already [-] in this case so adding dueBalance will subtract balance
+      //   final (partiErr, partiData) = await _updateDue(parti.id, inventory.dueBalance, record.type).toRecord();
+      //   if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
+      // }
     }
 
     //! add transaction log
@@ -65,7 +65,7 @@ class InventoryRepo with AwHandler {
     //! add details
     final (detailErr, detailsData) = await _createRecordDetails(inventory.details, false).toRecord();
     if (detailErr != null || detailsData == null) return left(detailErr ?? Failure(_generalFailure));
-    InventoryRecord? record = inventory.copyWith(details: detailsData).toInventoryRecord();
+    final InventoryRecord? record = inventory.copyWith(details: detailsData).toInventoryRecord();
     if (record == null) return left(Failure(_emptyFields));
 
     //! update account amount
@@ -75,8 +75,7 @@ class InventoryRepo with AwHandler {
     if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
 
     //! update Due
-    Parti? parti = record.parti;
-    //only updates th e [DUE]
+    Party? parti = record.parti;
     if (parti == null) return left(const Failure('Parti is required when purchasing'));
 
     if (inventory.hasDue || inventory.hasBalance) {
@@ -85,20 +84,20 @@ class InventoryRepo with AwHandler {
       // when hasDue, due is (+), so -(+due) will subtract due. will be added as balance
       final (partiErr, partiData) = await _updateDue(parti.id, -inventory.due, record.type).toRecord();
       if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
-      parti = Parti.fromDoc(partiData);
+      parti = Party.fromDoc(partiData);
     }
 
-    if (inventory.hasDue && inventory.partiHasDue) {
-      // when purchase has due and parti has due, add due to dueBalance
-      // this due has been already subtracted from parti.due
-      record = record.copyWith(dueBalance: record.dueBalance + inventory.due);
-    }
+    // if (inventory.hasDue && inventory.partiHasDue) {
+    //   // when purchase has due and parti has due, add due to dueBalance
+    //   // this due has been already subtracted from parti.due
+    //   record = record.copyWith(dueBalance: record.dueBalance + inventory.due);
+    // }
 
-    if (inventory.partiHasDue && inventory.dueBalance > 0) {
-      // [Parti.Due] is [+] in this case so subtracting dueBalance will subtract due
-      final (partiErr, partiData) = await _updateDue(parti.id, -inventory.dueBalance, record.type).toRecord();
-      if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
-    }
+    // if (inventory.partiHasDue && inventory.dueBalance > 0) {
+    //   // [Parti.Due] is [+] in this case so subtracting dueBalance will subtract due
+    //   final (partiErr, partiData) = await _updateDue(parti.id, -inventory.dueBalance, record.type).toRecord();
+    //   if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
+    // }
 
     //! add transaction log
     await _addTransactionLog(record);

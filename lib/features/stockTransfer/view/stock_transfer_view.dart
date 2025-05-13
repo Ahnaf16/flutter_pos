@@ -146,16 +146,16 @@ class StockTransferView extends HookConsumerWidget {
                                                 child: Row(
                                                   spacing: Insets.sm,
                                                   children: [
-                                                    Expanded(
-                                                      child: SpacedText(
-                                                        left: 'Sale',
-                                                        right: (stock.salesPrice).currency(),
-                                                        style: context.text.muted,
-                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                        styleBuilder: (l, r) => (l, context.text.small),
-                                                        spaced: false,
-                                                      ),
-                                                    ),
+                                                    // Expanded(
+                                                    //   child: SpacedText(
+                                                    //     left: 'Sale',
+                                                    //     right: (stock.salesPrice).currency(),
+                                                    //     style: context.text.muted,
+                                                    //     crossAxisAlignment: CrossAxisAlignment.center,
+                                                    //     styleBuilder: (l, r) => (l, context.text.small),
+                                                    //     spaced: false,
+                                                    //   ),
+                                                    // ),
                                                     Expanded(
                                                       child: SpacedText(
                                                         left: 'Purchase',
@@ -166,16 +166,16 @@ class StockTransferView extends HookConsumerWidget {
                                                         spaced: false,
                                                       ),
                                                     ),
-                                                    Expanded(
-                                                      child: SpacedText(
-                                                        left: 'Sale value',
-                                                        right: (stock.salesPrice * stock.quantity).currency(),
-                                                        style: context.text.muted,
-                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                        styleBuilder: (l, r) => (l, context.text.small),
-                                                        spaced: false,
-                                                      ),
-                                                    ),
+                                                    // Expanded(
+                                                    //   child: SpacedText(
+                                                    //     left: 'Sale value',
+                                                    //     right: (stock.salesPrice * stock.quantity).currency(),
+                                                    //     style: context.text.muted,
+                                                    //     crossAxisAlignment: CrossAxisAlignment.center,
+                                                    //     styleBuilder: (l, r) => (l, context.text.small),
+                                                    //     spaced: false,
+                                                    //   ),
+                                                    // ),
                                                     Expanded(
                                                       child: CenterRight(
                                                         child: Text('${stock.quantity} ${product.unitName}'),
@@ -193,16 +193,16 @@ class StockTransferView extends HookConsumerWidget {
                                             mainAxisAlignment: MainAxisAlignment.end,
                                             spacing: Insets.lg,
                                             children: [
-                                              Expanded(
-                                                child: SpacedText(
-                                                  left: 'Total value',
-                                                  right: (product.totalValueByHouse(from?.id)).currency(),
-                                                  style: context.text.p,
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  styleBuilder: (l, r) => (l, context.text.p.bold),
-                                                  spaced: false,
-                                                ),
-                                              ),
+                                              // Expanded(
+                                              //   child: SpacedText(
+                                              //     left: 'Total value',
+                                              //     right: (product.totalValueByHouse(from?.id)).currency(),
+                                              //     style: context.text.p,
+                                              //     crossAxisAlignment: CrossAxisAlignment.center,
+                                              //     styleBuilder: (l, r) => (l, context.text.p.bold),
+                                              //     spaced: false,
+                                              //   ),
+                                              // ),
                                               Text.rich(
                                                 TextSpan(
                                                   children: [
@@ -392,55 +392,19 @@ class StockEditSection extends HookConsumerWidget {
                 ),
               ],
             ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: ShadTextField(
-                    name: 'wholesale_price',
-                    label: 'Wholesale Price',
-                    hintText: 'Enter wholesale price',
-                    numeric: true,
-                  ),
-                ),
-                Expanded(
-                  child: ShadTextField(
-                    name: 'dealer_price',
-                    label: 'Dealer Price',
-                    hintText: 'Enter dealer price',
-                    numeric: true,
-                  ),
-                ),
-                if (!context.layout.isMobile)
-                  Expanded(
-                    child: ShadTextField(
-                      name: 'quantity',
-                      label: 'Quantity',
-                      hintText: 'Enter Stock quantity',
-                      isRequired: true,
-                      initialValue: '0',
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      validators: [
-                        if (product != null && from != null)
-                          FormBuilderValidators.max(product.quantityByHouse(from.id), checkNullOrEmpty: false),
-                      ],
-                    ),
-                  ),
+
+            ShadTextField(
+              name: 'quantity',
+              label: 'Quantity',
+              hintText: 'Enter Stock quantity',
+              isRequired: true,
+              initialValue: '0',
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              validators: [
+                if (product != null && from != null)
+                  FormBuilderValidators.max(product.quantityByHouse(from.id), checkNullOrEmpty: false),
               ],
             ),
-            if (context.layout.isMobile)
-              ShadTextField(
-                name: 'quantity',
-                label: 'Quantity',
-                hintText: 'Enter Stock quantity',
-                isRequired: true,
-                initialValue: '0',
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                validators: [
-                  if (product != null && from != null)
-                    FormBuilderValidators.max(product.quantityByHouse(from.id), checkNullOrEmpty: false),
-                ],
-              ),
           ],
         ),
       ),

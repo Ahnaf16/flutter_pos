@@ -8,7 +8,7 @@ class TransactionLog {
   const TransactionLog({
     required this.id,
     required this.amount,
-    required this.usedDueBalance,
+    required this.due,
     required this.account,
     required this.transactedTo,
     required this.transactionFormParti,
@@ -25,14 +25,14 @@ class TransactionLog {
   final num amount;
 
   /// is parti paid using there due balance
-  final num usedDueBalance;
+  final num due;
   final PaymentAccount account;
 
   /// to whom the transaction was made. can be null when type is manual
-  final Parti? transactedTo;
+  final Party? transactedTo;
 
   ///on whose behalf the transaction was made
-  final Parti? transactionFormParti;
+  final Party? transactionFormParti;
 
   /// plain name of the person to whom the transaction was made
   final String? transactTo;
@@ -53,10 +53,10 @@ class TransactionLog {
   factory TransactionLog.fromMap(Map<String, dynamic> map) => TransactionLog(
     id: map.parseAwField(),
     amount: map.parseNum('amount'),
-    usedDueBalance: map.parseNum('used_due_balance'),
+    due: map.parseNum('used_due_balance'),
     account: PaymentAccount.fromMap(map['payment_account']),
-    transactedTo: Parti.tyrParse(map['parties']),
-    transactionFormParti: Parti.tyrParse(map['transaction_for']),
+    transactedTo: Party.tyrParse(map['parties']),
+    transactionFormParti: Party.tyrParse(map['transaction_for']),
     transactTo: map['transact_to'],
     transactToPhone: map['transact_to_phone'],
     transactionBy: AppUser.tryParse(map['transaction_by']),
@@ -80,7 +80,7 @@ class TransactionLog {
   QMap toMap() => {
     'id': id,
     'amount': amount,
-    'used_due_balance': usedDueBalance,
+    'used_due_balance': due,
     'payment_account': account.toMap(),
     'parties': transactedTo?.toMap(),
     'transact_to': transactTo,
@@ -95,7 +95,7 @@ class TransactionLog {
 
   QMap toAwPost() => {
     'amount': amount,
-    'used_due_balance': usedDueBalance,
+    'used_due_balance': due,
     'payment_account': account.id,
     'parties': transactedTo?.id,
     'transact_to': transactTo,
@@ -121,20 +121,20 @@ class TransactionLog {
     return null;
   }
 
-  Parti? get getParti {
+  Party? get getParti {
     if (transactedTo != null) return transactedTo;
     final name = transactTo;
     final phone = transactToPhone;
     if (name == null || phone == null) return null;
-    return Parti.fromWalkIn(WalkIn(name: name, phone: phone));
+    return Party.fromWalkIn(WalkIn(name: name, phone: phone));
   }
 
   static TransactionLog fromInventoryRecord(InventoryRecord record, AppUser user) {
-    final parti = record.parti ?? Parti.fromWalkIn(record.walkIn);
+    final parti = record.parti;
     return TransactionLog(
       id: '',
       amount: record.amount,
-      usedDueBalance: record.dueBalance,
+      due: record.due,
       account: record.account,
       transactedTo: parti,
       transactTo: parti?.name,
@@ -155,7 +155,7 @@ class TransactionLog {
     return TransactionLog(
       id: '',
       amount: ex.amount,
-      usedDueBalance: 0,
+      due: 0,
       account: ex.account,
       transactedTo: null,
       transactTo: null,
@@ -173,7 +173,7 @@ class TransactionLog {
     return TransactionLog(
       id: '',
       amount: rec.deductedFromAccount,
-      usedDueBalance: rec.deductedFromParty,
+      due: rec.deductedFromParty,
       account: rec.returnedRec.account,
       transactedTo: null,
       transactTo: null,
@@ -202,7 +202,7 @@ class TransactionLog {
   }
 
   static String _noteInv(InventoryRecord record) {
-    final parti = record.parti ?? Parti.fromWalkIn(record.walkIn);
+    final parti = record.parti;
 
     final isSale = record.type == RecordType.sale;
     final type = switch (record.type) {
@@ -213,7 +213,6 @@ class TransactionLog {
     final length = record.details.length;
     final item = length == 1 ? 'item' : 'items';
     final amount = record.amount;
-    final dueBalance = record.dueBalance;
     final preposition = isSale ? 'to' : 'from';
     final name = parti?.name;
     final date = record.date.formatDate();
@@ -222,7 +221,7 @@ class TransactionLog {
     return [
       '$type $length $item',
       'for $amount',
-      if (dueBalance > 0) 'and used $dueBalance from due balance',
+
       if (name != null) '$preposition $name',
       'on $date',
       'using $account',
@@ -234,8 +233,8 @@ class TransactionLog {
     num? amount,
     num? usedDueBalance,
     PaymentAccount? account,
-    ValueGetter<Parti?>? transactedTo,
-    ValueGetter<Parti?>? transactionFormParti,
+    ValueGetter<Party?>? transactedTo,
+    ValueGetter<Party?>? transactionFormParti,
     ValueGetter<String?>? transactTo,
     ValueGetter<String?>? transactToPhone,
     ValueGetter<AppUser?>? transactionBy,
@@ -247,7 +246,7 @@ class TransactionLog {
     return TransactionLog(
       id: id ?? this.id,
       amount: amount ?? this.amount,
-      usedDueBalance: usedDueBalance ?? this.usedDueBalance,
+      due: usedDueBalance ?? due,
       account: account ?? this.account,
       transactedTo: transactedTo != null ? transactedTo() : this.transactedTo,
       transactionFormParti: transactionFormParti != null ? transactionFormParti() : this.transactionFormParti,

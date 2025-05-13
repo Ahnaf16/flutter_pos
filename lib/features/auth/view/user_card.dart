@@ -5,10 +5,10 @@ class UserCard extends StatelessWidget {
   const UserCard({super.key, required this.userOrParti, this.title, this.subtitle, this.imgSize = 50});
   UserCard.user({super.key, required AppUser user, this.title, this.subtitle, this.imgSize = 50})
     : userOrParti = left(user);
-  UserCard.parti({super.key, required Parti? parti, this.title, this.subtitle, this.imgSize = 50})
+  UserCard.parti({super.key, required Party? parti, this.title, this.subtitle, this.imgSize = 50})
     : userOrParti = right(parti);
 
-  final Either<AppUser, Parti?> userOrParti;
+  final Either<AppUser, Party?> userOrParti;
   final String? title;
   final String? subtitle;
   final double imgSize;

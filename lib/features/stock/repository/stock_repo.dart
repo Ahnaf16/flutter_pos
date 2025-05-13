@@ -65,4 +65,10 @@ class StockRepo with AwHandler {
     final repo = locate<ProductRepo>();
     return await repo.linkStockToProduct(stock, product.id);
   }
+
+  FutureReport<Unit> deleteStock(String id) async {
+    final doc = await db.delete(AWConst.collections.stock, id);
+
+    return doc;
+  }
 }

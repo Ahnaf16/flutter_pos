@@ -29,13 +29,10 @@ class _SystemHash {
   }
 }
 
-abstract class _$PartiesCtrl
-    extends BuildlessAutoDisposeAsyncNotifier<List<Parti>> {
+abstract class _$PartiesCtrl extends BuildlessAutoDisposeAsyncNotifier<List<Party>> {
   late final bool? isCustomer;
 
-  FutureOr<List<Parti>> build(
-    bool? isCustomer,
-  );
+  FutureOr<List<Party>> build(bool? isCustomer);
 }
 
 /// See also [PartiesCtrl].
@@ -43,26 +40,18 @@ abstract class _$PartiesCtrl
 const partiesCtrlProvider = PartiesCtrlFamily();
 
 /// See also [PartiesCtrl].
-class PartiesCtrlFamily extends Family<AsyncValue<List<Parti>>> {
+class PartiesCtrlFamily extends Family<AsyncValue<List<Party>>> {
   /// See also [PartiesCtrl].
   const PartiesCtrlFamily();
 
   /// See also [PartiesCtrl].
-  PartiesCtrlProvider call(
-    bool? isCustomer,
-  ) {
-    return PartiesCtrlProvider(
-      isCustomer,
-    );
+  PartiesCtrlProvider call(bool? isCustomer) {
+    return PartiesCtrlProvider(isCustomer);
   }
 
   @override
-  PartiesCtrlProvider getProviderOverride(
-    covariant PartiesCtrlProvider provider,
-  ) {
-    return call(
-      provider.isCustomer,
-    );
+  PartiesCtrlProvider getProviderOverride(covariant PartiesCtrlProvider provider) {
+    return call(provider.isCustomer);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -73,32 +62,25 @@ class PartiesCtrlFamily extends Family<AsyncValue<List<Parti>>> {
   static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies => _allTransitiveDependencies;
 
   @override
   String? get name => r'partiesCtrlProvider';
 }
 
 /// See also [PartiesCtrl].
-class PartiesCtrlProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<PartiesCtrl, List<Parti>> {
+class PartiesCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<PartiesCtrl, List<Party>> {
   /// See also [PartiesCtrl].
-  PartiesCtrlProvider(
-    bool? isCustomer,
-  ) : this._internal(
-          () => PartiesCtrl()..isCustomer = isCustomer,
-          from: partiesCtrlProvider,
-          name: r'partiesCtrlProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$partiesCtrlHash,
-          dependencies: PartiesCtrlFamily._dependencies,
-          allTransitiveDependencies:
-              PartiesCtrlFamily._allTransitiveDependencies,
-          isCustomer: isCustomer,
-        );
+  PartiesCtrlProvider(bool? isCustomer)
+    : this._internal(
+        () => PartiesCtrl()..isCustomer = isCustomer,
+        from: partiesCtrlProvider,
+        name: r'partiesCtrlProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$partiesCtrlHash,
+        dependencies: PartiesCtrlFamily._dependencies,
+        allTransitiveDependencies: PartiesCtrlFamily._allTransitiveDependencies,
+        isCustomer: isCustomer,
+      );
 
   PartiesCtrlProvider._internal(
     super._createNotifier, {
@@ -113,12 +95,8 @@ class PartiesCtrlProvider
   final bool? isCustomer;
 
   @override
-  FutureOr<List<Parti>> runNotifierBuild(
-    covariant PartiesCtrl notifier,
-  ) {
-    return notifier.build(
-      isCustomer,
-    );
+  FutureOr<List<Party>> runNotifierBuild(covariant PartiesCtrl notifier) {
+    return notifier.build(isCustomer);
   }
 
   @override
@@ -138,8 +116,7 @@ class PartiesCtrlProvider
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<PartiesCtrl, List<Parti>>
-      createElement() {
+  AutoDisposeAsyncNotifierProviderElement<PartiesCtrl, List<Party>> createElement() {
     return _PartiesCtrlProviderElement(this);
   }
 
@@ -159,18 +136,18 @@ class PartiesCtrlProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin PartiesCtrlRef on AutoDisposeAsyncNotifierProviderRef<List<Parti>> {
+mixin PartiesCtrlRef on AutoDisposeAsyncNotifierProviderRef<List<Party>> {
   /// The parameter `isCustomer` of this provider.
   bool? get isCustomer;
 }
 
-class _PartiesCtrlProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<PartiesCtrl, List<Parti>>
+class _PartiesCtrlProviderElement extends AutoDisposeAsyncNotifierProviderElement<PartiesCtrl, List<Party>>
     with PartiesCtrlRef {
   _PartiesCtrlProviderElement(super.provider);
 
   @override
   bool? get isCustomer => (origin as PartiesCtrlProvider).isCustomer;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

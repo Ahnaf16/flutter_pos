@@ -6,12 +6,12 @@ import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
-  ('Parti', double.nan, Alignment.centerLeft),
-  ('Product', 400.0, Alignment.center),
-  ('Amount', 300.0, Alignment.center),
-  ('Account', 200.0, Alignment.center),
-  ('Status', 130.0, Alignment.center),
-  ('Action', 200.0, Alignment.centerRight),
+  TableHeading.positional('Parti'),
+  TableHeading.positional('Product', 400.0),
+  TableHeading.positional('Amount', 300.0),
+  TableHeading.positional('Account', 200.0, Alignment.center),
+  TableHeading.positional('Status', 130.0, Alignment.center),
+  TableHeading.positional('Action', 200.0, Alignment.centerRight),
 ];
 
 class InventoryRecordView extends HookConsumerWidget {
@@ -40,33 +40,33 @@ class InventoryRecordView extends HookConsumerWidget {
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: inventoryCtrlProvider),
         data: (inventories) {
-          return DataTableBuilder<InventoryRecord, (String, double, Alignment)>(
+          return DataTableBuilder<InventoryRecord, TableHeading>(
             rowHeight: 150,
             items: inventories,
             headings: _headings,
             headingBuilderIndexed: (heading, i) {
-              final alignment = heading.$3;
+              final alignment = heading.alignment;
               return GridColumn(
-                columnName: heading.$1,
+                columnName: heading.name,
                 columnWidthMode: ColumnWidthMode.fill,
-                maximumWidth: heading.$2,
-                minimumWidth: heading.$1 == 'Status' ? 100 : 150,
-                label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.$1)),
+                maximumWidth: heading.max,
+                minimumWidth: heading.name == 'Status' ? 100 : 150,
+                label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
               );
             },
-            cellAlignmentBuilder: (h) => _headings.firstWhere((element) => element.$1 == h).$3,
+            cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
             cellBuilder: (data, head) {
-              return switch (head.$1) {
-                'Parti' => DataGridCell(columnName: head.$1, value: _nameCellBuilder(data.getParti)),
-                'Product' => DataGridCell(columnName: head.$1, value: _productCellBuilder(data.details)),
-                'Amount' => DataGridCell(columnName: head.$1, value: _amountBuilder(data)),
-                'Account' => DataGridCell(columnName: head.$1, value: Text(data.account.name)),
+              return switch (head.name) {
+                'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
+                'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data.details)),
+                'Amount' => DataGridCell(columnName: head.name, value: _amountBuilder(data)),
+                'Account' => DataGridCell(columnName: head.name, value: Text(data.account.name)),
                 'Status' => DataGridCell(
-                  columnName: head.$1,
+                  columnName: head.name,
                   value: ShadBadge.secondary(child: Text(data.status.name.titleCase)),
                 ),
                 'Action' => DataGridCell(
-                  columnName: head.$1,
+                  columnName: head.name,
                   value: CenterRight(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -94,7 +94,7 @@ class InventoryRecordView extends HookConsumerWidget {
                     ),
                   ),
                 ),
-                _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
               };
             },
           );
@@ -103,7 +103,7 @@ class InventoryRecordView extends HookConsumerWidget {
     );
   }
 
-  Widget _nameCellBuilder(Parti? parti) => Builder(
+  Widget _nameCellBuilder(Party? parti) => Builder(
     builder: (context) {
       return Column(
         spacing: Insets.xs,
@@ -142,7 +142,7 @@ class InventoryRecordView extends HookConsumerWidget {
     builder: (context) {
       return Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           SpacedText(
             left: data.type == RecordType.purchase ? 'Paid' : 'Received',
@@ -150,13 +150,7 @@ class InventoryRecordView extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
           ),
-          if (data.dueBalance != 0)
-            SpacedText(
-              left: data.type.isSale ? 'Balance used' : 'Due used',
-              right: data.dueBalance.currency(),
-              crossAxisAlignment: CrossAxisAlignment.center,
-              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
-            ),
+
           if (data.vat != 0)
             SpacedText(
               left: 'Vat',
@@ -171,12 +165,13 @@ class InventoryRecordView extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
             ),
-          SpacedText(
-            left: 'Discount',
-            right: data.discountString(),
-            crossAxisAlignment: CrossAxisAlignment.center,
-            styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
-          ),
+          if (data.discount != 0)
+            SpacedText(
+              left: 'Discount',
+              right: data.discountString(),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+            ),
           if (data.due > 0)
             SpacedText(
               left: 'Due',

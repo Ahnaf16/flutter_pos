@@ -25,9 +25,8 @@ class StockTransferCtrl extends _$StockTransferCtrl {
     state = state.copyWith(
       from: () => warehouse,
       purchasePrice: () => stock?.purchasePrice,
-      salesPrice: () => stock?.salesPrice,
-      wholesalePrice: () => stock?.wholesalePrice,
-      dealerPrice: () => stock?.dealerPrice,
+      salesPrice: () => state.product?.salePrice,
+
       quantity: stock?.quantity,
     );
 

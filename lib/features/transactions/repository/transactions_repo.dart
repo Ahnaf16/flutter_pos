@@ -20,18 +20,18 @@ class TransactionsRepo with AwHandler {
 
     if (log.validate(fromMe) != null) return left(Failure(log.validate(fromMe)!));
 
-    Parti? fromParti = log.transactionFormParti;
+    Party? fromParti = log.transactionFormParti;
     if (!fromMe && fromParti != null) {
       final (err, parti) = await _updateDue(fromParti.id, log.amount).toRecord();
       if (err != null || parti == null) return left(err ?? const Failure('Unable to update due'));
-      fromParti = Parti.fromDoc(parti);
+      fromParti = Party.fromDoc(parti);
     }
 
-    Parti? toParti = log.transactedTo;
+    Party? toParti = log.transactedTo;
     if (toParti != null) {
       final (err, parti) = await _updateDue(toParti.id, -log.amount).toRecord();
       if (err != null || parti == null) return left(err ?? const Failure('Unable to update due'));
-      toParti = Parti.fromDoc(parti);
+      toParti = Party.fromDoc(parti);
     }
 
     if (log.transactionBy == null) {

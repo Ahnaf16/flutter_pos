@@ -74,7 +74,7 @@ class DueView extends HookConsumerWidget {
 
 class _PartyNameBuilder extends StatelessWidget {
   const _PartyNameBuilder(this.parti);
-  final Parti parti;
+  final Party parti;
   @override
   Widget build(BuildContext context) {
     return Row(

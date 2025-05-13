@@ -95,6 +95,19 @@ class AwDatabase {
       errorMsg: 'Not found ${collId.name} $docId',
     );
   }
+
+  FutureReport<Unit> delete(AwId collId, String docId) async {
+    catAw({'collId': collId.id, 'docId': docId}, '${collId.name} delete');
+
+    return await _handler<Unit>(
+      call: () async {
+        await _db.deleteDocument(databaseId: AWConst.databaseId.id, collectionId: collId.id, documentId: docId);
+        catAw('${collId.name} :: $docId deleted');
+        return unit;
+      },
+      errorMsg: 'Not found ${collId.name} $docId',
+    );
+  }
 }
 
 class AwStorage {

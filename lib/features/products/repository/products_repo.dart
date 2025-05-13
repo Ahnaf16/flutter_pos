@@ -1,11 +1,10 @@
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:pos/features/stock/repository/stock_repo.dart';
 import 'package:pos/main.export.dart';
 
 class ProductRepo with AwHandler {
-  FutureReport<Document> createProduct(QMap form, PFile? xfile) async {
-    Product product = Product.fromMap(form);
-
+  FutureReport<Document> createProduct(Product product, PFile? xfile) async {
     if (xfile != null) {
       final file = await storage.createFile(xfile);
 
@@ -16,7 +15,7 @@ class ProductRepo with AwHandler {
       if (error != null) return failure(error ?? 'Error uploading photo');
     }
 
-    final doc = await db.create(AWConst.collections.products, data: product.toAwPost());
+    final doc = await db.create(AWConst.collections.products, data: product.toAwPost(), docId: product.id);
     doc.fold((_) {
       if (product.photo != null) storage.deleteFile(product.photo!);
     }, identityNull);
@@ -41,6 +40,18 @@ class ProductRepo with AwHandler {
 
     final doc = await db.update(AWConst.collections.products, product.id, data: product.toAwPost(include));
     if (oldPhoto != null) await storage.deleteFile(oldPhoto!);
+    return doc;
+  }
+
+  FutureReport<Unit> deleteProduct(Product product) async {
+    final stockRepo = locate<StockRepo>();
+    for (final stock in product.stock) {
+      await stockRepo.deleteStock(stock.id);
+    }
+    final doc = await db.delete(AWConst.collections.products, product.id);
+
+    final photoId = product.photo;
+    if (photoId != null) await storage.deleteFile(photoId);
     return doc;
   }
 

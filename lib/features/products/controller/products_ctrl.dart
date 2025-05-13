@@ -1,7 +1,5 @@
-import 'package:appwrite/models.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/products/repository/products_repo.dart';
-import 'package:pos/features/stock/repository/stock_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -41,19 +39,8 @@ class ProductsCtrl extends _$ProductsCtrl {
     state = AsyncData(_searchFrom.where((e) => e.name.low.contains(query)).toList());
   }
 
-  Future<Result> createProduct(QMap formData, [PFile? file]) async {
-    final data = QMap.from(formData);
-    final stockData = data.remove('stock');
-
-    if (stockData != null) {
-      final (err, stockDoc) = await _createFirstStock(stockData).toRecord();
-
-      if (err != null || stockDoc == null) return (false, err?.message ?? 'Error creating stock');
-
-      data['stock'] = [Stock.fromDoc(stockDoc).toMap()];
-    }
-
-    final res = await _repo.createProduct(data, file);
+  Future<Result> createProduct(Product product, [PFile? file]) async {
+    final res = await _repo.createProduct(product, file);
 
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
@@ -61,8 +48,12 @@ class ProductsCtrl extends _$ProductsCtrl {
     });
   }
 
-  FutureReport<Document> _createFirstStock(QMap stockData) async {
-    final repo = locate<StockRepo>();
-    return await repo.createStock(stockData);
+  Future<Result> deleteProduct(Product product) async {
+    final res = await _repo.deleteProduct(product);
+
+    return res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      return rightResult('Product deleted successfully');
+    });
   }
 }

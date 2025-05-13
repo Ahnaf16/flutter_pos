@@ -29,6 +29,7 @@ class ProductUnit {
 
   static ProductUnit? tryParse(dynamic value) {
     try {
+      if (value case final ProductUnit u) return u;
       if (value case final Document doc) return ProductUnit.fromDoc(doc);
       if (value case final Map map) return ProductUnit.fromMap(map.toStringKey());
       return null;

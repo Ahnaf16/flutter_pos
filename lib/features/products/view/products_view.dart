@@ -79,6 +79,33 @@ class ProductsView extends HookConsumerWidget {
                         leading: const Icon(LuIcons.pen),
                         onPressed: () => RPaths.editProduct(data.id).pushNamed(context),
                       ),
+                      ShadButton.destructive(
+                        size: ShadButtonSize.sm,
+                        leading: const Icon(LuIcons.trash),
+                        onPressed: () {
+                          showShadDialog(
+                            context: context,
+                            builder: (c) {
+                              return ShadDialog.alert(
+                                title: const Text('Delete Product'),
+                                description: Text(
+                                  'This will delete ${data.name} and its ${data.stock.length} stocks permanently.',
+                                ),
+                                actions: [
+                                  ShadButton(onPressed: () => c.nPop(), child: const Text('Cancel')),
+                                  ShadButton.destructive(
+                                    onPressed: () async {
+                                      await ref.read(productsCtrlProvider.notifier).deleteProduct(data);
+                                      if (c.mounted) c.nPop();
+                                    },
+                                    child: const Text('Delete'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -100,9 +127,7 @@ class ProductsView extends HookConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           OverflowMarquee(child: Text('Purchase: ${stock?.purchasePrice.toString() ?? '--'}')),
-          OverflowMarquee(child: Text('Sale: ${stock?.salesPrice.toString() ?? '--'}')),
-          OverflowMarquee(child: Text('Wholesale: ${stock?.wholesalePrice.toString() ?? '--'}')),
-          OverflowMarquee(child: Text('Dealer: ${stock?.dealerPrice.toString() ?? '--'}')),
+          OverflowMarquee(child: Text('Sale: ${product.salePrice.toString()}')),
         ],
       );
     },
@@ -157,24 +182,23 @@ class _ProductViewDialog extends HookConsumerWidget {
           children: [
             if (product.photo != null) HostedImage.square(product.getPhoto, dimension: 80, radius: Corners.med),
 
-            SpacedText(left: 'Name', right: product.name, styleBuilder: (l, r) => (l, r.bold), spaced: false),
-            SpacedText(
-              left: 'Manufacturer',
-              right: product.manufacturer ?? '--',
-              styleBuilder: (l, r) => (l, r.bold),
-              spaced: false,
-            ),
+            SpacedText(left: 'Name', right: product.name, styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(left: 'Manufacturer', right: product.manufacturer ?? '--', styleBuilder: (l, r) => (l, r.bold)),
             SpacedText(
               left: 'Total Stock',
               right: '${product.quantity} ${product.unitName}',
               styleBuilder: (l, r) => (l, r.bold),
-              spaced: false,
             ),
             SpacedText(
               left: 'SKU',
               right: product.sku ?? '--',
               styleBuilder: (l, r) => (l, r.bold),
-              spaced: false,
+              trailing: SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(product.sku)),
+            ),
+            SpacedText(
+              left: 'Sale price',
+              right: product.salePrice.currency(),
+              styleBuilder: (l, r) => (l, r.bold),
               trailing: SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(product.sku)),
             ),
 
@@ -183,10 +207,8 @@ class _ProductViewDialog extends HookConsumerWidget {
             for (final stock in product.stock)
               SpacedText(
                 left: stock.warehouse?.name ?? '--',
-                right:
-                    '${stock.quantity} ${product.unitName}  |  Purchase ${stock.purchasePrice}  |  Sale ${stock.salesPrice}',
+                right: '${stock.quantity} ${product.unitName}  |  Purchase ${stock.purchasePrice}',
                 styleBuilder: (l, r) => (l, r.bold),
-                spaced: false,
               ),
             const Gap(Insets.xs),
             if (product.description != null) ...[const Text('Description:'), Text(product.description ?? '--')],

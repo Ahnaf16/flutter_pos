@@ -79,10 +79,10 @@ class TransactionsView extends HookConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SpacedText(left: 'Amount', right: data.amount.currency()),
-                      if (data.usedDueBalance > 0)
+                      if (data.due > 0)
                         SpacedText(
                           left: data.type == TransactionType.sale ? 'Balance used' : 'Due used',
-                          right: data.usedDueBalance.currency(),
+                          right: data.due.currency(),
                         ),
                     ],
                   ),
@@ -180,26 +180,11 @@ class _TrxViewDialog extends HookConsumerWidget {
 
             //! trx info
             const Gap(Insets.sm),
-            SpacedText(
-              left: 'Amount',
-              right: trx.amount.currency(),
-              styleBuilder: (l, r) => (l, r.bold),
-              spaced: false,
-            ),
-            SpacedText(
-              left: 'Used due/balance',
-              right: trx.usedDueBalance.currency(),
-              styleBuilder: (l, r) => (l, r.bold),
-              spaced: false,
-            ),
-            SpacedText(left: 'Account', right: trx.account.name, styleBuilder: (l, r) => (l, r.bold), spaced: false),
-            SpacedText(left: 'Date', right: trx.date.formatDate(), styleBuilder: (l, r) => (l, r.bold), spaced: false),
-            SpacedText(
-              left: 'Note',
-              right: trx.note ?? '--',
-              styleBuilder: (l, r) => (l, context.text.muted),
-              spaced: false,
-            ),
+            SpacedText(left: 'Amount', right: trx.amount.currency(), styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(left: 'Used due/balance', right: trx.due.currency(), styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(left: 'Account', right: trx.account.name, styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(left: 'Date', right: trx.date.formatDate(), styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(left: 'Note', right: trx.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),
           ],
         ),
       ),

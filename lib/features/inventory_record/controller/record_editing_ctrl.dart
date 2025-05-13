@@ -18,7 +18,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     return InventoryRecordState(type: type);
   }
 
-  void addProduct(Product product, Stock? newStock, WareHouse? warehouse) {
+  void addProduct(Product product, {Stock? newStock, WareHouse? warehouse, bool replaceExisting = false}) {
     Stock? stock = newStock;
 
     if (type.isSale) {
@@ -45,11 +45,11 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       id: '',
       product: product,
       stock: stock,
-      price: type.isSale ? stock.salesPrice : stock.purchasePrice,
+      price: type.isSale ? product.salePrice : stock.purchasePrice,
       quantity: qty,
     );
 
-    state = state.copyWith(details: [...state.details, details]);
+    state = state.copyWith(details: [if (!replaceExisting) ...state.details, details]);
   }
 
   void removeProduct(String pId, String sid) {
@@ -105,8 +105,8 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     }
   }
 
-  void changeParti(Parti? parti, WalkIn? wi) {
-    state = state.copyWith(parti: () => parti, walkIn: () => wi, dueBalance: 0);
+  void changeParti(Party? parti) {
+    state = state.copyWith(parti: () => parti);
   }
 
   void changeAccount(PaymentAccount? account) {
@@ -123,7 +123,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       vat: data.parseNum('vat'),
       discount: data.parseNum('discount'),
       shipping: data.parseNum('shipping'),
-      dueBalance: data.parseNum('due_balance'),
+      // dueBalance: data.parseNum('due_balance'),
     );
   }
 
@@ -131,7 +131,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     cat(state.toMap(), 'submit');
 
     if (state.parti == null) {
-      return (false, 'Please select a ${type.isSale ? 'customer' : 'supplier'}');
+      return (false, 'Please select a ${type.name}');
     }
     if (state.account == null && state.amount > 0) {
       return (false, 'Please select a payment account');
@@ -141,17 +141,11 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     }
 
     if (type.isPurchase) {
-      if (state.partiHasDue && state.dueBalance > (state.parti?.due.abs() ?? 0)) {
-        return (false, 'Given due can\'t be more than parti\'s due');
-      }
       return submitPurchase();
     } else {
       if (state.isWalkIn && state.hasDue) return (false, 'Clear due for walk-in customer');
       if (state.isWalkIn && state.hasBalance) return (false, 'Clear excess amount for walk-in customer');
 
-      if (state.partiHasBalance && state.dueBalance > (state.parti?.due.abs() ?? 0)) {
-        return (false, 'Given balance can\'t be more than available balance');
-      }
       return submitSale();
     }
   }

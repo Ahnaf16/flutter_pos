@@ -4,6 +4,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
+import 'package:pos/features/inventory_record/view/discount_type_pop_over.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
@@ -55,8 +56,8 @@ class CreateRecordView extends HookConsumerWidget {
                         //! Parti
                         _PartiSection(
                           record: record,
-                          onSelect: (p, wi) {
-                            recordCtrl().changeParti(p, wi);
+                          onSelect: (p) {
+                            recordCtrl().changeParti(p);
                             formKey.currentState?.fields['due_balance']?.reset();
                           },
                         ),
@@ -153,7 +154,7 @@ class CreateRecordView extends HookConsumerWidget {
                     child: ProductsPanel(
                       type: type,
                       userHouse: user?.warehouse,
-                      onProductSelect: recordCtrl().addProduct,
+                      onProductSelect: (p, s, w) => recordCtrl().addProduct(p, newStock: s, warehouse: w),
                     ),
                   ),
                 ],
@@ -207,7 +208,7 @@ class _Inputs extends HookConsumerWidget {
                 padding: kDefInputPadding.copyWith(bottom: 0, top: 0, right: 5),
                 keyboardType: TextInputType.number,
                 numeric: true,
-                trailing: _DiscountTypePopOver(onTypeChange: onTypeChange, type: record.discountType),
+                trailing: DiscountTypePopOver(onTypeChange: onTypeChange, type: record.discountType),
               ),
             ),
             Expanded(
@@ -264,7 +265,7 @@ class _Inputs extends HookConsumerWidget {
                   ),
                 ),
               ),
-            Expanded(child: _AccountSelect(onAccountSelect: onAccountSelect, type: type)),
+            Expanded(child: PaymentAccountSelect(onAccountSelect: onAccountSelect, type: type)),
           ],
         ),
       ],
@@ -347,56 +348,6 @@ class _Summary extends StatelessWidget {
             child: Text(type.name.up, style: context.text.large.textColor(context.colors.primaryForeground)),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _DiscountTypePopOver extends HookConsumerWidget {
-  const _DiscountTypePopOver({required this.type, required this.onTypeChange});
-
-  final DiscountType type;
-  final Function(DiscountType type) onTypeChange;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final popCtrl = useMemoized(ShadPopoverController.new);
-
-    return ShadPopover(
-      controller: popCtrl,
-      anchor: const ShadAnchorAuto(targetAnchor: Alignment.topRight, followerAnchor: Alignment.topCenter),
-      padding: Pads.zero,
-      popover: (context) {
-        return SizedBox(
-          width: 150,
-          height: 100,
-          child: IntrinsicWidth(
-            child: SeparatedColumn(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              separatorBuilder: () => const ShadSeparator.horizontal(margin: Pads.zero),
-              children: [
-                for (final t in DiscountType.values)
-                  ShadButton.ghost(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    child: Text(t.name.up),
-                    onPressed: () {
-                      popCtrl.hide();
-                      onTypeChange(t);
-                    },
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
-      child: ShadButton.ghost(
-        trailing: const Icon(LuIcons.chevronDown),
-        padding: Pads.sm('lr'),
-        size: ShadButtonSize.sm,
-        height: 32,
-        onPressed: () => popCtrl.toggle(),
-        child: Text(type.name.up),
       ),
     );
   }
@@ -503,7 +454,6 @@ class _ProductTile extends StatelessWidget {
                 style: context.text.muted,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 styleBuilder: (l, r) => (l, context.text.small),
-                spaced: false,
               ),
               SpacedText(
                 left: 'Total',
@@ -511,7 +461,6 @@ class _ProductTile extends StatelessWidget {
                 style: context.text.muted,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 styleBuilder: (l, r) => (l, context.text.small),
-                spaced: false,
               ),
             ],
           ),
@@ -545,11 +494,12 @@ class _ProductTile extends StatelessWidget {
   }
 }
 
-class _AccountSelect extends HookConsumerWidget {
-  const _AccountSelect({required this.onAccountSelect, required this.type});
+class PaymentAccountSelect extends HookConsumerWidget {
+  const PaymentAccountSelect({super.key, required this.onAccountSelect, required this.type, this.isRequired = false});
 
   final Function(PaymentAccount? acc) onAccountSelect;
   final RecordType type;
+  final bool isRequired;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -565,6 +515,7 @@ class _AccountSelect extends HookConsumerWidget {
           minWidth: 300,
           hintText: 'Select a payment account',
           initialValue: config.defaultAccount,
+          isRequired: isRequired,
           optionBuilder: (context, acc, _) {
             return ShadOption<PaymentAccount>(
               value: acc,
@@ -602,7 +553,7 @@ class _AccountSelect extends HookConsumerWidget {
 class _PartiSection extends HookConsumerWidget {
   const _PartiSection({required this.onSelect, required this.record});
 
-  final Function(Parti? parti, WalkIn? walkIn) onSelect;
+  final Function(Party? parti) onSelect;
   final InventoryRecordState record;
 
   @override
@@ -611,7 +562,7 @@ class _PartiSection extends HookConsumerWidget {
     final partiList = ref.watch(partiesCtrlProvider(null));
 
     final search = useState('');
-    final selectCtrl = useMemoized(ShadSelectController<Parti>.new);
+    final selectCtrl = useMemoized(ShadSelectController<Party>.new);
 
     final parti = record.getParti;
 
@@ -629,20 +580,20 @@ class _PartiSection extends HookConsumerWidget {
               runSpacing: Insets.sm,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                ShadSelect<Parti>.withSearch(
+                ShadSelect<Party>.withSearch(
                   controller: selectCtrl,
                   maxWidth: 400,
                   minWidth: 300,
                   placeholder: const Text('Select a parti'),
                   itemCount: filtered.length,
                   options: [
-                    ShadOption(value: Parti.fromWalkIn(const WalkIn()), child: const Text('Walk-in customer')),
+                    ShadOption(value: Party.fromWalkIn(const WalkIn()), child: const Text('Walk-in customer')),
                     if (filtered.isEmpty) Padding(padding: Pads.med('tb'), child: const Text('No Parties found')),
                     ...filtered.map((house) {
                       return ShadOption(value: house, child: Text(house.name));
                     }),
                   ],
-                  onChanged: (v) => onSelect(v, null),
+                  onChanged: (v) => onSelect(v),
                   selectedOptionBuilder: (_, v) => Text(v.name),
                   onSearchChanged: search.set,
                 ),
@@ -674,16 +625,7 @@ class _PartiSection extends HookConsumerWidget {
                               Text(parti.name),
                               if (parti.due != 0)
                                 Text.rich(
-                                  TextSpan(
-                                    text: '${parti.hasDue() ? 'Due' : 'Balance'}: ${parti.due.currency()}',
-                                    children: [
-                                      if (record.dueBalance > 0)
-                                        TextSpan(
-                                          text: ' (-${record.dueBalance.currency()})',
-                                          style: context.text.p.size(12).textColor(Colors.green),
-                                        ),
-                                    ],
-                                  ),
+                                  TextSpan(text: '${parti.hasDue() ? 'Due' : 'Balance'}: ${parti.due.currency()}'),
                                   style: context.text.p.size(12),
                                 ),
                               Text(parti.phone, style: context.text.muted.size(12)),
@@ -876,18 +818,18 @@ class _AddStockDialog extends HookConsumerWidget {
                     },
                   ),
                 ),
-                Expanded(
-                  child: ShadTextField(
-                    name: 'sales_price',
-                    label: 'Sales Price',
-                    hintText: 'Enter sale price',
-                    isRequired: true,
-                    numeric: true,
-                    onChanged: (value) {
-                      stock.value = stock.value.copyWith(salesPrice: Parser.toNum(value));
-                    },
-                  ),
-                ),
+                // Expanded(
+                //   child: ShadTextField(
+                //     name: 'sales_price',
+                //     label: 'Sales Price',
+                //     hintText: 'Enter sale price',
+                //     isRequired: true,
+                //     numeric: true,
+                //     onChanged: (value) {
+                //       stock.value = stock.value.copyWith(salesPrice: Parser.toNum(value));
+                //     },
+                //   ),
+                // ),
               ],
             ),
 

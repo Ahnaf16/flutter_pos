@@ -27,12 +27,11 @@ class InventoryRecord {
     required this.status,
     required this.date,
     required this.type,
-    required this.dueBalance,
-    this.walkIn,
+    required this.isWalkIn,
   });
 
   final String id;
-  final Parti? parti;
+  final Party? parti;
   final List<InventoryDetails> details;
   final num amount;
   final PaymentAccount account;
@@ -40,19 +39,16 @@ class InventoryRecord {
   final num discount;
   final DiscountType discountType;
   final num shipping;
-  final WalkIn? walkIn;
-
-  /// the amount covered by due_balance from parti
-  final num dueBalance;
   final InventoryStatus status;
   final DateTime date;
   final RecordType type;
+  final bool isWalkIn;
 
   factory InventoryRecord.fromDoc(Document doc) {
     final data = doc.data;
     return InventoryRecord(
       id: doc.$id,
-      parti: Parti.tyrParse(data['parties']),
+      parti: Party.tyrParse(data['parties']),
       details: switch (data['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
@@ -66,15 +62,14 @@ class InventoryRecord {
       status: InventoryStatus.values.byName(data['status']),
       date: DateTime.parse(data['date']),
       type: RecordType.values.byName(data['record_type']),
-      dueBalance: data['due_balance'],
-      walkIn: WalkIn.fromMap(data),
+      isWalkIn: data['is_walk_in'],
     );
   }
 
   factory InventoryRecord.fromMap(Map<String, dynamic> map) {
     return InventoryRecord(
       id: map.parseAwField(),
-      parti: Parti.tyrParse(map['parties']),
+      parti: Party.tyrParse(map['parties']),
       details: switch (map['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
@@ -88,8 +83,7 @@ class InventoryRecord {
       status: InventoryStatus.values.byName(map['status']),
       date: DateTime.parse(map['date']),
       type: RecordType.values.byName(map['record_type']),
-      dueBalance: map.parseNum('due_balance'),
-      walkIn: WalkIn.fromMap(map),
+      isWalkIn: map.parseBool('is_walk_in'),
     );
   }
   static InventoryRecord? tryParse(dynamic value) {
@@ -105,7 +99,7 @@ class InventoryRecord {
   InventoryRecord marge(Map<String, dynamic> map) {
     return InventoryRecord(
       id: map.tryParseAwField() ?? id,
-      parti: map['parties'] == null ? parti : Parti.tyrParse(map['parties']) ?? parti,
+      parti: map['parties'] == null ? parti : Party.tyrParse(map['parties']) ?? parti,
       details: switch (map['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => details,
@@ -119,8 +113,7 @@ class InventoryRecord {
       status: map['status'] == null ? status : InventoryStatus.values.byName(map['status']),
       date: map['date'] == null ? date : DateTime.parse(map['date']),
       type: map['record_type'] == null ? type : RecordType.values.byName(map['record_type']),
-      dueBalance: map.parseNum('due_balance', fallBack: dueBalance),
-      walkIn: WalkIn.fromMap(map) ?? walkIn,
+      isWalkIn: map.parseBool('is_walk_in', isWalkIn),
     );
   }
 
@@ -137,8 +130,7 @@ class InventoryRecord {
     'status': status.name,
     'date': date.toIso8601String(),
     'record_type': type.name,
-    'due_balance': dueBalance,
-    ...?walkIn?.toMap(),
+    'is_walk_in': isWalkIn,
   };
 
   Map<String, dynamic> toAwPost() => {
@@ -153,11 +145,10 @@ class InventoryRecord {
     'status': status.name,
     'date': date.toIso8601String(),
     'record_type': type.name,
-    'due_balance': dueBalance,
-    ...?walkIn?.toMap(),
+    'is_walk_in': isWalkIn,
   };
 
-  Parti? get getParti => parti ?? Parti.fromWalkIn(walkIn);
+  Party? get getParti => parti;
 
   String discountString() => discountType == DiscountType.percentage ? '$discount%' : discount.currency();
 
@@ -166,11 +157,11 @@ class InventoryRecord {
   num get subtotal => details.map((e) => e.totalPrice()).sum;
   num get total => (subtotal + shipping + vat) - calculateDiscount();
 
-  num get due => total - amount - dueBalance;
+  num get due => total - amount;
 
   InventoryRecord copyWith({
     String? id,
-    ValueGetter<Parti?>? parti,
+    ValueGetter<Party?>? parti,
     List<InventoryDetails>? details,
     num? amount,
     PaymentAccount? account,
@@ -178,11 +169,10 @@ class InventoryRecord {
     num? discount,
     DiscountType? discountType,
     num? shipping,
-    ValueGetter<WalkIn?>? walkIn,
-    num? dueBalance,
     InventoryStatus? status,
     DateTime? date,
     RecordType? type,
+    bool? isWalkIn,
   }) {
     return InventoryRecord(
       id: id ?? this.id,
@@ -194,11 +184,10 @@ class InventoryRecord {
       discount: discount ?? this.discount,
       discountType: discountType ?? this.discountType,
       shipping: shipping ?? this.shipping,
-      walkIn: walkIn != null ? walkIn() : this.walkIn,
-      dueBalance: dueBalance ?? this.dueBalance,
       status: status ?? this.status,
       date: date ?? this.date,
       type: type ?? this.type,
+      isWalkIn: isWalkIn ?? this.isWalkIn,
     );
   }
 }

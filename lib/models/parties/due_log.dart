@@ -17,7 +17,7 @@ class DueLog {
   final num postAmount;
   final bool isAdded;
   final DateTime date;
-  final Parti parti;
+  final Party parti;
   final String? note;
 
   factory DueLog.fromMap(Map<String, dynamic> map) => DueLog(
@@ -26,7 +26,7 @@ class DueLog {
     postAmount: map.parseNum('post_amount'),
     isAdded: map.parseBool('is_added'),
     date: DateTime.parse(map['adjustment_date']),
-    parti: Parti.fromMap(map['parties']),
+    parti: Party.fromMap(map['parties']),
     note: map['note'],
   );
 
@@ -38,7 +38,7 @@ class DueLog {
       postAmount: map.parseNum('post_amount'),
       isAdded: map.parseBool('is_added'),
       date: DateTime.parse(map['adjustment_date']),
-      parti: Parti.fromMap(map['parties']),
+      parti: Party.fromMap(map['parties']),
       note: map['note'],
     );
   }

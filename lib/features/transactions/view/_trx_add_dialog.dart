@@ -103,12 +103,11 @@ class _TransferDialog extends HookConsumerWidget {
                           tabs: [
                             ShadTab(
                               value: true,
-                              content: ShadSelectField<Parti>(
+                              content: ShadSelectField<Party>(
                                 name: 'parties',
                                 hintText: 'To whom?',
                                 label: 'Transfer to',
                                 options: parties,
-                                allowDeselection: true,
                                 valueTransformer: (value) => value?.toMap(),
                                 optionBuilder: (_, v, i) {
                                   return ShadOption(
@@ -249,16 +248,15 @@ class _TransferDialog extends HookConsumerWidget {
 class _TransactionForParti extends StatelessWidget {
   const _TransactionForParti({required this.parties});
 
-  final List<Parti> parties;
+  final List<Party> parties;
 
   @override
   Widget build(BuildContext context) {
-    return ShadSelectField<Parti>(
+    return ShadSelectField<Party>(
       name: 'transaction_for',
       hintText: 'Select a parti',
       label: 'Transfer form',
       options: parties,
-      allowDeselection: true,
       valueTransformer: (value) => value?.toMap(),
       optionBuilder: (_, v, i) {
         return ShadOption(

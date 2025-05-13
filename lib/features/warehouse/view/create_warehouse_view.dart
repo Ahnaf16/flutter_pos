@@ -9,7 +9,7 @@ class CreateWarehouseView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final updatingId = context.param('id');
-    final updatingStaff = ref.watch(updateWarehouseCtrlProvider(updatingId));
+    final updatingWh = ref.watch(updateWarehouseCtrlProvider(updatingId));
     final updateCtrl = useCallback(() => ref.read(updateWarehouseCtrlProvider(updatingId).notifier));
 
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
@@ -49,7 +49,7 @@ class CreateWarehouseView extends HookConsumerWidget {
         ),
       ],
 
-      body: updatingStaff.when(
+      body: updatingWh.when(
         error: (e, s) => ErrorView(e, s, prov: updateWarehouseCtrlProvider(updatingId)),
         loading: () => const Loading(),
         data: (updating) {
@@ -110,6 +110,70 @@ class CreateWarehouseView extends HookConsumerWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class AddWarehouseDialog extends HookConsumerWidget {
+  const AddWarehouseDialog({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
+
+    return ShadDialog(
+      title: const Text('Create Warehouse'),
+      actions: [
+        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+
+        SubmitButton(
+          size: ShadButtonSize.lg,
+          child: const Text('Create'),
+          onPressed: (l) async {
+            final state = formKey.currentState!;
+            if (!state.saveAndValidate()) return;
+            final data = state.value;
+
+            l.truthy();
+            final ctrl = ref.read(warehouseCtrlProvider.notifier);
+            final result = await ctrl.createWarehouse(data);
+            l.falsey();
+
+            if (!context.mounted) return;
+            result.showToast(context);
+            if (result.success) context.pop();
+          },
+        ),
+      ],
+
+      child: Container(
+        padding: Pads.padding(v: Insets.med),
+        child: FormBuilder(
+          key: formKey,
+
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: Insets.med,
+            children: [
+              ShadTextField(name: 'name', label: 'Warehouse Name', hintText: 'Enter warehouse name', isRequired: true),
+              ShadTextField(
+                name: 'address',
+                label: 'Warehouse address',
+                hintText: 'Enter warehouse name',
+                isRequired: true,
+              ),
+              ShadTextField(name: 'contact_person', label: 'Contact Person', hintText: 'Enter contact persons name'),
+              ShadTextField(
+                name: 'contact_number',
+                label: 'Contact Number',
+                hintText: 'Enter contact persons number',
+                isRequired: true,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

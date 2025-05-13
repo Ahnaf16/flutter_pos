@@ -10,8 +10,8 @@ class Product {
     required this.photo,
     required this.unit,
     required this.stock,
-    required this.manageStock,
     required this.manufacturer,
+    required this.salePrice,
   });
 
   final String id;
@@ -21,8 +21,8 @@ class Product {
   final String? photo;
   final ProductUnit? unit;
   final List<Stock> stock;
-  final bool manageStock;
   final String? manufacturer;
+  final num salePrice;
 
   factory Product.fromDoc(Document doc) {
     final data = doc.data;
@@ -37,8 +37,8 @@ class Product {
         final List l => l.map((e) => Stock.tryParse(e)).nonNulls.toList(),
         _ => [],
       },
-      manageStock: data.parseBool('manage_stock'),
       manufacturer: data['manufacturer'],
+      salePrice: data['sale_price'],
     );
   }
 
@@ -54,13 +54,14 @@ class Product {
         final List l => l.map((e) => Stock.tryParse(e)).nonNulls.toList(),
         _ => [],
       },
-      manageStock: map.parseBool('manage_stock'),
       manufacturer: map['manufacturer'],
+      salePrice: map.parseNum('sale_price'),
     );
   }
 
   static Product? tryParse(dynamic value) {
     try {
+      if (value case final Product p) return p;
       if (value case final Document doc) return Product.fromDoc(doc);
       if (value case final Map map) return Product.fromMap(map.toStringKey());
       return null;
@@ -81,8 +82,8 @@ class Product {
         final List l => l.map((e) => Stock.tryParse(e)).nonNulls.toList(),
         _ => stock,
       },
-      manageStock: map['manage_stock'] ?? manageStock,
       manufacturer: map['manufacturer'] ?? manufacturer,
+      salePrice: map.parseNum('sale_price', fallBack: salePrice),
     );
   }
 
@@ -96,20 +97,10 @@ class Product {
     'photo': photo,
     'unit': unit?.toMap(),
     'stock': stock.map((e) => e.toMap()).toList(),
-    'manage_stock': manageStock,
     'manufacturer': manufacturer,
+    'sale_price': salePrice,
   };
 
-  // QMap toAwPost() => {
-  //   'name': name,
-  //   'description': description,
-  //   'sku': sku,
-  //   'photo': photo,
-  //   'unit': unit?.id,
-  //   'stock': stock.map((e) => e.id).toList(),
-  //   'manage_stock': manageStock,
-  //   'manufacturer': manufacturer,
-  // };
   Map<String, dynamic> toAwPost([List<String>? include]) {
     final map = <String, dynamic>{};
 
@@ -125,8 +116,8 @@ class Product {
     add(fields.photo, photo);
     add(fields.unit, unit?.id);
     add(fields.stock, stock.map((e) => e.id).toList());
-    add(fields.manageStock, manageStock);
     add(fields.manufacturer, manufacturer);
+    add(fields.salePrice, salePrice);
 
     return map;
   }
@@ -139,8 +130,8 @@ class Product {
     ValueGetter<String?>? photo,
     ValueGetter<ProductUnit?>? unit,
     List<Stock>? stock,
-    bool? manageStock,
-    String? manufacturer,
+    ValueGetter<String?>? manufacturer,
+    num? salePrice,
   }) {
     return Product(
       id: id ?? this.id,
@@ -150,8 +141,8 @@ class Product {
       photo: photo != null ? photo() : this.photo,
       unit: unit != null ? unit() : this.unit,
       stock: stock ?? this.stock,
-      manageStock: manageStock ?? this.manageStock,
-      manufacturer: manufacturer ?? this.manufacturer,
+      manufacturer: manufacturer != null ? manufacturer() : this.manufacturer,
+      salePrice: salePrice ?? this.salePrice,
     );
   }
 
@@ -160,9 +151,6 @@ class Product {
   int get quantity => stock.map((e) => e.quantity).sum;
 
   int quantityByHouse(String? houseId) => stocksByHouse(houseId).map((e) => e.quantity).sum;
-
-  num valueByHouse(String? houseId) => stocksByHouse(houseId).map((e) => e.salesPrice).sum;
-  num totalValueByHouse(String? houseId) => stocksByHouse(houseId).map((e) => e.salesPrice * e.quantity).sum;
 
   String get unitName => unit?.unitName ?? '';
 
@@ -241,6 +229,7 @@ class _ProductFiled {
   final String stock = 'stock';
   final String manageStock = 'manage_stock';
   final String manufacturer = 'manufacturer';
+  final String salePrice = 'sale_price';
 }
 
 extension ProductEx on List<Product> {

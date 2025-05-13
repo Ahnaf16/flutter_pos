@@ -27,7 +27,7 @@ class ShadSelectField<T> extends ShadFormDecoration<T> {
     this.validators,
     this.helperText,
     this.outsideTrailing,
-    this.allowDeselection = false,
+    this.allowDeselection = true,
     this.maxHeight,
     this.maxWidth,
     this.minWidth,

@@ -1,7 +1,7 @@
 import 'package:pos/main.export.dart';
 
 class InventoryRecordState {
-  final Parti? parti;
+  final Party? parti;
   final List<InventoryDetails> details;
   final PaymentAccount? account;
   final num amount;
@@ -9,7 +9,6 @@ class InventoryRecordState {
   final num shipping;
   final num discount;
   final DiscountType discountType;
-  final num dueBalance;
   final RecordType type;
 
   const InventoryRecordState({
@@ -22,7 +21,6 @@ class InventoryRecordState {
     this.discount = 0,
     this.discountType = DiscountType.flat,
     this.shipping = 0,
-    this.dueBalance = 0,
   });
 
   QMap toMap() => {
@@ -34,12 +32,11 @@ class InventoryRecordState {
     'discount': discount,
     'discountType': discountType.name,
     'shipping': shipping,
-    'dueBalance': dueBalance,
     'type': type.name,
   };
 
   InventoryRecordState copyWith({
-    ValueGetter<Parti?>? parti,
+    ValueGetter<Party?>? parti,
     List<InventoryDetails>? details,
     ValueGetter<PaymentAccount?>? account,
     num? amount,
@@ -47,7 +44,6 @@ class InventoryRecordState {
     num? shipping,
     num? discount,
     DiscountType? discountType,
-    num? dueBalance,
     RecordType? type,
     ValueGetter<WalkIn?>? walkIn,
   }) {
@@ -60,7 +56,6 @@ class InventoryRecordState {
       shipping: shipping ?? this.shipping,
       discount: discount ?? this.discount,
       discountType: discountType ?? this.discountType,
-      dueBalance: dueBalance ?? this.dueBalance,
       type: type ?? this.type,
     );
   }
@@ -71,7 +66,7 @@ class InventoryRecordState {
 
   num totalPrice() => (subtotal() + shipping + vat) - calculateDiscount();
 
-  num get due => totalPrice() - amount - dueBalance;
+  num get due => totalPrice() - amount;
 
   bool get hasDue => due > 0;
   bool get hasBalance => due < 0;
@@ -79,9 +74,9 @@ class InventoryRecordState {
   bool get partiHasBalance => parti?.due.isNegative ?? false;
   bool get partiHasDue => (parti?.due ?? 0) > 0;
 
-  Parti? get getParti => parti;
+  Party? get getParti => parti;
 
-  bool get isWalkIn => parti?.isWalkIn ?? false;
+  bool get isWalkIn => parti?.isWalkIn ?? true;
 
   InventoryRecord? toInventoryRecord() {
     if (account == null) return null;
@@ -99,7 +94,7 @@ class InventoryRecordState {
       status: hasDue ? InventoryStatus.unpaid : InventoryStatus.paid,
       date: DateTime.now(),
       type: type,
-      dueBalance: dueBalance,
+      isWalkIn: isWalkIn,
     );
   }
 }

@@ -9,7 +9,7 @@ part 'parties_ctrl.g.dart';
 class PartiesCtrl extends _$PartiesCtrl {
   final _repo = locate<PartiesRepo>();
   @override
-  Future<List<Parti>> build(bool? isCustomer) async {
+  Future<List<Party>> build(bool? isCustomer) async {
     final types = switch (isCustomer) {
       true => PartiType.customers,
       false => PartiType.suppliers,
@@ -30,7 +30,12 @@ class PartiesCtrl extends _$PartiesCtrl {
     });
   }
 
-  Future<Result> updateParti(Parti parti, [PFile? file]) async {
+  Future<Result> checkAvailability(String phone) async {
+    final res = await _repo.checkAvailability(phone);
+    return res.fold(leftResult, (_) => rightResult('Phone available'));
+  }
+
+  Future<Result> updateParti(Party parti, [PFile? file]) async {
     final res = await _repo.updateParti(parti, file);
     return res.fold(leftResult, (r) {
       ref.invalidate(partiesCtrlProvider);

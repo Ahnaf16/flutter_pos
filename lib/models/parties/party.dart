@@ -3,18 +3,15 @@ import 'package:pos/main.export.dart';
 
 enum PartiType {
   customer,
-  supplier,
-  retailer,
-  dealer,
-  wholesaler;
+  supplier;
 
   static List<PartiType> get customers => [customer];
-  static List<PartiType> get suppliers => values.toList()..removeWhere((e) => e == customer);
+  static List<PartiType> get suppliers => [supplier];
 }
 
-class Parti {
+class Party {
   final String id;
-  const Parti({
+  const Party({
     required this.id,
     required this.name,
     required this.phone,
@@ -44,9 +41,9 @@ class Parti {
   bool hasDue() => due > 0;
   bool hasBalance() => due < 0;
 
-  factory Parti.fromDoc(Document doc) {
+  factory Party.fromDoc(Document doc) {
     final map = doc.data;
-    return Parti(
+    return Party(
       id: doc.$id,
       name: map['name'] ?? '',
       phone: map['phone'] ?? '',
@@ -58,7 +55,7 @@ class Parti {
     );
   }
 
-  factory Parti.fromMap(Map<String, dynamic> map) => Parti(
+  factory Party.fromMap(Map<String, dynamic> map) => Party(
     id: map.parseAwField(),
     name: map['name'] ?? '',
     phone: map['phone'] ?? '',
@@ -69,20 +66,20 @@ class Parti {
     type: PartiType.values.byName(map['type']),
   );
 
-  static Parti? tyrParse(dynamic value) {
+  static Party? tyrParse(dynamic value) {
     try {
-      if (value case final Parti p) return p;
-      if (value case final Document doc) return Parti.fromDoc(doc);
-      if (value case final Map map) return Parti.fromMap(map.toStringKey());
+      if (value case final Party p) return p;
+      if (value case final Document doc) return Party.fromDoc(doc);
+      if (value case final Map map) return Party.fromMap(map.toStringKey());
       return null;
     } catch (e) {
       return null;
     }
   }
 
-  static Parti? fromWalkIn(WalkIn? wi) {
+  static Party? fromWalkIn(WalkIn? wi) {
     if (wi == null) return null;
-    return Parti(
+    return Party(
       id: '',
       name: wi.name ?? 'Walk In',
       phone: wi.phone ?? '',
@@ -95,8 +92,8 @@ class Parti {
     );
   }
 
-  Parti marge(Map<String, dynamic> map) {
-    return Parti(
+  Party marge(Map<String, dynamic> map) {
+    return Party(
       id: map.tryParseAwField() ?? id,
       name: map['name'] ?? name,
       phone: map['phone'] ?? phone,
@@ -121,7 +118,7 @@ class Parti {
 
   Map<String, dynamic> toAwPost() => toMap()..removeWhere((key, value) => key == 'id');
 
-  Parti copyWith({
+  Party copyWith({
     String? id,
     String? name,
     String? phone,
@@ -131,7 +128,7 @@ class Parti {
     ValueGetter<String?>? photo,
     PartiType? type,
   }) {
-    return Parti(
+    return Party(
       id: id ?? this.id,
       name: name ?? this.name,
       phone: phone ?? this.phone,
