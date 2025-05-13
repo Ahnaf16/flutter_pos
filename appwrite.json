@@ -22,13 +22,6 @@
             "documentSecurity": false,
             "attributes": [
                 {
-                    "key": "maintenance_mode",
-                    "type": "boolean",
-                    "required": false,
-                    "array": false,
-                    "default": false
-                },
-                {
                     "key": "currency_symbol",
                     "type": "string",
                     "required": true,
@@ -62,6 +55,18 @@
                     "array": false,
                     "size": 40,
                     "default": null
+                },
+                {
+                    "key": "default_account",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "68063141003974052255",
+                    "relationType": "oneToOne",
+                    "twoWay": false,
+                    "twoWayKey": "6821a1100006ad981f7b",
+                    "onDelete": "setNull",
+                    "side": "parent"
                 }
             ],
             "indexes": []
@@ -193,6 +198,15 @@
                     "array": false,
                     "min": -9223372036854775808,
                     "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "price",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
                     "default": null
                 }
             ],
@@ -328,28 +342,22 @@
                     "default": null
                 },
                 {
-                    "key": "due_balance",
-                    "type": "double",
+                    "key": "returnRecord",
+                    "type": "relationship",
                     "required": false,
                     "array": false,
-                    "min": -1.7976931348623157e+308,
-                    "max": 1.7976931348623157e+308,
-                    "default": null
+                    "relatedCollection": "68205e6c0011238344a3",
+                    "relationType": "oneToOne",
+                    "twoWay": true,
+                    "twoWayKey": "inventoryRecord",
+                    "onDelete": "setNull",
+                    "side": "child"
                 },
                 {
-                    "key": "walk_in_name",
-                    "type": "string",
-                    "required": false,
+                    "key": "is_walk_in",
+                    "type": "boolean",
+                    "required": true,
                     "array": false,
-                    "size": 100,
-                    "default": null
-                },
-                {
-                    "key": "walk_in_phone",
-                    "type": "string",
-                    "required": false,
-                    "array": false,
-                    "size": 40,
                     "default": null
                 }
             ],
@@ -486,7 +494,8 @@
             "$permissions": [
                 "create(\"users\")",
                 "read(\"users\")",
-                "update(\"users\")"
+                "update(\"users\")",
+                "delete(\"users\")"
             ],
             "databaseId": "6805362c0032bd189cd2",
             "name": "products",
@@ -563,6 +572,15 @@
                     "array": false,
                     "size": 50000,
                     "default": null
+                },
+                {
+                    "key": "sale_price",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
                 }
             ],
             "indexes": []
@@ -612,11 +630,14 @@
                         "manageSupplier",
                         "manageStaff",
                         "manageRole",
+                        "manageWarehouse",
                         "transferStock",
+                        "manageAccounts",
                         "manageExpanse",
-                        "manageDue",
+                        "moneyTransfer",
                         "transferMoney",
-                        "manageWarehouse"
+                        "due",
+                        "transactions"
                     ],
                     "format": "enum",
                     "default": null
@@ -629,7 +650,8 @@
             "$permissions": [
                 "create(\"users\")",
                 "read(\"users\")",
-                "update(\"users\")"
+                "update(\"users\")",
+                "delete(\"users\")"
             ],
             "databaseId": "6805362c0032bd189cd2",
             "name": "stock",
@@ -640,33 +662,6 @@
                     "key": "purchase_price",
                     "type": "double",
                     "required": true,
-                    "array": false,
-                    "min": 0,
-                    "max": 1.7976931348623157e+308,
-                    "default": null
-                },
-                {
-                    "key": "sales_price",
-                    "type": "double",
-                    "required": true,
-                    "array": false,
-                    "min": 0,
-                    "max": 1.7976931348623157e+308,
-                    "default": null
-                },
-                {
-                    "key": "wholesale_price",
-                    "type": "double",
-                    "required": false,
-                    "array": false,
-                    "min": 0,
-                    "max": 1.7976931348623157e+308,
-                    "default": null
-                },
-                {
-                    "key": "dealer_price",
-                    "type": "double",
-                    "required": false,
                     "array": false,
                     "min": 0,
                     "max": 1.7976931348623157e+308,
@@ -746,10 +741,11 @@
                     "required": true,
                     "array": false,
                     "elements": [
-                        "menual",
                         "expanse",
                         "purchase",
-                        "sale"
+                        "sale",
+                        "transfer",
+                        "returned"
                     ],
                     "format": "enum",
                     "default": null
@@ -798,6 +794,26 @@
                     "min": -1.7976931348623157e+308,
                     "max": 1.7976931348623157e+308,
                     "default": null
+                },
+                {
+                    "key": "transact_to_phone",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "transaction_for",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680629bf003151f6f6ad",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "681adfb4002ccc5ff9dd",
+                    "onDelete": "setNull",
+                    "side": "parent"
                 }
             ],
             "indexes": []
@@ -1076,6 +1092,85 @@
                     "required": false,
                     "array": false,
                     "default": true
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "68205e6c0011238344a3",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "return_record",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "inventoryRecord",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680628f40031fda735e1",
+                    "relationType": "oneToOne",
+                    "twoWay": true,
+                    "twoWayKey": "returnRecord",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "users",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680536a4003be2a282af",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "6820e5f5001817de4c8c",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "note",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 300,
+                    "default": null
+                },
+                {
+                    "key": "deductedFromAccount",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "deductedFromParty",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": 0
+                },
+                {
+                    "key": "isSale",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "stock_qty_pair",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 200,
+                    "default": null
                 }
             ],
             "indexes": []

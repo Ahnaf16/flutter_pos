@@ -1,42 +1,91 @@
-void main(List<String> args) {
-  // create project
+import 'dart:convert';
+import 'dart:io';
 
-  // create db
-  // appwrite databases create --database-id 6805362c0032bd189cd2 --name pos_db
+import 'package:pos/_core/database/aw_const.dart';
 
-  //create admin
-  // appwrite users create --user-id "unique()" \
-  //     --email admin@gmail.com \
-  //     --password 12341234
+final _dbId = AWConst.databaseId.id;
+final _userCollId = AWConst.collections.users.id;
+final _roleCollId = AWConst.collections.role.id;
+const _adminRoleId = '680a082b001d1b08d793';
+const _adminId = '6817c1c0002570812122';
+const _email = 'admin@gmail.com';
+const _pass = '12341234';
 
-  //create config doc
-  // appwrite databases create-document \
-  //     --database-id "6805362c0032bd189cd2" --collection-id "6805c476002d4333ccb1" \
-  //     --document-id 'APP_CONFIG' --data '$_defConfig' \
-  //     --permissions 'read("any")' 'write("users")' 'update("users")'
+const _user = {'name': 'Admin', 'phone': '', 'email': _email, 'role': _adminRoleId, 'is_user_created': true};
+
+final _role = {
+  'name': 'admin',
+  'enabled': true,
+  'permissions': [
+    'manageProduct',
+    'manageStock',
+    'manageUnit',
+    'makeSale',
+    'returnSale',
+    'makePurchase',
+    'returnPurchase',
+    'manageCustomer',
+    'manageSupplier',
+    'manageStaff',
+    'manageRole',
+    'manageWarehouse',
+    'transferStock',
+    'manageAccounts',
+    'manageExpanse',
+    'moneyTransfer',
+    'transferMoney',
+    'transactions',
+    'due',
+  ],
+};
+
+void main(List<String> args) async {
+  final arg = args.firstOrNull;
+
+  if (arg == null) return stdout.writeln('Pass an arg');
+
+  if (arg == 'adminAcc') {
+    _account();
+  }
+
+  if (arg == 'adminDoc') {
+    await createDoc(coll: _roleCollId, docId: _adminRoleId, data: _role);
+    await createDoc(coll: _userCollId, docId: _adminId, data: _user);
+  }
 }
 
-// final _defConfig = json.encode(Config.def().toAwPost());
+Future createDoc({required String coll, required String docId, required Map data}) async {
+  final doc = await Process.run('appwrite', [
+    'databases',
+    'create-document',
+    '--database-id',
+    _dbId,
+    '--collection-id',
+    coll,
+    '--document-id',
+    docId,
+    '--data',
+    jsonEncode(data),
+  ], runInShell: true);
 
-//  aw databases create-string-attribute --database-id 6805362c0032bd189cd2 --collection-id 6805c476002d4333ccb1 --key currency_symbol --size 15 --required false --xdefault "$"
+  stdout.writeln(doc.stdout);
+  stdout.writeln(doc.stderr);
+}
 
+void _account() {
+  final acc = Process.runSync('appwrite', [
+    'users',
+    'create',
+    '--user-id',
+    _adminId,
+    '--email',
+    _email,
+    '--password',
+    _pass,
+    '--name',
+    'Admin',
+  ], runInShell: true);
 
-   // create-boolean-attribute 
-  
-   // create-datetime-attribute 
-   
-   // create-email-attribute 
-  
-   // create-enum-attribute 
-   
-   // create-float-attribute 
-   
-   // create-integer-attribute 
-   
-   // create-ip-attribute 
-  
-   // create-relationship-attribute 
-
-   // create-string-attribute 
-  
-                                           
+  stdout.writeln(acc.stdout);
+  stdout.writeln(acc.stderr);
+}

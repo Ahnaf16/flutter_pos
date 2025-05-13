@@ -81,7 +81,7 @@ flutter_gen:
     lottie: true
 
 # appwrite
-secret API key: ahnaf
+secret API key:
 account:
   name: ahnaf
   email: ahnafsakil9@gmail.com

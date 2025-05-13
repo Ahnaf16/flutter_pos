@@ -65,4 +65,6 @@ extension EnumByName<T extends Enum> on Iterable<T> {
 
     return null;
   }
+
+  List<String> names() => map((e) => e.name).toList();
 }
