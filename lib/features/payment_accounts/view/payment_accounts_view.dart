@@ -18,7 +18,7 @@ class PaymentAccountsView extends HookConsumerWidget {
         ShadButton(
           child: const Text('Add a account'),
           onPressed: () {
-            showShadDialog(context: context, builder: (context) => const _AccountAddDialog());
+            showShadDialog(context: context, builder: (context) => const AccountAddDialog());
           },
         ),
       ],
@@ -70,7 +70,13 @@ class PaymentAccountsView extends HookConsumerWidget {
                         size: ShadButtonSize.sm,
                         leading: const Icon(LuIcons.pen),
                         onPressed:
-                            () => showShadDialog(context: context, builder: (context) => _AccountAddDialog(acc: data)),
+                            () => showShadDialog(context: context, builder: (context) => AccountAddDialog(acc: data)),
+                      ),
+                      ShadButton.secondary(
+                        size: ShadButtonSize.sm,
+                        leading: const Icon(LuIcons.eye),
+                        onPressed:
+                            () => showShadDialog(context: context, builder: (context) => _AccountViewDialog(acc: data)),
                       ),
                     ],
                   ),
@@ -107,8 +113,8 @@ class PaymentAccountsView extends HookConsumerWidget {
   }
 }
 
-class _AccountAddDialog extends HookConsumerWidget {
-  const _AccountAddDialog({this.acc});
+class AccountAddDialog extends HookConsumerWidget {
+  const AccountAddDialog({super.key, this.acc});
 
   final PaymentAccount? acc;
 
@@ -116,8 +122,11 @@ class _AccountAddDialog extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
     final actionTxt = acc == null ? 'Add' : 'Update';
+
+    final isCash = useState(acc?.type == AccountType.cash);
+
     return ShadDialog(
-      title: Text('$actionTxt Unit'),
+      title: Text('$actionTxt account'),
       description: Text(acc == null ? 'Fill the form to add a new account' : 'Update the form for ${acc!.name}'),
       actions: [
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
@@ -125,7 +134,7 @@ class _AccountAddDialog extends HookConsumerWidget {
           onPressed: (l) async {
             final state = formKey.currentState!;
             if (!state.saveAndValidate()) return;
-            final data = state.value;
+            final data = state.transformedValues;
 
             final ctrl = ref.read(paymentAccountsCtrlProvider(false).notifier);
             (bool, String)? result;
@@ -161,11 +170,163 @@ class _AccountAddDialog extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: Insets.med,
             children: [
-              ShadTextField(name: 'name', label: 'Name', isRequired: true),
+              Row(
+                children: [
+                  Expanded(flex: 2, child: ShadTextField(name: 'name', label: 'Name', isRequired: true)),
+                  Expanded(
+                    child: ShadSelectField<AccountType>(
+                      name: 'type',
+                      label: 'Type',
+                      hintText: 'Account Type',
+                      isRequired: true,
+                      initialValue: acc?.type,
+                      valueTransformer: (value) => value?.name,
+                      options: AccountType.values,
+                      optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name.titleCase)),
+                      selectedBuilder: (_, v) => Text(v.name.titleCase),
+                      onChanged: (value) {
+                        if (value == null) return;
+                        isCash.value = value == AccountType.cash;
+                        formKey.currentState?.fields['custom_info']?.reset();
+                      },
+                    ),
+                  ),
+                ],
+              ),
               ShadTextField(name: 'description', label: 'description'),
               if (acc == null) ShadTextField(name: 'amount', label: 'initial amount'),
+              if (!isCash.value)
+                FormBuilderField<List<MapEntry<String, String>>>(
+                  name: 'custom_info',
+                  initialValue: acc?.customInfo.entries.toList(),
+                  valueTransformer: (value) {
+                    if (value == null) return [];
+                    final list = <String>[];
+                    for (final entry in value) {
+                      list.add('${entry.key}:~:${entry.value}');
+                    }
+                    return list;
+                  },
+                  builder: (field) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Custom Info', style: context.theme.decoration.labelStyle),
+                            ShadButton(
+                              size: ShadButtonSize.sm,
+                              leading: const Icon(LuIcons.plus),
+                              child: const Text('Add field'),
+                              onPressed: () => field.didChange([...?field.value, const MapEntry('', '')]),
+                            ),
+                          ],
+                        ),
+                        ...?field.value?.mapIndexed(
+                          (i, v) => Row(
+                            children: [
+                              Expanded(
+                                child: ShadTextField(
+                                  name: '${i}_key',
+                                  initialValue: v.key,
+                                  label: 'Key',
+                                  onChanged: (key) {
+                                    key ??= '';
+                                    final values = field.value?.toList();
+                                    if (values == null) return;
+                                    MapEntry<String, String> entry = values[i];
+                                    entry = MapEntry(key, entry.value);
+
+                                    values[i] = entry;
+                                    field.didChange(values);
+                                  },
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: ShadTextField(
+                                  name: '${i}_value',
+                                  initialValue: v.value,
+                                  label: 'Value',
+                                  onChanged: (value) {
+                                    value ??= '';
+                                    final values = field.value?.toList();
+                                    if (values == null) return;
+                                    MapEntry<String, String> entry = values[i];
+                                    entry = MapEntry(entry.key, value);
+
+                                    values[i] = entry;
+                                    field.didChange(values);
+                                  },
+                                  outsideTrailing: ShadButton.outline(
+                                    size: ShadButtonSize.sm,
+                                    leading: const Icon(LuIcons.x),
+                                    onPressed: () {
+                                      final list =
+                                          field.value?.where((e) => e != v).toList() ?? <MapEntry<String, String>>[];
+                                      field.didChange(list);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AccountViewDialog extends HookConsumerWidget {
+  const _AccountViewDialog({required this.acc});
+
+  final PaymentAccount acc;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ShadDialog(
+      title: const Text('Account'),
+      description: Text('Details of ${acc.name}'),
+      actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
+      child: Container(
+        padding: Pads.padding(v: Insets.med),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: Insets.sm,
+          children: [
+            Row(
+              spacing: Insets.med,
+              children: [
+                ShadBadge.raw(
+                  variant: acc.isActive ? ShadBadgeVariant.primary : ShadBadgeVariant.destructive,
+                  child: Text(acc.isActive ? 'Active' : 'Inactive'),
+                ),
+                ShadBadge(child: Text(acc.type.name.titleCase)),
+              ],
+            ),
+            SpacedText(left: 'Name', right: acc.name, styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(
+              left: 'Amount',
+              right: acc.amount.currency(),
+              styleBuilder: (l, r) => (l, context.text.list),
+              crossAxisAlignment: CrossAxisAlignment.center,
+            ),
+            if (acc.description != null)
+              SpacedText(left: 'Description', right: acc.description!, styleBuilder: (l, r) => (l, context.text.muted)),
+
+            Text('Custom info:', style: context.theme.decoration.labelStyle),
+            for (final MapEntry(:key, :value) in acc.customInfo.entries)
+              SpacedText(left: key, right: value, styleBuilder: (l, r) => (l, r.bold)),
+          ],
         ),
       ),
     );

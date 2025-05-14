@@ -495,11 +495,18 @@ class _ProductTile extends StatelessWidget {
 }
 
 class PaymentAccountSelect extends HookConsumerWidget {
-  const PaymentAccountSelect({super.key, required this.onAccountSelect, required this.type, this.isRequired = false});
+  const PaymentAccountSelect({
+    super.key,
+    required this.onAccountSelect,
+    required this.type,
+    this.isRequired = false,
+    this.outsideTrailing,
+  });
 
   final Function(PaymentAccount? acc) onAccountSelect;
   final RecordType type;
   final bool isRequired;
+  final Widget? outsideTrailing;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -544,6 +551,7 @@ class PaymentAccountSelect extends HookConsumerWidget {
           },
           onChanged: onAccountSelect,
           anchor: const ShadAnchorAuto(targetAnchor: Alignment.topCenter, followerAnchor: Alignment.topCenter),
+          outsideTrailing: outsideTrailing,
         );
       },
     );

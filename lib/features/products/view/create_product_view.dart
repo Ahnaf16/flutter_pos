@@ -7,6 +7,7 @@ import 'package:pos/features/inventory_record/view/create_record_view.dart';
 import 'package:pos/features/inventory_record/view/discount_type_pop_over.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
+import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/features/products/controller/update_product_ctrl.dart';
 import 'package:pos/features/staffs/controller/update_staff_ctrl.dart';
@@ -429,10 +430,18 @@ class _InitialStock extends HookConsumerWidget {
             Row(
               children: [
                 Expanded(
-                  child: PaymentAccountSelect(onAccountSelect: recordCtrl().changeAccount, type: RecordType.purchase),
+                  child: PaymentAccountSelect(
+                    onAccountSelect: recordCtrl().changeAccount,
+                    type: RecordType.purchase,
+                    outsideTrailing: ShadButton.outline(
+                      leading: const Icon(LuIcons.plus),
+                      onPressed: () {
+                        showShadDialog(context: context, builder: (context) => const AccountAddDialog());
+                      },
+                    ),
+                  ),
                 ),
                 Expanded(
-                  flex: 2,
                   child: ShadTextField(
                     name: 'record.amount',
                     hintText: 'Paid',
