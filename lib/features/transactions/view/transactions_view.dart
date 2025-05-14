@@ -137,7 +137,7 @@ class _TrxViewDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final TransactionLog(getParti: parti, transactionBy: user, transactionForm: transactionFor) = trx;
+    final TransactionLog(getParti: to, transactionBy: user, transactionForm: from) = trx;
     return ShadDialog(
       title: Text('${trx.type.name.titleCase} log'),
       description: Row(
@@ -154,10 +154,10 @@ class _TrxViewDialog extends HookConsumerWidget {
           spacing: Insets.med,
           children: [
             //! from
-            if (transactionFor != null) UserCard.parti(imgSize: 70, parti: transactionFor, title: 'Transaction from'),
+            if (from != null) UserCard.parti(imgSize: 70, parti: from, title: 'Transaction from', showDue: true),
 
             //! parti
-            if (parti != null) UserCard.parti(imgSize: 70, parti: parti, title: 'Transacted To'),
+            if (to != null) UserCard.parti(imgSize: 70, parti: to, title: 'Transacted To', showDue: true),
 
             // //! user
             // if (user != null) UserCard.user(imgSize: 70, user: user, title: '${trx.type.name.titleCase} By'),
@@ -165,9 +165,18 @@ class _TrxViewDialog extends HookConsumerWidget {
             //! trx info
             const Gap(Insets.sm),
             SpacedText(left: 'Amount', right: trx.amount.currency(), styleBuilder: (l, r) => (l, r.bold)),
-            SpacedText(left: 'Account', right: trx.account?.name ?? '--', styleBuilder: (l, r) => (l, r.bold)),
+
+            if (trx.account != null)
+              SpacedText(left: 'Account', right: trx.account?.name ?? '--', styleBuilder: (l, r) => (l, r.bold)),
+
             SpacedText(left: 'Date', right: trx.date.formatDate(), styleBuilder: (l, r) => (l, r.bold)),
-            SpacedText(left: 'Note', right: trx.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),
+
+            if (trx.note != null)
+              SpacedText(left: 'Note', right: trx.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),
+
+            Text('Custom info:', style: context.theme.decoration.labelStyle),
+            for (final MapEntry(:key, :value) in trx.customInfo.entries)
+              SpacedText(left: key, right: value, styleBuilder: (l, r) => (l, r.bold)),
           ],
         ),
       ),

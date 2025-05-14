@@ -36,7 +36,11 @@ class Party {
 
   bool get isCustomer => type == PartiType.customer;
 
-  Color get dueColor => due == 0 ? Colors.grey : (hasBalance() ? Colors.green.shade500 : Colors.red.shade500);
+  Color dueColor() {
+    if (due == 0) return Colors.grey;
+    if (!isCustomer) return (hasBalance() ? Colors.red : Colors.green);
+    return (hasDue() ? Colors.red : Colors.green);
+  }
 
   bool hasDue() => due > 0;
   bool hasBalance() => due < 0;
@@ -66,7 +70,7 @@ class Party {
     type: PartiType.values.byName(map['type']),
   );
 
-  static Party? tyrParse(dynamic value) {
+  static Party? tryParse(dynamic value) {
     try {
       if (value case final Party p) return p;
       if (value case final Document doc) return Party.fromDoc(doc);

@@ -1,7 +1,17 @@
 import 'package:appwrite/models.dart';
 import 'package:pos/main.export.dart';
 
-enum AccountType { cash, bank, mobileBank }
+enum AccountType {
+  cash,
+  bank,
+  mobileBank;
+
+  SMap fixedKeyValue() => switch (this) {
+    AccountType.cash => {},
+    AccountType.bank => {'Account number': '', 'Branch': ''},
+    AccountType.mobileBank => {},
+  };
+}
 
 class PaymentAccount {
   const PaymentAccount({

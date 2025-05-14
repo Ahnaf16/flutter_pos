@@ -9,7 +9,7 @@ class DueRepo with AwHandler {
     final data = DueLog(
       amount: amount,
       postAmount: parti.due + amount,
-      isAdded: isAdd,
+      isDueAdded: isAdd,
       date: dateNow.run(),
       parti: parti,
       note: note,

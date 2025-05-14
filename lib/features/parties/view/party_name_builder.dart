@@ -16,7 +16,7 @@ class PartyNameBuilder extends StatelessWidget {
           if (showDue && !v.isWalkIn)
             TextSpan(
               text: '   ${v.hasDue() ? 'Due: ' : 'Balance: '}${v.due.abs().currency()}',
-              style: context.text.muted.textColor(v.dueColor),
+              style: context.text.muted.textColor(v.dueColor()),
             ),
         ],
       ),

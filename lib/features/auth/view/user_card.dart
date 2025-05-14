@@ -2,16 +2,40 @@ import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 
 class UserCard extends StatelessWidget {
-  const UserCard({super.key, required this.userOrParti, this.title, this.subtitle, this.imgSize = 50});
-  UserCard.user({super.key, required AppUser user, this.title, this.subtitle, this.imgSize = 50})
-    : userOrParti = left(user);
-  UserCard.parti({super.key, required Party? parti, this.title, this.subtitle, this.imgSize = 50})
-    : userOrParti = right(parti);
+  const UserCard({
+    super.key,
+    required this.userOrParti,
+    this.title,
+    this.subtitle,
+    this.imgSize = 50,
+    this.showDue = false,
+    this.forceDue,
+  });
+  UserCard.user({
+    super.key,
+    required AppUser user,
+    this.title,
+    this.subtitle,
+    this.imgSize = 50,
+    this.showDue = false,
+    this.forceDue,
+  }) : userOrParti = left(user);
+  UserCard.parti({
+    super.key,
+    required Party? parti,
+    this.title,
+    this.subtitle,
+    this.imgSize = 50,
+    this.showDue = false,
+    this.forceDue,
+  }) : userOrParti = right(parti);
 
   final Either<AppUser, Party?> userOrParti;
   final String? title;
   final String? subtitle;
   final double imgSize;
+  final bool showDue;
+  final bool? forceDue;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +48,7 @@ class UserCard extends StatelessWidget {
     return ShadCard(
       title: title == null ? null : Text(title!, style: context.theme.decoration.labelStyle),
       description: subtitle == null ? null : Text(subtitle!, style: context.theme.decoration.descriptionStyle),
-      childPadding: Pads.sm('t'),
+      // childPadding: Pads.sm('t'),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -67,12 +91,14 @@ class UserCard extends StatelessWidget {
                     onTap: (left, right) => Copier.copy(right),
                   ),
 
-                if (hasDue != null && due != null)
+                if (hasDue != null && due != null && showDue)
                   SpacedText(
-                    left: hasDue ? 'Due' : 'Balance',
+                    left: (hasDue || forceDue == true) ? 'Due' : 'Balance',
                     right: due.abs().currency(),
                     style: context.text.list,
-                    styleBuilder: (l, r) => (l, r.bold.textColor(hasDue ? Colors.red : Colors.green)),
+                    styleBuilder: (l, r) {
+                      return (l, r.bold.textColor((hasDue || forceDue == true) ? Colors.red : Colors.green));
+                    },
                     crossAxisAlignment: CrossAxisAlignment.center,
                   ),
               ],

@@ -47,9 +47,9 @@ class TransactionLog {
   factory TransactionLog.fromMap(Map<String, dynamic> map) => TransactionLog(
     id: map.parseAwField(),
     amount: map.parseNum('amount'),
-    account: PaymentAccount.fromMap(map['payment_account']),
-    transactedTo: Party.tyrParse(map['transaction_to']),
-    transactionForm: Party.tyrParse(map['transaction_from']),
+    account: PaymentAccount.tryParse(map['payment_account']),
+    transactedTo: Party.tryParse(map['transaction_to']),
+    transactionForm: Party.tryParse(map['transaction_from']),
     customInfo: map.parseCustomInfo('custom_info'),
     transactionBy: AppUser.tryParse(map['transaction_by']),
     date: DateTime.parse(map['date']),

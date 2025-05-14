@@ -48,7 +48,7 @@ class InventoryRecord {
     final data = doc.data;
     return InventoryRecord(
       id: doc.$id,
-      parti: Party.tyrParse(data['parties']),
+      parti: Party.tryParse(data['parties']),
       details: switch (data['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
@@ -69,7 +69,7 @@ class InventoryRecord {
   factory InventoryRecord.fromMap(Map<String, dynamic> map) {
     return InventoryRecord(
       id: map.parseAwField(),
-      parti: Party.tyrParse(map['parties']),
+      parti: Party.tryParse(map['parties']),
       details: switch (map['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
@@ -99,7 +99,7 @@ class InventoryRecord {
   InventoryRecord marge(Map<String, dynamic> map) {
     return InventoryRecord(
       id: map.tryParseAwField() ?? id,
-      parti: map['parties'] == null ? parti : Party.tyrParse(map['parties']) ?? parti,
+      parti: map['parties'] == null ? parti : Party.tryParse(map['parties']) ?? parti,
       details: switch (map['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => details,

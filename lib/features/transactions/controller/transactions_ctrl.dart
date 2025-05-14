@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/transactions/repository/transactions_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -18,11 +19,30 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
     }, identity);
   }
 
-  Future<Result> createManual(QMap form) async {
+  Future<Result> adjustCustomerDue(QMap form) async {
     final res = await _repo.adjustCustomerDue(form);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
-      return rightResult('Transaction created successfully');
+      ref.invalidate(partiesCtrlProvider);
+      return rightResult('Due adjusted successfully');
+    });
+  }
+
+  Future<Result> supplierDuePayment(QMap form) async {
+    final res = await _repo.supplierDuePayment(form);
+    return res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      ref.invalidate(partiesCtrlProvider);
+      return rightResult('Due paid successfully');
+    });
+  }
+
+  Future<Result> transferBalance(QMap form) async {
+    final res = await _repo.transferBalance(form);
+    return res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      ref.invalidate(partiesCtrlProvider);
+      return rightResult('Balance transferred successfully');
     });
   }
 }

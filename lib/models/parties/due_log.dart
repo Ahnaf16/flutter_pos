@@ -6,7 +6,7 @@ class DueLog {
     this.id = '',
     required this.amount,
     required this.postAmount,
-    required this.isAdded,
+    required this.isDueAdded,
     required this.date,
     required this.parti,
     this.note,
@@ -15,7 +15,7 @@ class DueLog {
   final String id;
   final num amount;
   final num postAmount;
-  final bool isAdded;
+  final bool isDueAdded;
   final DateTime date;
   final Party parti;
   final String? note;
@@ -24,7 +24,7 @@ class DueLog {
     id: map.parseAwField(),
     amount: map.parseNum('amount'),
     postAmount: map.parseNum('post_amount'),
-    isAdded: map.parseBool('is_added'),
+    isDueAdded: map.parseBool('is_added'),
     date: DateTime.parse(map['adjustment_date']),
     parti: Party.fromMap(map['parties']),
     note: map['note'],
@@ -36,7 +36,7 @@ class DueLog {
       id: doc.$id,
       amount: map.parseNum('amount'),
       postAmount: map.parseNum('post_amount'),
-      isAdded: map.parseBool('is_added'),
+      isDueAdded: map.parseBool('is_added'),
       date: DateTime.parse(map['adjustment_date']),
       parti: Party.fromMap(map['parties']),
       note: map['note'],
@@ -47,7 +47,7 @@ class DueLog {
     'id': id,
     'amount': amount,
     'post_amount': postAmount,
-    'is_added': isAdded,
+    'is_added': isDueAdded,
     'adjustment_date': date.toIso8601String(),
     'parties': parti.toMap(),
     'note': note,
@@ -56,7 +56,7 @@ class DueLog {
   Map<String, dynamic> toAwPost() => {
     'amount': amount,
     'post_amount': postAmount,
-    'is_added': isAdded,
+    'is_added': isDueAdded,
     'adjustment_date': date.toIso8601String(),
     'parties': parti.id,
     'note': note,

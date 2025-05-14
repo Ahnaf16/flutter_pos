@@ -1,27 +1,37 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/main.export.dart';
 
-class CustomInfoFiled extends StatelessWidget {
+typedef _CustomInfo = List<MapEntry<String, String>>;
+
+class CustomInfoFiled extends HookWidget {
   const CustomInfoFiled({
     super.key,
     this.name,
     this.title,
-    this.initialInfo = const {},
-    this.canRemoveInitial = true,
+    this.initialInfo,
+    this.fixedInitialField = const {},
     this.header,
   });
 
   final String? name;
   final String? title;
-  final SMap initialInfo;
-  final bool canRemoveInitial;
-  final Widget? Function(BuildContext context, Function() addingMethod)? header;
+  final SMap? initialInfo;
+  final SMap fixedInitialField;
+  final Widget? Function(BuildContext context, VoidCallback addingMethod)? header;
+
+  void _addingMethod(FormFieldState<_CustomInfo> field) {
+    const entry = MapEntry('', '');
+    if (field.value?.contains(entry) ?? false) return;
+    field.didChange([...?field.value, entry]);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FormBuilderField<List<MapEntry<String, String>>>(
+    final initials = {...fixedInitialField, ...?initialInfo};
+
+    return FormBuilderField<_CustomInfo>(
       name: name ?? 'custom_info',
-      initialValue: initialInfo.entries.toList(),
+      initialValue: initials.entries.toList(),
       valueTransformer: (value) {
         if (value == null) return [];
         final list = <String>[];
@@ -35,13 +45,7 @@ class CustomInfoFiled extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: Insets.sm,
           children: [
-            header?.call(context, () {
-                  const entry = MapEntry('', '');
-
-                  if (field.value?.contains(entry) ?? false) return;
-
-                  field.didChange([...?field.value, entry]);
-                }) ??
+            header?.call(context, () => _addingMethod(field)) ??
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -50,18 +54,12 @@ class CustomInfoFiled extends StatelessWidget {
                       size: ShadButtonSize.sm,
                       leading: const Icon(LuIcons.plus),
                       child: const Text('Add field'),
-                      onPressed: () {
-                        const entry = MapEntry('', '');
-
-                        if (field.value?.contains(entry) ?? false) return;
-
-                        field.didChange([...?field.value, entry]);
-                      },
+                      onPressed: () => _addingMethod(field),
                     ),
                   ],
                 ),
             ...?field.value?.mapIndexed((i, v) {
-              final showXButton = !initialInfo.containsKey(v.key) || canRemoveInitial;
+              final showXButton = !fixedInitialField.containsKey(v.key);
               return Row(
                 children: [
                   Expanded(
@@ -69,7 +67,8 @@ class CustomInfoFiled extends StatelessWidget {
                       name: '${i}_key',
                       label: 'Key',
                       initialValue: v.key,
-                      isRequired: true,
+                      isRequired: showXButton,
+                      readOnly: !showXButton,
                       onChanged: (key) {
                         key ??= '';
                         final values = field.value?.toList();

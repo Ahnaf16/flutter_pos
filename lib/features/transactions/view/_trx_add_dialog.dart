@@ -32,7 +32,7 @@ class _TransferDialog extends HookConsumerWidget {
             final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.transfer).notifier);
 
             l.truthy();
-            final result = await ctrl.createManual(data);
+            final result = await ctrl.adjustCustomerDue(data);
             l.falsey();
 
             if (result case final Result r) {
@@ -55,7 +55,7 @@ class _TransferDialog extends HookConsumerWidget {
               onChanged: () {
                 final state = formKey.currentState!;
                 if (state.instantValue.containsKey('transaction_from')) {
-                  selected.value = Party.tyrParse(state.instantValue['transaction_from']);
+                  selected.value = Party.tryParse(state.instantValue['transaction_from']);
                 }
               },
               child: Column(

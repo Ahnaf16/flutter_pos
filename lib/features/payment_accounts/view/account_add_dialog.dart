@@ -12,7 +12,7 @@ class AccountAddDialog extends HookConsumerWidget {
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
     final actionTxt = acc == null ? 'Add' : 'Update';
 
-    final isCash = useState(acc?.type == AccountType.cash);
+    final type = useState(acc?.type ?? AccountType.cash);
 
     return ShadDialog(
       title: Text('$actionTxt account'),
@@ -68,14 +68,14 @@ class AccountAddDialog extends HookConsumerWidget {
                       label: 'Type',
                       hintText: 'Account Type',
                       isRequired: true,
-                      initialValue: acc?.type,
+                      initialValue: type.value,
                       valueTransformer: (value) => value?.name,
                       options: AccountType.values,
                       optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name.titleCase)),
                       selectedBuilder: (_, v) => Text(v.name.titleCase),
                       onChanged: (value) {
                         if (value == null) return;
-                        isCash.value = value == AccountType.cash;
+                        type.value = value;
                         formKey.currentState?.fields['custom_info']?.reset();
                       },
                     ),
@@ -84,7 +84,7 @@ class AccountAddDialog extends HookConsumerWidget {
               ),
               ShadTextField(name: 'description', label: 'description'),
               if (acc == null) ShadTextField(name: 'amount', label: 'initial amount'),
-              if (!isCash.value) CustomInfoFiled(initialInfo: acc?.customInfo ?? {}),
+              if (type.value != AccountType.cash) CustomInfoFiled(initialInfo: acc?.customInfo),
             ],
           ),
         ),

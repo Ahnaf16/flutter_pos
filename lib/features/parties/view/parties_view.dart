@@ -7,7 +7,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 const _headings = [
   TableHeading(name: 'Name'),
   TableHeading(name: 'Phone', max: 300.0, alignment: Alignment.center),
-  TableHeading(name: 'Due/Balance', max: 200.0, alignment: Alignment.center),
+  TableHeading(name: 'Due/Balance', max: 200.0),
   TableHeading(name: 'Action', max: 200.0, alignment: Alignment.centerRight),
 ];
 
@@ -69,17 +69,24 @@ class PartiesView extends HookConsumerWidget {
                   value: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (data.hasDue())
+                      if (data.isCustomer) ...[
+                        if (data.hasDue())
+                          SpacedText(
+                            left: 'Due',
+                            right: data.due.currency(),
+                            styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+                          )
+                        else
+                          SpacedText(
+                            left: 'Balance',
+                            right: data.due.abs().currency(),
+                            styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+                          ),
+                      ] else
                         SpacedText(
                           left: 'Due',
                           right: data.due.currency(),
-                          styleBuilder: (r, l) => (r, context.text.small.error(context)),
-                        )
-                      else
-                        SpacedText(
-                          left: 'Balance',
-                          right: data.due.abs().currency(),
-                          styleBuilder: (r, l) => (r, context.text.small.success()),
+                          styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
                         ),
                     ],
                   ),
@@ -100,6 +107,17 @@ class PartiesView extends HookConsumerWidget {
                             );
                           },
                         ),
+                      if (data.hasBalance() && !data.isCustomer)
+                        ShadButton.secondary(
+                          size: ShadButtonSize.sm,
+                          leading: const Icon(LuIcons.handCoins),
+                          onPressed: () {
+                            showShadDialog(
+                              context: context,
+                              builder: (context) => SupplierDueDialog(parti: data, type: data.type),
+                            );
+                          },
+                        ),
                       if (data.hasBalance() && data.isCustomer)
                         ShadButton.secondary(
                           size: ShadButtonSize.sm,
@@ -107,10 +125,11 @@ class PartiesView extends HookConsumerWidget {
                           onPressed: () {
                             showShadDialog(
                               context: context,
-                              builder: (context) => PartyBalanceDialog(parti: data, type: data.type),
+                              builder: (context) => BalanceTransferDialog(parti: data, type: data.type),
                             );
                           },
                         ),
+
                       ShadButton.secondary(
                         size: ShadButtonSize.sm,
                         leading: const Icon(LuIcons.eye),
@@ -376,7 +395,7 @@ class _PartiViewDialog extends HookConsumerWidget {
               left: parti.hasDue() ? 'Due' : 'Balance',
               right: parti.due.abs().currency(),
               styleBuilder: (l, r) => (l, r.bold),
-              builder: (r) => Text(r, style: context.text.small.textColor(parti.dueColor)),
+              builder: (r) => Text(r, style: context.text.small.textColor(parti.dueColor())),
               crossAxisAlignment: CrossAxisAlignment.center,
               trailing:
                   parti.due == 0
