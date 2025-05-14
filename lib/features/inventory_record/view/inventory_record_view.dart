@@ -172,12 +172,12 @@ class InventoryRecordView extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
             ),
-          if (data.due > 0)
+          if (data.due != 0)
             SpacedText(
               left: 'Due',
               right: data.due.currency(),
               crossAxisAlignment: CrossAxisAlignment.center,
-              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold.error(context)),
+              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.error(context)),
             ),
           SpacedText(
             left: 'Total',

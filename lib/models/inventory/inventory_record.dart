@@ -159,6 +159,11 @@ class InventoryRecord {
 
   num get due => total - amount;
 
+  bool get hasDue => due > 0;
+  bool get hasBalance => due < 0;
+
+  num get payable => hasDue ? amount : amount + due;
+
   InventoryRecord copyWith({
     String? id,
     ValueGetter<Party?>? parti,

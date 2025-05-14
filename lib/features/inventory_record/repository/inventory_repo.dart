@@ -21,8 +21,9 @@ class InventoryRepo with AwHandler {
 
     //! update account amount
     final acc = record.account;
-    //when amount is more then total, we only add the total price to the account. the remaining will go to users due/balance
-    final payable = inventory.hasDue ? record.amount : record.amount + inventory.due;
+
+    final payable = inventory.payable;
+
     if (acc != null && payable > 0) {
       final (accErr, accData) = await _updateAccountAmount(acc.id, payable).toRecord();
       if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
@@ -48,6 +49,7 @@ class InventoryRepo with AwHandler {
     //! add record
     final doc = await db.create(AWConst.collections.inventoryRecord, data: record.toAwPost());
     return doc;
+    // return left(const Failure('___'));
   }
 
   FutureReport<Document> createPurchase(InventoryRecordState inventory) async {

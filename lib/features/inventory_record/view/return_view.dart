@@ -6,7 +6,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 const _headings = [
   TableHeading.positional('From'),
   TableHeading.positional('By'),
-  TableHeading.positional('Amount', 300.0, Alignment.center),
+  TableHeading.positional('Amount', 300.0),
   TableHeading.positional('Account', 200.0, Alignment.center),
   TableHeading.positional('Date', 150.0, Alignment.center),
 ];

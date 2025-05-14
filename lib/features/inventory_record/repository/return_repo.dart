@@ -13,7 +13,7 @@ class ReturnRepo with AwHandler {
   final String _generalFailure = 'Failed to create record';
   final String _updateAccountFailure = 'Failed to update account amount';
 
-  FutureReport<Document> returnSale(InventoryRecord record, Map<String, int> data, {bool coverVatShip = true}) async {
+  FutureReport<Document> returnRecord(InventoryRecord record, Map<String, int> data, {bool coverVatShip = true}) async {
     final isSale = record.type.isSale;
 
     num effectiveOp(num value) => isSale ? value : -value;
@@ -30,7 +30,7 @@ class ReturnRepo with AwHandler {
       totalPrice = totalPrice + detail.totalPrice(value);
 
       final qty = effectiveOp(value).toInt();
-      detailsQtyPair.add('$key::$qty');
+      detailsQtyPair.add('$key$kSplitPattern$qty');
       final (stockErr, stockData) = await _updateStockQty(detail.stock, qty).toRecord();
       if (stockErr != null || stockData == null) return left(stockErr ?? Failure(_generalFailure));
     }

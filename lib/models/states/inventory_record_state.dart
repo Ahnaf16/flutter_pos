@@ -78,6 +78,12 @@ class InventoryRecordState {
 
   bool get isWalkIn => parti?.isWalkIn ?? true;
 
+  /// amount added/subtracted from the account
+  ///
+  /// when has due use the full amount otherwise add the due with the amount
+  /// the due, when hasBalance is (-), so the amount will be subtracted
+  num get payable => hasDue ? amount : amount + due;
+
   InventoryRecord toInventoryRecord() {
     return InventoryRecord(
       id: '',

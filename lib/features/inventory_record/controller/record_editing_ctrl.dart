@@ -172,7 +172,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
   }
 
   Future<Result> returnInventory(InventoryRecord rec, QMap data) async {
-    final res = await locate<ReturnRepo>().returnSale(rec, data.transformValues((_, v) => Parser.toInt(v) ?? 0));
+    final res = await locate<ReturnRepo>().returnRecord(rec, data.transformValues((_, v) => Parser.toInt(v) ?? 0));
 
     return res.fold(leftResult, (r) {
       ref.invalidate(inventoryCtrlProvider);
