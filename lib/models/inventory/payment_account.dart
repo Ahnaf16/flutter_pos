@@ -30,7 +30,7 @@ class PaymentAccount {
       amount: data['amount'],
       isActive: data['is_active'],
       type: AccountType.values.byName(data['type']),
-      customInfo: _parseCustomInfo(data['custom_info']),
+      customInfo: data.parseCustomInfo('custom_info'),
     );
   }
 
@@ -42,7 +42,7 @@ class PaymentAccount {
       amount: map.parseNum('amount'),
       isActive: map.parseBool('is_active', true),
       type: AccountType.values.byName(map['type']),
-      customInfo: _parseCustomInfo(map['custom_info']),
+      customInfo: map.parseCustomInfo('custom_info'),
     );
   }
   static PaymentAccount? tryParse(dynamic value) {
@@ -64,30 +64,30 @@ class PaymentAccount {
       amount: map['amount'] ?? amount,
       isActive: map['is_active'] ?? isActive,
       type: map['type'] == null ? type : AccountType.values.byName(map['type']),
-      customInfo: map['custom_info'] == null ? customInfo : _parseCustomInfo(map['custom_info']),
+      customInfo: map['custom_info'] == null ? customInfo : map.parseCustomInfo('custom_info'),
     );
   }
 
-  static SMap _parseCustomInfo(dynamic data) {
-    final map = <String, String>{};
-    if (data case final List list) {
-      for (final info in list) {
-        final parts = info.toString().split(':~:');
-        if (parts.length == 2) {
-          map[parts[0]] = parts[1];
-        }
-      }
-    }
-    return map;
-  }
+  // static SMap _parseCustomInfo(dynamic data) {
+  //   final map = <String, String>{};
+  //   if (data case final List list) {
+  //     for (final info in list) {
+  //       final parts = info.toString().split(':~:');
+  //       if (parts.length == 2) {
+  //         map[parts[0]] = parts[1];
+  //       }
+  //     }
+  //   }
+  //   return map;
+  // }
 
-  static List<String> _customToList(SMap map) {
-    final list = <String>[];
-    for (final entry in map.entries) {
-      list.add('${entry.key}:~:${entry.value}');
-    }
-    return list;
-  }
+  // static List<String> _customToList(SMap map) {
+  //   final list = <String>[];
+  //   for (final entry in map.entries) {
+  //     list.add('${entry.key}:~:${entry.value}');
+  //   }
+  //   return list;
+  // }
 
   Map<String, dynamic> toMap() {
     return {
@@ -97,7 +97,7 @@ class PaymentAccount {
       'amount': amount,
       'is_active': isActive,
       'type': type.name,
-      'custom_info': _customToList(customInfo),
+      'custom_info': customInfo.toCustomList(),
     };
   }
 

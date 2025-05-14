@@ -2,7 +2,9 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/auth/view/user_card.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
+import 'package:pos/features/parties/view/party_name_builder.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
+import 'package:pos/features/payment_accounts/view/local/account_name_builder.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/transactions/controller/transactions_ctrl.dart';
 import 'package:pos/main.export.dart';
@@ -18,9 +20,9 @@ class TransactionsView extends HookConsumerWidget {
   final _headings = const [
     TableHeading.positional('To'),
     TableHeading.positional('From'),
-    TableHeading.positional('Amount', 300.0, Alignment.center),
+    TableHeading.positional('Amount', 300.0),
     TableHeading.positional('Account', 150.0, Alignment.center),
-    TableHeading.positional('Type', 110.0, Alignment.center),
+    TableHeading.positional('Type', 200.0, Alignment.center),
     TableHeading.positional('Date', 150.0, Alignment.center),
     TableHeading.positional('Action', 100.0, Alignment.centerRight),
   ];
@@ -68,32 +70,21 @@ class TransactionsView extends HookConsumerWidget {
                 'From' => DataGridCell(
                   columnName: head.name,
                   value: NameCellBuilder(
-                    data.transactionBy?.name ?? data.transactionFormParti?.name,
-                    data.transactionFormParti?.phone,
+                    data.transactionForm?.name ?? data.transactionBy?.name,
+                    data.transactionForm?.phone ?? data.transactionBy?.phone,
                   ),
                 ),
                 'Amount' => DataGridCell(
                   columnName: head.name,
-                  value: Column(
-                    spacing: Insets.xs,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SpacedText(left: 'Amount', right: data.amount.currency()),
-                      if (data.due > 0)
-                        SpacedText(
-                          left: data.type == TransactionType.sale ? 'Balance used' : 'Due used',
-                          right: data.due.currency(),
-                        ),
-                    ],
-                  ),
+                  value: SpacedText(left: 'Amount', right: data.amount.currency()),
                 ),
                 'Account' => DataGridCell(
                   columnName: head.name,
-                  value: ShadBadge.secondary(child: Text(data.account.name.up)),
+                  value: ShadBadge.secondary(child: Text(data.account?.name.titleCase ?? '--')),
                 ),
                 'Type' => DataGridCell(
                   columnName: head.name,
-                  value: ShadBadge.secondary(child: Text(data.type.name.up)),
+                  value: ShadBadge.secondary(child: Text(data.type.name.titleCase)),
                 ),
                 'Date' => DataGridCell(columnName: head.name, value: Center(child: Text(data.date.formatDate()))),
                 'Action' => DataGridCell(
@@ -146,18 +137,12 @@ class _TrxViewDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final TransactionLog(
-      getParti: parti,
-      :transactTo,
-      :transactToPhone,
-      transactionBy: user,
-      transactionFormParti: transactionFor,
-    ) = trx;
+    final TransactionLog(getParti: parti, transactionBy: user, transactionForm: transactionFor) = trx;
     return ShadDialog(
       title: Text('${trx.type.name.titleCase} log'),
       description: Row(
         spacing: Insets.sm,
-        children: [Text('Details of a ${trx.type.name}'), ShadBadge.secondary(child: Text(trx.type.name.up))],
+        children: [Text('Details of a ${trx.type.name}'), ShadBadge.secondary(child: Text(trx.type.name.titleCase))],
       ),
 
       actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
@@ -172,17 +157,15 @@ class _TrxViewDialog extends HookConsumerWidget {
             if (transactionFor != null) UserCard.parti(imgSize: 70, parti: transactionFor, title: 'Transaction from'),
 
             //! parti
-            if (parti != null || transactTo != null || transactToPhone != null)
-              UserCard.parti(imgSize: 70, parti: parti, title: 'Transacted To'),
+            if (parti != null) UserCard.parti(imgSize: 70, parti: parti, title: 'Transacted To'),
 
-            //! user
-            if (user != null) UserCard.user(imgSize: 70, user: user, title: '${trx.type.name.titleCase} By'),
+            // //! user
+            // if (user != null) UserCard.user(imgSize: 70, user: user, title: '${trx.type.name.titleCase} By'),
 
             //! trx info
             const Gap(Insets.sm),
             SpacedText(left: 'Amount', right: trx.amount.currency(), styleBuilder: (l, r) => (l, r.bold)),
-            SpacedText(left: 'Used due/balance', right: trx.due.currency(), styleBuilder: (l, r) => (l, r.bold)),
-            SpacedText(left: 'Account', right: trx.account.name, styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(left: 'Account', right: trx.account?.name ?? '--', styleBuilder: (l, r) => (l, r.bold)),
             SpacedText(left: 'Date', right: trx.date.formatDate(), styleBuilder: (l, r) => (l, r.bold)),
             SpacedText(left: 'Note', right: trx.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),
           ],

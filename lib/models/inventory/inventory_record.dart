@@ -34,7 +34,7 @@ class InventoryRecord {
   final Party? parti;
   final List<InventoryDetails> details;
   final num amount;
-  final PaymentAccount account;
+  final PaymentAccount? account;
   final num vat;
   final num discount;
   final DiscountType discountType;
@@ -54,7 +54,7 @@ class InventoryRecord {
         _ => [],
       },
       amount: data['amount'],
-      account: PaymentAccount.fromMap(data['payment_account']),
+      account: PaymentAccount.tryParse(data['payment_account']),
       vat: data['vat'],
       discount: data['discount'],
       discountType: DiscountType.values.byName(data['discount_type']),
@@ -75,7 +75,7 @@ class InventoryRecord {
         _ => [],
       },
       amount: map.parseNum('amount'),
-      account: PaymentAccount.fromMap(map['payment_account']),
+      account: PaymentAccount.tryParse(map['payment_account']),
       vat: map.parseNum('vat'),
       discount: map.parseNum('discount'),
       discountType: DiscountType.values.byName(map['discount_type']),
@@ -105,7 +105,7 @@ class InventoryRecord {
         _ => details,
       },
       amount: map.parseNum('amount', fallBack: amount),
-      account: map['payment_account'] == null ? account : PaymentAccount.fromMap(map['payment_account']),
+      account: map['payment_account'] == null ? account : PaymentAccount.tryParse(map['payment_account']),
       vat: map.parseNum('vat', fallBack: vat),
       discount: map.parseNum('discount', fallBack: discount),
       discountType: map['discount_type'] == null ? discountType : DiscountType.values.byName(map['discount_type']),
@@ -122,7 +122,7 @@ class InventoryRecord {
     'parties': parti?.toMap(),
     'inventory_details': details.map((e) => e.toMap()).toList(),
     'amount': amount,
-    'payment_account': account.toMap(),
+    'payment_account': account?.toMap(),
     'vat': vat,
     'discount': discount,
     'discount_type': discountType.name,
@@ -137,7 +137,7 @@ class InventoryRecord {
     'parties': parti?.id,
     'inventory_details': details.map((e) => e.id).toList(),
     'amount': amount,
-    'payment_account': account.id,
+    'payment_account': account?.id,
     'vat': vat,
     'discount': discount,
     'discount_type': discountType.name,

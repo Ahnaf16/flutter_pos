@@ -5,11 +5,10 @@ import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/features/inventory_record/view/discount_type_pop_over.dart';
+import 'package:pos/features/inventory_record/view/payment_account_select.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
-import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
-import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
 
@@ -323,16 +322,14 @@ class _Summary extends StatelessWidget {
                 style: context.text.muted.error(context),
               ),
             ),
-          if (record.hasBalance && !record.isWalkIn)
+          if (record.hasBalance && !record.isWalkIn && type.isSale)
             ShadCard(
               border: Border.all(color: context.colors.destructive),
               leading: Icon(LuIcons.triangleAlert, color: context.colors.destructive),
               childPadding: Pads.sm('l'),
               rowCrossAxisAlignment: CrossAxisAlignment.center,
               child: Text(
-                type.isSale
-                    ? 'The due amount ${record.due.abs().currency()} will be added as balance'
-                    : '${record.due.abs().currency()} will be added to parti\'s due',
+                'The due amount ${record.due.abs().currency()} will be added as balance',
                 style: context.text.muted.error(context),
               ),
             ),
@@ -494,70 +491,6 @@ class _ProductTile extends StatelessWidget {
   }
 }
 
-class PaymentAccountSelect extends HookConsumerWidget {
-  const PaymentAccountSelect({
-    super.key,
-    required this.onAccountSelect,
-    required this.type,
-    this.isRequired = false,
-    this.outsideTrailing,
-  });
-
-  final Function(PaymentAccount? acc) onAccountSelect;
-  final RecordType type;
-  final bool isRequired;
-  final Widget? outsideTrailing;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final accList = ref.watch(paymentAccountsCtrlProvider());
-    final config = ref.watch(configCtrlProvider);
-
-    return accList.when(
-      loading: () => Padding(padding: Pads.sm('lrt'), child: const ShadCard(width: 300, child: Loading())),
-      error: (e, s) => ErrorView(e, s, prov: paymentAccountsCtrlProvider),
-      data: (accounts) {
-        return ShadSelectField<PaymentAccount>(
-          label: 'Account',
-          minWidth: 300,
-          hintText: 'Select a payment account',
-          initialValue: config.defaultAccount,
-          isRequired: isRequired,
-          optionBuilder: (context, acc, _) {
-            return ShadOption<PaymentAccount>(
-              value: acc,
-              child: Row(
-                children: [
-                  Text(acc.name),
-                  Text(
-                    ' (${acc.amount.currency()})',
-                    style: context.text.muted.textColor(acc.amount <= 0 ? context.colors.destructive : null),
-                  ),
-                ],
-              ),
-            );
-          },
-          options: accounts,
-          selectedBuilder: (_, v) {
-            return Row(
-              children: [
-                Text(v.name),
-                Text(
-                  ' (${v.amount.currency()})',
-                  style: context.text.muted.textColor(v.amount <= 0 ? context.colors.destructive : null),
-                ),
-              ],
-            );
-          },
-          onChanged: onAccountSelect,
-          anchor: const ShadAnchorAuto(targetAnchor: Alignment.topCenter, followerAnchor: Alignment.topCenter),
-          outsideTrailing: outsideTrailing,
-        );
-      },
-    );
-  }
-}
-
 class _PartiSection extends HookConsumerWidget {
   const _PartiSection({required this.onSelect, required this.record});
 
@@ -567,7 +500,7 @@ class _PartiSection extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final type = record.type;
-    final partiList = ref.watch(partiesCtrlProvider(null));
+    final partiList = ref.watch(partiesCtrlProvider(type.isSale));
 
     final search = useState('');
     final selectCtrl = useMemoized(ShadSelectController<Party>.new);
@@ -582,7 +515,7 @@ class _PartiSection extends HookConsumerWidget {
         return Padding(
           padding: Pads.sm('lrt'),
           child: ShadInputDecorator(
-            label: const Text('Parti').required(),
+            label: Text(type.isSale ? 'Customer' : 'Supplier').required(),
             child: Wrap(
               spacing: Insets.sm,
               runSpacing: Insets.sm,
@@ -592,10 +525,10 @@ class _PartiSection extends HookConsumerWidget {
                   controller: selectCtrl,
                   maxWidth: 400,
                   minWidth: 300,
-                  placeholder: const Text('Select a parti'),
+                  placeholder: Text(type.isSale ? 'Customer' : 'Supplier'),
                   itemCount: filtered.length,
                   options: [
-                    ShadOption(value: Party.fromWalkIn(const WalkIn()), child: const Text('Walk-in customer')),
+                    if (type.isSale) ShadOption(value: Party.fromWalkIn(), child: const Text('Walk-in customer')),
                     if (filtered.isEmpty) Padding(padding: Pads.med('tb'), child: const Text('No Parties found')),
                     ...filtered.map((house) {
                       return ShadOption(value: house, child: Text(house.name));

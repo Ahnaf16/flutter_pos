@@ -66,7 +66,7 @@ class ReturnView extends HookConsumerWidget {
                 ),
                 'Account' => DataGridCell(
                   columnName: head.name,
-                  value: ShadBadge.secondary(child: Text(data.returnedRec.account.name.up)),
+                  value: ShadBadge.secondary(child: Text(data.returnedRec.account?.name.up ?? '--')),
                 ),
 
                 'Date' => DataGridCell(columnName: head.name, value: Center(child: Text(data.returnDate.formatDate()))),

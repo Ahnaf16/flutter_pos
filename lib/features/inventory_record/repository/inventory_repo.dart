@@ -11,24 +11,25 @@ import 'package:pos/main.export.dart';
 
 class InventoryRepo with AwHandler {
   final String _generalFailure = 'Failed to create record';
-  final String _emptyFields = 'One or multiple required fields are empty';
   final String _updateAccountFailure = 'Failed to update account amount';
 
   FutureReport<Document> createSale(InventoryRecordState inventory) async {
     //! add details
     final (detailErr, detailsData) = await _createRecordDetails(inventory.details, true).toRecord();
     if (detailErr != null || detailsData == null) return left(detailErr ?? Failure(_generalFailure));
-    final InventoryRecord? record = inventory.copyWith(details: detailsData).toInventoryRecord();
-    if (record == null) return left(Failure(_emptyFields));
+    final record = inventory.copyWith(details: detailsData).toInventoryRecord();
 
     //! update account amount
     final acc = record.account;
-    final (accErr, accData) = await _updateAccountAmount(acc.id, record.amount).toRecord();
-    if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
+    //when amount is more then total, we only add the total price to the account. the remaining will go to users due/balance
+    final payable = inventory.hasDue ? record.amount : record.amount + inventory.due;
+    if (acc != null && payable > 0) {
+      final (accErr, accData) = await _updateAccountAmount(acc.id, payable).toRecord();
+      if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
+    }
 
     //! update Due
     Party? parti = record.parti;
-    //only updates th e [DUE]
     // will be null if customer is walk-in
     if (parti != null) {
       if (inventory.hasDue || inventory.hasBalance) {
@@ -39,18 +40,6 @@ class InventoryRepo with AwHandler {
         if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
         parti = Party.fromDoc(partiData);
       }
-
-      // if (inventory.hasDue && inventory.partiHasBalance) {
-      //   // when sale has due but parti has balance, the due will be added to record.dueBalance.
-      //   // this due has been already deducted from parti.due
-      //   record = record.copyWith(dueBalance: record.dueBalance + inventory.due);
-      // }
-
-      // if (inventory.partiHasBalance && inventory.dueBalance > 0) {
-      //   // [Parti.Due] is already [-] in this case so adding dueBalance will subtract balance
-      //   final (partiErr, partiData) = await _updateDue(parti.id, inventory.dueBalance, record.type).toRecord();
-      //   if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
-      // }
     }
 
     //! add transaction log
@@ -63,21 +52,26 @@ class InventoryRepo with AwHandler {
 
   FutureReport<Document> createPurchase(InventoryRecordState inventory) async {
     //! add details
-    final (detailErr, detailsData) = await _createRecordDetails(inventory.details, false).toRecord();
-    if (detailErr != null || detailsData == null) return left(detailErr ?? Failure(_generalFailure));
-    final InventoryRecord? record = inventory.copyWith(details: detailsData).toInventoryRecord();
-    if (record == null) return left(Failure(_emptyFields));
-
-    //! update account amount
-    final acc = record.account;
-    // (-) amount because it is a purchase and _updateAccountAmount adds the amount.
-    final (accErr, accData) = await _updateAccountAmount(acc.id, -record.amount).toRecord();
-    if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
-
-    //! update Due
+    InventoryRecord record = inventory.toInventoryRecord();
     Party? parti = record.parti;
     if (parti == null) return left(const Failure('Parti is required when purchasing'));
 
+    final (detailErr, detailsData) = await _createRecordDetails(inventory.details, false).toRecord();
+    if (detailErr != null || detailsData == null) return left(detailErr ?? Failure(_generalFailure));
+    record = record.copyWith(details: detailsData);
+
+    //! update account amount
+    final acc = record.account;
+    final payable = inventory.hasDue ? record.amount : record.amount + inventory.due;
+
+    // when amount is more then total, we only add the total price to the account. the remaining will go to users due/balance
+    // (-) amount because it is a purchase and _updateAccountAmount adds the amount.
+    if (acc != null && payable > 0) {
+      final (accErr, accData) = await _updateAccountAmount(acc.id, -payable).toRecord();
+      if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
+    }
+
+    //! update Due
     if (inventory.hasDue || inventory.hasBalance) {
       // _updateDue adds the due with the parti.due. if due is (-) it will be subtracted
       // when hasBalance, due is (-), so -(-due) will add due. will be added as due
@@ -87,22 +81,10 @@ class InventoryRepo with AwHandler {
       parti = Party.fromDoc(partiData);
     }
 
-    // if (inventory.hasDue && inventory.partiHasDue) {
-    //   // when purchase has due and parti has due, add due to dueBalance
-    //   // this due has been already subtracted from parti.due
-    //   record = record.copyWith(dueBalance: record.dueBalance + inventory.due);
-    // }
-
-    // if (inventory.partiHasDue && inventory.dueBalance > 0) {
-    //   // [Parti.Due] is [+] in this case so subtracting dueBalance will subtract due
-    //   final (partiErr, partiData) = await _updateDue(parti.id, -inventory.dueBalance, record.type).toRecord();
-    //   if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
-    // }
-
-    //! add transaction log
+    // //! add transaction log
     await _addTransactionLog(record);
 
-    //! add record
+    // //! add record
     final doc = await db.create(AWConst.collections.inventoryRecord, data: record.toAwPost());
     return doc;
   }

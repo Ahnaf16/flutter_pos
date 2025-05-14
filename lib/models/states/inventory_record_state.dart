@@ -78,14 +78,12 @@ class InventoryRecordState {
 
   bool get isWalkIn => parti?.isWalkIn ?? true;
 
-  InventoryRecord? toInventoryRecord() {
-    if (account == null) return null;
-
+  InventoryRecord toInventoryRecord() {
     return InventoryRecord(
       id: '',
       parti: parti,
       details: details,
-      account: account!,
+      account: account,
       amount: amount,
       vat: vat,
       discount: discount,

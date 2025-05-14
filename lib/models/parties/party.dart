@@ -77,17 +77,30 @@ class Party {
     }
   }
 
-  static Party? fromWalkIn(WalkIn? wi) {
-    if (wi == null) return null;
+  static Party fromWalkIn([String? name]) {
     return Party(
       id: '',
-      name: wi.name ?? 'Walk In',
-      phone: wi.phone ?? '',
+      name: name ?? 'Walk In',
+      phone: '',
       email: null,
       address: null,
       due: 0,
       photo: null,
       type: PartiType.customer,
+      isWalkIn: true,
+    );
+  }
+
+  static Party fromCustom([String? name]) {
+    return Party(
+      id: '',
+      name: name ?? 'Custom',
+      phone: '',
+      email: null,
+      address: null,
+      due: 0,
+      photo: null,
+      type: PartiType.supplier,
       isWalkIn: true,
     );
   }

@@ -43,11 +43,11 @@ class ReturnRepo with AwHandler {
     //! update account amount
     final acc = record.account;
     final effectiveAccBal = (totalPrice >= maxToAcc ? maxToAcc : totalPrice);
-
-    final effectiveOp2 = effectiveOp(-effectiveAccBal);
-    final (accErr, accData) = await _updateAccountAmount(acc.id, effectiveOp2).toRecord();
-    if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
-
+    if (acc != null) {
+      final effectiveOp2 = effectiveOp(-effectiveAccBal);
+      final (accErr, accData) = await _updateAccountAmount(acc.id, effectiveOp2).toRecord();
+      if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
+    }
     final remaining = totalPrice - effectiveAccBal;
 
     //! update Due

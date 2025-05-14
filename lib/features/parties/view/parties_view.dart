@@ -1,5 +1,6 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
+import 'package:pos/features/transactions/view/party_due_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -88,6 +89,28 @@ class PartiesView extends HookConsumerWidget {
                   value: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      if (data.hasDue())
+                        ShadButton.secondary(
+                          size: ShadButtonSize.sm,
+                          leading: const Icon(LuIcons.handCoins),
+                          onPressed: () {
+                            showShadDialog(
+                              context: context,
+                              builder: (context) => PartyDueDialog(parti: data, type: data.type),
+                            );
+                          },
+                        ),
+                      if (data.hasBalance() && data.isCustomer)
+                        ShadButton.secondary(
+                          size: ShadButtonSize.sm,
+                          leading: const Icon(LuIcons.arrowLeftRight),
+                          onPressed: () {
+                            showShadDialog(
+                              context: context,
+                              builder: (context) => PartyBalanceDialog(parti: data, type: data.type),
+                            );
+                          },
+                        ),
                       ShadButton.secondary(
                         size: ShadButtonSize.sm,
                         leading: const Icon(LuIcons.eye),

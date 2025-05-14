@@ -8,16 +8,18 @@ class _TransferDialog extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
 
-    final fromMe = useState(true);
-    final toParti = useState(true);
+    final fromCustomer = useState<bool?>(null);
+    final toCustom = useState<bool?>(null);
+    final selected = useState<Party?>(null);
     final config = ref.watch(configCtrlProvider);
 
     final accountList = ref.watch(paymentAccountsCtrlProvider());
     final partiList = ref.watch(partiesCtrlProvider(null));
     final user = ref.watch(authStateSyncProvider).toNullable();
+
     return ShadDialog(
       title: const Text('Transfer money'),
-      description: const Text('Select parties to transfer money'),
+      description: const Text('Transfer money to someone'),
       actions: [
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
 
@@ -30,7 +32,7 @@ class _TransferDialog extends HookConsumerWidget {
             final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.transfer).notifier);
 
             l.truthy();
-            final result = await ctrl.createManual(data, fromMe.value);
+            final result = await ctrl.createManual(data);
             l.falsey();
 
             if (result case final Result r) {
@@ -44,251 +46,151 @@ class _TransferDialog extends HookConsumerWidget {
       ],
       child: Container(
         padding: Pads.padding(v: Insets.med),
-        child: FormBuilder(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              //! type
-              VisibilityField<TransactionType>(
-                name: 'transaction_type',
-                data: TransactionType.transfer,
-                valueTransformer: (v) => v?.name,
-              ),
-              //! user
-              VisibilityField<AppUser>(name: 'transaction_by', data: user, valueTransformer: (v) => v?.toMap()),
-              //! from - to
-              partiList.maybeWhen(
-                orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                data: (parties) {
-                  return ShadCard(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: Insets.med,
-                      children: [
-                        if (user != null)
-                          ShadTabs<bool>(
-                            value: fromMe.value,
-                            onChanged: (v) {
-                              fromMe.value = v;
-                              formKey.currentState?.fields['transaction_for']?.reset();
-                            },
-                            tabs: [
-                              ShadTab(value: true, content: UserCard.user(user: user), child: const Text('From me')),
-                              ShadTab(
-                                value: false,
-                                content: _TransactionForParti(parties: parties),
-                                child: const Text('From parti'),
-                              ),
-                            ],
-                          )
-                        else
-                          _TransactionForParti(parties: parties),
+        child: partiList.when(
+          loading: () => const Loading(),
+          error: (e, s) => ErrorView(e, s, prov: transactionLogCtrlProvider),
+          data: (parties) {
+            return FormBuilder(
+              key: formKey,
+              onChanged: () {
+                final state = formKey.currentState!;
+                if (state.instantValue.containsKey('transaction_from')) {
+                  selected.value = Party.tyrParse(state.instantValue['transaction_from']);
+                }
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
 
-                        Row(
-                          children: [
-                            Flexible(child: ShadSeparator.horizontal(margin: Pads.lg('tb'))),
-                            Padding(padding: Pads.lg('lr'), child: const Text('TO')),
-                            Flexible(child: ShadSeparator.horizontal(margin: Pads.lg('tb'))),
-                          ],
-                        ),
+                children: [
+                  //! type
+                  VisibilityField<TransactionType>(
+                    name: 'transaction_type',
+                    data: TransactionType.transfer,
+                    valueTransformer: (v) => v?.name,
+                  ),
 
-                        ShadTabs<bool>(
-                          value: toParti.value,
-                          onChanged: (v) {
-                            toParti.value = v;
-                            formKey.currentState?.fields['transaction_for']?.reset();
-                          },
-                          tabs: [
-                            ShadTab(
-                              value: true,
-                              content: ShadSelectField<Party>(
-                                name: 'parties',
-                                hintText: 'To whom?',
-                                label: 'Transfer to',
-                                options: parties,
-                                valueTransformer: (value) => value?.toMap(),
-                                optionBuilder: (_, v, i) {
-                                  return ShadOption(
-                                    value: v,
-                                    child: Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(text: v.name),
-                                          TextSpan(text: ' (${v.type.name})', style: context.text.muted.size(12)),
-                                          // TextSpan(
-                                          //   text: ' ${v.hasDue() ? 'Due: ' : 'Balance: '}${v.due.abs().currency()}',
-                                          //   style: context.text.muted.textColor(v.dueColor),
-                                          // ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                                selectedBuilder: (context, v) {
-                                  return Text.rich(
-                                    TextSpan(
-                                      children: [
-                                        TextSpan(text: v.name),
-                                        TextSpan(text: ' (${v.type.name})', style: context.text.muted.size(12)),
-                                        // TextSpan(
-                                        //   text: ' ${v.hasDue() ? 'Due: ' : 'Balance: '}${v.due.abs().currency()}',
-                                        //   style: context.text.muted.textColor(v.dueColor),
-                                        // ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                              child: const Text('Parti'),
-                            ),
-                            ShadTab(
-                              value: false,
-                              content: Row(
-                                children: [
-                                  Flexible(
-                                    child: ShadTextField(name: 'transact_to', label: 'Name', hintText: 'Enter name'),
-                                  ),
-                                  Flexible(
-                                    child: ShadTextField(
-                                      name: 'transact_to_phone',
-                                      label: 'Phone',
-                                      hintText: 'Enter phone',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              child: const Text('Custom'),
-                            ),
-                          ],
-                        ),
-                      ],
+                  //! user
+                  VisibilityField<AppUser>(name: 'transaction_by', data: user, valueTransformer: (v) => v?.toMap()),
+
+                  //! Amount
+                  ShadTextField(name: 'amount', hintText: 'Amount', label: 'Amount', numeric: true),
+                  const Gap(Insets.med),
+
+                  //! from
+                  _PeopleSelector(
+                    name: 'transaction_from',
+                    hintText: 'Select a customer/Supplier',
+                    label: 'Transfer form',
+                    parties: parties,
+                    onSelect: (customer, _) {
+                      fromCustomer.set(customer);
+                      if (customer == true) {
+                        formKey.currentState?.fields['transaction_to']?.reset();
+                        formKey.currentState?.fields['custom_info']?.reset();
+                      }
+                      if (customer == false) {
+                        formKey.currentState?.fields['transaction_to']?.reset();
+                        formKey.currentState?.fields['payment_account']?.reset();
+                      }
+                    },
+                  ),
+                  const Gap(Insets.med),
+                  //! to
+                  if (fromCustomer.value == false) ...[
+                    _PeopleSelector(
+                      name: 'transaction_to',
+                      hintText: 'Select a supplier',
+                      label: 'Transfer to',
+                      parties: parties.where((p) => !p.isCustomer && p.id != selected.value?.id).toList(),
+                      isRequired: false,
+                      allowCustom: true,
+                      onSelect: (_, custom) {
+                        toCustom.set(custom);
+                        if (custom != true) {
+                          formKey.currentState?.fields['custom_info']?.reset();
+                        }
+                      },
                     ),
-                  );
-                },
-              ),
-              const Gap(Insets.med),
-              ShadCard(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        //! Amount
-                        Flexible(
-                          child: ShadTextField(name: 'amount', hintText: 'Amount', label: 'Amount', numeric: true),
-                        ),
-                        //! Account
-                        Flexible(
-                          child: accountList.maybeWhen(
-                            orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                            data: (accounts) {
-                              return ShadSelectField<PaymentAccount>(
-                                name: 'payment_account',
-                                hintText: 'Payment account',
-                                label: 'Payment account',
-                                initialValue: config.defaultAccount,
-                                options: accounts,
-                                isRequired: true,
-                                valueTransformer: (value) => value?.toMap(),
-                                optionBuilder: (_, v, i) {
-                                  return ShadOption(
-                                    value: v,
-                                    child: Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(text: v.name),
-                                          TextSpan(
-                                            text: ' (${v.amount.currency()})',
-                                            style: context.text.muted.textColor(
-                                              v.amount <= 0 ? context.colors.destructive : null,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                                selectedBuilder: (_, v) {
-                                  return Text.rich(
-                                    TextSpan(
-                                      children: [
-                                        TextSpan(text: v.name),
-                                        TextSpan(
-                                          text: ' (${v.amount.currency()})',
-                                          style: context.text.muted.textColor(
-                                            v.amount <= 0 ? context.colors.destructive : null,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+
+                    if (toCustom.value == true) ...[
+                      const Gap(Insets.med),
+                      const CustomInfoFiled(title: 'Add custom info'),
+                    ],
                   ],
-                ),
+
+                  //! Account
+                  if (fromCustomer.value == true)
+                    accountList.maybeWhen(
+                      orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                      data: (accounts) {
+                        return ShadSelectField<PaymentAccount>(
+                          name: 'payment_account',
+                          hintText: 'Payment account',
+                          label: 'Payment account',
+                          initialValue: config.defaultAccount,
+                          options: accounts,
+                          isRequired: true,
+                          valueTransformer: (value) => value?.toMap(),
+                          optionBuilder: (_, v, i) {
+                            return ShadOption(value: v, child: AccountNameBuilder(v));
+                          },
+                          selectedBuilder: (_, v) => AccountNameBuilder(v),
+                        );
+                      },
+                    ),
+
+                  const Gap(Insets.med),
+                  ShadTextAreaField(name: 'note', label: 'Note'),
+                ],
               ),
-              const Gap(Insets.med),
-              ShadTextAreaField(name: 'note', label: 'Note'),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
   }
 }
 
-class _TransactionForParti extends StatelessWidget {
-  const _TransactionForParti({required this.parties});
+class _PeopleSelector extends StatelessWidget {
+  const _PeopleSelector({
+    required this.parties,
+    required this.name,
+    required this.label,
+    required this.hintText,
+    this.onSelect,
+    this.isRequired = true,
+    this.allowCustom = false,
+  });
 
+  final String name;
+  final String label;
+  final String hintText;
   final List<Party> parties;
+  final bool allowCustom;
+  final bool isRequired;
+  final Function(bool? isCustomer, bool? isCustom)? onSelect;
 
   @override
   Widget build(BuildContext context) {
+    List<Party> list = parties;
+    if (allowCustom) {
+      list = [Party.fromCustom(), ...list];
+    }
+
     return ShadSelectField<Party>(
-      name: 'transaction_for',
-      hintText: 'Select a parti',
-      label: 'Transfer form',
-      options: parties,
+      name: name,
+      hintText: hintText,
+      label: label,
+      options: list,
       valueTransformer: (value) => value?.toMap(),
       optionBuilder: (_, v, i) {
-        return ShadOption(
-          value: v,
-          child: Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(text: v.name),
-                TextSpan(text: ' (${v.type.name})', style: context.text.muted.size(12)),
-                // TextSpan(
-                //   text: ' ${v.hasDue() ? 'Due: ' : 'Balance: '}${v.due.abs().currency()}',
-                //   style: context.text.muted.textColor(v.dueColor),
-                // ),
-              ],
-            ),
-          ),
-        );
+        return ShadOption(value: v, child: PartyNameBuilder(v, showType: true));
       },
       selectedBuilder: (context, v) {
-        return Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(text: v.name),
-              TextSpan(text: ' (${v.type.name})', style: context.text.muted.size(12)),
-              // TextSpan(
-              //   text: ' ${v.hasDue() ? 'Due: ' : 'Balance: '}${v.due.abs().currency()}',
-              //   style: context.text.muted.textColor(v.dueColor),
-              // ),
-            ],
-          ),
-        );
+        return PartyNameBuilder(v, showType: true);
       },
+      onChanged: (value) => onSelect?.call(value?.isCustomer, value?.isWalkIn),
     );
   }
 }

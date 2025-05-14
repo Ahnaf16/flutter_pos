@@ -60,7 +60,7 @@ class InventoryRecordView extends HookConsumerWidget {
                 'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
                 'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data.details)),
                 'Amount' => DataGridCell(columnName: head.name, value: _amountBuilder(data)),
-                'Account' => DataGridCell(columnName: head.name, value: Text(data.account.name)),
+                'Account' => DataGridCell(columnName: head.name, value: Text(data.account?.name ?? '--')),
                 'Status' => DataGridCell(
                   columnName: head.name,
                   value: ShadBadge.secondary(child: Text(data.status.name.titleCase)),

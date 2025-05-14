@@ -18,8 +18,8 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
     }, identity);
   }
 
-  Future<Result> createManual(QMap form, [bool formMe = true]) async {
-    final res = await _repo.addManual(form, formMe);
+  Future<Result> createManual(QMap form) async {
+    final res = await _repo.adjustCustomerDue(form);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       return rightResult('Transaction created successfully');

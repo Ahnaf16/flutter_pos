@@ -43,7 +43,7 @@ class ProductsCtrl extends _$ProductsCtrl {
     final res = await _repo.createProduct(product, file);
 
     return res.fold(leftResult, (r) {
-      ref.invalidateSelf();
+      ref.invalidate(productsCtrlProvider);
       return rightResult('Product created successfully');
     });
   }

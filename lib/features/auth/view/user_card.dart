@@ -19,8 +19,8 @@ class UserCard extends StatelessWidget {
     final name = userOrParti.fold((l) => l.name, (r) => r?.name);
     final phone = userOrParti.fold((l) => l.phone, (r) => r?.phone);
     final email = userOrParti.fold((l) => l.email, (r) => r?.email);
-    final address = userOrParti.fold(identityNull, (r) => r?.address);
-    final isWalkIn = userOrParti.fold(identityNull, (r) => r?.isWalkIn);
+    final hasDue = userOrParti.fold(identityNull, (r) => r?.hasDue());
+    final due = userOrParti.fold(identityNull, (r) => r?.due);
     return ShadCard(
       title: title == null ? null : Text(title!, style: context.theme.decoration.labelStyle),
       description: subtitle == null ? null : Text(subtitle!, style: context.theme.decoration.descriptionStyle),
@@ -47,7 +47,6 @@ class UserCard extends StatelessWidget {
                   left: 'Name',
                   right: name ?? '--',
                   styleBuilder: (l, r) => (l, r.bold),
-                  spaced: false,
                   crossAxisAlignment: CrossAxisAlignment.center,
                 ),
 
@@ -55,28 +54,26 @@ class UserCard extends StatelessWidget {
                   left: 'Phone',
                   right: phone ?? '--',
                   styleBuilder: (l, r) => (l, r.bold),
-                  spaced: false,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   onTap: (left, right) => Copier.copy(right),
                 ),
-                if (isWalkIn ?? false) ShadBadge.secondary(child: Text('Walk-In', style: context.text.muted)),
+
                 if (email != null)
                   SpacedText(
                     left: 'Email',
                     right: email,
                     styleBuilder: (l, r) => (l, r.bold),
-                    spaced: false,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     onTap: (left, right) => Copier.copy(right),
                   ),
-                if (address != null)
+
+                if (hasDue != null && due != null)
                   SpacedText(
-                    left: 'Address',
-                    right: address,
-                    styleBuilder: (l, r) => (l, r.bold),
-                    spaced: false,
+                    left: hasDue ? 'Due' : 'Balance',
+                    right: due.abs().currency(),
+                    style: context.text.list,
+                    styleBuilder: (l, r) => (l, r.bold.textColor(hasDue ? Colors.red : Colors.green)),
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    onTap: (left, right) => Copier.copy(right),
                   ),
               ],
             ),

@@ -128,10 +128,10 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
   }
 
   Future<Result> submit() async {
-    cat(state.toMap(), 'submit');
+    // cat(state.toMap(), 'submit');
 
     if (state.parti == null) {
-      return (false, 'Please select a ${type.name}');
+      return (false, 'Please select a ${type.isSale ? 'customer' : 'supplier'}');
     }
     if (state.account == null && state.amount > 0) {
       return (false, 'Please select a payment account');
@@ -141,6 +141,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     }
 
     if (type.isPurchase) {
+      if (state.hasBalance) return (false, 'Negative Due amount is not allowed');
       return submitPurchase();
     } else {
       if (state.isWalkIn && state.hasDue) return (false, 'Clear due for walk-in customer');

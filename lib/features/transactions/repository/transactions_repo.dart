@@ -13,35 +13,32 @@ class TransactionsRepo with AwHandler {
     return await db.create(_coll, data: log.toAwPost());
   }
 
-  FutureReport<Document> addManual(QMap form, [bool fromMe = true]) async {
+  FutureReport<Document> adjustCustomerDue(QMap form) async {
     final data = QMap.from(form);
     data.addAll({'date': DateTime.now().toIso8601String()});
     TransactionLog log = TransactionLog.fromMap(data);
 
-    if (log.validate(fromMe) != null) return left(Failure(log.validate(fromMe)!));
+    if (log.validate() != null) return left(Failure(log.validate()!));
+    // return left(const Failure('---'));
 
-    Party? fromParti = log.transactionFormParti;
-    if (!fromMe && fromParti != null) {
-      final (err, parti) = await _updateDue(fromParti.id, log.amount).toRecord();
+    Party? fromParti = log.transactionForm;
+    if (fromParti != null && !fromParti.isWalkIn) {
+      final (err, parti) = await _updateDue(fromParti.id, -log.amount).toRecord();
       if (err != null || parti == null) return left(err ?? const Failure('Unable to update due'));
       fromParti = Party.fromDoc(parti);
     }
 
-    Party? toParti = log.transactedTo;
-    if (toParti != null) {
-      final (err, parti) = await _updateDue(toParti.id, -log.amount).toRecord();
-      if (err != null || parti == null) return left(err ?? const Failure('Unable to update due'));
-      toParti = Party.fromDoc(parti);
-    }
-
     if (log.transactionBy == null) {
       final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
-      if (err != null || user == null) return left(err ?? const Failure('Unable to getting current user'));
+      if (err != null || user == null) return left(err ?? const Failure('Unable to get current user'));
       log = log.copyWith(transactionBy: () => user);
     }
 
-    final (err, acc) = await _updateAccountAmount(log.account.id, -log.amount).toRecord();
-    if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
+    final account = log.account;
+    if (account != null) {
+      final (err, acc) = await _updateAccountAmount(account.id, log.amount).toRecord();
+      if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
+    }
 
     return await db.create(_coll, data: log.toAwPost());
   }
