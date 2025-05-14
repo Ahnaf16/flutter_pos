@@ -67,31 +67,30 @@ class InventoryRecordView extends HookConsumerWidget {
                 ),
                 'Action' => DataGridCell(
                   columnName: head.name,
-                  value: CenterRight(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ShadButton.secondary(
-                          size: ShadButtonSize.sm,
-                          leading: const Icon(LuIcons.eye),
+                  value: PopOverBuilder(
+                    children: [
+                      PopOverButton(
+                        icon: const Icon(LuIcons.eye),
+                        onPressed: () {
+                          showShadDialog(context: context, builder: (context) => _InventoryViewDialog(inventory: data));
+                        },
+                        child: const Text('View'),
+                      ),
+                      PopOverButton(
+                        icon: const Icon(LuIcons.bookText),
+                        onPressed: () {},
+                        child: const Text('View invoice'),
+                      ),
+                      if (data.status != InventoryStatus.returned)
+                        PopOverButton(
+                          icon: const Icon(LuIcons.undo2),
+                          isDestructive: true,
                           onPressed: () {
-                            showShadDialog(
-                              context: context,
-                              builder: (context) => _InventoryViewDialog(inventory: data),
-                            );
+                            showShadDialog(context: context, builder: (context) => _ReturnDialog(inventory: data));
                           },
+                          child: const Text('Return'),
                         ),
-                        if (data.status != InventoryStatus.returned)
-                          ShadButton.destructive(
-                            size: ShadButtonSize.sm,
-                            leading: const Icon(LuIcons.undo2),
-                            onPressed: () {
-                              showShadDialog(context: context, builder: (context) => _ReturnDialog(inventory: data));
-                            },
-                          ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
                 _ => DataGridCell(columnName: head.name, value: Text(data.toString())),

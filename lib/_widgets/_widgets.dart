@@ -22,4 +22,5 @@ export 'loader.dart';
 export 'nav_side_bar.dart';
 export 'overflow_marquee.dart';
 export 'pagination.dart';
+export 'pop_over_builder.dart';
 export 'spaced_text.dart';
