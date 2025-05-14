@@ -183,9 +183,12 @@ class InventoryRepo with AwHandler {
     return await updateRecord(rec.copyWith(status: status));
   }
 
-  FutureReport<List<InventoryRecord>> getRecords(RecordType type) async {
+  FutureReport<List<InventoryRecord>> getRecords(RecordType? type) async {
     return await db
-        .getList(AWConst.collections.inventoryRecord, queries: [Query.equal('record_type', type.name)])
+        .getList(
+          AWConst.collections.inventoryRecord,
+          queries: [if (type != null) Query.equal('record_type', type.name)],
+        )
         .convert((docs) => docs.convertDoc(InventoryRecord.fromDoc));
   }
 

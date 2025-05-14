@@ -9,7 +9,7 @@ part 'inventory_record_ctrl.g.dart';
 class InventoryCtrl extends _$InventoryCtrl {
   final _repo = locate<InventoryRepo>();
   @override
-  Future<List<InventoryRecord>> build(RecordType type) async {
+  Future<List<InventoryRecord>> build(RecordType? type) async {
     final staffs = await _repo.getRecords(type);
     return staffs.fold(
       (l) {
@@ -27,7 +27,7 @@ class InventoryCtrl extends _$InventoryCtrl {
 class InventoryReturnCtrl extends _$InventoryReturnCtrl {
   final _repo = locate<ReturnRepo>();
   @override
-  Future<List<ReturnRecord>> build(bool isSale) async {
+  Future<List<ReturnRecord>> build(bool? isSale) async {
     final staffs = await _repo.getRecords(isSale);
     return staffs.fold((l) {
       Toast.showErr(Ctx.context, l);

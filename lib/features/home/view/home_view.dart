@@ -1,5 +1,4 @@
-import 'package:fpdart/fpdart.dart';
-import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
+import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class HomeView extends HookConsumerWidget {
@@ -7,7 +6,7 @@ class HomeView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final accounts = ref.watch(paymentAccountsCtrlProvider(false)).maybeWhen(data: identity, orElse: () => null);
+    final counters = ref.watch(homeCountersProvider);
 
     return BaseBody(
       scrollable: true,
@@ -16,18 +15,35 @@ class HomeView extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: Insets.lg,
         children: [
-          if (accounts != null && accounts.isEmpty)
-            const ShadAlert.destructive(
-              title: Text('Setup payment account'),
-              description: Text('No payment account has been added'),
-              iconData: LuIcons.triangleAlert,
+          GridView.builder(
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 300,
+              crossAxisSpacing: Insets.med,
+              mainAxisSpacing: Insets.med,
+              mainAxisExtent: 120,
             ),
-          const Row(
-            spacing: Insets.lg,
-            children: [
-              ShadCard(expanded: false, height: 200, width: 300),
-              ShadCard(expanded: false, height: 200, width: 300),
-            ],
+            itemCount: counters.length,
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) {
+              final MapEntry(key: (title, path), :value) = counters.entries.toList()[index];
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  ShadCard(
+                    padding: Pads.med(),
+                    childPadding: Pads.med('t'),
+                    title: OverflowMarquee(child: Text(title, style: context.text.list.op(.5))),
+                    child: OverflowMarquee(child: Text(value.toString(), style: context.text.h4)),
+                  ),
+
+                  Positioned(
+                    bottom: 15,
+                    right: 15,
+                    child: SmallButton(icon: LuIcons.squareArrowOutUpRight, onPressed: () => path.pushNamed(context)),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),

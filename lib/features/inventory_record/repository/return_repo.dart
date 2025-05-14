@@ -119,9 +119,9 @@ class ReturnRepo with AwHandler {
     return await repo.addTransaction(transaction);
   }
 
-  FutureReport<List<ReturnRecord>> getRecords(bool isSale) async {
+  FutureReport<List<ReturnRecord>> getRecords(bool? isSale) async {
     return await db
-        .getList(AWConst.collections.returnRecord, queries: [Query.equal('isSale', isSale)])
+        .getList(AWConst.collections.returnRecord, queries: [if (isSale != null) Query.equal('isSale', isSale)])
         .convert((docs) => docs.convertDoc(ReturnRecord.fromDoc));
   }
 

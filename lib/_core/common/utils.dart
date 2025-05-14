@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -90,4 +91,8 @@ String hashPass(String password) {
   final bytes = utf8.encode(password);
   final digest = sha256.convert(bytes);
   return digest.toString();
+}
+
+extension AsyncValueListX<T> on AsyncValue<List<T>> {
+  List<T> maybeList() => maybeWhen(orElse: () => <T>[], data: identity);
 }

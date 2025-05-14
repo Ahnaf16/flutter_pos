@@ -9,7 +9,15 @@ enum RecordType {
   bool get isPurchase => this == RecordType.purchase;
 }
 
-enum InventoryStatus { paid, unpaid, returned }
+enum InventoryStatus {
+  paid,
+  unpaid,
+  returned;
+
+  bool get isPaid => this == InventoryStatus.paid;
+  bool get isUnpaid => this == InventoryStatus.unpaid;
+  bool get isReturned => this == InventoryStatus.returned;
+}
 
 enum DiscountType { flat, percentage }
 

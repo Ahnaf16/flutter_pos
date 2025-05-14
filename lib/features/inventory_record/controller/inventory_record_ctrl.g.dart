@@ -6,7 +6,7 @@ part of 'inventory_record_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$inventoryCtrlHash() => r'2c3e91db5f8d006cb70d08230ec93c53e1b7a8c8';
+String _$inventoryCtrlHash() => r'83e8ca905704e9582792b807f19c540a291f90de';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -31,10 +31,10 @@ class _SystemHash {
 
 abstract class _$InventoryCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<InventoryRecord>> {
-  late final RecordType type;
+  late final RecordType? type;
 
   FutureOr<List<InventoryRecord>> build(
-    RecordType type,
+    RecordType? type,
   );
 }
 
@@ -49,7 +49,7 @@ class InventoryCtrlFamily extends Family<AsyncValue<List<InventoryRecord>>> {
 
   /// See also [InventoryCtrl].
   InventoryCtrlProvider call(
-    RecordType type,
+    RecordType? type,
   ) {
     return InventoryCtrlProvider(
       type,
@@ -85,7 +85,7 @@ class InventoryCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
     InventoryCtrl, List<InventoryRecord>> {
   /// See also [InventoryCtrl].
   InventoryCtrlProvider(
-    RecordType type,
+    RecordType? type,
   ) : this._internal(
           () => InventoryCtrl()..type = type,
           from: inventoryCtrlProvider,
@@ -110,7 +110,7 @@ class InventoryCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
     required this.type,
   }) : super.internal();
 
-  final RecordType type;
+  final RecordType? type;
 
   @override
   FutureOr<List<InventoryRecord>> runNotifierBuild(
@@ -162,7 +162,7 @@ class InventoryCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
 mixin InventoryCtrlRef
     on AutoDisposeAsyncNotifierProviderRef<List<InventoryRecord>> {
   /// The parameter `type` of this provider.
-  RecordType get type;
+  RecordType? get type;
 }
 
 class _InventoryCtrlProviderElement
@@ -171,18 +171,18 @@ class _InventoryCtrlProviderElement
   _InventoryCtrlProviderElement(super.provider);
 
   @override
-  RecordType get type => (origin as InventoryCtrlProvider).type;
+  RecordType? get type => (origin as InventoryCtrlProvider).type;
 }
 
 String _$inventoryReturnCtrlHash() =>
-    r'2fed3030fe89a6e9e3b821ac4d32497f0124437e';
+    r'8a869fa8f3f015d2428d7d121da926258d3cf648';
 
 abstract class _$InventoryReturnCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<ReturnRecord>> {
-  late final bool isSale;
+  late final bool? isSale;
 
   FutureOr<List<ReturnRecord>> build(
-    bool isSale,
+    bool? isSale,
   );
 }
 
@@ -197,7 +197,7 @@ class InventoryReturnCtrlFamily extends Family<AsyncValue<List<ReturnRecord>>> {
 
   /// See also [InventoryReturnCtrl].
   InventoryReturnCtrlProvider call(
-    bool isSale,
+    bool? isSale,
   ) {
     return InventoryReturnCtrlProvider(
       isSale,
@@ -233,7 +233,7 @@ class InventoryReturnCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
     InventoryReturnCtrl, List<ReturnRecord>> {
   /// See also [InventoryReturnCtrl].
   InventoryReturnCtrlProvider(
-    bool isSale,
+    bool? isSale,
   ) : this._internal(
           () => InventoryReturnCtrl()..isSale = isSale,
           from: inventoryReturnCtrlProvider,
@@ -258,7 +258,7 @@ class InventoryReturnCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
     required this.isSale,
   }) : super.internal();
 
-  final bool isSale;
+  final bool? isSale;
 
   @override
   FutureOr<List<ReturnRecord>> runNotifierBuild(
@@ -310,7 +310,7 @@ class InventoryReturnCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
 mixin InventoryReturnCtrlRef
     on AutoDisposeAsyncNotifierProviderRef<List<ReturnRecord>> {
   /// The parameter `isSale` of this provider.
-  bool get isSale;
+  bool? get isSale;
 }
 
 class _InventoryReturnCtrlProviderElement
@@ -319,7 +319,7 @@ class _InventoryReturnCtrlProviderElement
   _InventoryReturnCtrlProviderElement(super.provider);
 
   @override
-  bool get isSale => (origin as InventoryReturnCtrlProvider).isSale;
+  bool? get isSale => (origin as InventoryReturnCtrlProvider).isSale;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

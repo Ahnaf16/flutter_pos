@@ -32,6 +32,8 @@ extension TextStyleExtensions on TextStyle {
   TextStyle secondary(BuildContext context) => copyWith(color: context.colors.secondary);
   TextStyle onSecondary(BuildContext context) => copyWith(color: context.colors.secondaryForeground);
 
+  TextStyle muted(BuildContext context) => copyWith(color: context.colors.muted);
+
   TextStyle error(BuildContext context) => copyWith(color: context.colors.destructive);
   TextStyle onError(BuildContext context) => copyWith(color: context.colors.destructiveForeground);
 
