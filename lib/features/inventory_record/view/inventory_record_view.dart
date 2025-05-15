@@ -3,6 +3,9 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
+import 'package:pos/features/parties/view/parties_view.dart';
+import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
+import 'package:pos/features/products/view/product_view_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -12,7 +15,7 @@ const _headings = [
   TableHeading.positional('Amount', 300.0),
   TableHeading.positional('Account', 200.0, Alignment.center),
   TableHeading.positional('Status', 130.0, Alignment.center),
-  TableHeading.positional('Action', 200.0, Alignment.centerRight),
+  TableHeading.positional('Action', 100.0, Alignment.centerRight),
 ];
 
 class InventoryRecordView extends HookConsumerWidget {
@@ -27,6 +30,9 @@ class InventoryRecordView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final inventoryList = ref.watch(inventoryCtrlProvider(type));
+    final invCtrl = useCallback(() => ref.read(inventoryCtrlProvider(type).notifier), [type]);
+    final accountList = ref.watch(paymentAccountsCtrlProvider());
+
     return BaseBody(
       title: 'All ${type.name}',
       actions: [
@@ -41,74 +47,120 @@ class InventoryRecordView extends HookConsumerWidget {
           },
         ),
       ],
-      body: inventoryList.when(
-        loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: inventoryCtrlProvider),
-        data: (inventories) {
-          return DataTableBuilder<InventoryRecord, TableHeading>(
-            rowHeight: 150,
-            items: inventories,
-            headings: _headings,
-            headingBuilderIndexed: (heading, i) {
-              final alignment = heading.alignment;
-              return GridColumn(
-                columnName: heading.name,
-                columnWidthMode: ColumnWidthMode.fill,
-                maximumWidth: heading.max,
-                minimumWidth: heading.name == 'Status' ? 100 : 150,
-                label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
-              );
-            },
-            cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
-            cellBuilder: (data, head) {
-              return switch (head.name) {
-                'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
-                'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data.details)),
-                'Amount' => DataGridCell(columnName: head.name, value: _amountBuilder(data)),
-                'Account' => DataGridCell(columnName: head.name, value: Text(data.account?.name ?? '--')),
-                'Status' => DataGridCell(
-                  columnName: head.name,
-                  value: ShadBadge.secondary(child: Text(data.status.name.titleCase)),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: ShadTextField(
+                  hintText: 'Search',
+                  onChanged: (v) => invCtrl().search(v ?? ''),
+                  showClearButton: true,
                 ),
-                'Action' => DataGridCell(
-                  columnName: head.name,
-                  value: PopOverBuilder(
-                    children: [
-                      // PopOverButton(
-                      //   icon: const Icon(LuIcons.eye),
-                      //   onPressed: () {
-                      //     showShadDialog(
-                      //       context: context,
-                      //       builder: (context) => _InventoryViewDialog(inventory: data),
-                      //     );
-                      //   },
-                      //   child: const Text('View'),
-                      // ),
-                      PopOverButton(
-                        icon: const Icon(LuIcons.download),
-                        onPressed: () async {
-                          final doc = await generateSlip(data);
-                          await PDFCtrl().save(doc, data.id);
-                        },
-                        child: const Text('Download invoice'),
+              ),
+
+              Expanded(
+                child: accountList.maybeWhen(
+                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                  data: (accounts) {
+                    return ShadSelectField<PaymentAccount>(
+                      hintText: 'Account',
+                      options: accounts,
+                      selectedBuilder: (context, value) => Text(value.name),
+                      optionBuilder: (_, value, _) {
+                        return ShadOption(value: value, child: Text(value.name));
+                      },
+                      onChanged: (v) => invCtrl().filter(account: v),
+                    );
+                  },
+                ),
+              ),
+              Expanded(
+                child: ShadSelectField<InventoryStatus>(
+                  hintText: 'Status',
+                  options: InventoryStatus.values,
+                  selectedBuilder: (context, value) => Text(value.name),
+                  optionBuilder: (_, value, _) {
+                    return ShadOption(value: value, child: Text(value.name));
+                  },
+                  onChanged: (v) => invCtrl().filter(status: v),
+                ),
+              ),
+              const Gap(Insets.xs),
+              ShadDatePicker.range(key: ValueKey(type), onRangeChanged: (v) => invCtrl().filter(range: v)),
+              ShadIconButton.raw(
+                icon: const Icon(LuIcons.x),
+                onPressed: () => invCtrl().filter(),
+                variant: ShadButtonVariant.destructive,
+              ),
+            ],
+          ),
+          const Gap(Insets.med),
+          Expanded(
+            child: inventoryList.when(
+              loading: () => const Loading(),
+              error: (e, s) => ErrorView(e, s, prov: inventoryCtrlProvider),
+              data: (inventories) {
+                return DataTableBuilder<InventoryRecord, TableHeading>(
+                  rowHeight: 150,
+                  items: inventories,
+                  headings: _headings,
+                  headingBuilderIndexed: (heading, i) {
+                    final alignment = heading.alignment;
+                    return GridColumn(
+                      columnName: heading.name,
+                      columnWidthMode: ColumnWidthMode.fill,
+                      maximumWidth: heading.max,
+                      minimumWidth: heading.name == 'Status' ? 100 : 150,
+                      label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
+                    );
+                  },
+                  cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
+                  cellBuilder: (data, head) {
+                    return switch (head.name) {
+                      'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
+                      'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data.details)),
+                      'Amount' => DataGridCell(columnName: head.name, value: _amountBuilder(data)),
+                      'Account' => DataGridCell(columnName: head.name, value: Text(data.account?.name ?? '--')),
+                      'Status' => DataGridCell(
+                        columnName: head.name,
+                        value: ShadBadge.secondary(child: Text(data.status.name.titleCase)),
                       ),
-                      if (data.status != InventoryStatus.returned)
-                        PopOverButton(
-                          icon: const Icon(LuIcons.undo2),
-                          isDestructive: true,
-                          onPressed: () {
-                            showShadDialog(context: context, builder: (context) => _ReturnDialog(inventory: data));
-                          },
-                          child: const Text('Return'),
+                      'Action' => DataGridCell(
+                        columnName: head.name,
+                        value: PopOverBuilder(
+                          children: [
+                            PopOverButton(
+                              icon: const Icon(LuIcons.download),
+                              onPressed: () async {
+                                final doc = await generateSlip(data);
+                                await PDFCtrl().save(doc, data.id);
+                              },
+                              child: const Text('Download invoice'),
+                            ),
+                            if (data.status != InventoryStatus.returned)
+                              PopOverButton(
+                                icon: const Icon(LuIcons.undo2),
+                                isDestructive: true,
+                                onPressed: () {
+                                  showShadDialog(
+                                    context: context,
+                                    builder: (context) => _ReturnDialog(inventory: data),
+                                  );
+                                },
+                                child: const Text('Return'),
+                              ),
+                          ],
                         ),
-                    ],
-                  ),
-                ),
-                _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
-              };
-            },
-          );
-        },
+                      ),
+                      _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
+                    };
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -120,7 +172,13 @@ class InventoryRecordView extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          OverflowMarquee(child: Text(parti?.name ?? '--', style: context.text.list)),
+          GestureDetector(
+            onTap: () {
+              if (parti == null) return;
+              showShadDialog(context: context, builder: (context) => PartiViewDialog(parti: parti));
+            },
+            child: OverflowMarquee(child: Text(parti?.name ?? '--', style: context.text.list)),
+          ),
           if (parti != null) OverflowMarquee(child: Text('Phone: ${parti.phone}')),
           if (parti?.email != null) OverflowMarquee(child: Text('Email: ${parti!.email}')),
         ],
@@ -134,13 +192,18 @@ class InventoryRecordView extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (final p in details.takeFirst(2))
-            Row(
-              spacing: Insets.xs,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(child: Text(p.product.name, style: context.text.small, maxLines: 1)),
-                Text(' (${p.quantity})', style: context.text.muted.size(12)),
-              ],
+            GestureDetector(
+              onTap: () {
+                showShadDialog(context: context, builder: (context) => ProductViewDialog(product: p.product));
+              },
+              child: Row(
+                spacing: Insets.xs,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(child: Text(p.product.name, style: context.text.small, maxLines: 1)),
+                  Text(' (${p.quantity})', style: context.text.muted.size(12)),
+                ],
+              ),
             ),
 
           if (details.length > 2) Text('+ ${details.length - 2} more', style: context.text.muted.size(12)),

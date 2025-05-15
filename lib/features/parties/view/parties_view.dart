@@ -101,7 +101,7 @@ class PartiesView extends HookConsumerWidget {
                           PopOverButton(
                             icon: const Icon(LuIcons.eye),
                             onPressed: () {
-                              showShadDialog(context: context, builder: (context) => _PartiViewDialog(parti: data));
+                              showShadDialog(context: context, builder: (context) => PartiViewDialog(parti: data));
                             },
                             child: const Text('View'),
                           ),
@@ -361,8 +361,8 @@ class _PartiAddDialog extends HookConsumerWidget {
   }
 }
 
-class _PartiViewDialog extends HookConsumerWidget {
-  const _PartiViewDialog({required this.parti});
+class PartiViewDialog extends HookConsumerWidget {
+  const PartiViewDialog({super.key, required this.parti});
 
   final Party parti;
 

@@ -15,9 +15,9 @@ class ProductViewDialog extends HookConsumerWidget {
       child: Container(
         padding: Pads.padding(v: Insets.med),
         child: Column(
+          spacing: Insets.med,
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
             if (product.photo != null) HostedImage.square(product.getPhoto, dimension: 80, radius: Corners.med),
 
@@ -42,7 +42,7 @@ class ProductViewDialog extends HookConsumerWidget {
             ),
 
             const Gap(Insets.xs),
-            const Text('Stock Locations:'),
+            if (product.stock.isNotEmpty) const Text('Stock Locations:'),
             for (final stock in product.stock)
               SpacedText(
                 left: stock.warehouse?.name ?? '--',

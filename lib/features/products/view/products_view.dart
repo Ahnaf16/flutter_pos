@@ -78,11 +78,12 @@ class ProductsView extends HookConsumerWidget {
                             ShadButton.secondary(
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.eye),
-                              onPressed:
-                                  () => showShadDialog(
-                                    context: context,
-                                    builder: (context) => ProductViewDialog(product: data),
-                                  ),
+                              onPressed: () {
+                                showShadDialog(
+                                  context: context,
+                                  builder: (context) => ProductViewDialog(product: data),
+                                );
+                              },
                             ),
                             ShadButton.secondary(
                               size: ShadButtonSize.sm,
