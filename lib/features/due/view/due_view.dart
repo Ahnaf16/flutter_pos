@@ -9,68 +9,98 @@ class DueView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final partiList = ref.watch(dueLogCtrlProvider);
+    final dueList = ref.watch(dueLogCtrlProvider);
+    final dueCtrl = useCallback(() => ref.read(dueLogCtrlProvider.notifier));
     return BaseBody(
       title: 'Due logs',
-      body: partiList.when(
-        loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: dueLogCtrlProvider),
-        data: (dues) {
-          return DataTableBuilder<DueLog, (String, double)>(
-            rowHeight: 100,
-            items: dues,
-            headings: _headings,
-            headingBuilderIndexed: (heading, i) {
-              Alignment alignment = i == _headings.length - 1 ? Alignment.centerRight : Alignment.centerLeft;
-              if (i == 2) alignment = Alignment.center;
-              return GridColumn(
-                columnName: heading.$1,
-                columnWidthMode: ColumnWidthMode.fill,
-                maximumWidth: heading.$2,
-                minimumWidth: 200,
-                label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.$1)),
-              );
-            },
-            cellAlignment: Alignment.centerLeft,
-            cellBuilder: (data, head) {
-              return switch (head.$1) {
-                'Name' => DataGridCell(columnName: head.$1, value: _PartyNameBuilder(data.parti)),
-                'Amount' => DataGridCell(
-                  columnName: head.$1,
-                  value: Column(
-                    spacing: Insets.xs,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SpacedText(
-                        left: 'Amount',
-                        right: data.amount.abs().currency(),
-                        styleBuilder: (l, r) => (l, r.bold),
-                      ),
-                      SpacedText(left: 'Post amount', right: data.postAmount.currency()),
-                    ],
-                  ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: Insets.med,
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: 350,
+                child: ShadTextField(
+                  hintText: 'Search',
+                  onChanged: (v) => dueCtrl().search(v ?? ''),
+                  showClearButton: true,
                 ),
-                'Date' => DataGridCell(columnName: head.$1, value: Center(child: Text(data.date.formatDate()))),
-                'Action' => DataGridCell(
-                  columnName: head.$1,
-                  value: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.eye),
-                        onPressed:
-                            () => showShadDialog(context: context, builder: (context) => _PartiViewDialog(log: data)),
+              ),
+              ShadDatePicker.range(onRangeChanged: (v) => dueCtrl().filter(range: v)),
+              ShadIconButton.raw(
+                icon: const Icon(LuIcons.x),
+                onPressed: () => dueCtrl().filter(),
+                variant: ShadButtonVariant.destructive,
+              ),
+            ],
+          ),
+          Expanded(
+            child: dueList.when(
+              loading: () => const Loading(),
+              error: (e, s) => ErrorView(e, s, prov: dueLogCtrlProvider),
+              data: (dues) {
+                return DataTableBuilder<DueLog, (String, double)>(
+                  rowHeight: 100,
+                  items: dues,
+                  headings: _headings,
+                  headingBuilderIndexed: (heading, i) {
+                    Alignment alignment = i == _headings.length - 1 ? Alignment.centerRight : Alignment.centerLeft;
+                    if (i == 2) alignment = Alignment.center;
+                    return GridColumn(
+                      columnName: heading.$1,
+                      columnWidthMode: ColumnWidthMode.fill,
+                      maximumWidth: heading.$2,
+                      minimumWidth: 200,
+                      label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.$1)),
+                    );
+                  },
+                  cellAlignment: Alignment.centerLeft,
+                  cellBuilder: (data, head) {
+                    return switch (head.$1) {
+                      'Name' => DataGridCell(columnName: head.$1, value: _PartyNameBuilder(data.parti)),
+                      'Amount' => DataGridCell(
+                        columnName: head.$1,
+                        value: Column(
+                          spacing: Insets.xs,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SpacedText(
+                              left: 'Amount',
+                              right: data.amount.abs().currency(),
+                              styleBuilder: (l, r) => (l, r.bold),
+                            ),
+                            SpacedText(left: 'Post amount', right: data.postAmount.currency()),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-                _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
-              };
-            },
-          );
-        },
+                      'Date' => DataGridCell(columnName: head.$1, value: Center(child: Text(data.date.formatDate()))),
+                      'Action' => DataGridCell(
+                        columnName: head.$1,
+                        value: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ShadButton.secondary(
+                              size: ShadButtonSize.sm,
+                              leading: const Icon(LuIcons.eye),
+                              onPressed:
+                                  () => showShadDialog(
+                                    context: context,
+                                    builder: (context) => _PartiViewDialog(log: data),
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                    };
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

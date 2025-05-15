@@ -146,6 +146,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
             },
             allowDeselection: true,
           ),
+        const Gap(Insets.med),
         if (!context.routeState.matchedLocation.contains(RPaths.sales.path))
           ShadButton(
             leading: const Icon(LuIcons.calculator),
