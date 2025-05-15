@@ -54,6 +54,11 @@ dependencies:
   syncfusion_flutter_core: ^29.1.39
   sliver_tools: ^0.2.12
   nanoid2: ^2.0.1
+  pdf: ^3.11.3
+  file_saver: ^0.2.14
+  printing: ^5.14.2
+  path_provider: ^2.1.5
+  universal_html: ^2.2.4
 
 dev_dependencies:
   flutter_test:

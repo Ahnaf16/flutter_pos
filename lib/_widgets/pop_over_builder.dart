@@ -47,10 +47,7 @@ class PopOverButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShadButton.raw(
-      variant: ShadButtonVariant.ghost,
-      backgroundColor: isDestructive ? context.colors.destructive.op4 : context.colors.secondary.op4,
-      hoverBackgroundColor: isDestructive ? context.colors.destructive : context.colors.secondary,
-      width: 150,
+      variant: isDestructive ? ShadButtonVariant.destructive : ShadButtonVariant.ghost,
       size: ShadButtonSize.sm,
       mainAxisAlignment: MainAxisAlignment.start,
       enabled: enabled,

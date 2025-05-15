@@ -1,5 +1,6 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/main.export.dart';
@@ -18,6 +19,10 @@ class InventoryRecordView extends HookConsumerWidget {
   const InventoryRecordView({super.key, required this.type});
 
   final RecordType type;
+
+  Future<pw.Document> generateSlip(InventoryRecord record) async {
+    return PDFCtrl().getDoc(InvoicePDF(record).fullPDF);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -67,29 +72,45 @@ class InventoryRecordView extends HookConsumerWidget {
                 ),
                 'Action' => DataGridCell(
                   columnName: head.name,
-                  value: PopOverBuilder(
+                  value: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      PopOverButton(
-                        icon: const Icon(LuIcons.eye),
-                        onPressed: () {
-                          showShadDialog(context: context, builder: (context) => _InventoryViewDialog(inventory: data));
-                        },
-                        child: const Text('View'),
-                      ),
-                      PopOverButton(
-                        icon: const Icon(LuIcons.bookText),
-                        onPressed: () {},
-                        child: const Text('View invoice'),
-                      ),
-                      if (data.status != InventoryStatus.returned)
-                        PopOverButton(
-                          icon: const Icon(LuIcons.undo2),
-                          isDestructive: true,
-                          onPressed: () {
-                            showShadDialog(context: context, builder: (context) => _ReturnDialog(inventory: data));
-                          },
-                          child: const Text('Return'),
+                      Flexible(
+                        child: PopOverBuilder(
+                          children: [
+                            PopOverButton(
+                              icon: const Icon(LuIcons.eye),
+                              onPressed: () {
+                                showShadDialog(
+                                  context: context,
+                                  builder: (context) => _InventoryViewDialog(inventory: data),
+                                );
+                              },
+                              child: const Text('View'),
+                            ),
+                            PopOverButton(
+                              icon: const Icon(LuIcons.download),
+                              onPressed: () async {
+                                final doc = await generateSlip(data);
+                                await PDFCtrl().save(doc, data.id);
+                              },
+                              child: const Text('Download invoice'),
+                            ),
+                            if (data.status != InventoryStatus.returned)
+                              PopOverButton(
+                                icon: const Icon(LuIcons.undo2),
+                                isDestructive: true,
+                                onPressed: () {
+                                  showShadDialog(
+                                    context: context,
+                                    builder: (context) => _ReturnDialog(inventory: data),
+                                  );
+                                },
+                                child: const Text('Return'),
+                              ),
+                          ],
                         ),
+                      ),
                     ],
                   ),
                 ),
