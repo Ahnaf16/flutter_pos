@@ -1,6 +1,7 @@
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
+import 'package:pos/features/products/view/product_filter_fields.dart';
 import 'package:pos/main.export.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
@@ -10,6 +11,8 @@ class StockView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productList = ref.watch(productsCtrlProvider);
+    final productCtrl = useCallback(() => ref.read(productsCtrlProvider.notifier));
+
     final viewingWh = ref.watch(viewingWHProvider);
     final permissions = ref.watch(authStateSyncProvider).toNullable()?.role?.permissions ?? [];
 
@@ -49,7 +52,10 @@ class StockView extends HookConsumerWidget {
                 return CustomScrollView(
                   slivers: [
                     MultiSliver(
-                      children: [for (final product in products) _ProductSection(model: product, wh: viewingWh)],
+                      children: [
+                        SliverToBoxAdapter(child: CenterLeft(child: ProductFilterFields(productCtrl: productCtrl))),
+                        for (final product in products) _ProductSection(model: product, wh: viewingWh),
+                      ],
                     ),
                   ],
                 );

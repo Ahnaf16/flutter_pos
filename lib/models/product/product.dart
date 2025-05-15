@@ -235,6 +235,9 @@ class _ProductFiled {
 extension ProductEx on List<Product> {
   List<Product> filterHouse(WareHouse? house, [bool showEmptyStock = true]) {
     if (house == null) return this;
-    return where((e) => e.stock.isEmpty ? showEmptyStock : e.stock.any((s) => s.warehouse?.id == house.id)).toList();
+
+    final list = map((e) => e.copyWith(stock: e.stock.where((s) => s.warehouse?.id == house.id).toList())).toList();
+    return list.where((e) => e.stock.isEmpty ? showEmptyStock : true).toList();
+    // return where((e) => e.stock.isEmpty ? showEmptyStock : e.stock.any((s) => s.warehouse?.id == house.id)).toList();
   }
 }
