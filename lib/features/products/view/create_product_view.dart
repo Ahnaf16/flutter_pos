@@ -37,6 +37,7 @@ class CreateProductView extends HookConsumerWidget {
 
     final updating = updatingId != null;
     final initialStock = useState(false);
+    final createdId = useState<String?>(null);
 
     final actionText = updating ? 'Update' : 'Create';
 
@@ -63,20 +64,23 @@ class CreateProductView extends HookConsumerWidget {
             } else {
               l.truthy();
 
-              final ctrl = ref.read(productsCtrlProvider.notifier);
-              result = await ctrl.createProduct(product, selectedFile.value);
+              if (createdId.value == null) {
+                final ctrl = ref.read(productsCtrlProvider.notifier);
+                final (res, id) = await ctrl.createProduct(product, selectedFile.value);
+                result = res;
+                createdId.value = id;
+              }
 
-              if (initialStock.value && result.success == true) {
+              if (initialStock.value && (result?.success == true || createdId.value != null)) {
                 final stock = Stock.tryParse(data['stock'])?.copyWith(id: ID.unique());
 
                 recordCtrl().setInputsFromMap(data['record'] ?? {});
-                recordCtrl().addProduct(product, newStock: stock, replaceExisting: true);
+                recordCtrl().addProduct(product.copyWith(id: createdId.value), newStock: stock, replaceExisting: true);
 
                 final (ok, msg) = await recordCtrl().submit();
                 l.falsey();
-                if (!ok && context.mounted) {
-                  return Toast.showErr(context, msg);
-                }
+                if (!ok && context.mounted) return Toast.showErr(context, msg);
+                if (ok) return context.pop();
               }
 
               l.falsey();

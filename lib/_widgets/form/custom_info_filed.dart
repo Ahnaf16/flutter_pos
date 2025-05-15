@@ -65,7 +65,7 @@ class CustomInfoFiled extends HookWidget {
                   Expanded(
                     child: ShadTextField(
                       name: '${i}_key',
-                      label: 'Key',
+                      hintText: 'Key',
                       initialValue: v.key,
                       isRequired: showXButton,
                       readOnly: !showXButton,
@@ -85,7 +85,7 @@ class CustomInfoFiled extends HookWidget {
                     flex: 2,
                     child: ShadTextField(
                       name: '${i}_value',
-                      label: 'Value',
+                      hintText: 'Value',
                       initialValue: v.value,
                       isRequired: true,
                       onChanged: (value) {

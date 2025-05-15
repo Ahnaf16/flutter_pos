@@ -96,55 +96,71 @@ class PartiesView extends HookConsumerWidget {
                   value: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (data.hasDue())
-                        ShadButton.secondary(
-                          size: ShadButtonSize.sm,
-                          leading: const Icon(LuIcons.handCoins),
-                          onPressed: () {
-                            showShadDialog(
-                              context: context,
-                              builder: (context) => PartyDueDialog(parti: data, type: data.type),
-                            );
-                          },
-                        ),
-                      if (data.hasBalance() && !data.isCustomer)
-                        ShadButton.secondary(
-                          size: ShadButtonSize.sm,
-                          leading: const Icon(LuIcons.handCoins),
-                          onPressed: () {
-                            showShadDialog(
-                              context: context,
-                              builder: (context) => SupplierDueDialog(parti: data, type: data.type),
-                            );
-                          },
-                        ),
-                      if (data.hasBalance() && data.isCustomer)
-                        ShadButton.secondary(
-                          size: ShadButtonSize.sm,
-                          leading: const Icon(LuIcons.arrowLeftRight),
-                          onPressed: () {
-                            showShadDialog(
-                              context: context,
-                              builder: (context) => BalanceTransferDialog(parti: data, type: data.type),
-                            );
-                          },
-                        ),
+                      PopOverBuilder(
+                        children: [
+                          PopOverButton(
+                            icon: const Icon(LuIcons.eye),
+                            onPressed: () {
+                              showShadDialog(context: context, builder: (context) => _PartiViewDialog(parti: data));
+                            },
+                            child: const Text('View'),
+                          ),
+                          PopOverButton(
+                            icon: const Icon(LuIcons.pen),
+                            onPressed: () async {
+                              await showShadDialog(
+                                context: context,
+                                builder: (context) => _PartiAddDialog(parti: data, isCustomer: isCustomer),
+                              );
+                            },
+                            child: const Text('Update'),
+                          ),
+                          if (data.hasDue())
+                            PopOverButton(
+                              icon: const Icon(LuIcons.handCoins),
+                              onPressed: () {
+                                showShadDialog(
+                                  context: context,
+                                  builder: (context) => PartyDueDialog(parti: data, type: data.type),
+                                );
+                              },
+                              child: const Text('Due adjustment'),
+                            ),
+                          if (data.hasBalance() && !data.isCustomer)
+                            PopOverButton(
+                              icon: const Icon(LuIcons.handCoins),
+                              onPressed: () {
+                                showShadDialog(
+                                  context: context,
+                                  builder: (context) => SupplierDueDialog(parti: data, type: data.type),
+                                );
+                              },
+                              child: const Text('Due clearance'),
+                            ),
+                          if (data.hasBalance() && data.isCustomer)
+                            PopOverButton(
+                              icon: const Icon(LuIcons.arrowLeftRight),
+                              onPressed: () {
+                                showShadDialog(
+                                  context: context,
+                                  builder: (context) => BalanceTransferDialog(parti: data, type: data.type),
+                                );
+                              },
+                              child: const Text('Transfer Balance'),
+                            ),
 
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.eye),
-                        onPressed:
-                            () => showShadDialog(context: context, builder: (context) => _PartiViewDialog(parti: data)),
-                      ),
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.pen),
-                        onPressed: () async {
-                          await showShadDialog(
-                            context: context,
-                            builder: (context) => _PartiAddDialog(parti: data, isCustomer: isCustomer),
-                          );
-                        },
+                          PopOverButton(
+                            icon: const Icon(LuIcons.pen),
+                            onPressed: () async {
+                              await showShadDialog(
+                                context: context,
+                                builder: (context) => _PartiAddDialog(parti: data, isCustomer: isCustomer),
+                              );
+                            },
+                            isDestructive: true,
+                            child: const Text('Delete'),
+                          ),
+                        ],
                       ),
                     ],
                   ),

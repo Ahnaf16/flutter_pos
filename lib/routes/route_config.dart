@@ -185,7 +185,7 @@ class AppRouter extends Notifier<GoRouter> {
           ),
           //! moneyTransfer
           AppRoute(
-            RPaths.moneyTransfer,
+            RPaths.dueManagement,
             redirect: (_, _) => RolePermissions.transferMoney.redirect(p),
             (_) => const TransactionsView(type: TransactionType.transfer),
           ),

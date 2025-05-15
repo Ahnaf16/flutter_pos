@@ -22,13 +22,7 @@ class StockTransferCtrl extends _$StockTransferCtrl {
 
   QMap setFrom(WareHouse? warehouse) {
     final stock = state.product?.getEffectiveStock(_config.stockDistPolicy, warehouse?.id);
-    state = state.copyWith(
-      from: () => warehouse,
-      purchasePrice: () => stock?.purchasePrice,
-      salesPrice: () => state.product?.salePrice,
-
-      quantity: stock?.quantity,
-    );
+    state = state.copyWith(from: () => warehouse, purchasePrice: () => stock?.purchasePrice, quantity: stock?.quantity);
 
     // this is to set form fields
     return (stock?.toAwPost() ?? {})..remove('quantity');
@@ -39,7 +33,6 @@ class StockTransferCtrl extends _$StockTransferCtrl {
   void setStockData(QMap form) {
     state = state.copyWith(
       purchasePrice: () => form.parseNum('purchase_price'),
-      salesPrice: () => form.parseNum('sales_price'),
       wholesalePrice: () => form.parseNum('wholesale_price'),
       dealerPrice: () => form.parseNum('dealer_price'),
       quantity: form.parseInt('quantity'),

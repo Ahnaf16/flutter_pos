@@ -72,45 +72,35 @@ class InventoryRecordView extends HookConsumerWidget {
                 ),
                 'Action' => DataGridCell(
                   columnName: head.name,
-                  value: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  value: PopOverBuilder(
                     children: [
-                      Flexible(
-                        child: PopOverBuilder(
-                          children: [
-                            PopOverButton(
-                              icon: const Icon(LuIcons.eye),
-                              onPressed: () {
-                                showShadDialog(
-                                  context: context,
-                                  builder: (context) => _InventoryViewDialog(inventory: data),
-                                );
-                              },
-                              child: const Text('View'),
-                            ),
-                            PopOverButton(
-                              icon: const Icon(LuIcons.download),
-                              onPressed: () async {
-                                final doc = await generateSlip(data);
-                                await PDFCtrl().save(doc, data.id);
-                              },
-                              child: const Text('Download invoice'),
-                            ),
-                            if (data.status != InventoryStatus.returned)
-                              PopOverButton(
-                                icon: const Icon(LuIcons.undo2),
-                                isDestructive: true,
-                                onPressed: () {
-                                  showShadDialog(
-                                    context: context,
-                                    builder: (context) => _ReturnDialog(inventory: data),
-                                  );
-                                },
-                                child: const Text('Return'),
-                              ),
-                          ],
-                        ),
+                      // PopOverButton(
+                      //   icon: const Icon(LuIcons.eye),
+                      //   onPressed: () {
+                      //     showShadDialog(
+                      //       context: context,
+                      //       builder: (context) => _InventoryViewDialog(inventory: data),
+                      //     );
+                      //   },
+                      //   child: const Text('View'),
+                      // ),
+                      PopOverButton(
+                        icon: const Icon(LuIcons.download),
+                        onPressed: () async {
+                          final doc = await generateSlip(data);
+                          await PDFCtrl().save(doc, data.id);
+                        },
+                        child: const Text('Download invoice'),
                       ),
+                      if (data.status != InventoryStatus.returned)
+                        PopOverButton(
+                          icon: const Icon(LuIcons.undo2),
+                          isDestructive: true,
+                          onPressed: () {
+                            showShadDialog(context: context, builder: (context) => _ReturnDialog(inventory: data));
+                          },
+                          child: const Text('Return'),
+                        ),
                     ],
                   ),
                 ),
@@ -211,6 +201,7 @@ class InventoryRecordView extends HookConsumerWidget {
   );
 }
 
+// ignore: unused_element
 class _InventoryViewDialog extends HookConsumerWidget {
   const _InventoryViewDialog({required this.inventory});
 

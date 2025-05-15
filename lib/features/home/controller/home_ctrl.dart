@@ -10,6 +10,7 @@ part 'home_ctrl.g.dart';
 @Riverpod(keepAlive: true)
 class ViewingWH extends _$ViewingWH {
   Future<void> updateHouse(WareHouse? house) async {
+    if (house?.isDefault == true) return state = null;
     state = house;
   }
 

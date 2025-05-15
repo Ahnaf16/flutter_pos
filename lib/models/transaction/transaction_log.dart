@@ -17,6 +17,7 @@ class TransactionLog {
     required this.type,
     required this.note,
     required this.adjustBalance,
+    this.payMethod,
   });
 
   final String id;
@@ -39,6 +40,7 @@ class TransactionLog {
   final TransactionType type;
   final String? note;
   final bool adjustBalance;
+  final AccountType? payMethod;
 
   // final bool transactionFromMe;
 
@@ -56,6 +58,7 @@ class TransactionLog {
     note: map['note'],
     type: TransactionType.values.byName(map['transaction_type']),
     adjustBalance: map.parseBool('adjust_balance'),
+    payMethod: AccountType.values.tryByName(map['pay_method']),
   );
 
   static TransactionLog? tyrParse(dynamic value) {
@@ -82,6 +85,7 @@ class TransactionLog {
     'note': note,
     'adjust_balance': adjustBalance,
     'transaction_from': transactionForm?.toMap(),
+    'pay_method': payMethod?.name,
   };
 
   QMap toAwPost() => {
@@ -94,6 +98,7 @@ class TransactionLog {
     'transaction_type': type.name,
     'note': note,
     'transaction_from': transactionForm?.id,
+    'pay_method': payMethod?.name,
   };
 
   String? validate() {
@@ -134,7 +139,6 @@ class TransactionLog {
     return TransactionLog(
       id: '',
       amount: ex.amount,
-
       account: ex.account,
       transactedTo: null,
       customInfo: {},
@@ -208,7 +212,7 @@ class TransactionLog {
   TransactionLog copyWith({
     String? id,
     num? amount,
-    PaymentAccount? account,
+    ValueGetter<PaymentAccount?>? account,
     ValueGetter<Party?>? transactedTo,
     ValueGetter<Party?>? transactionForm,
     SMap? customInfo,
@@ -217,11 +221,12 @@ class TransactionLog {
     TransactionType? type,
     ValueGetter<String?>? note,
     bool? adjustBalance,
+    ValueGetter<AccountType?>? payMethod,
   }) {
     return TransactionLog(
       id: id ?? this.id,
       amount: amount ?? this.amount,
-      account: account ?? this.account,
+      account: account != null ? account() : this.account,
       transactedTo: transactedTo != null ? transactedTo() : this.transactedTo,
       transactionForm: transactionForm != null ? transactionForm() : this.transactionForm,
       customInfo: customInfo ?? this.customInfo,
@@ -230,6 +235,7 @@ class TransactionLog {
       type: type ?? this.type,
       note: note != null ? note() : this.note,
       adjustBalance: adjustBalance ?? this.adjustBalance,
+      payMethod: payMethod != null ? payMethod() : this.payMethod,
     );
   }
 }

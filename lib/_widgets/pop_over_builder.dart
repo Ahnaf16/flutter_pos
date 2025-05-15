@@ -46,14 +46,18 @@ class PopOverButton extends StatelessWidget {
   final bool enabled;
   @override
   Widget build(BuildContext context) {
-    return ShadButton.raw(
-      variant: isDestructive ? ShadButtonVariant.destructive : ShadButtonVariant.ghost,
-      size: ShadButtonSize.sm,
-      mainAxisAlignment: MainAxisAlignment.start,
-      enabled: enabled,
-      leading: icon,
-      onPressed: onPressed,
-      child: child,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 150),
+      child: ShadButton.raw(
+        variant: isDestructive ? ShadButtonVariant.destructive : ShadButtonVariant.ghost,
+        size: ShadButtonSize.sm,
+
+        mainAxisAlignment: MainAxisAlignment.start,
+        enabled: enabled,
+        leading: icon,
+        onPressed: onPressed,
+        child: child,
+      ),
     );
   }
 }

@@ -146,16 +146,6 @@ class StockTransferView extends HookConsumerWidget {
                                                 child: Row(
                                                   spacing: Insets.sm,
                                                   children: [
-                                                    // Expanded(
-                                                    //   child: SpacedText(
-                                                    //     left: 'Sale',
-                                                    //     right: (stock.salesPrice).currency(),
-                                                    //     style: context.text.muted,
-                                                    //     crossAxisAlignment: CrossAxisAlignment.center,
-                                                    //     styleBuilder: (l, r) => (l, context.text.small),
-                                                    //     spaced: false,
-                                                    //   ),
-                                                    // ),
                                                     Expanded(
                                                       child: SpacedText(
                                                         left: 'Purchase',
@@ -165,16 +155,7 @@ class StockTransferView extends HookConsumerWidget {
                                                         styleBuilder: (l, r) => (l, context.text.small),
                                                       ),
                                                     ),
-                                                    // Expanded(
-                                                    //   child: SpacedText(
-                                                    //     left: 'Sale value',
-                                                    //     right: (stock.salesPrice * stock.quantity).currency(),
-                                                    //     style: context.text.muted,
-                                                    //     crossAxisAlignment: CrossAxisAlignment.center,
-                                                    //     styleBuilder: (l, r) => (l, context.text.small),
-                                                    //     spaced: false,
-                                                    //   ),
-                                                    // ),
+
                                                     Expanded(
                                                       child: CenterRight(
                                                         child: Text('${stock.quantity} ${product.unitName}'),
@@ -382,26 +363,27 @@ class StockEditSection extends HookConsumerWidget {
                 ),
                 Expanded(
                   child: ShadTextField(
-                    name: 'sales_price',
-                    label: 'Sales Price',
-                    hintText: 'Enter sale price',
+                    name: 'quantity',
+                    label: 'Quantity',
+                    hintText: 'Enter Stock quantity',
                     isRequired: true,
-                    numeric: true,
+                    initialValue: '0',
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    validators: [
+                      if (product != null && from != null)
+                        FormBuilderValidators.max(product.quantityByHouse(from.id), checkNullOrEmpty: false),
+                    ],
                   ),
                 ),
-              ],
-            ),
-
-            ShadTextField(
-              name: 'quantity',
-              label: 'Quantity',
-              hintText: 'Enter Stock quantity',
-              isRequired: true,
-              initialValue: '0',
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              validators: [
-                if (product != null && from != null)
-                  FormBuilderValidators.max(product.quantityByHouse(from.id), checkNullOrEmpty: false),
+                // Expanded(
+                //   child: ShadTextField(
+                //     name: 'sales_price',
+                //     label: 'Sales Price',
+                //     hintText: 'Enter sale price',
+                //     isRequired: true,
+                //     numeric: true,
+                //   ),
+                // ),
               ],
             ),
           ],

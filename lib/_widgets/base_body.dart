@@ -40,7 +40,11 @@ class BaseBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = AnimatedPadding(padding: padding ?? context.layout.pagePadding, duration: 250.ms, child: body);
+    Widget child = AnimatedPadding(
+      padding: padding ?? context.layout.pagePadding.copyWith(top: Insets.sm),
+      duration: 250.ms,
+      child: body,
+    );
 
     if (scrollable) {
       child = SingleChildScrollView(child: child);

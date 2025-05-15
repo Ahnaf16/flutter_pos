@@ -6,7 +6,6 @@ class StockTransferState {
     this.to,
     this.product,
     this.purchasePrice,
-    this.salesPrice,
     this.wholesalePrice,
     this.dealerPrice,
     this.quantity = 0,
@@ -16,7 +15,6 @@ class StockTransferState {
   final WareHouse? to;
   final Product? product;
   final num? purchasePrice;
-  final num? salesPrice;
   final num? wholesalePrice;
   final num? dealerPrice;
   final int quantity;
@@ -26,7 +24,6 @@ class StockTransferState {
     ValueGetter<WareHouse?>? to,
     ValueGetter<Product?>? product,
     ValueGetter<num?>? purchasePrice,
-    ValueGetter<num?>? salesPrice,
     ValueGetter<num?>? wholesalePrice,
     ValueGetter<num?>? dealerPrice,
     int? quantity,
@@ -36,7 +33,6 @@ class StockTransferState {
       to: to != null ? to() : this.to,
       product: product != null ? product() : this.product,
       purchasePrice: purchasePrice != null ? purchasePrice() : this.purchasePrice,
-      salesPrice: salesPrice != null ? salesPrice() : this.salesPrice,
       wholesalePrice: wholesalePrice != null ? wholesalePrice() : this.wholesalePrice,
       dealerPrice: dealerPrice != null ? dealerPrice() : this.dealerPrice,
       quantity: quantity ?? this.quantity,
@@ -52,7 +48,6 @@ class StockTransferState {
     final qtyByHouse = product!.quantityByHouse(from!.id);
     if (quantity > qtyByHouse) return 'quantity must be less than available quantity';
     if (purchasePrice == null) return 'purchase price is required';
-    if (salesPrice == null) return 'sales price is required';
     return null;
   }
 
@@ -61,7 +56,6 @@ class StockTransferState {
     'to': to?.toMap(),
     'product': product?.toMap(),
     'purchase_price': purchasePrice,
-    'sales_price': salesPrice,
     'wholesale_price': wholesalePrice,
     'dealer_price': dealerPrice,
     'quantity': quantity,

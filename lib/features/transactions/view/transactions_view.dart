@@ -165,6 +165,8 @@ class _TrxViewDialog extends HookConsumerWidget {
             //! trx info
             const Gap(Insets.sm),
             SpacedText(left: 'Amount', right: trx.amount.currency(), styleBuilder: (l, r) => (l, r.bold)),
+            if (trx.payMethod != null)
+              SpacedText(left: 'Payment method', right: trx.payMethod!.name, styleBuilder: (l, r) => (l, r.bold)),
 
             if (trx.account != null)
               SpacedText(left: 'Account', right: trx.account?.name ?? '--', styleBuilder: (l, r) => (l, r.bold)),

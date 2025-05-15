@@ -75,7 +75,7 @@ class RPaths {
   static RPath paymentAccount = const RPath('/payment_account');
 
   // moneyTransfer
-  static RPath moneyTransfer = const RPath('/money_transfer');
+  static RPath dueManagement = const RPath('/money_transfer');
 
   // transactions
   static RPath transactions = const RPath('/transactions');

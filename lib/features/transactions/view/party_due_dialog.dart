@@ -384,7 +384,31 @@ class BalanceTransferDialog extends HookConsumerWidget {
                   if (party?.hasBalance() == true) ...[
                     const Gap(Insets.med),
 
-                    ShadTextField(name: 'amount', hintText: 'Amount', label: 'Amount', numeric: true, isRequired: true),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: ShadTextField(
+                            name: 'amount',
+                            hintText: 'Amount',
+                            label: 'Amount',
+                            numeric: true,
+                            isRequired: true,
+                          ),
+                        ),
+                        Expanded(
+                          child: ShadSelectField<AccountType>(
+                            name: 'pay_method',
+                            label: 'Payment method',
+                            hintText: 'Select',
+                            valueTransformer: (value) => value?.name,
+                            options: AccountType.values,
+                            optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name.titleCase)),
+                            selectedBuilder: (_, v) => Text(v.name.titleCase),
+                          ),
+                        ),
+                      ],
+                    ),
 
                     const Gap(Insets.med),
                     ShadCard(

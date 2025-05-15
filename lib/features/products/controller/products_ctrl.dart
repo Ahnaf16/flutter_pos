@@ -39,12 +39,25 @@ class ProductsCtrl extends _$ProductsCtrl {
     state = AsyncData(_searchFrom.where((e) => e.name.low.contains(query)).toList());
   }
 
-  Future<Result> createProduct(Product product, [PFile? file]) async {
+  void filter({WareHouse? wh, ProductUnit? unit}) async {
+    if (wh != null) {
+      state = AsyncData(_searchFrom.filterHouse(wh, false));
+    }
+    if (unit != null) {
+      state = AsyncData(_searchFrom.where((e) => e.unit?.id == unit.id).toList());
+    }
+
+    if (wh == null && unit == null) {
+      state = AsyncData(_searchFrom);
+    }
+  }
+
+  Future<(Result, String?)> createProduct(Product product, [PFile? file]) async {
     final res = await _repo.createProduct(product, file);
 
-    return res.fold(leftResult, (r) {
-      ref.invalidate(productsCtrlProvider);
-      return rightResult('Product created successfully');
+    return res.fold((l) => (leftResult(l), ''), (r) {
+      ref.invalidateSelf();
+      return (rightResult('Product created successfully'), r.$id);
     });
   }
 
