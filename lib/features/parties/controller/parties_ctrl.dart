@@ -1,4 +1,3 @@
-import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/parties/repository/parties_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -8,6 +7,9 @@ part 'parties_ctrl.g.dart';
 @riverpod
 class PartiesCtrl extends _$PartiesCtrl {
   final _repo = locate<PartiesRepo>();
+
+  final List<Party> _searchFrom = [];
+
   @override
   Future<List<Party>> build(bool? isCustomer) async {
     final types = switch (isCustomer) {
@@ -16,10 +18,30 @@ class PartiesCtrl extends _$PartiesCtrl {
       _ => null,
     };
     final staffs = await _repo.getParties(types);
-    return staffs.fold((l) {
-      Toast.showErr(Ctx.context, l);
-      return [];
-    }, identity);
+    return staffs.fold(
+      (l) {
+        Toast.showErr(Ctx.context, l);
+        return [];
+      },
+      (r) {
+        _searchFrom.clear();
+        _searchFrom.addAll(r);
+        return r;
+      },
+    );
+  }
+
+  void search(String query) async {
+    if (query.isEmpty) {
+      state = AsyncValue.data(_searchFrom);
+    }
+    final list =
+        _searchFrom.where((e) {
+          return e.name.low.contains(query.low) ||
+              e.phone.low.contains(query.low) ||
+              (e.email?.low.contains(query.low) ?? false);
+        }).toList();
+    state = AsyncData(list);
   }
 
   Future<Result> createParti(QMap formData, [PFile? file]) async {

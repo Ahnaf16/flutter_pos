@@ -155,6 +155,11 @@ class StockTransferView extends HookConsumerWidget {
                                                         styleBuilder: (l, r) => (l, context.text.small),
                                                       ),
                                                     ),
+                                                    Expanded(
+                                                      child: CenterLeft(
+                                                        child: ShadBadge(child: Text(stock.warehouse?.name ?? '--')),
+                                                      ),
+                                                    ),
 
                                                     Expanded(
                                                       child: CenterRight(
@@ -173,16 +178,6 @@ class StockTransferView extends HookConsumerWidget {
                                             mainAxisAlignment: MainAxisAlignment.end,
                                             spacing: Insets.lg,
                                             children: [
-                                              // Expanded(
-                                              //   child: SpacedText(
-                                              //     left: 'Total value',
-                                              //     right: (product.totalValueByHouse(from?.id)).currency(),
-                                              //     style: context.text.p,
-                                              //     crossAxisAlignment: CrossAxisAlignment.center,
-                                              //     styleBuilder: (l, r) => (l, context.text.p.bold),
-                                              //     spaced: false,
-                                              //   ),
-                                              // ),
                                               Text.rich(
                                                 TextSpan(
                                                   children: [

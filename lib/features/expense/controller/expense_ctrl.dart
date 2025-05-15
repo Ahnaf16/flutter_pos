@@ -8,13 +8,49 @@ part 'expense_ctrl.g.dart';
 @riverpod
 class ExpenseCtrl extends _$ExpenseCtrl {
   final _repo = locate<ExpenseRepo>();
+
+  final List<Expense> _searchFrom = [];
+
   @override
   Future<List<Expense>> build() async {
     final staffs = await _repo.getExpenses();
-    return staffs.fold((l) {
-      Toast.showErr(Ctx.context, l);
-      return [];
-    }, identity);
+    return staffs.fold(
+      (l) {
+        Toast.showErr(Ctx.context, l);
+        return [];
+      },
+      (r) {
+        _searchFrom.clear();
+        _searchFrom.addAll(r);
+        return r;
+      },
+    );
+  }
+
+  void search(String query) async {
+    if (query.isEmpty) {
+      state = AsyncValue.data(_searchFrom);
+    }
+    query = query.low;
+    final list =
+        _searchFrom.where((e) {
+          return e.expenseBy.name.low.contains(query) ||
+              e.expenseBy.phone.low.contains(query) ||
+              e.expenseBy.email.low.contains(query);
+        }).toList();
+    state = AsyncData(list);
+  }
+
+  void filter({PaymentAccount? acc, ExpenseCategory? category}) async {
+    if (acc != null) {
+      state = AsyncData(_searchFrom.where((e) => e.account.id == acc.id).toList());
+    }
+    if (category != null) {
+      state = AsyncData(_searchFrom.where((e) => e.category.id == category.id).toList());
+    }
+    if (acc == null && category == null) {
+      state = AsyncValue.data(_searchFrom);
+    }
   }
 
   Future<Result> createExpense(QMap form) async {

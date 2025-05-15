@@ -3,14 +3,15 @@ import 'package:pos/features/payment_accounts/view/account_add_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('Name', double.nan), ('Amount', double.nan), ('Active', 200.0), ('Action', 200.0)];
+const _headings = [('Name', double.nan), ('Amount', 300.0), ('Type', 200.0), ('Active', 200.0), ('Action', 200.0)];
 
 class PaymentAccountsView extends HookConsumerWidget {
   const PaymentAccountsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final productList = ref.watch(paymentAccountsCtrlProvider(false));
+    final accountList = ref.watch(paymentAccountsCtrlProvider(false));
+    final accCtrl = useCallback(() => ref.read(paymentAccountsCtrlProvider(false).notifier));
 
     return BaseBody(
       title: 'Payment Accounts',
@@ -22,70 +23,113 @@ class PaymentAccountsView extends HookConsumerWidget {
           },
         ),
       ],
-      body: productList.when(
-        loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: paymentAccountsCtrlProvider),
-        data: (products) {
-          return DataTableBuilder<PaymentAccount, (String, double)>(
-            rowHeight: 70,
-            items: products,
-            headings: _headings,
-            headingBuilder: (heading) {
-              return GridColumn(
-                columnName: heading.$1,
-                columnWidthMode: ColumnWidthMode.fill,
-                maximumWidth: heading.$2,
-                minimumWidth: 200,
-                label: Container(
-                  padding: Pads.med(),
-                  alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Text(heading.$1),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: 350,
+                child: ShadTextField(
+                  hintText: 'Search',
+                  onChanged: (v) => accCtrl().search(v ?? ''),
+                  showClearButton: true,
                 ),
-              );
-            },
-            cellAlignment: Alignment.centerLeft,
-            cellBuilder: (data, head) {
-              return switch (head.$1) {
-                'Name' => DataGridCell(
-                  columnName: head.$1,
-                  value: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(data.name),
-                      if (data.description != null) Text(data.description!, style: context.text.muted, maxLines: 1),
-                    ],
-                  ),
+              ),
+              SizedBox(
+                width: 250,
+                child: ShadSelectField<AccountType>(
+                  hintText: 'Type',
+                  options: AccountType.values,
+                  selectedBuilder: (context, value) => Text(value.name),
+                  optionBuilder: (_, value, _) {
+                    return ShadOption(value: value, child: Text(value.name));
+                  },
+                  onChanged: (v) => accCtrl().filter(type: v),
                 ),
-                'Amount' => DataGridCell(columnName: head.$1, value: Text(data.amount.currency())),
+              ),
+            ],
+          ),
+          const Gap(Insets.med),
 
-                'Active' => DataGridCell(columnName: head.$1, value: _buildActiveCell(data)),
+          Expanded(
+            child: accountList.when(
+              loading: () => const Loading(),
+              error: (e, s) => ErrorView(e, s, prov: paymentAccountsCtrlProvider),
+              data: (accounts) {
+                return DataTableBuilder<PaymentAccount, (String, double)>(
+                  rowHeight: 70,
+                  items: accounts,
+                  headings: _headings,
+                  headingBuilder: (heading) {
+                    return GridColumn(
+                      columnName: heading.$1,
+                      columnWidthMode: ColumnWidthMode.fill,
+                      maximumWidth: heading.$2,
+                      minimumWidth: 200,
+                      label: Container(
+                        padding: Pads.med(),
+                        alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
+                        child: Text(heading.$1),
+                      ),
+                    );
+                  },
+                  cellAlignment: Alignment.centerLeft,
+                  cellBuilder: (data, head) {
+                    return switch (head.$1) {
+                      'Name' => DataGridCell(
+                        columnName: head.$1,
+                        value: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(data.name),
+                            if (data.description != null)
+                              Text(data.description!, style: context.text.muted, maxLines: 1),
+                          ],
+                        ),
+                      ),
+                      'Amount' => DataGridCell(columnName: head.$1, value: Text(data.amount.currency())),
+                      'Type' => DataGridCell(
+                        columnName: head.$1,
+                        value: ShadBadge.secondary(child: Text(data.type.name.titleCase)),
+                      ),
 
-                'Action' => DataGridCell(
-                  columnName: head.$1,
-                  value: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.pen),
-                        onPressed:
-                            () => showShadDialog(context: context, builder: (context) => AccountAddDialog(acc: data)),
+                      'Active' => DataGridCell(columnName: head.$1, value: _buildActiveCell(data)),
+
+                      'Action' => DataGridCell(
+                        columnName: head.$1,
+                        value: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ShadButton.secondary(
+                              size: ShadButtonSize.sm,
+                              leading: const Icon(LuIcons.pen),
+                              onPressed:
+                                  () => showShadDialog(
+                                    context: context,
+                                    builder: (context) => AccountAddDialog(acc: data),
+                                  ),
+                            ),
+                            ShadButton.secondary(
+                              size: ShadButtonSize.sm,
+                              leading: const Icon(LuIcons.eye),
+                              onPressed:
+                                  () => showShadDialog(
+                                    context: context,
+                                    builder: (context) => _AccountViewDialog(acc: data),
+                                  ),
+                            ),
+                          ],
+                        ),
                       ),
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.eye),
-                        onPressed:
-                            () => showShadDialog(context: context, builder: (context) => _AccountViewDialog(acc: data)),
-                      ),
-                    ],
-                  ),
-                ),
-                _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
-              };
-            },
-          );
-        },
+                      _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                    };
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

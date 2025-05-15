@@ -22,6 +22,8 @@ class PartiesView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final partiList = ref.watch(partiesCtrlProvider(isCustomer));
+    final partiCtrl = useCallback(() => ref.read(partiesCtrlProvider(isCustomer).notifier), [isCustomer]);
+
     return BaseBody(
       title: isCustomer ? 'Customers' : 'Suppliers',
       actions: [
@@ -32,144 +34,163 @@ class PartiesView extends HookConsumerWidget {
           },
         ),
       ],
-      body: partiList.when(
-        loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: partiesCtrlProvider),
-        data: (parties) {
-          return DataTableBuilder<Party, TableHeading>(
-            rowHeight: 100,
-            items: parties,
-            headings: _headings,
-            headingBuilder: (heading) {
-              return GridColumn(
-                columnName: heading.name,
-                columnWidthMode: ColumnWidthMode.fill,
-                maximumWidth: heading.max,
-                minimumWidth: 200,
-                label: Container(padding: Pads.med(), alignment: heading.alignment, child: Text(heading.name)),
-              );
-            },
-            cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
-            cellBuilder: (data, head) {
-              return switch (head.name) {
-                'Name' => DataGridCell(columnName: head.name, value: _PartyNameBuilder(data)),
-                'Phone' => DataGridCell(
-                  columnName: head.name,
-                  value: Row(
-                    spacing: Insets.xs,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(data.phone),
-                      SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(data.phone)),
-                    ],
-                  ),
-                ),
-                'Due/Balance' => DataGridCell(
-                  columnName: head.name,
-                  value: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (data.isCustomer) ...[
-                        if (data.hasDue())
-                          SpacedText(
-                            left: 'Due',
-                            right: data.due.currency(),
-                            styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
-                          )
-                        else
-                          SpacedText(
-                            left: 'Balance',
-                            right: data.due.abs().currency(),
-                            styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
-                          ),
-                      ] else
-                        SpacedText(
-                          left: 'Due',
-                          right: data.due.currency(),
-                          styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 300,
+            child: ShadTextField(
+              hintText: 'Search',
+              onChanged: (v) => partiCtrl().search(v ?? ''),
+              showClearButton: true,
+            ),
+          ),
+          const Gap(Insets.med),
+          Expanded(
+            child: partiList.when(
+              loading: () => const Loading(),
+              error: (e, s) => ErrorView(e, s, prov: partiesCtrlProvider),
+              data: (parties) {
+                return DataTableBuilder<Party, TableHeading>(
+                  rowHeight: 100,
+                  items: parties,
+                  headings: _headings,
+                  headingBuilder: (heading) {
+                    return GridColumn(
+                      columnName: heading.name,
+                      columnWidthMode: ColumnWidthMode.fill,
+                      maximumWidth: heading.max,
+                      minimumWidth: 200,
+                      label: Container(padding: Pads.med(), alignment: heading.alignment, child: Text(heading.name)),
+                    );
+                  },
+                  cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
+                  cellBuilder: (data, head) {
+                    return switch (head.name) {
+                      'Name' => DataGridCell(columnName: head.name, value: _PartyNameBuilder(data)),
+                      'Phone' => DataGridCell(
+                        columnName: head.name,
+                        value: Row(
+                          spacing: Insets.xs,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(data.phone),
+                            SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(data.phone)),
+                          ],
                         ),
-                    ],
-                  ),
-                ),
-                'Action' => DataGridCell(
-                  columnName: head.name,
-                  value: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      PopOverBuilder(
-                        children: [
-                          PopOverButton(
-                            icon: const Icon(LuIcons.eye),
-                            onPressed: () {
-                              showShadDialog(context: context, builder: (context) => PartiViewDialog(parti: data));
-                            },
-                            child: const Text('View'),
-                          ),
-                          PopOverButton(
-                            icon: const Icon(LuIcons.pen),
-                            onPressed: () async {
-                              await showShadDialog(
-                                context: context,
-                                builder: (context) => _PartiAddDialog(parti: data, isCustomer: isCustomer),
-                              );
-                            },
-                            child: const Text('Update'),
-                          ),
-                          if (data.hasDue())
-                            PopOverButton(
-                              icon: const Icon(LuIcons.handCoins),
-                              onPressed: () {
-                                showShadDialog(
-                                  context: context,
-                                  builder: (context) => PartyDueDialog(parti: data, type: data.type),
-                                );
-                              },
-                              child: const Text('Due adjustment'),
-                            ),
-                          if (data.hasBalance() && !data.isCustomer)
-                            PopOverButton(
-                              icon: const Icon(LuIcons.handCoins),
-                              onPressed: () {
-                                showShadDialog(
-                                  context: context,
-                                  builder: (context) => SupplierDueDialog(parti: data, type: data.type),
-                                );
-                              },
-                              child: const Text('Due clearance'),
-                            ),
-                          if (data.hasBalance() && data.isCustomer)
-                            PopOverButton(
-                              icon: const Icon(LuIcons.arrowLeftRight),
-                              onPressed: () {
-                                showShadDialog(
-                                  context: context,
-                                  builder: (context) => BalanceTransferDialog(parti: data, type: data.type),
-                                );
-                              },
-                              child: const Text('Transfer Balance'),
-                            ),
-
-                          PopOverButton(
-                            icon: const Icon(LuIcons.pen),
-                            onPressed: () async {
-                              await showShadDialog(
-                                context: context,
-                                builder: (context) => _PartiAddDialog(parti: data, isCustomer: isCustomer),
-                              );
-                            },
-                            isDestructive: true,
-                            child: const Text('Delete'),
-                          ),
-                        ],
                       ),
-                    ],
-                  ),
-                ),
-                _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
-              };
-            },
-          );
-        },
+                      'Due/Balance' => DataGridCell(
+                        columnName: head.name,
+                        value: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (data.isCustomer) ...[
+                              if (data.hasDue())
+                                SpacedText(
+                                  left: 'Due',
+                                  right: data.due.currency(),
+                                  styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+                                )
+                              else
+                                SpacedText(
+                                  left: 'Balance',
+                                  right: data.due.abs().currency(),
+                                  styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+                                ),
+                            ] else
+                              SpacedText(
+                                left: 'Due',
+                                right: data.due.currency(),
+                                styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+                              ),
+                          ],
+                        ),
+                      ),
+                      'Action' => DataGridCell(
+                        columnName: head.name,
+                        value: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            PopOverBuilder(
+                              children: [
+                                PopOverButton(
+                                  icon: const Icon(LuIcons.eye),
+                                  onPressed: () {
+                                    showShadDialog(
+                                      context: context,
+                                      builder: (context) => PartiViewDialog(parti: data),
+                                    );
+                                  },
+                                  child: const Text('View'),
+                                ),
+                                PopOverButton(
+                                  icon: const Icon(LuIcons.pen),
+                                  onPressed: () async {
+                                    await showShadDialog(
+                                      context: context,
+                                      builder: (context) => _PartiAddDialog(parti: data, isCustomer: isCustomer),
+                                    );
+                                  },
+                                  child: const Text('Update'),
+                                ),
+                                if (data.hasDue())
+                                  PopOverButton(
+                                    icon: const Icon(LuIcons.handCoins),
+                                    onPressed: () {
+                                      showShadDialog(
+                                        context: context,
+                                        builder: (context) => PartyDueDialog(parti: data, type: data.type),
+                                      );
+                                    },
+                                    child: const Text('Due adjustment'),
+                                  ),
+                                if (data.hasBalance() && !data.isCustomer)
+                                  PopOverButton(
+                                    icon: const Icon(LuIcons.handCoins),
+                                    onPressed: () {
+                                      showShadDialog(
+                                        context: context,
+                                        builder: (context) => SupplierDueDialog(parti: data, type: data.type),
+                                      );
+                                    },
+                                    child: const Text('Due clearance'),
+                                  ),
+                                if (data.hasBalance() && data.isCustomer)
+                                  PopOverButton(
+                                    icon: const Icon(LuIcons.arrowLeftRight),
+                                    onPressed: () {
+                                      showShadDialog(
+                                        context: context,
+                                        builder: (context) => BalanceTransferDialog(parti: data, type: data.type),
+                                      );
+                                    },
+                                    child: const Text('Transfer Balance'),
+                                  ),
+
+                                PopOverButton(
+                                  icon: const Icon(LuIcons.pen),
+                                  onPressed: () async {
+                                    await showShadDialog(
+                                      context: context,
+                                      builder: (context) => _PartiAddDialog(parti: data, isCustomer: isCustomer),
+                                    );
+                                  },
+                                  isDestructive: true,
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
+                    };
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

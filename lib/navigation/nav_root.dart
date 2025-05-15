@@ -381,10 +381,10 @@ List<(String text, IconData? icon, RPath? path)> _items(List<RolePermissions> p)
     if (RolePermissions.isInGroup(p, RolePermissions.peopleGroup)) ...[
       ('Customer', null, null),
       if (p.contains(RolePermissions.manageCustomer)) ('Customers', LuIcons.users, RPaths.customer),
-      if (p.contains(RolePermissions.manageCustomer)) ('Due Adjustment', LuIcons.users, RPaths.dueManagement),
+      // if (p.contains(RolePermissions.manageCustomer)) ('Due Adjustment', LuIcons.users, RPaths.dueManagement),
       ('Supplier', null, null),
       if (p.contains(RolePermissions.manageSupplier)) ('Suppliers', LuIcons.usersRound, RPaths.supplier),
-      if (p.contains(RolePermissions.manageSupplier)) ('Due Clearance', LuIcons.usersRound, RPaths.dueManagement),
+      // if (p.contains(RolePermissions.manageSupplier)) ('Due Clearance', LuIcons.usersRound, RPaths.dueManagement),
       ('Staff', null, null),
       if (p.contains(RolePermissions.manageStaff)) ('Staffs', LuIcons.userCog, RPaths.staffs),
       if (p.contains(RolePermissions.manageRole)) ('Roles', LuIcons.shield, RPaths.roles),

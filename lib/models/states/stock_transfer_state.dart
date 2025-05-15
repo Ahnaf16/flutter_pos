@@ -63,11 +63,11 @@ class StockTransferState {
 
   List<Stock> sortedStocks(StockDistPolicy p) {
     if (product == null) return [];
-    if (from == null) return [];
+    // if (from == null) return [];
 
     final list = switch (p) {
-      StockDistPolicy.newerFirst => product!.sortByNewest(from!.id),
-      StockDistPolicy.olderFirst => product!.sortByOldest(from!.id),
+      StockDistPolicy.newerFirst => product!.sortByNewest(from?.id),
+      StockDistPolicy.olderFirst => product!.sortByOldest(from?.id),
     };
 
     return list;

@@ -1,8 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/features/expense/controller/expense_ctrl.dart';
+import 'package:pos/features/expense/view/expense_category_view.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
+import 'package:pos/features/payment_accounts/view/account_add_dialog.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
@@ -16,6 +17,9 @@ class ExpenseView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final expenseList = ref.watch(expenseCtrlProvider);
+    final exCtrl = useCallback(() => ref.read(expenseCtrlProvider.notifier));
+    final accountList = ref.watch(paymentAccountsCtrlProvider(false));
+    final categoryList = ref.watch(expenseCategoryCtrlProvider);
 
     return BaseBody(
       title: 'Expense',
@@ -27,78 +31,134 @@ class ExpenseView extends HookConsumerWidget {
           },
         ),
       ],
-      body: expenseList.when(
-        loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: expenseCtrlProvider),
-        data: (expenses) {
-          return DataTableBuilder<Expense, (String, double)>(
-            rowHeight: 110,
-            items: expenses,
-            headings: _headings,
-            headingBuilder: (heading) {
-              return GridColumn(
-                columnName: heading.$1,
-                columnWidthMode: ColumnWidthMode.fill,
-                maximumWidth: heading.$2,
-                minimumWidth: 200,
-                label: Container(
-                  padding: Pads.med(),
-                  alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Text(heading.$1),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: 350,
+                child: ShadTextField(
+                  hintText: 'Search',
+                  onChanged: (v) => exCtrl().search(v ?? ''),
+                  showClearButton: true,
                 ),
-              );
-            },
-            cellAlignment: Alignment.centerLeft,
-            cellBuilder: (data, head) {
-              return switch (head.$1) {
-                'For' => DataGridCell(
-                  columnName: head.$1,
-                  value: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(data.amount.currency(), style: context.text.lead),
-                      Text(data.expanseFor, style: context.text.small, maxLines: 2),
-                    ],
-                  ),
+              ),
+              SizedBox(
+                width: 250,
+                child: categoryList.maybeWhen(
+                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                  data: (categories) {
+                    return ShadSelectField<ExpenseCategory>(
+                      hintText: 'Category',
+                      options: categories,
+                      selectedBuilder: (context, value) => Text(value.name),
+                      optionBuilder: (_, value, _) {
+                        return ShadOption(value: value, child: Text(value.name));
+                      },
+                      onChanged: (v) => exCtrl().filter(category: v),
+                    );
+                  },
                 ),
-
-                'By' => DataGridCell(
-                  columnName: head.$1,
-                  value: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(data.expenseBy.name, style: context.text.list),
-                      Text(data.expenseBy.email, style: context.text.small, maxLines: 1),
-                    ],
-                  ),
+              ),
+              SizedBox(
+                width: 250,
+                child: accountList.maybeWhen(
+                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                  data: (accounts) {
+                    return ShadSelectField<PaymentAccount>(
+                      hintText: 'Accounts',
+                      options: accounts,
+                      selectedBuilder: (context, value) => Text(value.name),
+                      optionBuilder: (_, value, _) {
+                        return ShadOption(value: value, child: Text(value.name));
+                      },
+                      onChanged: (v) => exCtrl().filter(acc: v),
+                    );
+                  },
                 ),
-                'Account' => DataGridCell(
-                  columnName: head.$1,
-                  value: Text(data.account.name, style: context.text.list),
-                ),
-                'date' => DataGridCell(columnName: head.$1, value: Text(data.date.formatDate())),
-
-                'Action' => DataGridCell(
-                  columnName: head.$1,
-                  value: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.eye),
-                        onPressed:
-                            () => showShadDialog(context: context, builder: (context) => _ExpenseViewDialog(ex: data)),
+              ),
+            ],
+          ),
+          const Gap(Insets.med),
+          Expanded(
+            child: expenseList.when(
+              loading: () => const Loading(),
+              error: (e, s) => ErrorView(e, s, prov: expenseCtrlProvider),
+              data: (expenses) {
+                return DataTableBuilder<Expense, (String, double)>(
+                  rowHeight: 110,
+                  items: expenses,
+                  headings: _headings,
+                  headingBuilder: (heading) {
+                    return GridColumn(
+                      columnName: heading.$1,
+                      columnWidthMode: ColumnWidthMode.fill,
+                      maximumWidth: heading.$2,
+                      minimumWidth: 200,
+                      label: Container(
+                        padding: Pads.med(),
+                        alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
+                        child: Text(heading.$1),
                       ),
-                    ],
-                  ),
-                ),
-                _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
-              };
-            },
-          );
-        },
+                    );
+                  },
+                  cellAlignment: Alignment.centerLeft,
+                  cellBuilder: (data, head) {
+                    return switch (head.$1) {
+                      'For' => DataGridCell(
+                        columnName: head.$1,
+                        value: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(data.amount.currency(), style: context.text.lead),
+                            Text(data.expanseFor, style: context.text.small, maxLines: 2),
+                          ],
+                        ),
+                      ),
+
+                      'By' => DataGridCell(
+                        columnName: head.$1,
+                        value: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(data.expenseBy.name, style: context.text.list),
+                            Text(data.expenseBy.email, style: context.text.small, maxLines: 1),
+                          ],
+                        ),
+                      ),
+                      'Account' => DataGridCell(
+                        columnName: head.$1,
+                        value: Text(data.account.name, style: context.text.list),
+                      ),
+                      'date' => DataGridCell(columnName: head.$1, value: Text(data.date.formatDate())),
+
+                      'Action' => DataGridCell(
+                        columnName: head.$1,
+                        value: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ShadButton.secondary(
+                              size: ShadButtonSize.sm,
+                              leading: const Icon(LuIcons.eye),
+                              onPressed:
+                                  () => showShadDialog(
+                                    context: context,
+                                    builder: (context) => _ExpenseViewDialog(ex: data),
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                    };
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -140,14 +200,12 @@ class _ExpenseViewDialog extends HookConsumerWidget {
                           left: 'Name',
                           right: user.name,
                           styleBuilder: (l, r) => (l, r.bold),
-                          spaced: false,
                           crossAxisAlignment: CrossAxisAlignment.center,
                         ),
                         SpacedText(
                           left: 'Phone Number',
                           right: user.phone,
                           styleBuilder: (l, r) => (l, r.bold),
-                          spaced: false,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           onTap: (left, right) => Copier.copy(right),
                         ),
@@ -155,7 +213,6 @@ class _ExpenseViewDialog extends HookConsumerWidget {
                           left: 'Email',
                           right: user.email,
                           styleBuilder: (l, r) => (l, r.bold),
-                          spaced: false,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           onTap: (left, right) => Copier.copy(right),
                         ),
@@ -167,16 +224,11 @@ class _ExpenseViewDialog extends HookConsumerWidget {
             ),
             //! trx info
             const Gap(Insets.sm),
-            SpacedText(left: 'Amount', right: ex.amount.currency(), styleBuilder: (l, r) => (l, r.bold), spaced: false),
+            SpacedText(left: 'Amount', right: ex.amount.currency(), styleBuilder: (l, r) => (l, r.bold)),
 
-            SpacedText(left: 'Account', right: ex.account.name, styleBuilder: (l, r) => (l, r.bold), spaced: false),
-            SpacedText(left: 'Date', right: ex.date.formatDate(), styleBuilder: (l, r) => (l, r.bold), spaced: false),
-            SpacedText(
-              left: 'Note',
-              right: ex.note ?? '--',
-              styleBuilder: (l, r) => (l, context.text.muted),
-              spaced: false,
-            ),
+            SpacedText(left: 'Account', right: ex.account.name, styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(left: 'Date', right: ex.date.formatDate(), styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(left: 'Note', right: ex.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),
           ],
         ),
       ),
@@ -198,8 +250,6 @@ class _ExpenseAddDialog extends HookConsumerWidget {
     final accountList = ref.watch(paymentAccountsCtrlProvider());
     final categoryList = ref.watch(expenseCategoryCtrlProvider);
 
-    final searchUser = useState('');
-
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
     final actionTxt = ex == null ? 'Add' : 'Update';
     return ShadDialog(
@@ -211,7 +261,7 @@ class _ExpenseAddDialog extends HookConsumerWidget {
           onPressed: (l) async {
             final state = formKey.currentState!;
             if (!state.saveAndValidate()) return;
-            final data = state.value;
+            final data = state.transformedValues;
 
             final ctrl = ref.read(expenseCtrlProvider.notifier);
             (bool, String)? result;
@@ -257,34 +307,23 @@ class _ExpenseAddDialog extends HookConsumerWidget {
                 children: [
                   Flexible(child: ShadTextField(name: 'expanse_for', label: 'Expanse For', isRequired: true)),
                   Flexible(
-                    child: FormBuilderField<QMap>(
-                      name: 'expanseCategory',
-                      validator: FormBuilderValidators.required(),
-                      builder: (form) {
-                        return ShadInputDecorator(
-                          label: const Text('Category').required(),
-                          error: form.errorText == null ? null : Text(form.errorText!),
-                          decoration: context.theme.decoration.copyWith(hasError: form.hasError),
-                          child: categoryList.maybeWhen(
-                            orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                            data: (roles) {
-                              final filtered = roles.where((e) => e.name.low.contains(searchUser.value.low));
-                              return LimitedWidthBox(
-                                child: ShadSelect<ExpenseCategory>(
-                                  initialValue: ExpenseCategory.tryParse(form.value),
-                                  placeholder: const Text('Select a category'),
-                                  options: [
-                                    if (filtered.isEmpty)
-                                      Padding(padding: Pads.padding(v: 24), child: const Text('No category found')),
-
-                                    ...filtered.map((c) {
-                                      return ShadOption(value: c, child: Text(c.name));
-                                    }),
-                                  ],
-                                  selectedOptionBuilder: (context, v) => Text(v.name),
-                                  onChanged: (v) => form.didChange(v?.toMap()),
-                                ),
-                              );
+                    child: categoryList.maybeWhen(
+                      orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                      data: (category) {
+                        return ShadSelectField<ExpenseCategory>(
+                          name: 'expanseCategory',
+                          label: 'Category',
+                          hintText: 'Select a category',
+                          isRequired: true,
+                          initialValue: ex?.category,
+                          valueTransformer: (value) => value?.toMap(),
+                          options: category,
+                          optionBuilder: (_, c, _) => ShadOption(value: c, child: Text(c.name)),
+                          selectedBuilder: (context, v) => Text(v.name),
+                          outsideTrailing: ShadIconButton.outline(
+                            icon: const Icon(LuIcons.plus),
+                            onPressed: () {
+                              showShadDialog(context: context, builder: (context) => const ExCategoryAddDialog());
                             },
                           ),
                         );
@@ -296,71 +335,41 @@ class _ExpenseAddDialog extends HookConsumerWidget {
               Row(
                 children: [
                   Flexible(
-                    child: FormBuilderField<QMap>(
-                      name: 'users',
-                      validator: FormBuilderValidators.required(),
-                      builder: (form) {
-                        return ShadInputDecorator(
-                          label: const Text('Expense By').required(),
-                          error: form.errorText == null ? null : Text(form.errorText!),
-                          decoration: context.theme.decoration.copyWith(hasError: form.hasError),
-                          child: staffList.maybeWhen(
-                            orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                            data: (roles) {
-                              final filtered = roles.where((e) => e.name.low.contains(searchUser.value.low));
-                              return LimitedWidthBox(
-                                child: ShadSelect<AppUser>.withSearch(
-                                  initialValue: AppUser.tryParse(form.value),
-                                  placeholder: const Text('Who is expensing?'),
-                                  options: [
-                                    if (filtered.isEmpty)
-                                      Padding(padding: Pads.padding(v: 24), child: const Text('No one found')),
-
-                                    ...filtered.map((user) {
-                                      return ShadOption(value: user, child: Text(user.name));
-                                    }),
-                                  ],
-                                  selectedOptionBuilder: (context, v) => Text(v.name),
-                                  onSearchChanged: searchUser.set,
-                                  onChanged: (v) => form.didChange(v?.toMap()),
-                                ),
-                              );
-                            },
-                          ),
+                    child: staffList.maybeWhen(
+                      orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                      data: (roles) {
+                        return ShadSelectField<AppUser>(
+                          name: 'users',
+                          label: 'Expense By',
+                          hintText: 'Who is expending?',
+                          initialValue: ex?.expenseBy,
+                          isRequired: true,
+                          valueTransformer: (value) => value?.toMap(),
+                          options: roles,
+                          optionBuilder: (_, c, _) => ShadOption(value: c, child: Text(c.name)),
+                          selectedBuilder: (context, v) => Text(v.name),
                         );
                       },
                     ),
                   ),
                   Flexible(
-                    child: FormBuilderField<QMap>(
-                      name: 'payment_account',
-                      validator: FormBuilderValidators.required(),
-                      initialValue: config.defaultAccount?.toMap(),
-                      builder: (form) {
-                        return ShadInputDecorator(
-                          label: const Text('Payment Account').required(),
-                          error: form.errorText == null ? null : Text(form.errorText!),
-                          decoration: context.theme.decoration.copyWith(hasError: form.hasError),
-                          child: accountList.maybeWhen(
-                            orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                            data: (acc) {
-                              final filtered = acc.where((e) => e.name.low.contains(searchUser.value.low));
-                              return LimitedWidthBox(
-                                child: ShadSelect<PaymentAccount>(
-                                  initialValue: PaymentAccount.tryParse(form.value),
-                                  placeholder: const Text('Select a payment account'),
-                                  options: [
-                                    if (filtered.isEmpty)
-                                      Padding(padding: Pads.padding(v: 24), child: const Text('Not Item found')),
-
-                                    ...filtered.map((role) {
-                                      return ShadOption(value: role, child: Text(role.name));
-                                    }),
-                                  ],
-                                  selectedOptionBuilder: (context, v) => Text(v.name),
-                                  onChanged: (v) => form.didChange(v?.toMap()),
-                                ),
-                              );
+                    child: accountList.maybeWhen(
+                      orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                      data: (acc) {
+                        return ShadSelectField<PaymentAccount>(
+                          name: 'payment_account',
+                          label: 'Payment Account',
+                          hintText: 'Select a account',
+                          initialValue: ex?.account ?? config.defAccount,
+                          isRequired: true,
+                          valueTransformer: (value) => value?.toMap(),
+                          options: acc,
+                          optionBuilder: (_, c, _) => ShadOption(value: c, child: Text(c.name)),
+                          selectedBuilder: (context, v) => Text(v.name),
+                          outsideTrailing: ShadIconButton.outline(
+                            icon: const Icon(LuIcons.plus),
+                            onPressed: () {
+                              showShadDialog(context: context, builder: (context) => const AccountAddDialog());
                             },
                           ),
                         );

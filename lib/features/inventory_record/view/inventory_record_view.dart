@@ -6,6 +6,7 @@ import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dar
 import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/products/view/product_view_dialog.dart';
+import 'package:pos/features/transactions/view/party_due_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -117,6 +118,7 @@ class InventoryRecordView extends HookConsumerWidget {
                   },
                   cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
                   cellBuilder: (data, head) {
+                    final parti = data.getParti;
                     return switch (head.name) {
                       'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
                       'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data.details)),
@@ -130,6 +132,30 @@ class InventoryRecordView extends HookConsumerWidget {
                         columnName: head.name,
                         value: PopOverBuilder(
                           children: [
+                            if (parti != null) ...[
+                              if (parti.hasDue() && data.hasDue)
+                                PopOverButton(
+                                  icon: const Icon(LuIcons.handCoins),
+                                  onPressed: () {
+                                    showShadDialog(
+                                      context: context,
+                                      builder: (context) => PartyDueDialog(parti: parti, type: parti.type),
+                                    );
+                                  },
+                                  child: const Text('Due adjustment'),
+                                ),
+                              if (parti.hasBalance() && !parti.isCustomer && data.hasDue)
+                                PopOverButton(
+                                  icon: const Icon(LuIcons.handCoins),
+                                  onPressed: () {
+                                    showShadDialog(
+                                      context: context,
+                                      builder: (context) => SupplierDueDialog(parti: parti, type: parti.type),
+                                    );
+                                  },
+                                  child: const Text('Due clearance'),
+                                ),
+                            ],
                             PopOverButton(
                               icon: const Icon(LuIcons.download),
                               onPressed: () async {

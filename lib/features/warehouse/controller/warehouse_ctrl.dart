@@ -8,6 +8,9 @@ part 'warehouse_ctrl.g.dart';
 @riverpod
 class WarehouseCtrl extends _$WarehouseCtrl {
   final _repo = locate<WarehouseRepo>();
+
+  final List<WareHouse> _searchFrom = [];
+
   @override
   Future<List<WareHouse>> build() async {
     final staffs = await _repo.getWareHouses();
@@ -18,9 +21,25 @@ class WarehouseCtrl extends _$WarehouseCtrl {
       },
       (r) {
         r.sort((a, b) => a.isDefault ? -1 : 1);
+        _searchFrom.clear();
+        _searchFrom.addAll(r);
         return r;
       },
     );
+  }
+
+  void search(String query) async {
+    if (query.isEmpty) {
+      state = AsyncValue.data(_searchFrom);
+    }
+    query = query.low;
+    final list =
+        _searchFrom.where((e) {
+          return e.name.low.contains(query) ||
+              e.contactNumber.low.contains(query) ||
+              (e.contactPerson?.low.contains(query) ?? false);
+        }).toList();
+    state = AsyncData(list);
   }
 
   Future<Result> createWarehouse(QMap formData) async {

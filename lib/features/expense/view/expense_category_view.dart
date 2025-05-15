@@ -18,7 +18,7 @@ class ExpenseCategoryView extends HookConsumerWidget {
         ShadButton(
           child: const Text('Add a category'),
           onPressed: () {
-            showShadDialog(context: context, builder: (context) => const _CategoryAddDialog());
+            showShadDialog(context: context, builder: (context) => const ExCategoryAddDialog());
           },
         ),
       ],
@@ -61,7 +61,7 @@ class ExpenseCategoryView extends HookConsumerWidget {
                         onPressed:
                             () => showShadDialog(
                               context: context,
-                              builder: (context) => _CategoryAddDialog(category: data),
+                              builder: (context) => ExCategoryAddDialog(category: data),
                             ),
                       ),
                     ],
@@ -99,8 +99,8 @@ class ExpenseCategoryView extends HookConsumerWidget {
   }
 }
 
-class _CategoryAddDialog extends HookConsumerWidget {
-  const _CategoryAddDialog({this.category});
+class ExCategoryAddDialog extends HookConsumerWidget {
+  const ExCategoryAddDialog({super.key, this.category});
 
   final ExpenseCategory? category;
 
