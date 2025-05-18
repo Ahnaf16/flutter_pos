@@ -6,7 +6,7 @@ part of 'home_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$viewingWHHash() => r'6248c056a640630c8f495c937b835c7ff73b8e04';
+String _$viewingWHHash() => r'4b8f7e3a91701ffbeb869c5f99e83c0c7a1355a9';
 
 /// See also [ViewingWH].
 @ProviderFor(ViewingWH)

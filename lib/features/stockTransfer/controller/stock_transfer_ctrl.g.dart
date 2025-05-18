@@ -6,7 +6,7 @@ part of 'stock_transfer_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$stockTransferCtrlHash() => r'60a7dd2c3664231924a788f41e7b6ae024761414';
+String _$stockTransferCtrlHash() => r'272862b58b6b67b4eca14fa8453adb711a6d6c7e';
 
 /// See also [StockTransferCtrl].
 @ProviderFor(StockTransferCtrl)

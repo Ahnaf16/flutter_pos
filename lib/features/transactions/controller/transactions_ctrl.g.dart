@@ -6,8 +6,8 @@ part of 'transactions_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$transactionLogCtrlHash() =>
-    r'd962c30db1f85437f523d622f34d9dc83fdcfa40';
+String _$transactionsByPartiHash() =>
+    r'2cb18556a9194bf4c0d2d51484110ef9ddaf0716';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,6 +29,142 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// See also [transactionsByParti].
+@ProviderFor(transactionsByParti)
+const transactionsByPartiProvider = TransactionsByPartiFamily();
+
+/// See also [transactionsByParti].
+class TransactionsByPartiFamily
+    extends Family<AsyncValue<List<TransactionLog>>> {
+  /// See also [transactionsByParti].
+  const TransactionsByPartiFamily();
+
+  /// See also [transactionsByParti].
+  TransactionsByPartiProvider call(
+    String? parti,
+  ) {
+    return TransactionsByPartiProvider(
+      parti,
+    );
+  }
+
+  @override
+  TransactionsByPartiProvider getProviderOverride(
+    covariant TransactionsByPartiProvider provider,
+  ) {
+    return call(
+      provider.parti,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'transactionsByPartiProvider';
+}
+
+/// See also [transactionsByParti].
+class TransactionsByPartiProvider
+    extends AutoDisposeFutureProvider<List<TransactionLog>> {
+  /// See also [transactionsByParti].
+  TransactionsByPartiProvider(
+    String? parti,
+  ) : this._internal(
+          (ref) => transactionsByParti(
+            ref as TransactionsByPartiRef,
+            parti,
+          ),
+          from: transactionsByPartiProvider,
+          name: r'transactionsByPartiProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$transactionsByPartiHash,
+          dependencies: TransactionsByPartiFamily._dependencies,
+          allTransitiveDependencies:
+              TransactionsByPartiFamily._allTransitiveDependencies,
+          parti: parti,
+        );
+
+  TransactionsByPartiProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.parti,
+  }) : super.internal();
+
+  final String? parti;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<TransactionLog>> Function(TransactionsByPartiRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: TransactionsByPartiProvider._internal(
+        (ref) => create(ref as TransactionsByPartiRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        parti: parti,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<TransactionLog>> createElement() {
+    return _TransactionsByPartiProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TransactionsByPartiProvider && other.parti == parti;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, parti.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin TransactionsByPartiRef
+    on AutoDisposeFutureProviderRef<List<TransactionLog>> {
+  /// The parameter `parti` of this provider.
+  String? get parti;
+}
+
+class _TransactionsByPartiProviderElement
+    extends AutoDisposeFutureProviderElement<List<TransactionLog>>
+    with TransactionsByPartiRef {
+  _TransactionsByPartiProviderElement(super.provider);
+
+  @override
+  String? get parti => (origin as TransactionsByPartiProvider).parti;
+}
+
+String _$transactionLogCtrlHash() =>
+    r'52e33fd3e12695541866684cf774369b20a1b0ad';
 
 abstract class _$TransactionLogCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<TransactionLog>> {

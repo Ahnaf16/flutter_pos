@@ -1,3 +1,4 @@
+import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/products/repository/products_repo.dart';
 import 'package:pos/main.export.dart';
@@ -69,4 +70,18 @@ class ProductsCtrl extends _$ProductsCtrl {
       return rightResult('Product deleted successfully');
     });
   }
+}
+
+@riverpod
+FutureOr<Product?> productDetails(Ref ref, String? id) async {
+  if (id == null) return null;
+
+  final repo = locate<ProductRepo>();
+
+  final product = await repo.getProductById(id);
+
+  return product.fold((l) {
+    Toast.showErr(Ctx.context, l);
+    return null;
+  }, identity);
 }

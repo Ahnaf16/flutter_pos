@@ -11,8 +11,10 @@ import 'package:pos/features/inventory_record/view/create_record_view.dart';
 import 'package:pos/features/inventory_record/view/inventory_record_view.dart';
 import 'package:pos/features/inventory_record/view/return_view.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
+import 'package:pos/features/parties/view/party_details_view.dart';
 import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
 import 'package:pos/features/products/view/create_product_view.dart';
+import 'package:pos/features/products/view/product_details_view.dart';
 import 'package:pos/features/products/view/products_view.dart';
 import 'package:pos/features/settings/view/settings_view.dart';
 import 'package:pos/features/staffs/view/create_staff_view.dart';
@@ -66,6 +68,7 @@ class AppRouter extends Notifier<GoRouter> {
             routes: [
               AppRoute(RPaths.createProduct, (_) => const CreateProductView(), parentKey: _shell),
               AppRoute(RPaths.editProduct(':id'), (_) => const CreateProductView(), parentKey: _shell),
+              AppRoute(RPaths.productDetails(':id'), (_) => const ProductDetailsView(), parentKey: _shell),
             ],
           ),
           //! stock
@@ -78,13 +81,13 @@ class AppRouter extends Notifier<GoRouter> {
             RPaths.sales,
             redirect: (_, _) => RolePermissions.makeSale.redirect(p),
             (_) => const InventoryRecordView(type: RecordType.sale),
-            routes: [
-              AppRoute(
-                RPaths.createSales,
-                redirect: (_, _) => RolePermissions.makeSale.redirect(p),
-                (_) => const CreateRecordView(type: RecordType.sale),
-              ),
-            ],
+          ),
+
+          //! new sales
+          AppRoute(
+            RPaths.createSales,
+            redirect: (_, _) => RolePermissions.makeSale.redirect(p),
+            (_) => const CreateRecordView(type: RecordType.sale),
           ),
 
           //! sales_return
@@ -120,12 +123,14 @@ class AppRouter extends Notifier<GoRouter> {
             RPaths.customer,
             redirect: (_, _) => RolePermissions.manageCustomer.redirect(p),
             (_) => const PartiesView(isCustomer: true),
+            routes: [AppRoute(RPaths.customerDetails(':id'), (_) => const PartyDetailsView(), parentKey: _shell)],
           ),
           //! supplier
           AppRoute(
             RPaths.supplier,
             redirect: (_, _) => RolePermissions.manageSupplier.redirect(p),
             (_) => const PartiesView(),
+            routes: [AppRoute(RPaths.supplierDetails(':id'), (_) => const PartyDetailsView(), parentKey: _shell)],
           ),
           //! staffs
           AppRoute(

@@ -7,7 +7,8 @@ class DataTableBuilder<T, R> extends StatefulWidget {
     super.key,
     required this.items,
     required this.headings,
-    required this.cellBuilder,
+    this.cellBuilder,
+    this.cellBuilderIndexed,
     this.headingBuilder,
     this.headingBuilderIndexed,
     this.rowHeight,
@@ -18,11 +19,16 @@ class DataTableBuilder<T, R> extends StatefulWidget {
   }) : assert(
          headingBuilder != null || headingBuilderIndexed != null,
          'Either headingBuilder or headingBuilderIndexed must be provided',
+       ),
+       assert(
+         cellBuilder != null || cellBuilderIndexed != null,
+         'Either cellBuilder or cellBuilderIndexed must be provided',
        );
 
   final List<T> items;
   final List<R> headings;
-  final DataGridCell Function(T data, R head) cellBuilder;
+  final DataGridCell Function(T data, R head)? cellBuilder;
+  final DataGridCell Function(T data, R head, int index)? cellBuilderIndexed;
 
   /// will be ignored if headingBuilderIndexed is provided
   final GridColumn Function(R heading)? headingBuilder;
@@ -49,7 +55,9 @@ class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
           source: _DataSource<T, R>(
             items: widget.items,
             headings: widget.headings,
-            cellBuilder: widget.cellBuilder,
+            cellBuilder: (data, head, index) {
+              return widget.cellBuilderIndexed?.call(data, head, index) ?? widget.cellBuilder!(data, head);
+            },
             padding: widget.cellPadding,
             alignment: widget.cellAlignment,
             alignmentBuilder: widget.cellAlignmentBuilder,
@@ -82,12 +90,20 @@ class _DataSource<T, R> extends DataGridSource {
   _DataSource({
     required List<T> items,
     required List<R> headings,
-    required DataGridCell Function(T data, R head) cellBuilder,
+    required DataGridCell Function(T data, R head, int index) cellBuilder,
     this.padding,
     this.alignment,
     this.alignmentBuilder,
   }) {
-    datas = items.map((e) => DataGridRow(cells: headings.map((h) => cellBuilder(e, h)).toList())).toList();
+    final list = <DataGridRow>[];
+    for (int i = 0; i < items.length; i++) {
+      final item = items[i];
+      final row = DataGridRow(cells: headings.map((h) => cellBuilder(item, h, i)).toList());
+      list.add(row);
+    }
+
+    datas = list;
+    // items.map((e) => DataGridRow(cells: headings.map((h) => cellBuilder(e, h)).toList())).toList();
   }
 
   List<DataGridRow> datas = [];

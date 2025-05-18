@@ -81,28 +81,36 @@ class PartiesView extends HookConsumerWidget {
                       ),
                       'Due/Balance' => DataGridCell(
                         columnName: head.name,
-                        value: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        value: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            if (data.isCustomer) ...[
-                              if (data.hasDue())
-                                SpacedText(
-                                  left: 'Due',
-                                  right: data.due.currency(),
-                                  styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
-                                )
-                              else
-                                SpacedText(
-                                  left: 'Balance',
-                                  right: data.due.abs().currency(),
-                                  styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
-                                ),
-                            ] else
-                              SpacedText(
-                                left: 'Due',
-                                right: data.due.currency(),
-                                styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+                            Flexible(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (data.isCustomer) ...[
+                                    if (data.hasDue())
+                                      SpacedText(
+                                        left: 'Due',
+                                        right: data.due.currency(),
+                                        styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+                                      )
+                                    else
+                                      SpacedText(
+                                        left: 'Balance',
+                                        right: data.due.abs().currency(),
+                                        styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+                                      ),
+                                  ] else
+                                    SpacedText(
+                                      left: 'Due',
+                                      right: data.due.currency(),
+                                      styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+                                    ),
+                                ],
                               ),
+                            ),
+                            SmallButton(icon: LuIcons.pen, onPressed: () {}),
                           ],
                         ),
                       ),
@@ -116,10 +124,7 @@ class PartiesView extends HookConsumerWidget {
                                 PopOverButton(
                                   icon: const Icon(LuIcons.eye),
                                   onPressed: () {
-                                    showShadDialog(
-                                      context: context,
-                                      builder: (context) => PartiViewDialog(parti: data),
-                                    );
+                                    RPaths.customerDetails(data.id).pushNamed(context);
                                   },
                                   child: const Text('View'),
                                 ),

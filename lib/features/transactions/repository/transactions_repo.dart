@@ -110,8 +110,8 @@ class TransactionsRepo with AwHandler {
     return await repo.updateDue(parti, due, !due.isNegative, '');
   }
 
-  FutureReport<List<TransactionLog>> getTransactionLogs([TransactionType? type]) async {
-    final q = [if (type != null) Query.equal('transaction_type', type.name)];
+  FutureReport<List<TransactionLog>> getTransactionLogs([TransactionType? type, List<String>? queries]) async {
+    final q = [if (type != null) Query.equal('transaction_type', type.name), ...?queries];
     return await db.getList(_coll, queries: q).convert((docs) => docs.convertDoc(TransactionLog.fromDoc));
   }
 }

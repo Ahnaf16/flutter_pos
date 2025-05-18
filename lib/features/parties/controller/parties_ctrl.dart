@@ -1,3 +1,4 @@
+import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/parties/repository/parties_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -64,4 +65,18 @@ class PartiesCtrl extends _$PartiesCtrl {
       return rightResult('Parti updated successfully');
     });
   }
+}
+
+@riverpod
+FutureOr<Party?> partyDetails(Ref ref, String? id) async {
+  if (id == null) return null;
+
+  final repo = locate<PartiesRepo>();
+
+  final party = await repo.getPartiById(id);
+
+  return party.fold((l) {
+    Toast.showErr(Ctx.context, l);
+    return null;
+  }, identity);
 }

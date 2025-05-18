@@ -6,7 +6,7 @@ part of 'warehouse_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$warehouseCtrlHash() => r'e63e6e85fd47b0971c0b5d413e327509d01a2cdf';
+String _$warehouseCtrlHash() => r'215901fd8e1528b74f763491ab5dd3d4329a258b';
 
 /// See also [WarehouseCtrl].
 @ProviderFor(WarehouseCtrl)

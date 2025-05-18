@@ -147,7 +147,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
             allowDeselection: true,
           ),
         const Gap(Insets.med),
-        if (!context.routeState.matchedLocation.contains(RPaths.sales.path))
+        if (!context.routeState.matchedLocation.contains(RPaths.createSales.path))
           ShadButton(
             leading: const Icon(LuIcons.calculator),
             onPressed: () => RPaths.createSales.pushNamed(context),
@@ -364,9 +364,10 @@ List<(String text, IconData? icon, RPath? path)> _items(List<RolePermissions> p)
   return [
     ('Home', LuIcons.house, RPaths.home),
     if (RolePermissions.isInGroup(p, RolePermissions.inventoryGroup)) ...[
+      if (p.contains(RolePermissions.makeSale)) ('New Sale', LuIcons.shoppingCart, RPaths.createSales),
       ('Inventory', null, null),
       if (p.contains(RolePermissions.manageProduct)) ('Products', LuIcons.box, RPaths.products),
-      if (p.contains(RolePermissions.manageStock)) ('Stock', LuIcons.arrowUp01, RPaths.stock),
+      // if (p.contains(RolePermissions.manageStock)) ('Stock', LuIcons.arrowUp01, RPaths.stock),
       if (p.contains(RolePermissions.manageUnit)) ('Unit', LuIcons.ruler, RPaths.unit),
     ],
     if (RolePermissions.isInGroup(p, RolePermissions.salesGroup)) ...[

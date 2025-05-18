@@ -6,7 +6,7 @@ part of 'inventory_record_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$inventoryCtrlHash() => r'83e8ca905704e9582792b807f19c540a291f90de';
+String _$recordsByPartiHash() => r'e7c9d8e762a34d65dee1a2696f5f3d0fb8c2ae8e';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -28,6 +28,138 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// See also [recordsByParti].
+@ProviderFor(recordsByParti)
+const recordsByPartiProvider = RecordsByPartiFamily();
+
+/// See also [recordsByParti].
+class RecordsByPartiFamily extends Family<AsyncValue<List<InventoryRecord>>> {
+  /// See also [recordsByParti].
+  const RecordsByPartiFamily();
+
+  /// See also [recordsByParti].
+  RecordsByPartiProvider call(
+    String? parti,
+  ) {
+    return RecordsByPartiProvider(
+      parti,
+    );
+  }
+
+  @override
+  RecordsByPartiProvider getProviderOverride(
+    covariant RecordsByPartiProvider provider,
+  ) {
+    return call(
+      provider.parti,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'recordsByPartiProvider';
+}
+
+/// See also [recordsByParti].
+class RecordsByPartiProvider
+    extends AutoDisposeFutureProvider<List<InventoryRecord>> {
+  /// See also [recordsByParti].
+  RecordsByPartiProvider(
+    String? parti,
+  ) : this._internal(
+          (ref) => recordsByParti(
+            ref as RecordsByPartiRef,
+            parti,
+          ),
+          from: recordsByPartiProvider,
+          name: r'recordsByPartiProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$recordsByPartiHash,
+          dependencies: RecordsByPartiFamily._dependencies,
+          allTransitiveDependencies:
+              RecordsByPartiFamily._allTransitiveDependencies,
+          parti: parti,
+        );
+
+  RecordsByPartiProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.parti,
+  }) : super.internal();
+
+  final String? parti;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<InventoryRecord>> Function(RecordsByPartiRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: RecordsByPartiProvider._internal(
+        (ref) => create(ref as RecordsByPartiRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        parti: parti,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<InventoryRecord>> createElement() {
+    return _RecordsByPartiProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RecordsByPartiProvider && other.parti == parti;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, parti.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin RecordsByPartiRef on AutoDisposeFutureProviderRef<List<InventoryRecord>> {
+  /// The parameter `parti` of this provider.
+  String? get parti;
+}
+
+class _RecordsByPartiProviderElement
+    extends AutoDisposeFutureProviderElement<List<InventoryRecord>>
+    with RecordsByPartiRef {
+  _RecordsByPartiProviderElement(super.provider);
+
+  @override
+  String? get parti => (origin as RecordsByPartiProvider).parti;
+}
+
+String _$inventoryCtrlHash() => r'1194fae47afd6ae76c9fe9eab24cc5c3445dfbf4';
 
 abstract class _$InventoryCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<InventoryRecord>> {
@@ -175,7 +307,7 @@ class _InventoryCtrlProviderElement
 }
 
 String _$inventoryReturnCtrlHash() =>
-    r'8a869fa8f3f015d2428d7d121da926258d3cf648';
+    r'1e08e0e07aa7029b1e87458f6b623cb1666237f0';
 
 abstract class _$InventoryReturnCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<ReturnRecord>> {

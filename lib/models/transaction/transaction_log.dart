@@ -1,5 +1,6 @@
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:nanoid2/nanoid2.dart';
 import 'package:pos/main.export.dart';
 
 enum TransactionType { sale, payment, returned, expanse, transfer, dueAdjustment }
@@ -7,6 +8,7 @@ enum TransactionType { sale, payment, returned, expanse, transfer, dueAdjustment
 class TransactionLog {
   const TransactionLog({
     required this.id,
+    required this.trxNo,
     required this.amount,
     required this.account,
     required this.transactedTo,
@@ -21,6 +23,7 @@ class TransactionLog {
   });
 
   final String id;
+  final String trxNo;
   final num amount;
   final PaymentAccount? account;
 
@@ -48,6 +51,7 @@ class TransactionLog {
 
   factory TransactionLog.fromMap(Map<String, dynamic> map) => TransactionLog(
     id: map.parseAwField(),
+    trxNo: map['trx_no'] ?? '',
     amount: map.parseNum('amount'),
     account: PaymentAccount.tryParse(map['payment_account']),
     transactedTo: Party.tryParse(map['transaction_to']),
@@ -75,6 +79,7 @@ class TransactionLog {
 
   QMap toMap() => {
     'id': id,
+    'trx_no': trxNo,
     'amount': amount,
     'payment_account': account?.toMap(),
     'transaction_to': transactedTo?.toMap(),
@@ -90,6 +95,7 @@ class TransactionLog {
 
   QMap toAwPost() => {
     'amount': amount,
+    'trx_no': trxNo,
     'payment_account': account?.id,
     'transaction_to': transactedTo?.id,
     'custom_info': customInfo.toCustomList(),
@@ -119,6 +125,7 @@ class TransactionLog {
     final parti = record.parti;
     return TransactionLog(
       id: '',
+      trxNo: nanoid(length: 8, alphabet: '0123456789'),
       amount: record.amount,
       account: record.account,
       transactedTo: parti,
@@ -138,6 +145,8 @@ class TransactionLog {
   static TransactionLog fromExpense(Expense ex) {
     return TransactionLog(
       id: '',
+      trxNo: nanoid(length: 8, alphabet: '0123456789'),
+
       amount: ex.amount,
       account: ex.account,
       transactedTo: null,
@@ -154,6 +163,8 @@ class TransactionLog {
   static TransactionLog fromReturn(ReturnRecord rec) {
     return TransactionLog(
       id: '',
+      trxNo: nanoid(length: 8, alphabet: '0123456789'),
+
       amount: rec.deductedFromAccount,
 
       account: rec.returnedRec.account,
@@ -211,6 +222,7 @@ class TransactionLog {
 
   TransactionLog copyWith({
     String? id,
+    String? trxNo,
     num? amount,
     ValueGetter<PaymentAccount?>? account,
     ValueGetter<Party?>? transactedTo,
@@ -225,6 +237,7 @@ class TransactionLog {
   }) {
     return TransactionLog(
       id: id ?? this.id,
+      trxNo: trxNo ?? this.trxNo,
       amount: amount ?? this.amount,
       account: account != null ? account() : this.account,
       transactedTo: transactedTo != null ? transactedTo() : this.transactedTo,

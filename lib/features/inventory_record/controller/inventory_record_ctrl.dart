@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
 import 'package:pos/features/inventory_record/repository/return_repo.dart';
 import 'package:pos/main.export.dart';
@@ -127,4 +128,12 @@ class InventoryReturnCtrl extends _$InventoryReturnCtrl {
       state = AsyncValue.data(_searchFrom);
     }
   }
+}
+
+@riverpod
+Future<List<InventoryRecord>> recordsByParti(Ref ref, String? parti) async {
+  if (parti == null) return [];
+  final repo = locate<InventoryRepo>();
+  final result = await repo.getRecordFiltered([Query.equal('parties', parti)]);
+  return result.fold((l) => [], (r) => r);
 }

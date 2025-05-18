@@ -24,10 +24,6 @@ class InventoryRecordView extends HookConsumerWidget {
 
   final RecordType type;
 
-  Future<pw.Document> generateSlip(InventoryRecord record) async {
-    return PDFCtrl().getDoc(InvoicePDF(record).fullPDF);
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final inventoryList = ref.watch(inventoryCtrlProvider(type));
@@ -102,87 +98,7 @@ class InventoryRecordView extends HookConsumerWidget {
               loading: () => const Loading(),
               error: (e, s) => ErrorView(e, s, prov: inventoryCtrlProvider),
               data: (inventories) {
-                return DataTableBuilder<InventoryRecord, TableHeading>(
-                  rowHeight: 150,
-                  items: inventories,
-                  headings: _headings,
-                  headingBuilderIndexed: (heading, i) {
-                    final alignment = heading.alignment;
-                    return GridColumn(
-                      columnName: heading.name,
-                      columnWidthMode: ColumnWidthMode.fill,
-                      maximumWidth: heading.max,
-                      minimumWidth: heading.name == 'Status' ? 100 : 150,
-                      label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
-                    );
-                  },
-                  cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
-                  cellBuilder: (data, head) {
-                    final parti = data.getParti;
-                    return switch (head.name) {
-                      'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
-                      'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data.details)),
-                      'Amount' => DataGridCell(columnName: head.name, value: _amountBuilder(data)),
-                      'Account' => DataGridCell(columnName: head.name, value: Text(data.account?.name ?? '--')),
-                      'Status' => DataGridCell(
-                        columnName: head.name,
-                        value: ShadBadge.secondary(child: Text(data.status.name.titleCase)),
-                      ),
-                      'Action' => DataGridCell(
-                        columnName: head.name,
-                        value: PopOverBuilder(
-                          children: [
-                            if (parti != null) ...[
-                              if (parti.hasDue() && data.hasDue)
-                                PopOverButton(
-                                  icon: const Icon(LuIcons.handCoins),
-                                  onPressed: () {
-                                    showShadDialog(
-                                      context: context,
-                                      builder: (context) => PartyDueDialog(parti: parti, type: parti.type),
-                                    );
-                                  },
-                                  child: const Text('Due adjustment'),
-                                ),
-                              if (parti.hasBalance() && !parti.isCustomer && data.hasDue)
-                                PopOverButton(
-                                  icon: const Icon(LuIcons.handCoins),
-                                  onPressed: () {
-                                    showShadDialog(
-                                      context: context,
-                                      builder: (context) => SupplierDueDialog(parti: parti, type: parti.type),
-                                    );
-                                  },
-                                  child: const Text('Due clearance'),
-                                ),
-                            ],
-                            PopOverButton(
-                              icon: const Icon(LuIcons.download),
-                              onPressed: () async {
-                                final doc = await generateSlip(data);
-                                await PDFCtrl().save(doc, data.id);
-                              },
-                              child: const Text('Download invoice'),
-                            ),
-                            if (data.status != InventoryStatus.returned)
-                              PopOverButton(
-                                icon: const Icon(LuIcons.undo2),
-                                isDestructive: true,
-                                onPressed: () {
-                                  showShadDialog(
-                                    context: context,
-                                    builder: (context) => _ReturnDialog(inventory: data),
-                                  );
-                                },
-                                child: const Text('Return'),
-                              ),
-                          ],
-                        ),
-                      ),
-                      _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
-                    };
-                  },
-                );
+                return RecordTable(inventories: inventories);
               },
             ),
           ),
@@ -190,104 +106,207 @@ class InventoryRecordView extends HookConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _nameCellBuilder(Party? parti) => Builder(
-    builder: (context) {
-      return Column(
-        spacing: Insets.xs,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (parti == null) return;
-              showShadDialog(context: context, builder: (context) => PartiViewDialog(parti: parti));
-            },
-            child: OverflowMarquee(child: Text(parti?.name ?? '--', style: context.text.list)),
+class RecordTable extends StatelessWidget {
+  const RecordTable({super.key, required this.inventories, this.excludes = const []});
+
+  final List<InventoryRecord> inventories;
+  final List<String> excludes;
+
+  Future<pw.Document> generateSlip(InventoryRecord record) async {
+    return PDFCtrl().getDoc(InvoicePDF(record).fullPDF);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final heads = _headings.where((e) => !excludes.contains(e.name)).toList();
+
+    return DataTableBuilder<InventoryRecord, TableHeading>(
+      rowHeight: 150,
+      items: inventories,
+      headings: heads,
+      headingBuilderIndexed: (heading, i) {
+        final alignment = heading.alignment;
+        return GridColumn(
+          columnName: heading.name,
+          columnWidthMode: ColumnWidthMode.fill,
+          maximumWidth: heading.max,
+          minimumWidth: heading.name == 'Status' ? 100 : 150,
+          label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
+        );
+      },
+      cellAlignmentBuilder: (h) => heads.fromName(h).alignment,
+      cellBuilder: (data, head) {
+        final parti = data.getParti;
+        return switch (head.name) {
+          'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
+          'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data.details)),
+          'Amount' => DataGridCell(columnName: head.name, value: _amountBuilder(data)),
+          'Account' => DataGridCell(columnName: head.name, value: Text(data.account?.name ?? '--')),
+          'Status' => DataGridCell(
+            columnName: head.name,
+            value: ShadBadge.secondary(child: Text(data.status.name.titleCase)),
           ),
-          if (parti != null) OverflowMarquee(child: Text('Phone: ${parti.phone}')),
-          if (parti?.email != null) OverflowMarquee(child: Text('Email: ${parti!.email}')),
-        ],
-      );
-    },
-  );
-  Widget _productCellBuilder(List<InventoryDetails> details) => Builder(
-    builder: (context) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final p in details.takeFirst(2))
+          'Action' => DataGridCell(
+            columnName: head.name,
+            value: PopOverBuilder(
+              children: [
+                if (parti != null) ...[
+                  if (parti.hasDue() && data.hasDue)
+                    PopOverButton(
+                      icon: const Icon(LuIcons.handCoins),
+                      onPressed: () {
+                        showShadDialog(
+                          context: context,
+                          builder: (context) => PartyDueDialog(parti: parti, type: parti.type),
+                        );
+                      },
+                      child: const Text('Due adjustment'),
+                    ),
+                  if (parti.hasBalance() && !parti.isCustomer && data.hasDue)
+                    PopOverButton(
+                      icon: const Icon(LuIcons.handCoins),
+                      onPressed: () {
+                        showShadDialog(
+                          context: context,
+                          builder: (context) => SupplierDueDialog(parti: parti, type: parti.type),
+                        );
+                      },
+                      child: const Text('Due clearance'),
+                    ),
+                ],
+                PopOverButton(
+                  icon: const Icon(LuIcons.download),
+                  onPressed: () async {
+                    final doc = await generateSlip(data);
+                    await PDFCtrl().save(doc, data.id);
+                  },
+                  child: const Text('Download invoice'),
+                ),
+                if (data.status != InventoryStatus.returned)
+                  PopOverButton(
+                    icon: const Icon(LuIcons.undo2),
+                    isDestructive: true,
+                    onPressed: () {
+                      showShadDialog(context: context, builder: (context) => _ReturnDialog(inventory: data));
+                    },
+                    child: const Text('Return'),
+                  ),
+              ],
+            ),
+          ),
+          _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
+        };
+      },
+    );
+  }
+
+  Widget _nameCellBuilder(Party? parti) {
+    return Builder(
+      builder: (context) {
+        return Column(
+          spacing: Insets.xs,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
             GestureDetector(
               onTap: () {
-                showShadDialog(context: context, builder: (context) => ProductViewDialog(product: p.product));
+                if (parti == null) return;
+                showShadDialog(context: context, builder: (context) => PartiViewDialog(parti: parti));
               },
-              child: Row(
-                spacing: Insets.xs,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(child: Text(p.product.name, style: context.text.small, maxLines: 1)),
-                  Text(' (${p.quantity})', style: context.text.muted.size(12)),
-                ],
+              child: OverflowMarquee(child: Text(parti?.name ?? '--', style: context.text.list)),
+            ),
+            if (parti != null) OverflowMarquee(child: Text('Phone: ${parti.phone}')),
+            if (parti?.email != null) OverflowMarquee(child: Text('Email: ${parti!.email}')),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _productCellBuilder(List<InventoryDetails> details) {
+    return Builder(
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final p in details.takeFirst(2))
+              GestureDetector(
+                onTap: () {
+                  showShadDialog(context: context, builder: (context) => ProductViewDialog(product: p.product));
+                },
+                child: Row(
+                  spacing: Insets.xs,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(child: Text(p.product.name, style: context.text.small, maxLines: 1)),
+                    Text(' (${p.quantity})', style: context.text.muted.size(12)),
+                  ],
+                ),
               ),
+
+            if (details.length > 2) Text('+ ${details.length - 2} more', style: context.text.muted.size(12)),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _amountBuilder(InventoryRecord data) {
+    return Builder(
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            SpacedText(
+              left: data.type == RecordType.purchase ? 'Paid' : 'Received',
+              right: data.amount.currency(),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
             ),
 
-          if (details.length > 2) Text('+ ${details.length - 2} more', style: context.text.muted.size(12)),
-        ],
-      );
-    },
-  );
-  Widget _amountBuilder(InventoryRecord data) => Builder(
-    builder: (context) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          SpacedText(
-            left: data.type == RecordType.purchase ? 'Paid' : 'Received',
-            right: data.amount.currency(),
-            crossAxisAlignment: CrossAxisAlignment.center,
-            styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
-          ),
-
-          if (data.vat != 0)
+            if (data.vat != 0)
+              SpacedText(
+                left: 'Vat',
+                right: data.vat.currency(),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+              ),
+            if (data.shipping != 0)
+              SpacedText(
+                left: 'Shipping',
+                right: data.shipping.currency(),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+              ),
+            if (data.discount != 0)
+              SpacedText(
+                left: 'Discount',
+                right: data.discountString(),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+              ),
+            if (data.due != 0)
+              SpacedText(
+                left: 'Due',
+                right: data.due.currency(),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.error(context)),
+              ),
             SpacedText(
-              left: 'Vat',
-              right: data.vat.currency(),
+              left: 'Total',
+              right: data.total.currency(),
               crossAxisAlignment: CrossAxisAlignment.center,
-              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+              styleBuilder: (l, r) => (context.text.small.textHeight(1.1), context.text.p.bold),
             ),
-          if (data.shipping != 0)
-            SpacedText(
-              left: 'Shipping',
-              right: data.shipping.currency(),
-              crossAxisAlignment: CrossAxisAlignment.center,
-              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
-            ),
-          if (data.discount != 0)
-            SpacedText(
-              left: 'Discount',
-              right: data.discountString(),
-              crossAxisAlignment: CrossAxisAlignment.center,
-              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
-            ),
-          if (data.due != 0)
-            SpacedText(
-              left: 'Due',
-              right: data.due.currency(),
-              crossAxisAlignment: CrossAxisAlignment.center,
-              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.error(context)),
-            ),
-          SpacedText(
-            left: 'Total',
-            right: data.total.currency(),
-            crossAxisAlignment: CrossAxisAlignment.center,
-            styleBuilder: (l, r) => (context.text.small.textHeight(1.1), context.text.p.bold),
-          ),
-        ],
-      );
-    },
-  );
+          ],
+        );
+      },
+    );
+  }
 }
 
 // ignore: unused_element

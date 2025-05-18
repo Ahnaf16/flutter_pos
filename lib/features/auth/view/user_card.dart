@@ -10,6 +10,8 @@ class UserCard extends StatelessWidget {
     this.imgSize = 50,
     this.showDue = false,
     this.forceDue,
+    this.extra = const {},
+    this.direction,
   });
   UserCard.user({
     super.key,
@@ -19,6 +21,8 @@ class UserCard extends StatelessWidget {
     this.imgSize = 50,
     this.showDue = false,
     this.forceDue,
+    this.extra = const {},
+    this.direction,
   }) : userOrParti = left(user);
   UserCard.parti({
     super.key,
@@ -28,6 +32,8 @@ class UserCard extends StatelessWidget {
     this.imgSize = 50,
     this.showDue = false,
     this.forceDue,
+    this.extra = const {},
+    this.direction,
   }) : userOrParti = right(parti);
 
   final Either<AppUser, Party?> userOrParti;
@@ -36,6 +42,8 @@ class UserCard extends StatelessWidget {
   final double imgSize;
   final bool showDue;
   final bool? forceDue;
+  final SMap extra;
+  final Axis? direction;
 
   @override
   Widget build(BuildContext context) {
@@ -45,14 +53,17 @@ class UserCard extends StatelessWidget {
     final email = userOrParti.fold((l) => l.email, (r) => r?.email);
     final hasDue = userOrParti.fold(identityNull, (r) => r?.hasDue());
     final due = userOrParti.fold(identityNull, (r) => r?.due);
+    final address = userOrParti.fold(identityNull, (r) => r?.address);
+
     return ShadCard(
       title: title == null ? null : Text(title!, style: context.theme.decoration.labelStyle),
       description: subtitle == null ? null : Text(subtitle!, style: context.theme.decoration.descriptionStyle),
-      // childPadding: Pads.sm('t'),
-      child: Row(
+      childPadding: title == null && subtitle == null ? Pads.zero : Pads.sm('t'),
+      child: Flex(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         spacing: Insets.med,
+        direction: direction ?? Axis.horizontal,
         children: [
           if (photo != null)
             ShadCard(
@@ -90,6 +101,14 @@ class UserCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     onTap: (left, right) => Copier.copy(right),
                   ),
+                if (address != null)
+                  SpacedText(
+                    left: 'Address',
+                    right: address,
+                    styleBuilder: (l, r) => (l, r.bold),
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    onTap: (left, right) => Copier.copy(right),
+                  ),
 
                 if (hasDue != null && due != null && showDue)
                   SpacedText(
@@ -99,6 +118,14 @@ class UserCard extends StatelessWidget {
                     styleBuilder: (l, r) {
                       return (l, r.bold.textColor((hasDue || forceDue == true) ? Colors.red : Colors.green));
                     },
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                  ),
+                for (final MapEntry(:key, :value) in extra.entries)
+                  SpacedText(
+                    left: key,
+                    right: value,
+                    style: context.text.list,
+                    styleBuilder: (l, r) => (l, r.bold),
                     crossAxisAlignment: CrossAxisAlignment.center,
                   ),
               ],

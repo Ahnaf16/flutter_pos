@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/transactions/repository/transactions_repo.dart';
 import 'package:pos/main.export.dart';
@@ -97,4 +98,14 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
       return rightResult('Balance transferred successfully');
     });
   }
+}
+
+@riverpod
+Future<List<TransactionLog>> transactionsByParti(Ref ref, String? parti) async {
+  if (parti == null) return [];
+  final repo = locate<TransactionsRepo>();
+  final result = await repo.getTransactionLogs(null, [
+    Query.or([Query.equal('transaction_from', parti), Query.equal('transaction_to', parti)]),
+  ]);
+  return result.fold((l) => [], (r) => r);
 }

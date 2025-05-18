@@ -192,6 +192,12 @@ class InventoryRepo with AwHandler {
         .convert((docs) => docs.convertDoc(InventoryRecord.fromDoc));
   }
 
+  FutureReport<List<InventoryRecord>> getRecordFiltered(List<String> queries) async {
+    return await db
+        .getList(AWConst.collections.inventoryRecord, queries: queries)
+        .convert((docs) => docs.convertDoc(InventoryRecord.fromDoc));
+  }
+
   FutureReport<InventoryRecord> getRecordById(String id) async {
     return await db.get(AWConst.collections.inventoryRecord, id).convert(InventoryRecord.fromDoc);
   }

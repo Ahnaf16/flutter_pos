@@ -12,20 +12,21 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 part '_trx_add_dialog.dart';
 
+const _headings = [
+  TableHeading.positional('#', 50.0),
+  TableHeading.positional('To'),
+  TableHeading.positional('From'),
+  TableHeading.positional('Amount', 300.0),
+  TableHeading.positional('Account', 150.0, Alignment.center),
+  TableHeading.positional('Type', 200.0, Alignment.center),
+  TableHeading.positional('Date', 150.0, Alignment.center),
+  TableHeading.positional('Action', 100.0, Alignment.centerRight),
+];
+
 class TransactionsView extends HookConsumerWidget {
   const TransactionsView({super.key, this.type});
 
   final TransactionType? type;
-
-  final _headings = const [
-    TableHeading.positional('To'),
-    TableHeading.positional('From'),
-    TableHeading.positional('Amount', 300.0),
-    TableHeading.positional('Account', 150.0, Alignment.center),
-    TableHeading.positional('Type', 200.0, Alignment.center),
-    TableHeading.positional('Date', 150.0, Alignment.center),
-    TableHeading.positional('Action', 100.0, Alignment.centerRight),
-  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -99,72 +100,83 @@ class TransactionsView extends HookConsumerWidget {
               loading: () => const Loading(),
               error: (e, s) => ErrorView(e, s, prov: transactionLogCtrlProvider),
               data: (dues) {
-                return DataTableBuilder<TransactionLog, TableHeading>(
-                  rowHeight: 120,
-                  items: dues,
-                  headings: _headings,
-                  headingBuilderIndexed: (heading, i) {
-                    final alignment = heading.alignment;
-                    return GridColumn(
-                      columnName: heading.name,
-                      columnWidthMode: ColumnWidthMode.fill,
-                      maximumWidth: heading.max,
-                      minimumWidth: context.layout.isDesktop ? 100 : 200,
-                      label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
-                    );
-                  },
-                  cellAlignment: Alignment.centerLeft,
-                  cellAlignmentBuilder: (i) => _headings.fromName(i).alignment,
-                  cellBuilder: (data, head) {
-                    return switch (head.name) {
-                      'To' => DataGridCell(
-                        columnName: head.name,
-                        value: NameCellBuilder(data.getParti?.name, data.getParti?.phone),
-                      ),
-                      'From' => DataGridCell(
-                        columnName: head.name,
-                        value: NameCellBuilder(
-                          data.transactionForm?.name ?? data.transactionBy?.name,
-                          data.transactionForm?.phone ?? data.transactionBy?.phone,
-                        ),
-                      ),
-                      'Amount' => DataGridCell(
-                        columnName: head.name,
-                        value: SpacedText(left: 'Amount', right: data.amount.currency()),
-                      ),
-                      'Account' => DataGridCell(
-                        columnName: head.name,
-                        value: ShadBadge.secondary(child: Text(data.account?.name.titleCase ?? '--')),
-                      ),
-                      'Type' => DataGridCell(
-                        columnName: head.name,
-                        value: ShadBadge.secondary(child: Text(data.type.name.titleCase)),
-                      ),
-                      'Date' => DataGridCell(columnName: head.name, value: Center(child: Text(data.date.formatDate()))),
-                      'Action' => DataGridCell(
-                        columnName: head.name,
-                        value: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            ShadButton.secondary(
-                              size: ShadButtonSize.sm,
-                              leading: const Icon(LuIcons.eye),
-                              onPressed: () {
-                                showShadDialog(context: context, builder: (context) => _TrxViewDialog(trx: data));
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
-                    };
-                  },
-                );
+                return TrxTable(logs: dues);
               },
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class TrxTable extends StatelessWidget {
+  const TrxTable({super.key, required this.logs, this.excludes = const []});
+  final List<TransactionLog> logs;
+
+  final List<String> excludes;
+
+  @override
+  Widget build(BuildContext context) {
+    final heads = _headings.where((e) => !excludes.contains(e.name)).toList();
+    return DataTableBuilder<TransactionLog, TableHeading>(
+      rowHeight: 120,
+      items: logs,
+      headings: heads,
+      headingBuilderIndexed: (heading, i) {
+        final alignment = heading.alignment;
+        return GridColumn(
+          columnName: heading.name,
+          columnWidthMode: ColumnWidthMode.fill,
+          maximumWidth: heading.max,
+          minimumWidth: context.layout.isDesktop ? 100 : 200,
+          label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
+        );
+      },
+      cellAlignment: Alignment.centerLeft,
+      cellAlignmentBuilder: (i) => heads.fromName(i).alignment,
+      cellBuilderIndexed: (data, head, i) {
+        return switch (head.name) {
+          '#' => DataGridCell(columnName: head.name, value: Text((i + 1).toString())),
+          'To' => DataGridCell(
+            columnName: head.name,
+            value: NameCellBuilder(data.getParti?.name, data.getParti?.phone),
+          ),
+          'From' => DataGridCell(
+            columnName: head.name,
+            value: NameCellBuilder(
+              data.transactionForm?.name ?? data.transactionBy?.name,
+              data.transactionForm?.phone ?? data.transactionBy?.phone,
+            ),
+          ),
+          'Amount' => DataGridCell(columnName: head.name, value: Text(data.amount.currency())),
+          'Account' => DataGridCell(
+            columnName: head.name,
+            value: ShadBadge.secondary(child: Text(data.account?.name.titleCase ?? '--')),
+          ),
+          'Type' => DataGridCell(
+            columnName: head.name,
+            value: ShadBadge.secondary(child: Text(data.type.name.titleCase)),
+          ),
+          'Date' => DataGridCell(columnName: head.name, value: Center(child: Text(data.date.formatDate()))),
+          'Action' => DataGridCell(
+            columnName: head.name,
+            value: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ShadButton.secondary(
+                  size: ShadButtonSize.sm,
+                  leading: const Icon(LuIcons.eye),
+                  onPressed: () {
+                    showShadDialog(context: context, builder: (context) => _TrxViewDialog(trx: data));
+                  },
+                ),
+              ],
+            ),
+          ),
+          _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
+        };
+      },
     );
   }
 }
