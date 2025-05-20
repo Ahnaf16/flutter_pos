@@ -187,7 +187,7 @@ class RecordDetailsView extends HookConsumerWidget {
                                 ShadSeparator.horizontal(margin: Pads.sm('b')),
                                 SpacedText(left: 'paid amount', right: rec.amount.currency()),
                                 SpacedText(
-                                  left: 'Due amount',
+                                  left: rec.hasBalance ? 'Extra amount' : 'Due amount',
                                   right: rec.due.currency(),
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   trailing:
@@ -197,9 +197,10 @@ class RecordDetailsView extends HookConsumerWidget {
                                             child: const Icon(LuIcons.info),
                                             builder: (context) {
                                               return Text(
+                                                // TODO : check condition
                                                 rec.hasBalance
-                                                    ? 'Extra amount paid by ${rec.type.isSale ? 'customer' : 'supplier'}.'
-                                                    : 'Remaining amount to be paid by ${rec.type.isSale ? 'customer' : 'supplier'}.',
+                                                    ? 'Extra amount paid ${rec.type.isSale ? 'by customer' : 'to supplier'}.'
+                                                    : 'Remaining amount to be paid ${rec.type.isSale ? 'by customer' : 'to supplier'}.',
                                               );
                                             },
                                           ),
