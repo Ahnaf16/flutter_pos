@@ -1,5 +1,6 @@
 import 'package:appwrite/models.dart';
 import 'package:pos/main.export.dart';
+import 'package:pos/models/config/shop_config.dart';
 
 enum StockDistPolicy { newerFirst, olderFirst }
 
@@ -10,6 +11,7 @@ class Config {
     required this.stockDistPolicy,
     required this.minimumVersion,
     required this.defAccount,
+    this.shop = const ShopConfig(),
   });
 
   final String currencySymbol;
@@ -17,6 +19,7 @@ class Config {
   final StockDistPolicy stockDistPolicy;
   final String? minimumVersion;
   final PaymentAccount? defAccount;
+  final ShopConfig shop;
 
   PaymentAccount? get defaultAccount => (defAccount?.isActive ?? false) ? defAccount : null;
 
@@ -40,6 +43,7 @@ class Config {
       stockDistPolicy: StockDistPolicy.values.byName(map['stock_distribution_policy']),
       minimumVersion: map['minimum_version'] ?? _def.minimumVersion,
       defAccount: PaymentAccount.tryParse(map['default_account']),
+      shop: ShopConfig.fromMap(map),
     );
   }
 
@@ -66,6 +70,7 @@ class Config {
               : StockDistPolicy.values.byName(map['stock_distribution_policy']),
       minimumVersion: map['minimum_version'] ?? minimumVersion,
       defAccount: PaymentAccount.tryParse(map['default_account']) ?? defAccount,
+      shop: shop.marge(map),
     );
   }
 
@@ -76,6 +81,7 @@ class Config {
       'stock_distribution_policy': stockDistPolicy.name,
       'minimum_version': minimumVersion,
       'default_account': defAccount?.toMap(),
+      ...shop.toMap(),
     };
   }
 
@@ -85,6 +91,7 @@ class Config {
     'stock_distribution_policy': stockDistPolicy.name,
     'minimum_version': minimumVersion,
     'default_account': defAccount?.id,
+    ...shop.toMap(),
   };
 
   Config copyWith({
@@ -93,6 +100,7 @@ class Config {
     StockDistPolicy? stockDistPolicy,
     ValueGetter<String?>? minimumVersion,
     ValueGetter<PaymentAccount?>? defAccount,
+    ShopConfig? shop,
   }) {
     return Config(
       currencySymbol: currencySymbol ?? this.currencySymbol,
@@ -100,6 +108,7 @@ class Config {
       stockDistPolicy: stockDistPolicy ?? this.stockDistPolicy,
       minimumVersion: minimumVersion != null ? minimumVersion() : this.minimumVersion,
       defAccount: defAccount != null ? defAccount() : this.defAccount,
+      shop: shop ?? this.shop,
     );
   }
 }

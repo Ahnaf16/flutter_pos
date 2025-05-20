@@ -1,3 +1,4 @@
+import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/settings/repository/config_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -29,6 +30,24 @@ class ConfigCtrl extends _$ConfigCtrl {
     final user = state.marge(formData);
 
     final res = await _repo.updateConfig(user);
+    return res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      return rightResult('Settings updated successfully');
+    });
+  }
+}
+
+@Riverpod(keepAlive: true)
+class ConfigCtrlAsync extends _$ConfigCtrlAsync {
+  final _repo = locate<ConfigRepo>();
+  @override
+  FutureOr<Config> build() async {
+    final res = await _repo.getConfig();
+    return res.fold(failToErr, identity);
+  }
+
+  Future<Result> updateConfig(Config data, [PFile? image]) async {
+    final res = await _repo.updateConfig(data, image);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       return rightResult('Settings updated successfully');

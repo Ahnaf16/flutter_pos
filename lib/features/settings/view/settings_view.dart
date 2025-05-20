@@ -1,6 +1,7 @@
 import 'package:pos/features/settings/view/appearance_settings_view.dart';
 import 'package:pos/features/settings/view/general_settings_view.dart';
 import 'package:pos/features/settings/view/profile_view.dart';
+import 'package:pos/features/settings/view/shop_settings_view.dart';
 import 'package:pos/main.export.dart';
 
 class SettingsView extends HookConsumerWidget {
@@ -15,10 +16,12 @@ class SettingsView extends HookConsumerWidget {
       title: 'Settings',
       padding: Pads.zero,
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!ly.isDesktop)
             ShadTabs<int>(
               value: index.value,
+              scrollable: true,
               tabBarConstraints: const BoxConstraints(maxWidth: 500),
               tabs: [
                 for (int i = 0; i < _paths.length; i++)
@@ -66,5 +69,6 @@ class SettingsView extends HookConsumerWidget {
 final _paths = [
   ('Profile', const ProfileView()),
   ('General', const GeneralSettingsView()),
+  ('Shop', const ShopSettingsView()),
   ('Appearance', const AppearanceSettingsView()),
 ];
