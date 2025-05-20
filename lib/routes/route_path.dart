@@ -29,7 +29,8 @@ class RPaths {
 
   // sales
   static RPath sales = const RPath('/sales');
-  static RPath createSales = const RPath('/create_sales');
+  static RPath createSales = const RPath('/create_sale');
+  static RPath saleDetails(String id) => RPath('/sale_details', {'id': id});
 
   // sales return
   static RPath salesReturn = const RPath('/sales_return');
@@ -37,6 +38,7 @@ class RPaths {
   // purchases
   static RPath purchases = const RPath('/purchases');
   static RPath createPurchases = const RPath('/create_purchases');
+  static RPath purchaseDetails(String id) => RPath('/purchase_details', {'id': id});
 
   // purchases return
   static RPath purchasesReturn = const RPath('/purchases_return');
@@ -44,10 +46,12 @@ class RPaths {
   // customer
   static RPath customer = const RPath('/customer');
   static RPath customerDetails(String id) => RPath('/customer_details', {'id': id});
+  static RPath customerDueManagement = const RPath('/customer_due_management');
 
   // supplier
   static RPath supplier = const RPath('/supplier');
   static RPath supplierDetails(String id) => RPath('/supplier_details', {'id': id});
+  static RPath supplierDueManagement = const RPath('/supplier_due_management');
 
   // staffs
   static RPath staffs = const RPath('/staffs');
@@ -77,8 +81,7 @@ class RPaths {
   // Payment account
   static RPath paymentAccount = const RPath('/payment_account');
 
-  // moneyTransfer
-  static RPath dueManagement = const RPath('/money_transfer');
+  // due management
 
   // transactions
   static RPath transactions = const RPath('/transactions');

@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
 import 'package:pos/features/inventory_record/repository/return_repo.dart';
 import 'package:pos/main.export.dart';
@@ -35,7 +36,7 @@ class InventoryCtrl extends _$InventoryCtrl {
     final list =
         _searchFrom.where((e) {
           return e.details.any((d) => d.product.name.low.contains(query.low)) ||
-              (e.parti?.name.low.contains(query.low) ?? false);
+              (e.party?.name.low.contains(query.low) ?? false);
         }).toList();
     state = AsyncData(list);
   }
@@ -98,7 +99,7 @@ class InventoryReturnCtrl extends _$InventoryReturnCtrl {
     if (query.isEmpty) {
       state = AsyncValue.data(_searchFrom);
     }
-    final list = _searchFrom.where((e) => (e.returnedRec.parti?.name.low.contains(query.low) ?? false)).toList();
+    final list = _searchFrom.where((e) => (e.returnedRec.party?.name.low.contains(query.low) ?? false)).toList();
     state = AsyncData(list);
   }
 
@@ -136,4 +137,13 @@ Future<List<InventoryRecord>> recordsByParti(Ref ref, String? parti) async {
   final repo = locate<InventoryRepo>();
   final result = await repo.getRecordFiltered([Query.equal('parties', parti)]);
   return result.fold((l) => [], (r) => r);
+}
+
+@riverpod
+Future<InventoryRecord?> recordDetails(Ref ref, String? id) async {
+  if (id == null) return null;
+
+  final repo = locate<InventoryRepo>();
+  final result = await repo.getRecordById(id);
+  return result.fold(identityNull, identity);
 }

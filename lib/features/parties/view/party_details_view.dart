@@ -7,7 +7,9 @@ import 'package:pos/features/transactions/view/transactions_view.dart';
 import 'package:pos/main.export.dart';
 
 class PartyDetailsView extends HookConsumerWidget {
-  const PartyDetailsView({super.key});
+  const PartyDetailsView({super.key, this.isCustomer = true});
+
+  final bool isCustomer;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,13 +22,13 @@ class PartyDetailsView extends HookConsumerWidget {
     final tabValue = useState(true);
 
     return BaseBody(
-      title: 'Party Details',
+      title: '${isCustomer ? 'Customer' : 'Supplier'} Details',
       // scrollable: true,
       body: party.when(
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: partyDetailsProvider),
         data: (party) {
-          if (party == null) return const ErrorDisplay('Product not found');
+          if (party == null) return ErrorDisplay('No ${isCustomer ? 'Customer' : 'Supplier'} found');
           return Row(
             spacing: Insets.med,
             mainAxisSize: MainAxisSize.min,
@@ -75,13 +77,101 @@ class PartyDetailsView extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Customer details', style: context.text.list),
-                    UserCard.parti(parti: party, imgSize: 100, showDue: true, direction: Axis.vertical),
+                    UserCard.parti(
+                      parti: party,
+                      imgSize: 100,
+                      showDue: true,
+                      direction: Axis.vertical,
+                      onEdit: () {
+                        showShadDialog(context: context, builder: (context) => PartyBalanceDialog(party: party));
+                      },
+                    ),
                   ],
                 ),
               ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class PartyBalanceDialog extends HookConsumerWidget {
+  const PartyBalanceDialog({super.key, required this.party});
+
+  final Party party;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dueCtrl = useTextEditingController(text: party.due.toString());
+    final noteCtrl = useTextEditingController();
+
+    final due = useState(party.due);
+    void listener() => due.set(double.tryParse(dueCtrl.text) ?? 0);
+
+    useEffect(() {
+      dueCtrl.addListener(listener);
+      return () {
+        dueCtrl.removeListener(listener);
+      };
+    });
+
+    return ShadDialog(
+      title: const Text('Update Due'),
+      description: Row(
+        spacing: Insets.sm,
+        children: [Text('Update ${party.name}\'s Due'), ShadBadge.outline(child: Text(party.type.name))],
+      ),
+
+      actions: [
+        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        SubmitButton(
+          onPressed: (l) async {
+            final ctrl = ref.read(partiesCtrlProvider(party.isCustomer).notifier);
+            l.truthy();
+            final result = await ctrl.updatePartyDue(party, due.value, noteCtrl.text);
+            l.falsey();
+
+            if (context.mounted) {
+              result.showToast(context);
+              if (result.success) context.nPop();
+            }
+          },
+          child: const Text('Update'),
+        ),
+      ],
+      child: Container(
+        padding: Pads.padding(v: Insets.med),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: Insets.sm,
+          children: [
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: 'Current ${due.value > 0 ? 'Due' : 'Balance'}: '),
+                  TextSpan(
+                    text: due.value.abs().currency(),
+                    style: context.text.list.textColor(due.value > 0 ? context.colors.destructive : Colors.green),
+                  ),
+                ],
+              ),
+              style: context.text.list,
+            ),
+            ShadTextField(
+              controller: dueCtrl,
+              label: 'Balance/Due',
+              isRequired: true,
+              helperText: 'Use (-) to add balance and (+) for due',
+              numeric: true,
+              numericSymbol: true,
+            ),
+
+            ShadTextAreaField(controller: noteCtrl, label: 'Note'),
+          ],
+        ),
       ),
     );
   }

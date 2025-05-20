@@ -65,6 +65,14 @@ class PartiesCtrl extends _$PartiesCtrl {
       return rightResult('Parti updated successfully');
     });
   }
+
+  Future<Result> updatePartyDue(Party party, num amount, String? note) async {
+    final res = await _repo.updateDue(party, amount, !amount.isNegative, note);
+    return res.fold(leftResult, (r) {
+      ref.invalidate(partiesCtrlProvider);
+      return rightResult('Parti updated successfully');
+    });
+  }
 }
 
 @riverpod

@@ -16,7 +16,7 @@ const _headings = [
   TableHeading.positional('Amount', 300.0),
   TableHeading.positional('Account', 200.0, Alignment.center),
   TableHeading.positional('Status', 130.0, Alignment.center),
-  TableHeading.positional('Action', 100.0, Alignment.centerRight),
+  TableHeading.positional('Action', double.nan, Alignment.centerRight),
 ];
 
 class InventoryRecordView extends HookConsumerWidget {
@@ -98,7 +98,7 @@ class InventoryRecordView extends HookConsumerWidget {
               loading: () => const Loading(),
               error: (e, s) => ErrorView(e, s, prov: inventoryCtrlProvider),
               data: (inventories) {
-                return RecordTable(inventories: inventories);
+                return RecordTable(inventories: inventories, actionSpread: true);
               },
             ),
           ),
@@ -109,10 +109,11 @@ class InventoryRecordView extends HookConsumerWidget {
 }
 
 class RecordTable extends StatelessWidget {
-  const RecordTable({super.key, required this.inventories, this.excludes = const []});
+  const RecordTable({super.key, required this.inventories, this.excludes = const [], this.actionSpread = false});
 
   final List<InventoryRecord> inventories;
   final List<String> excludes;
+  final bool actionSpread;
 
   Future<pw.Document> generateSlip(InventoryRecord record) async {
     return PDFCtrl().getDoc(InvoicePDF(record).fullPDF);
@@ -151,10 +152,12 @@ class RecordTable extends StatelessWidget {
           'Action' => DataGridCell(
             columnName: head.name,
             value: PopOverBuilder(
+              actionSpread: actionSpread,
               children: [
                 if (parti != null) ...[
                   if (parti.hasDue() && data.hasDue)
                     PopOverButton(
+                      dense: actionSpread,
                       icon: const Icon(LuIcons.handCoins),
                       onPressed: () {
                         showShadDialog(
@@ -166,6 +169,7 @@ class RecordTable extends StatelessWidget {
                     ),
                   if (parti.hasBalance() && !parti.isCustomer && data.hasDue)
                     PopOverButton(
+                      dense: actionSpread,
                       icon: const Icon(LuIcons.handCoins),
                       onPressed: () {
                         showShadDialog(
@@ -177,6 +181,16 @@ class RecordTable extends StatelessWidget {
                     ),
                 ],
                 PopOverButton(
+                  dense: actionSpread,
+                  icon: const Icon(LuIcons.eye),
+                  onPressed: () async {
+                    if (data.type.isSale) RPaths.saleDetails(data.id).pushNamed(context);
+                    if (data.type.isPurchase) RPaths.purchaseDetails(data.id).pushNamed(context);
+                  },
+                  child: const Text('View'),
+                ),
+                PopOverButton(
+                  dense: actionSpread,
                   icon: const Icon(LuIcons.download),
                   onPressed: () async {
                     final doc = await generateSlip(data);
@@ -186,6 +200,7 @@ class RecordTable extends StatelessWidget {
                 ),
                 if (data.status != InventoryStatus.returned)
                   PopOverButton(
+                    dense: actionSpread,
                     icon: const Icon(LuIcons.undo2),
                     isDestructive: true,
                     onPressed: () {

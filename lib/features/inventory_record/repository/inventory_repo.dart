@@ -30,7 +30,7 @@ class InventoryRepo with AwHandler {
     }
 
     //! update Due
-    Party? parti = record.parti;
+    Party? parti = record.party;
     // will be null if customer is walk-in
     if (parti != null) {
       if (inventory.hasDue || inventory.hasBalance) {
@@ -55,7 +55,7 @@ class InventoryRepo with AwHandler {
   FutureReport<Document> createPurchase(InventoryRecordState inventory) async {
     //! add details
     InventoryRecord record = inventory.toInventoryRecord();
-    Party? parti = record.parti;
+    Party? parti = record.party;
     if (parti == null) return left(const Failure('Parti is required when purchasing'));
 
     final (detailErr, detailsData) = await _createRecordDetails(inventory.details, false).toRecord();

@@ -4,11 +4,13 @@ import 'package:pos/app_root.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/auth/view/login_view.dart';
 import 'package:pos/features/due/view/due_view.dart';
+import 'package:pos/features/due_adjustment/view/due_adjustment_view.dart';
 import 'package:pos/features/expense/view/expense_category_view.dart';
 import 'package:pos/features/expense/view/expense_view.dart';
 import 'package:pos/features/home/view/home_view.dart';
 import 'package:pos/features/inventory_record/view/create_record_view.dart';
 import 'package:pos/features/inventory_record/view/inventory_record_view.dart';
+import 'package:pos/features/inventory_record/view/record_details_view.dart';
 import 'package:pos/features/inventory_record/view/return_view.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/parties/view/party_details_view.dart';
@@ -81,6 +83,9 @@ class AppRouter extends Notifier<GoRouter> {
             RPaths.sales,
             redirect: (_, _) => RolePermissions.makeSale.redirect(p),
             (_) => const InventoryRecordView(type: RecordType.sale),
+            routes: [
+              AppRoute(RPaths.saleDetails(':id'), (_) => const RecordDetailsView(isSale: true), parentKey: _shell),
+            ],
           ),
 
           //! new sales
@@ -103,11 +108,8 @@ class AppRouter extends Notifier<GoRouter> {
             redirect: (_, _) => RolePermissions.makePurchase.redirect(p),
             (_) => const InventoryRecordView(type: RecordType.purchase),
             routes: [
-              AppRoute(
-                RPaths.createPurchases,
-                redirect: (_, _) => RolePermissions.manageProduct.redirect(p),
-                (_) => const CreateRecordView(type: RecordType.purchase),
-              ),
+              AppRoute(RPaths.purchaseDetails(':id'), (_) => const RecordDetailsView(isSale: false), parentKey: _shell),
+              AppRoute(RPaths.createPurchases, (_) => const CreateRecordView(type: RecordType.purchase)),
             ],
           ),
 
@@ -125,12 +127,30 @@ class AppRouter extends Notifier<GoRouter> {
             (_) => const PartiesView(isCustomer: true),
             routes: [AppRoute(RPaths.customerDetails(':id'), (_) => const PartyDetailsView(), parentKey: _shell)],
           ),
+          //! dueManagement
+          AppRoute(
+            RPaths.customerDueManagement,
+            redirect: (_, _) => RolePermissions.manageCustomer.redirect(p),
+            (_) => const DueAdjustmentView(isCustomer: true),
+          ),
           //! supplier
           AppRoute(
             RPaths.supplier,
             redirect: (_, _) => RolePermissions.manageSupplier.redirect(p),
             (_) => const PartiesView(),
-            routes: [AppRoute(RPaths.supplierDetails(':id'), (_) => const PartyDetailsView(), parentKey: _shell)],
+            routes: [
+              AppRoute(
+                RPaths.supplierDetails(':id'),
+                (_) => const PartyDetailsView(isCustomer: false),
+                parentKey: _shell,
+              ),
+            ],
+          ),
+          //! dueManagement
+          AppRoute(
+            RPaths.supplierDueManagement,
+            redirect: (_, _) => RolePermissions.manageSupplier.redirect(p),
+            (_) => const DueAdjustmentView(isCustomer: false),
           ),
           //! staffs
           AppRoute(
@@ -188,12 +208,7 @@ class AppRouter extends Notifier<GoRouter> {
             redirect: (_, _) => RolePermissions.manageExpanse.redirect(p),
             (_) => const ExpenseCategoryView(),
           ),
-          //! moneyTransfer
-          AppRoute(
-            RPaths.dueManagement,
-            redirect: (_, _) => RolePermissions.transferMoney.redirect(p),
-            (_) => const TransactionsView(type: TransactionType.transfer),
-          ),
+
           //! transactions
           AppRoute(
             RPaths.transactions,

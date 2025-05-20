@@ -51,6 +51,17 @@ class ReturnRecord {
     detailsQtyPair: List<String>.from(map['stock_qty_pair']),
   );
 
+  static ReturnRecord? tryParse(dynamic value) {
+    try {
+      if (value case final ReturnRecord r) return r;
+      if (value case final Document doc) return ReturnRecord.fromDoc(doc);
+      if (value case final Map map) return ReturnRecord.fromMap(map.toStringKey());
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   QMap toMap() => {
     'id': id,
     'inventoryRecord': returnedRec.toMap(),

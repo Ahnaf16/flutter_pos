@@ -1,3 +1,4 @@
+import 'package:nanoid2/nanoid2.dart';
 import 'package:pos/main.export.dart';
 
 class InventoryRecordState {
@@ -87,7 +88,8 @@ class InventoryRecordState {
   InventoryRecord toInventoryRecord() {
     return InventoryRecord(
       id: '',
-      parti: parti,
+      invoiceNo: 'pos${nanoid(length: 8, alphabet: '0123456789')}',
+      party: parti,
       details: details,
       account: account,
       amount: amount,

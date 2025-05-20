@@ -47,7 +47,7 @@ class UnitView extends HookConsumerWidget {
             cellBuilder: (data, head) {
               return switch (head.$1) {
                 'Name' => DataGridCell(columnName: head.$1, value: Text(data.name)),
-                'Unit Name' => DataGridCell(columnName: head.$1, value: Text(data.unitName)),
+                'Unit code' => DataGridCell(columnName: head.$1, value: Text(data.unitName)),
 
                 'Active' => DataGridCell(columnName: head.$1, value: _buildActiveCell(data)),
 

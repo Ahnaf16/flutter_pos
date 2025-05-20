@@ -1,5 +1,6 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
+import 'package:pos/features/parties/view/party_details_view.dart';
 import 'package:pos/features/transactions/view/party_due_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -110,7 +111,12 @@ class PartiesView extends HookConsumerWidget {
                                 ],
                               ),
                             ),
-                            SmallButton(icon: LuIcons.pen, onPressed: () {}),
+                            SmallButton(
+                              icon: LuIcons.pen,
+                              onPressed: () {
+                                showShadDialog(context: context, builder: (context) => PartyBalanceDialog(party: data));
+                              },
+                            ),
                           ],
                         ),
                       ),

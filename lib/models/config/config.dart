@@ -30,13 +30,7 @@ class Config {
 
   factory Config.fromDoc(Document doc) {
     final map = doc.data;
-    return Config(
-      currencySymbol: map['currency_symbol'] ?? _def.currencySymbol,
-      symbolLeft: map['currency_symbol_on_left'] ?? _def.symbolLeft,
-      stockDistPolicy: StockDistPolicy.values.byName(map['stock_distribution_policy']),
-      minimumVersion: map['minimum_version'] ?? _def.minimumVersion,
-      defAccount: PaymentAccount.tryParse(map['default_account']),
-    );
+    return Config.fromMap(map);
   }
 
   factory Config.fromMap(Map<String, dynamic> map) {
@@ -51,6 +45,7 @@ class Config {
 
   static Config tryParse(dynamic value) {
     try {
+      if (value case final Config c) return c;
       if (value case final Document doc) return Config.fromDoc(doc);
       if (value case final Map map) return Config.fromMap(map.toStringKey());
       return _def;

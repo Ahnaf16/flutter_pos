@@ -383,10 +383,11 @@ List<(String text, IconData? icon, RPath? path)> _items(List<RolePermissions> p)
     if (RolePermissions.isInGroup(p, RolePermissions.peopleGroup)) ...[
       ('Customer', null, null),
       if (p.contains(RolePermissions.manageCustomer)) ('Customers', LuIcons.users, RPaths.customer),
-      // if (p.contains(RolePermissions.manageCustomer)) ('Due Adjustment', LuIcons.users, RPaths.dueManagement),
+      if (p.contains(RolePermissions.manageCustomer)) ('Due Adjustment', LuIcons.users, RPaths.customerDueManagement),
       ('Supplier', null, null),
       if (p.contains(RolePermissions.manageSupplier)) ('Suppliers', LuIcons.usersRound, RPaths.supplier),
-      // if (p.contains(RolePermissions.manageSupplier)) ('Due Clearance', LuIcons.usersRound, RPaths.dueManagement),
+      if (p.contains(RolePermissions.manageSupplier))
+        ('Due Clearance', LuIcons.usersRound, RPaths.supplierDueManagement),
       ('Staff', null, null),
       if (p.contains(RolePermissions.manageStaff)) ('Staffs', LuIcons.userCog, RPaths.staffs),
       if (p.contains(RolePermissions.manageRole)) ('Roles', LuIcons.shield, RPaths.roles),
@@ -401,7 +402,6 @@ List<(String text, IconData? icon, RPath? path)> _items(List<RolePermissions> p)
       if (p.contains(RolePermissions.manageAccounts)) ('Payment Accounts', LuIcons.creditCard, RPaths.paymentAccount),
       if (p.contains(RolePermissions.manageExpanse)) ('Expense', LuIcons.wallet, RPaths.expense),
       if (p.contains(RolePermissions.manageExpanse)) ('Expense Category', LuIcons.variable, RPaths.expenseCategory),
-      // if (p.contains(RolePermissions.transferMoney)) ('Money transfer', LuIcons.arrowsUpFromLine, RPaths.moneyTransfer),
       if (p.contains(RolePermissions.transactions)) ('Transactions', LuIcons.landmark, RPaths.transactions),
       if (p.contains(RolePermissions.due)) ('Due', LuIcons.coins, RPaths.due),
     ],

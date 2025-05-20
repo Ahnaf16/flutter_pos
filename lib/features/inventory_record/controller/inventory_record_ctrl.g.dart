@@ -6,7 +6,7 @@ part of 'inventory_record_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$recordsByPartiHash() => r'e7c9d8e762a34d65dee1a2696f5f3d0fb8c2ae8e';
+String _$recordsByPartiHash() => r'e5005ec1220afa44b858f1414174f6b2b10ac668';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -157,6 +157,138 @@ class _RecordsByPartiProviderElement
 
   @override
   String? get parti => (origin as RecordsByPartiProvider).parti;
+}
+
+String _$recordDetailsHash() => r'6a509e5055f7c0b2498b229290bb0e4751afe428';
+
+/// See also [recordDetails].
+@ProviderFor(recordDetails)
+const recordDetailsProvider = RecordDetailsFamily();
+
+/// See also [recordDetails].
+class RecordDetailsFamily extends Family<AsyncValue<InventoryRecord?>> {
+  /// See also [recordDetails].
+  const RecordDetailsFamily();
+
+  /// See also [recordDetails].
+  RecordDetailsProvider call(
+    String? id,
+  ) {
+    return RecordDetailsProvider(
+      id,
+    );
+  }
+
+  @override
+  RecordDetailsProvider getProviderOverride(
+    covariant RecordDetailsProvider provider,
+  ) {
+    return call(
+      provider.id,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'recordDetailsProvider';
+}
+
+/// See also [recordDetails].
+class RecordDetailsProvider
+    extends AutoDisposeFutureProvider<InventoryRecord?> {
+  /// See also [recordDetails].
+  RecordDetailsProvider(
+    String? id,
+  ) : this._internal(
+          (ref) => recordDetails(
+            ref as RecordDetailsRef,
+            id,
+          ),
+          from: recordDetailsProvider,
+          name: r'recordDetailsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$recordDetailsHash,
+          dependencies: RecordDetailsFamily._dependencies,
+          allTransitiveDependencies:
+              RecordDetailsFamily._allTransitiveDependencies,
+          id: id,
+        );
+
+  RecordDetailsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.id,
+  }) : super.internal();
+
+  final String? id;
+
+  @override
+  Override overrideWith(
+    FutureOr<InventoryRecord?> Function(RecordDetailsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: RecordDetailsProvider._internal(
+        (ref) => create(ref as RecordDetailsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        id: id,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<InventoryRecord?> createElement() {
+    return _RecordDetailsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RecordDetailsProvider && other.id == id;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, id.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin RecordDetailsRef on AutoDisposeFutureProviderRef<InventoryRecord?> {
+  /// The parameter `id` of this provider.
+  String? get id;
+}
+
+class _RecordDetailsProviderElement
+    extends AutoDisposeFutureProviderElement<InventoryRecord?>
+    with RecordDetailsRef {
+  _RecordDetailsProviderElement(super.provider);
+
+  @override
+  String? get id => (origin as RecordDetailsProvider).id;
 }
 
 String _$inventoryCtrlHash() => r'1194fae47afd6ae76c9fe9eab24cc5c3445dfbf4';

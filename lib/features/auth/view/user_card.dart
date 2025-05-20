@@ -12,6 +12,9 @@ class UserCard extends StatelessWidget {
     this.forceDue,
     this.extra = const {},
     this.direction,
+    this.onEdit,
+    this.childSeparator,
+    this.titleStyle,
   });
   UserCard.user({
     super.key,
@@ -23,6 +26,9 @@ class UserCard extends StatelessWidget {
     this.forceDue,
     this.extra = const {},
     this.direction,
+    this.onEdit,
+    this.childSeparator,
+    this.titleStyle,
   }) : userOrParti = left(user);
   UserCard.parti({
     super.key,
@@ -34,6 +40,9 @@ class UserCard extends StatelessWidget {
     this.forceDue,
     this.extra = const {},
     this.direction,
+    this.onEdit,
+    this.childSeparator,
+    this.titleStyle,
   }) : userOrParti = right(parti);
 
   final Either<AppUser, Party?> userOrParti;
@@ -44,6 +53,9 @@ class UserCard extends StatelessWidget {
   final bool? forceDue;
   final SMap extra;
   final Axis? direction;
+  final Function()? onEdit;
+  final Widget? childSeparator;
+  final TextStyle? titleStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +68,10 @@ class UserCard extends StatelessWidget {
     final address = userOrParti.fold(identityNull, (r) => r?.address);
 
     return ShadCard(
-      title: title == null ? null : Text(title!, style: context.theme.decoration.labelStyle),
+      title: title == null ? null : Text(title!, style: titleStyle ?? context.theme.decoration.labelStyle),
       description: subtitle == null ? null : Text(subtitle!, style: context.theme.decoration.descriptionStyle),
-      childPadding: title == null && subtitle == null ? Pads.zero : Pads.sm('t'),
+      childPadding: ((title == null && subtitle == null) || childSeparator != null) ? Pads.zero : Pads.sm('t'),
+      childSeparator: childSeparator,
       child: Flex(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -119,6 +132,7 @@ class UserCard extends StatelessWidget {
                       return (l, r.bold.textColor((hasDue || forceDue == true) ? Colors.red : Colors.green));
                     },
                     crossAxisAlignment: CrossAxisAlignment.center,
+                    trailing: onEdit == null ? null : SmallButton(icon: LuIcons.pen, onPressed: onEdit),
                   ),
                 for (final MapEntry(:key, :value) in extra.entries)
                   SpacedText(

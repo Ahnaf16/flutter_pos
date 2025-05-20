@@ -1,14 +1,19 @@
 import 'package:pos/main.export.dart';
 
 class PopOverBuilder extends HookWidget {
-  const PopOverBuilder({super.key, required this.children, this.icon});
+  const PopOverBuilder({super.key, required this.children, this.icon, this.actionSpread = false});
 
   final List<Widget> children;
   final Widget? icon;
+  final bool actionSpread;
 
   @override
   Widget build(BuildContext context) {
     final popCtrl = useMemoized(ShadPopoverController.new);
+
+    if (actionSpread) {
+      return Row(mainAxisAlignment: MainAxisAlignment.end, children: children);
+    }
 
     return ShadPopover(
       controller: popCtrl,
@@ -37,6 +42,7 @@ class PopOverButton extends StatelessWidget {
     this.onPressed,
     this.isDestructive = false,
     this.enabled = true,
+    this.dense = false,
   });
 
   final Widget? child;
@@ -44,12 +50,24 @@ class PopOverButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isDestructive;
   final bool enabled;
+  final bool dense;
   @override
   Widget build(BuildContext context) {
+    if (dense) {
+      return ShadIconButton.ghost(
+        foregroundColor: isDestructive ? context.colors.destructive : context.colors.foreground,
+        hoverBackgroundColor: isDestructive ? context.colors.destructive.op1 : null,
+        hoverForegroundColor: isDestructive ? context.colors.destructive : context.colors.foreground,
+        enabled: enabled,
+        icon: icon ?? const SizedBox(),
+        onPressed: onPressed,
+      );
+    }
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 150),
-      child: ShadButton.raw(
-        variant: isDestructive ? ShadButtonVariant.destructive : ShadButtonVariant.ghost,
+      child: ShadButton.ghost(
+        foregroundColor: isDestructive ? context.colors.destructive : context.colors.foreground,
+        hoverBackgroundColor: isDestructive ? context.colors.destructive.op1 : null,
         size: ShadButtonSize.sm,
 
         mainAxisAlignment: MainAxisAlignment.start,

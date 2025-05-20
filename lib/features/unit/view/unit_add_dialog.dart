@@ -56,8 +56,8 @@ class UnitAddDialog extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: Insets.med,
             children: [
-              ShadTextField(name: 'name', label: 'Name', isRequired: true),
-              ShadTextField(name: 'unit_name', label: 'Unit Name', isRequired: true),
+              ShadTextField(name: 'name', label: 'Name', hintText: 'eg. Kilogram', isRequired: true),
+              ShadTextField(name: 'unit_name', label: 'Unit code', hintText: 'eg. kg', isRequired: true),
             ],
           ),
         ),

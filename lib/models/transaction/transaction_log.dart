@@ -122,7 +122,7 @@ class TransactionLog {
   Party? get getParti => transactedTo;
 
   static TransactionLog fromInventoryRecord(InventoryRecord record, AppUser user) {
-    final parti = record.parti;
+    final parti = record.party;
     return TransactionLog(
       id: '',
       trxNo: nanoid(length: 8, alphabet: '0123456789'),
@@ -194,7 +194,7 @@ class TransactionLog {
   }
 
   static String _noteInv(InventoryRecord record) {
-    final parti = record.parti;
+    final parti = record.party;
 
     final isSale = record.type == RecordType.sale;
     final type = switch (record.type) {

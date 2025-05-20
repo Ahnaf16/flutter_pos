@@ -85,7 +85,8 @@ String? tryDecodeUri(dynamic uri) {
 
 String encodeUri(String uri) => Uri.encodeComponent(uri);
 
-final decimalRegExp = RegExp(r'^\d*\.?\d*$');
+final numRegExp = RegExp(r'^\d*\.?\d*$');
+final numRegExpWithSymbol = RegExp(r'^[+-]?\d*\.?\d*$');
 
 String hashPass(String password) {
   final bytes = utf8.encode(password);

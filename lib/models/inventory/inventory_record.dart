@@ -24,7 +24,8 @@ enum DiscountType { flat, percentage }
 class InventoryRecord {
   const InventoryRecord({
     required this.id,
-    required this.parti,
+    required this.invoiceNo,
+    required this.party,
     required this.details,
     required this.amount,
     required this.account,
@@ -36,10 +37,12 @@ class InventoryRecord {
     required this.date,
     required this.type,
     required this.isWalkIn,
+    this.returnRecord,
   });
 
   final String id;
-  final Party? parti;
+  final String invoiceNo;
+  final Party? party;
   final List<InventoryDetails> details;
   final num amount;
   final PaymentAccount? account;
@@ -51,12 +54,14 @@ class InventoryRecord {
   final DateTime date;
   final RecordType type;
   final bool isWalkIn;
+  final ReturnRecord? returnRecord;
 
   factory InventoryRecord.fromDoc(Document doc) {
     final data = doc.data;
     return InventoryRecord(
       id: doc.$id,
-      parti: Party.tryParse(data['parties']),
+      invoiceNo: data['invoice_no'],
+      party: Party.tryParse(data['parties']),
       details: switch (data['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
@@ -71,13 +76,15 @@ class InventoryRecord {
       date: DateTime.parse(data['date']),
       type: RecordType.values.byName(data['record_type']),
       isWalkIn: data['is_walk_in'],
+      returnRecord: ReturnRecord.tryParse(data['returnRecord']),
     );
   }
 
   factory InventoryRecord.fromMap(Map<String, dynamic> map) {
     return InventoryRecord(
       id: map.parseAwField(),
-      parti: Party.tryParse(map['parties']),
+      invoiceNo: map['invoice_no'],
+      party: Party.tryParse(map['parties']),
       details: switch (map['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
@@ -92,10 +99,12 @@ class InventoryRecord {
       date: DateTime.parse(map['date']),
       type: RecordType.values.byName(map['record_type']),
       isWalkIn: map.parseBool('is_walk_in'),
+      returnRecord: ReturnRecord.tryParse(map['returnRecord']),
     );
   }
   static InventoryRecord? tryParse(dynamic value) {
     try {
+      if (value case final InventoryRecord r) return r;
       if (value case final Document doc) return InventoryRecord.fromDoc(doc);
       if (value case final Map map) return InventoryRecord.fromMap(map.toStringKey());
       return null;
@@ -107,13 +116,14 @@ class InventoryRecord {
   InventoryRecord marge(Map<String, dynamic> map) {
     return InventoryRecord(
       id: map.tryParseAwField() ?? id,
-      parti: map['parties'] == null ? parti : Party.tryParse(map['parties']) ?? parti,
+      invoiceNo: map['invoice_no'] ?? invoiceNo,
+      party: Party.tryParse(map['parties']) ?? party,
       details: switch (map['inventory_details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => details,
       },
       amount: map.parseNum('amount', fallBack: amount),
-      account: map['payment_account'] == null ? account : PaymentAccount.tryParse(map['payment_account']),
+      account: PaymentAccount.tryParse(map['payment_account']) ?? account,
       vat: map.parseNum('vat', fallBack: vat),
       discount: map.parseNum('discount', fallBack: discount),
       discountType: map['discount_type'] == null ? discountType : DiscountType.values.byName(map['discount_type']),
@@ -122,12 +132,14 @@ class InventoryRecord {
       date: map['date'] == null ? date : DateTime.parse(map['date']),
       type: map['record_type'] == null ? type : RecordType.values.byName(map['record_type']),
       isWalkIn: map.parseBool('is_walk_in', isWalkIn),
+      returnRecord: ReturnRecord.tryParse(map['returnRecord']) ?? returnRecord,
     );
   }
 
   Map<String, dynamic> toMap() => {
     'id': id,
-    'parties': parti?.toMap(),
+    'invoice_no': invoiceNo,
+    'parties': party?.toMap(),
     'inventory_details': details.map((e) => e.toMap()).toList(),
     'amount': amount,
     'payment_account': account?.toMap(),
@@ -139,10 +151,12 @@ class InventoryRecord {
     'date': date.toIso8601String(),
     'record_type': type.name,
     'is_walk_in': isWalkIn,
+    'returnRecord': returnRecord?.toMap(),
   };
 
   Map<String, dynamic> toAwPost() => {
-    'parties': parti?.id,
+    'parties': party?.id,
+    'invoice_no': invoiceNo,
     'inventory_details': details.map((e) => e.id).toList(),
     'amount': amount,
     'payment_account': account?.id,
@@ -156,7 +170,7 @@ class InventoryRecord {
     'is_walk_in': isWalkIn,
   };
 
-  Party? get getParti => parti;
+  Party? get getParti => isWalkIn ? Party.fromWalkIn() : party;
 
   String discountString() => discountType == DiscountType.percentage ? '$discount%' : discount.currency();
 
@@ -174,10 +188,11 @@ class InventoryRecord {
 
   InventoryRecord copyWith({
     String? id,
-    ValueGetter<Party?>? parti,
+    String? invoiceNo,
+    ValueGetter<Party?>? party,
     List<InventoryDetails>? details,
     num? amount,
-    PaymentAccount? account,
+    ValueGetter<PaymentAccount?>? account,
     num? vat,
     num? discount,
     DiscountType? discountType,
@@ -186,13 +201,15 @@ class InventoryRecord {
     DateTime? date,
     RecordType? type,
     bool? isWalkIn,
+    ValueGetter<ReturnRecord?>? returnRecord,
   }) {
     return InventoryRecord(
       id: id ?? this.id,
-      parti: parti != null ? parti() : this.parti,
+      invoiceNo: invoiceNo ?? this.invoiceNo,
+      party: party != null ? party() : this.party,
       details: details ?? this.details,
       amount: amount ?? this.amount,
-      account: account ?? this.account,
+      account: account != null ? account() : this.account,
       vat: vat ?? this.vat,
       discount: discount ?? this.discount,
       discountType: discountType ?? this.discountType,
@@ -201,6 +218,7 @@ class InventoryRecord {
       date: date ?? this.date,
       type: type ?? this.type,
       isWalkIn: isWalkIn ?? this.isWalkIn,
+      returnRecord: returnRecord != null ? returnRecord() : this.returnRecord,
     );
   }
 }

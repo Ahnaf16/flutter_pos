@@ -44,18 +44,16 @@ class ShadTextField extends ShadFormDecoration<String> {
     this.numeric = false,
     this.showClearButton = false,
     this.buttonVariant = ShadButtonVariant.ghost,
+    this.numericSymbol = false,
   }) : assert(initialValue == null || controller == null),
        super(
          name: name ?? label?.snakeCase ?? hintText?.snakeCase ?? 'field',
          initialValue: controller != null ? controller.text : initialValue,
-         validator: FormBuilderValidators.compose([
-           if (isRequired) FormBuilderValidators.required(),
-           if (numeric) FormBuilderValidators.numeric(checkNullOrEmpty: false),
-           ...?validators,
-         ]),
+         validator: FormBuilderValidators.compose([if (isRequired) FormBuilderValidators.required(), ...?validators]),
 
          builder: (FormFieldState<String?> field) {
            final state = field as _ShadTextFieldState;
+           final rx = numeric ? (numericSymbol ? numRegExpWithSymbol : numRegExp) : null;
            return ShadInputDecorator(
              label: label == null ? null : Text(label).required(isRequired),
              description: helperText == null ? null : Text(helperText),
@@ -81,10 +79,7 @@ class ShadTextField extends ShadFormDecoration<String> {
                      onPressed: onTap,
                      onPressedOutside: onTapOutside,
                      onSubmitted: onSubmitted,
-                     inputFormatters: [
-                       ...?inputFormatters,
-                       if (numeric) FilteringTextInputFormatter.allow(decimalRegExp),
-                     ],
+                     inputFormatters: [...?inputFormatters, if (rx != null) FilteringTextInputFormatter.allow(rx)],
                      enabled: state.enabled,
                      obscureText: isPassField ? state.isObscure : false,
                      placeholder: hintText == null ? null : Text(hintText),
@@ -115,6 +110,7 @@ class ShadTextField extends ShadFormDecoration<String> {
 
   final bool autofocus;
   final bool numeric;
+  final bool numericSymbol;
   final bool showClearButton;
   final TextEditingController? controller;
   final bool expands;

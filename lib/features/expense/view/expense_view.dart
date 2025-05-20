@@ -301,7 +301,7 @@ class _ExpenseAddDialog extends HookConsumerWidget {
                 name: 'amount',
                 label: 'Amount',
                 isRequired: true,
-                inputFormatters: [FilteringTextInputFormatter.allow(decimalRegExp)],
+                inputFormatters: [FilteringTextInputFormatter.allow(numRegExp)],
               ),
               Row(
                 children: [

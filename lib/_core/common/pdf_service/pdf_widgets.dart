@@ -22,7 +22,7 @@ class _Invoice extends StatelessWidget {
 
   @override
   Widget build(Context context) {
-    final InventoryRecord(:parti) = record;
+    final InventoryRecord(party: parti) = record;
     final theme = Theme.of(context);
 
     return Column(
