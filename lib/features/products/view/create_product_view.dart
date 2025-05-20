@@ -3,7 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:nanoid2/nanoid2.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
-import 'package:pos/features/inventory_record/view/discount_type_pop_over.dart';
+import 'package:pos/features/inventory_record/view/local/discount_type_pop_over.dart';
 import 'package:pos/features/inventory_record/view/payment_account_select.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/parties_view.dart';

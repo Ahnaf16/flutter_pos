@@ -10,9 +10,9 @@ import 'package:pos/features/transactions/controller/transactions_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class PartyDueDialog extends HookConsumerWidget {
-  const PartyDueDialog({super.key, this.parti, required this.type});
+  const PartyDueDialog({super.key, required this.parti, required this.type});
 
-  final Party? parti;
+  final Party parti;
   final PartiType type;
 
   @override
@@ -28,12 +28,12 @@ class PartyDueDialog extends HookConsumerWidget {
     final accountList = ref.watch(paymentAccountsCtrlProvider());
 
     return ShadDialog(
-      title: Text('${parti?.type.name.titleCase ?? ''} Due adjustment'),
+      title: Text('${parti.type.name.titleCase} Due adjustment'),
 
       actions: [
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         SubmitButton(
-          enabled: parti != null && parti?.hasDue() == true,
+          enabled: parti.hasDue() == true,
           onPressed: (l) async {
             final state = formKey.currentState!;
             if (!state.saveAndValidate()) return;
@@ -77,31 +77,12 @@ class PartyDueDialog extends HookConsumerWidget {
 
                   //! user
                   VisibilityField<AppUser>(name: 'transaction_by', data: user, valueTransformer: (v) => v?.toMap()),
+                  VisibilityField<Party>(name: 'transaction_from', data: parti, valueTransformer: (v) => v?.toMap()),
 
-                  Visibility(
-                    maintainState: true,
-                    maintainAnimation: true,
-                    visible: parti == null,
-                    child: ShadSelectField<Party>(
-                      name: 'transaction_from',
-                      hintText: 'Select customer',
-                      initialValue: parti,
-                      enabled: parti == null,
-                      options: parties.where((e) => e.hasDue()).toList(),
-                      valueTransformer: (value) => value?.toMap(),
-                      optionBuilder: (_, v, i) {
-                        return ShadOption(value: v, child: PartyNameBuilder(v));
-                      },
-                      selectedBuilder: (context, v) {
-                        return PartyNameBuilder(v);
-                      },
-                      onChanged: selectedParty.set,
-                    ),
-                  ),
                   const Gap(Insets.med),
                   UserCard.parti(parti: party, imgSize: 80, showDue: true),
 
-                  if (party?.hasDue() == true) ...[
+                  if (party.hasDue() == true) ...[
                     const Gap(Insets.med),
                     Row(
                       children: [

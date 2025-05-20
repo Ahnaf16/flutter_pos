@@ -39,7 +39,7 @@ class PartiesCtrl extends _$PartiesCtrl {
     final list =
         _searchFrom.where((e) {
           return e.name.low.contains(query.low) ||
-              e.phone.low.contains(query.low) ||
+              (e.phone.low.contains(query.low)) ||
               (e.email?.low.contains(query.low) ?? false);
         }).toList();
     state = AsyncData(list);

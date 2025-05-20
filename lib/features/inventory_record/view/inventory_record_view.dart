@@ -1,6 +1,5 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/features/inventory_record/view/local/inv_invoice_widget.dart';
@@ -8,7 +7,6 @@ import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/products/view/product_view_dialog.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
-import 'package:pos/features/transactions/view/party_due_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -117,10 +115,6 @@ class RecordTable extends ConsumerWidget {
   final List<String> excludes;
   final bool actionSpread;
 
-  Future<pw.Document> generateSlip(InventoryRecord record) async {
-    return PDFCtrl().getDoc(InvoicePDF(record).fullPDF);
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final heads = _headings.where((e) => !excludes.contains(e.name)).toList();
@@ -141,7 +135,6 @@ class RecordTable extends ConsumerWidget {
       },
       cellAlignmentBuilder: (h) => heads.fromName(h).alignment,
       cellBuilder: (data, head) {
-        final parti = data.getParti;
         return switch (head.name) {
           'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
           'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data.details)),
@@ -156,32 +149,32 @@ class RecordTable extends ConsumerWidget {
             value: PopOverBuilder(
               actionSpread: actionSpread,
               children: [
-                if (!parti.isWalkIn) ...[
-                  if (parti.hasDue() && data.hasDue)
-                    PopOverButton(
-                      dense: actionSpread,
-                      icon: const Icon(LuIcons.handCoins),
-                      onPressed: () {
-                        showShadDialog(
-                          context: context,
-                          builder: (context) => PartyDueDialog(parti: parti, type: parti.type),
-                        );
-                      },
-                      child: const Text('Due adjustment'),
-                    ),
-                  if (parti.hasBalance() && !parti.isCustomer && data.hasDue)
-                    PopOverButton(
-                      dense: actionSpread,
-                      icon: const Icon(LuIcons.handCoins),
-                      onPressed: () {
-                        showShadDialog(
-                          context: context,
-                          builder: (context) => SupplierDueDialog(parti: parti, type: parti.type),
-                        );
-                      },
-                      child: const Text('Due clearance'),
-                    ),
-                ],
+                // if (!parti.isWalkIn) ...[
+                //   if (parti.hasDue() && data.hasDue)
+                //     PopOverButton(
+                //       dense: actionSpread,
+                //       icon: const Icon(LuIcons.handCoins),
+                //       onPressed: () {
+                //         showShadDialog(
+                //           context: context,
+                //           builder: (context) => PartyDueDialog(parti: parti, type: parti.type),
+                //         );
+                //       },
+                //       child: const Text('Due adjustment'),
+                //     ),
+                //   if (parti.hasBalance() && !parti.isCustomer && data.hasDue)
+                //     PopOverButton(
+                //       dense: actionSpread,
+                //       icon: const Icon(LuIcons.handCoins),
+                //       onPressed: () {
+                //         showShadDialog(
+                //           context: context,
+                //           builder: (context) => SupplierDueDialog(parti: parti, type: parti.type),
+                //         );
+                //       },
+                //       child: const Text('Due clearance'),
+                //     ),
+                // ],
                 PopOverButton(
                   dense: actionSpread,
                   icon: const Icon(LuIcons.eye),

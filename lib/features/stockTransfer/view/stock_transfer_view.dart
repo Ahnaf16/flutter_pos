@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
-import 'package:pos/features/inventory_record/view/products_panel.dart';
+import 'package:pos/features/inventory_record/view/local/products_panel.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/stockTransfer/controller/stock_transfer_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';

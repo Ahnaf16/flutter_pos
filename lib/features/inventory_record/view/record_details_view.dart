@@ -57,6 +57,7 @@ class RecordDetailsView extends HookConsumerWidget {
                       );
                     },
                   ),
+
                   if (!rec.status.isReturned)
                     ShadButton.destructive(
                       leading: const Text('Return'),
@@ -89,19 +90,33 @@ class RecordDetailsView extends HookConsumerWidget {
 
                                     children: [
                                       Text((details.indexWhere((e) => e.id == d.id) + 1).toString()),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(d.product.name, style: context.text.list),
-                                          if (d.product.sku != null) Text(d.product.sku!, style: context.text.muted),
-                                        ],
+                                      Expanded(
+                                        flex: 2,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(d.product.name, style: context.text.list),
+                                            if (d.product.sku != null) Text(d.product.sku!, style: context.text.muted),
+                                          ],
+                                        ),
                                       ),
-                                      const Gap(Insets.xs),
-                                      Text('Price: ${d.price.currency()} x(${d.quantity})', style: context.text.list),
 
-                                      Text(
-                                        'Total Price: ${(d.price * d.quantity).currency()}',
-                                        style: context.text.list,
+                                      Expanded(
+                                        child: CenterLeft(
+                                          child: Text(
+                                            'Price: ${d.price.currency()} x(${d.quantity})',
+                                            style: context.text.list,
+                                          ),
+                                        ),
+                                      ),
+
+                                      Expanded(
+                                        child: CenterRight(
+                                          child: Text(
+                                            'Total Price: ${(d.price * d.quantity).currency()}',
+                                            style: context.text.list,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -166,11 +181,29 @@ class RecordDetailsView extends HookConsumerWidget {
                               children: [
                                 SpacedText(left: 'Subtotal', right: rec.subtotal.currency()),
                                 SpacedText(left: 'Discount', right: rec.discountString()),
+                                SpacedText(left: 'Shipping', right: rec.shipping.currency()),
                                 SpacedText(left: 'Vat', right: rec.vat.currency()),
                                 SpacedText(left: 'Total', right: rec.total.currency(), style: context.text.large),
                                 ShadSeparator.horizontal(margin: Pads.sm('b')),
                                 SpacedText(left: 'paid amount', right: rec.amount.currency()),
-                                SpacedText(left: 'Due amount', right: rec.due.currency()),
+                                SpacedText(
+                                  left: 'Due amount',
+                                  right: rec.due.currency(),
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  trailing:
+                                      rec.due == 0
+                                          ? null
+                                          : ShadTooltip(
+                                            child: const Icon(LuIcons.info),
+                                            builder: (context) {
+                                              return Text(
+                                                rec.hasBalance
+                                                    ? 'Extra amount paid by ${rec.type.isSale ? 'customer' : 'supplier'}.'
+                                                    : 'Remaining amount to be paid by ${rec.type.isSale ? 'customer' : 'supplier'}.',
+                                              );
+                                            },
+                                          ),
+                                ),
                               ],
                             ),
                           ),
@@ -185,6 +218,7 @@ class RecordDetailsView extends HookConsumerWidget {
                         childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
                         imgSize: 80,
                         showDue: !getParti.isWalkIn,
+                        direction: Axis.vertical,
                       ),
                     ),
                   ],

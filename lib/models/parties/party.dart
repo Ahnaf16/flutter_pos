@@ -85,7 +85,7 @@ class Party {
     return Party(
       id: '',
       name: name ?? 'Walk In',
-      phone: '',
+      phone: '--',
       email: null,
       address: null,
       due: 0,

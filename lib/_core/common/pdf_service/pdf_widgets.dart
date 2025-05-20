@@ -1,115 +1,181 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, use_key_in_widget_constructors
 
+import 'dart:typed_data';
+
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:pos/_core/_core.dart';
+import 'package:pos/locator.dart';
+import 'package:pos/models/config/config.dart';
+import 'package:pos/models/config/shop_config.dart';
 import 'package:pos/models/inventory/inventory_record.dart';
 
 class InvoicePDF {
-  InvoicePDF(this.record);
+  InvoicePDF(this.record, this.config);
 
   final InventoryRecord record;
+  final Config config;
+  final _st = locate<AwStorage>();
 
-  List<Widget> get fullPDF {
-    return [_Invoice(record)];
+  Future<List<Widget>> fullPDF() async {
+    Uint8List? bytes;
+    if (config.shop.shopLogo case final String id) {
+      bytes = await _st.imgPreview(id);
+    }
+    return [_Invoice(record, config, bytes)];
   }
 }
 
 class _Invoice extends StatelessWidget {
-  _Invoice(this.record);
+  _Invoice(this.rec, this.config, this.bytes);
 
-  final InventoryRecord record;
+  final InventoryRecord rec;
+  final Config config;
+  final Uint8List? bytes;
 
   @override
   Widget build(Context context) {
-    final InventoryRecord(party: parti) = record;
+    final ShopConfig(:shopAddress, :shopLogo, :shopName) = config.shop;
+
     final theme = Theme.of(context);
 
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-          children: [Text(kAppName), Text('INVOICE', style: theme.header3)],
-        ),
-        _gapH(20),
-        Row(
-          children: [
-            if (parti != null)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Bill to:'),
-                    _gapH(4),
-                    Text(parti.name),
-                    Text(parti.phone),
-                    if (parti.email != null) Text(parti.email!),
-                    if (parti.address != null) Text(parti.address!),
-                  ],
-                ),
-              ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SpacedText(left: 'Invoice', right: record.id),
-                  _SpacedText(left: 'Invoice Date', right: record.date.formatDate()),
-                  _SpacedText(left: 'Status', right: record.status.name),
-                ],
-              ),
-            ),
-          ],
-        ),
-        _gapH(20),
-
-        TableHelper.fromTextArray(
-          border: TableBorder.all(color: PdfColors.grey500),
-          cellPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          headerDecoration: const BoxDecoration(color: PdfColors.grey300),
-          headerAlignment: Alignment.centerRight,
-          headerAlignments: {0: Alignment.centerLeft},
-          cellAlignment: Alignment.centerRight,
-          cellAlignments: {0: Alignment.centerLeft},
-          columnWidths: {
-            0: const FlexColumnWidth(4),
-            1: const FlexColumnWidth(2),
-            2: const FlexColumnWidth(),
-            3: const FlexColumnWidth(2),
-          },
-          headers: ['Item', 'Unit price', 'Qty', 'Total'],
-          data: [
-            for (final item in record.details)
-              [
-                Text(item.product.name, maxLines: 1),
-                item.price.currency(),
-                item.quantity.toString(),
-                (item.price * item.quantity).currency(),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: Insets.xxxl),
+      alignment: Alignment.topRight,
+      child: Column(
+        children: [
+          if (shopLogo != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (bytes != null)
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(100)),
+                    alignment: Alignment.center,
+                    child: Image(MemoryImage(bytes!)),
+                  ),
+                if (bytes != null) _gapW(Insets.sm),
+                Text(shopName ?? kAppName, style: theme.header4),
               ],
-          ],
-        ),
-        _gapH(20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            SizedBox(
-              width: 200,
-              child: Column(
-                children: [
-                  _SpacedText(left: 'Subtotal', right: record.subtotal.currency()),
-                  if (record.vat != 0) _SpacedText(left: 'Vat', right: record.vat.currency()),
-                  if (record.shipping != 0) _SpacedText(left: 'Shipping', right: record.shipping.currency()),
-                  if (record.discount != 0) _SpacedText(left: 'Discount', right: record.discountString()),
-                  _SpacedText(left: 'Paid', right: record.amount.currency()),
-                  if (record.due != 0) _SpacedText(left: 'Due', right: record.due.currency()),
-                  _gapH(5),
-                  _SpacedText(left: 'Total', right: record.total.currency(), style: theme.header4),
-                ],
-              ),
             ),
+          _gapH(Insets.med),
+          if (shopAddress != null) Text(shopAddress, textAlign: TextAlign.center),
+          Divider(color: PdfColors.black),
+          _SpacedText(left: 'Invoice', right: rec.invoiceNo, mainAxisAlignment: MainAxisAlignment.center),
+          _gapH(Insets.xs),
+          Text(rec.date.formatDate('EEE, MMM dd, yyyy hh:mm a')),
+          Divider(color: PdfColors.black),
+          _gapH(Insets.med),
+          _SpacedText(
+            left: '${rec.type.isSale ? 'Customer' : 'Supplier'} Name',
+            right: rec.getParti.name,
+            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            spaced: true,
+          ),
+
+          if (!rec.getParti.isWalkIn) ...[
+            _SpacedText(
+              left: 'Phone',
+              right: rec.getParti.phone,
+              spaced: true,
+              styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            ),
+            if (rec.getParti.address != null)
+              _SpacedText(
+                left: 'Address',
+                right: rec.getParti.address!,
+                spaced: true,
+                styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+              ),
           ],
-        ),
-      ],
+          _gapH(Insets.lg),
+          Row(
+            children: [
+              Expanded(flex: 2, child: Text('Product')),
+              Expanded(child: Center(child: Text('Qty'))),
+              Expanded(child: Align(alignment: Alignment.centerRight, child: Text('Price'))),
+            ],
+          ),
+          Divider(color: PdfColors.black),
+          for (final item in rec.details) ...[
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Text('${rec.details.indexWhere((e) => e.id == item.id) + 1}.  ${item.product.name}'),
+                ),
+                Expanded(child: Center(child: Text(item.quantity.toString()))),
+                Expanded(child: Align(alignment: Alignment.centerRight, child: Text(item.price.currency()))),
+              ],
+            ),
+            _gapH(Insets.xs),
+          ],
+
+          Divider(color: PdfColors.black),
+          _gapH(Insets.sm),
+          _SpacedText(
+            left: 'Subtotal',
+            right: rec.subtotal.currency(),
+            spaced: true,
+            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+          ),
+          _SpacedText(
+            left: 'Discount',
+            right: rec.discount.currency(),
+            spaced: true,
+            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+          ),
+          _SpacedText(
+            left: 'Shipping',
+            right: rec.shipping.currency(),
+            spaced: true,
+            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+          ),
+          _SpacedText(
+            left: 'Vat',
+            right: rec.vat.currency(),
+            spaced: true,
+            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+          ),
+          _SpacedText(
+            left: 'Total',
+            right: rec.total.currency(),
+            spaced: true,
+            style: theme.header4,
+            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+          ),
+          Divider(color: PdfColors.black),
+          if (rec.account != null)
+            _SpacedText(
+              left: 'Paid By',
+              right: rec.account!.name,
+              spaced: true,
+              styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            ),
+          _SpacedText(
+            left: 'Paid amount',
+            right: rec.amount.currency(),
+            spaced: true,
+            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+          ),
+          _SpacedText(
+            left: 'Due amount',
+            right: rec.due.currency(),
+            spaced: true,
+            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+          ),
+          if (rec.returnRecord != null)
+            _SpacedText(
+              left: 'Return amount',
+              right: (rec.returnRecord!.totalReturn).currency(),
+              style: theme.header4,
+              spaced: true,
+              styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -117,23 +183,44 @@ class _Invoice extends StatelessWidget {
 EdgeInsets get cellPadding => const EdgeInsets.symmetric(horizontal: 10, vertical: 5);
 
 Widget _gapH(double h) => SizedBox(height: h);
+Widget _gapW(double w) => SizedBox(width: w);
+
+typedef _StyleBuilder = (TextStyle, TextStyle) Function(TextStyle left, TextStyle right);
 
 class _SpacedText extends StatelessWidget {
-  _SpacedText({required this.left, required this.right, this.style});
+  _SpacedText({
+    required this.left,
+    required this.right,
+    this.style,
+    this.spaced = false,
+    this.mainAxisAlignment,
+    this.styleBuilder,
+  });
 
   final String left;
-  final String right;
   final TextStyle? style;
+  final String right;
+  final _StyleBuilder? styleBuilder;
+  final bool spaced;
+  final MainAxisAlignment? mainAxisAlignment;
 
   @override
   Widget build(Context context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [Flexible(child: Text('$left: ', style: style)), Flexible(child: Text(right, style: style))],
-      ),
+    final effectiveStyle = style ?? const TextStyle(fontSize: 11);
+    final defBuilder = (effectiveStyle, effectiveStyle);
+
+    final (lSty, rSty) = styleBuilder?.call(effectiveStyle, effectiveStyle) ?? defBuilder;
+
+    return Row(
+      mainAxisAlignment: spaced ? MainAxisAlignment.spaceBetween : (mainAxisAlignment ?? MainAxisAlignment.start),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$left:', style: lSty),
+        _gapH(Insets.med),
+        Flexible(
+          child: DefaultTextStyle(style: rSty, textAlign: spaced ? TextAlign.end : TextAlign.start, child: Text(right)),
+        ),
+      ],
     );
   }
 }

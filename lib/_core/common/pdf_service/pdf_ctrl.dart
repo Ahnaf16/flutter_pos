@@ -42,7 +42,7 @@ class PDFCtrl {
     pdf.addPage(
       pw.MultiPage(
         margin: const pw.EdgeInsets.symmetric(horizontal: 15, vertical: 30),
-        pageFormat: PdfPageFormat.a4,
+        pageFormat: PdfPageFormat.a5,
         maxPages: 100,
 
         build: (context) => widgets,

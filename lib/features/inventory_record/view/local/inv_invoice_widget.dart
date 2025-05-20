@@ -1,4 +1,3 @@
-import 'package:flutter/rendering.dart';
 import 'package:pos/main.export.dart';
 
 class InvInvoiceWidget extends HookConsumerWidget {
@@ -10,7 +9,6 @@ class InvInvoiceWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ShopConfig(:shopAddress, :shopLogo, :shopName) = config.shop;
-    final globalKey = useMemoized(() => GlobalKey());
 
     return ShadDialog(
       title: const Row(
@@ -23,11 +21,10 @@ class InvInvoiceWidget extends HookConsumerWidget {
         SubmitButton(
           leading: const Icon(LuIcons.printer),
           onPressed: (l) async {
-            final boundary = globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
             final ctrl = PDFCtrl();
             l.truthy();
-            final bytes = await ctrl.createWidgetImage(boundary);
-            final doc = await ctrl.generatePdfFromBytes(bytes);
+            final pdf = await InvoicePDF(rec, config).fullPDF();
+            final doc = await ctrl.getDoc(pdf);
             await ctrl.save(doc, rec.invoiceNo);
             l.falsey();
             if (context.mounted) Toast.show(context, 'Invoice download');
@@ -35,13 +32,12 @@ class InvInvoiceWidget extends HookConsumerWidget {
           child: const Text('Print Invoice'),
         ),
       ],
-
+      scrollable: true,
       constraints: BoxConstraints(maxHeight: context.height * .9, maxWidth: 550),
-      child: Container(
-        color: Colors.white12,
-        padding: Pads.padding(h: Insets.offset),
-        child: RepaintBoundary(
-          key: globalKey,
+      child: SingleChildScrollView(
+        child: Container(
+          color: Colors.white12,
+          padding: Pads.padding(h: Insets.offset),
           child: Column(
             children: [
               if (shopLogo != null)
@@ -66,13 +62,14 @@ class InvInvoiceWidget extends HookConsumerWidget {
               Text(rec.date.formatDate('EEE, MMM dd, yyyy hh:mm a'), style: context.text.p),
               ShadSeparator.horizontal(margin: Pads.med('tb'), color: Colors.black26),
               SpacedText(
-                left: 'Customer Name',
+                left: '${rec.type.isSale ? 'Customer' : 'Supplier'} Name',
                 right: rec.getParti.name,
                 style: context.text.list,
                 mainAxisAlignment: MainAxisAlignment.center,
                 spaced: true,
                 styleBuilder: (l, r) => (l, r.bold),
               ),
+
               if (!rec.getParti.isWalkIn) ...[
                 SpacedText(
                   left: 'Phone',
@@ -105,7 +102,7 @@ class InvInvoiceWidget extends HookConsumerWidget {
                   children: [
                     Expanded(
                       flex: 2,
-                      child: Text('${rec.details.indexWhere((e) => e.id == item.id) + 1}.  ${item.product.name}' * 2),
+                      child: Text('${rec.details.indexWhere((e) => e.id == item.id) + 1}.  ${item.product.name}'),
                     ),
                     Expanded(child: Center(child: Text(item.quantity.toString()))),
                     Expanded(child: CenterRight(child: Text(item.price.currency()))),
@@ -128,6 +125,13 @@ class InvInvoiceWidget extends HookConsumerWidget {
                 styleBuilder: (l, r) => (l, r.bold),
               ),
               SpacedText(
+                left: 'Shipping',
+                right: rec.shipping.currency(),
+                style: context.text.list,
+                spaced: true,
+                styleBuilder: (l, r) => (l, r.bold),
+              ),
+              SpacedText(
                 left: 'Vat',
                 right: rec.vat.currency(),
                 style: context.text.list,
@@ -136,7 +140,7 @@ class InvInvoiceWidget extends HookConsumerWidget {
               ),
               SpacedText(
                 left: 'Total',
-                right: rec.vat.currency(),
+                right: rec.total.currency(),
                 style: context.text.large,
                 spaced: true,
                 styleBuilder: (l, r) => (l.bold, r.bold),
