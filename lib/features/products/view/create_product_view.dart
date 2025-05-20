@@ -242,7 +242,7 @@ class CreateProductView extends HookConsumerWidget {
                               child: ShadTextField(
                                 name: 'sku',
                                 label: 'SKU',
-                                initialValue: nanoid(length: 12),
+                                initialValue: nanoid(length: 8, alphabet: '0123456789'),
                                 hintText: 'Enter product SKU',
                                 outsideTrailing: SmallButton(
                                   icon: LuIcons.refreshCcw,

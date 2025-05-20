@@ -167,7 +167,7 @@ class TransactionLog {
 
       amount: rec.deductedFromAccount,
 
-      account: rec.returnedRec.account,
+      account: rec.returnedRec?.account,
       transactedTo: null,
       customInfo: {},
       transactionBy: rec.returnedBy,
@@ -181,7 +181,7 @@ class TransactionLog {
 
   static String _noteRe(ReturnRecord rec) {
     final amount = rec.deductedFromAccount;
-    final account = rec.returnedRec.account?.name;
+    final account = rec.returnedRec?.account?.name;
     final date = rec.returnDate.formatDate();
     return ['Returned $amount', rec.isSale ? ' from' : ' to', ' $account', 'on $date'].join(' ');
   }

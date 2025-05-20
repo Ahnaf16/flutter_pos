@@ -3,9 +3,11 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
+import 'package:pos/features/inventory_record/view/local/inv_invoice_widget.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/products/view/product_view_dialog.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/transactions/view/party_due_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -108,7 +110,7 @@ class InventoryRecordView extends HookConsumerWidget {
   }
 }
 
-class RecordTable extends StatelessWidget {
+class RecordTable extends ConsumerWidget {
   const RecordTable({super.key, required this.inventories, this.excludes = const [], this.actionSpread = false});
 
   final List<InventoryRecord> inventories;
@@ -120,7 +122,7 @@ class RecordTable extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final heads = _headings.where((e) => !excludes.contains(e.name)).toList();
 
     return DataTableBuilder<InventoryRecord, TableHeading>(
@@ -154,7 +156,7 @@ class RecordTable extends StatelessWidget {
             value: PopOverBuilder(
               actionSpread: actionSpread,
               children: [
-                if (parti != null) ...[
+                if (!parti.isWalkIn) ...[
                   if (parti.hasDue() && data.hasDue)
                     PopOverButton(
                       dense: actionSpread,
@@ -193,8 +195,13 @@ class RecordTable extends StatelessWidget {
                   dense: actionSpread,
                   icon: const Icon(LuIcons.download),
                   onPressed: () async {
-                    final doc = await generateSlip(data);
-                    await PDFCtrl().save(doc, data.id);
+                    final config = await ref.read(configCtrlAsyncProvider.future);
+
+                    if (!context.mounted) return;
+                    await showShadDialog(
+                      context: context,
+                      builder: (context) => InvInvoiceWidget(rec: data, config: config),
+                    );
                   },
                   child: const Text('Download invoice'),
                 ),
@@ -204,7 +211,7 @@ class RecordTable extends StatelessWidget {
                     icon: const Icon(LuIcons.undo2),
                     isDestructive: true,
                     onPressed: () {
-                      showShadDialog(context: context, builder: (context) => _ReturnDialog(inventory: data));
+                      showShadDialog(context: context, builder: (context) => ReturnRecordDialog(inventory: data));
                     },
                     child: const Text('Return'),
                   ),
@@ -349,8 +356,8 @@ class _InventoryViewDialog extends HookConsumerWidget {
   }
 }
 
-class _ReturnDialog extends HookConsumerWidget {
-  const _ReturnDialog({required this.inventory});
+class ReturnRecordDialog extends HookConsumerWidget {
+  const ReturnRecordDialog({super.key, required this.inventory});
 
   final InventoryRecord inventory;
 

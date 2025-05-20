@@ -152,7 +152,7 @@ class Product {
 
   int quantityByHouse(String? houseId) => stocksByHouse(houseId).map((e) => e.quantity).sum;
 
-  String get unitName => unit?.unitName ?? '';
+  String get unitName => unit?.name ?? '';
 
   WareHouse? get warehouse => stock.map((e) => e.warehouse).firstOrNull;
 

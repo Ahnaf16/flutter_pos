@@ -59,9 +59,9 @@ class UserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final photo = userOrParti.fold((l) => l.getPhoto, (r) => r?.getPhoto);
+    final photo = userOrParti.fold((l) => l.getPhoto, (r) => r?.isWalkIn == true ? null : r?.getPhoto);
     final name = userOrParti.fold((l) => l.name, (r) => r?.name);
-    final phone = userOrParti.fold((l) => l.phone, (r) => r?.phone);
+    final phone = userOrParti.fold((l) => l.phone, (r) => r?.isWalkIn == true ? null : r?.phone);
     final email = userOrParti.fold((l) => l.email, (r) => r?.email);
     final hasDue = userOrParti.fold(identityNull, (r) => r?.hasDue());
     final due = userOrParti.fold(identityNull, (r) => r?.due);
@@ -97,14 +97,14 @@ class UserCard extends StatelessWidget {
                   styleBuilder: (l, r) => (l, r.bold),
                   crossAxisAlignment: CrossAxisAlignment.center,
                 ),
-
-                SpacedText(
-                  left: 'Phone',
-                  right: phone ?? '--',
-                  styleBuilder: (l, r) => (l, r.bold),
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  onTap: (left, right) => Copier.copy(right),
-                ),
+                if (phone != null)
+                  SpacedText(
+                    left: 'Phone',
+                    right: phone,
+                    styleBuilder: (l, r) => (l, r.bold),
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    onTap: (left, right) => Copier.copy(right),
+                  ),
 
                 if (email != null)
                   SpacedText(

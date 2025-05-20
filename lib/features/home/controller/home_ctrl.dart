@@ -26,12 +26,12 @@ class HomeCounters extends _$HomeCounters {
     final inventory = ref.watch(inventoryCtrlProvider(null)).maybeList();
     final returns = ref.watch(inventoryReturnCtrlProvider(null)).maybeList();
     final peoples = ref.watch(partiesCtrlProvider(null)).maybeList();
-    final accounts = ref.watch(PaymentAccountsCtrlProvider()).maybeList();
+    final accounts = ref.watch(paymentAccountsCtrlProvider()).maybeList();
 
     final sales = inventory.where((e) => e.type == RecordType.sale);
     final purchases = inventory.where((e) => e.type == RecordType.purchase);
-    final returnSales = returns.where((e) => e.returnedRec.type == RecordType.sale);
-    final returnPurchases = returns.where((e) => e.returnedRec.type == RecordType.purchase);
+    final returnSales = returns.where((e) => e.returnedRec?.type == RecordType.sale);
+    final returnPurchases = returns.where((e) => e.returnedRec?.type == RecordType.purchase);
 
     final todaysSales = sales.where((e) => !e.status.isReturned && e.date.isSameDay(DateTime.now()));
     final todaysPurchases = purchases.where((e) => !e.status.isReturned && e.date.isSameDay(DateTime.now()));

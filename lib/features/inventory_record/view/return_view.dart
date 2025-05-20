@@ -89,7 +89,7 @@ class ReturnView extends HookConsumerWidget {
                     return switch (head.name) {
                       'From' => DataGridCell(
                         columnName: head.name,
-                        value: NameCellBuilder(data.returnedRec.getParti?.name, data.returnedRec.getParti?.phone),
+                        value: NameCellBuilder(data.returnedRec?.getParti.name, data.returnedRec?.getParti.phone),
                       ),
                       'By' => DataGridCell(
                         columnName: head.name,
@@ -110,7 +110,7 @@ class ReturnView extends HookConsumerWidget {
                       ),
                       'Account' => DataGridCell(
                         columnName: head.name,
-                        value: ShadBadge.secondary(child: Text(data.returnedRec.account?.name.up ?? '--')),
+                        value: ShadBadge.secondary(child: Text(data.returnedRec?.account?.name.up ?? '--')),
                       ),
 
                       'Date' => DataGridCell(

@@ -1,5 +1,8 @@
 import 'package:pos/features/auth/view/user_card.dart';
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
+import 'package:pos/features/inventory_record/view/inventory_record_view.dart';
+import 'package:pos/features/inventory_record/view/local/inv_invoice_widget.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class RecordDetailsView extends HookConsumerWidget {
@@ -40,113 +43,140 @@ class RecordDetailsView extends HookConsumerWidget {
                     ],
                   ),
                   const Spacer(),
-                  ShadButton(leading: const Text('Print'), onPressed: () {}),
-                  ShadButton(leading: const Text('Return'), onPressed: () {}),
+                  SubmitButton(
+                    leading: const Icon(LuIcons.printer),
+                    child: const Text('Print invoice'),
+                    onPressed: (l) async {
+                      l.truthy();
+                      final config = await ref.read(configCtrlAsyncProvider.future);
+                      l.falsey();
+                      if (!context.mounted) return;
+                      await showShadDialog(
+                        context: context,
+                        builder: (context) => InvInvoiceWidget(rec: rec, config: config),
+                      );
+                    },
+                  ),
+                  if (!rec.status.isReturned)
+                    ShadButton.destructive(
+                      leading: const Text('Return'),
+                      onPressed: () {
+                        showShadDialog(context: context, builder: (context) => ReturnRecordDialog(inventory: rec));
+                      },
+                    ),
                 ],
               ),
 
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: Insets.med,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      spacing: Insets.med,
-                      children: [
-                        ShadCard(
-                          title: Text('Product summary (${details.length})'),
-                          childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
-                          child: Column(
-                            spacing: Insets.med,
-                            children: [
-                              for (final d in details)
-                                Row(
-                                  spacing: Insets.lg,
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  spacing: Insets.med,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        spacing: Insets.med,
+                        children: [
+                          ShadCard(
+                            title: Text('Product summary (${details.length})'),
+                            childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
+                            child: Column(
+                              spacing: Insets.med,
+                              children: [
+                                for (final d in details)
+                                  Row(
+                                    spacing: Insets.lg,
 
-                                  children: [
-                                    Text((details.indexWhere((e) => e.id == d.id) + 1).toString()),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(d.product.name, style: context.text.list),
-                                        if (d.product.sku != null) Text(d.product.sku!, style: context.text.muted),
-                                      ],
-                                    ),
-                                    const Gap(Insets.xs),
-                                    Text('Price: ${d.price.currency()} x(${d.quantity})', style: context.text.list),
-
-                                    Text('Total Price: ${(d.price * d.quantity).currency()}', style: context.text.list),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          spacing: Insets.med,
-                          children: [
-                            Expanded(
-                              child: ShadCard(
-                                title: const Text('Order Summary'),
-                                childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
-                                child: Column(
-                                  spacing: Insets.med,
-                                  children: [
-                                    SpacedText(
-                                      left: 'Account',
-                                      right: account?.name.titleCase ?? 'N/A',
-                                      builder: (v) => ShadBadge.secondary(child: Text(v)),
-                                    ),
-                                    SpacedText(
-                                      left: 'Status',
-                                      right: rec.status.name.titleCase,
-                                      builder: (v) => ShadBadge(child: Text(v)),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            if (returned != null)
-                              Expanded(
-                                child: ShadCard(
-                                  title: const Text('Return Summary'),
-                                  childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
-                                  child: Column(
-                                    spacing: Insets.med,
                                     children: [
-                                      SpacedText(
-                                        left: 'Return date',
-                                        right: returned.returnDate.formatDate('MMM dd, yyyy hh:mm a'),
+                                      Text((details.indexWhere((e) => e.id == d.id) + 1).toString()),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(d.product.name, style: context.text.list),
+                                          if (d.product.sku != null) Text(d.product.sku!, style: context.text.muted),
+                                        ],
                                       ),
-                                      SpacedText(
-                                        left: 'Return amount',
-                                        right: (returned.deductedFromAccount + returned.deductedFromParty).currency(),
+                                      const Gap(Insets.xs),
+                                      Text('Price: ${d.price.currency()} x(${d.quantity})', style: context.text.list),
+
+                                      Text(
+                                        'Total Price: ${(d.price * d.quantity).currency()}',
+                                        style: context.text.list,
                                       ),
                                     ],
                                   ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        ShadCard(
-                          title: const Text('Billing Summary'),
-                          childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
-                          child: Column(
-                            spacing: Insets.med,
-                            children: [
-                              SpacedText(left: 'Subtotal', right: rec.subtotal.currency()),
-                              SpacedText(left: 'Discount', right: rec.discountString()),
-                              SpacedText(left: 'Vat', right: rec.vat.currency()),
-                              SpacedText(left: 'Total', right: rec.total.currency(), style: context.text.large),
-                              SpacedText(left: 'paid amount', right: rec.amount.currency()),
-                              SpacedText(left: 'Due amount', right: rec.due.currency()),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                          IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              spacing: Insets.med,
+                              children: [
+                                Expanded(
+                                  child: ShadCard(
+                                    title: const Text('Order Summary'),
+                                    childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
+                                    child: Column(
+                                      spacing: Insets.med,
+                                      children: [
+                                        SpacedText(
+                                          left: 'Account',
+                                          right: account?.name.titleCase ?? 'N/A',
+                                          builder: (v) => ShadBadge.secondary(child: Text(v)),
+                                        ),
+                                        SpacedText(
+                                          left: 'Status',
+                                          right: rec.status.name.titleCase,
+                                          builder: (v) => ShadBadge(child: Text(v)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                if (returned != null)
+                                  Expanded(
+                                    child: ShadCard(
+                                      title: const Text('Return Summary'),
+                                      childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
+                                      child: Column(
+                                        spacing: Insets.med,
+                                        children: [
+                                          SpacedText(
+                                            left: 'Return date',
+                                            right: returned.returnDate.formatDate('MMM dd, yyyy hh:mm a'),
+                                          ),
+                                          SpacedText(
+                                            left: 'Return amount',
+                                            right:
+                                                (returned.deductedFromAccount + returned.deductedFromParty).currency(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          ShadCard(
+                            title: const Text('Billing Summary'),
+                            childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
+                            child: Column(
+                              spacing: Insets.med,
+                              children: [
+                                SpacedText(left: 'Subtotal', right: rec.subtotal.currency()),
+                                SpacedText(left: 'Discount', right: rec.discountString()),
+                                SpacedText(left: 'Vat', right: rec.vat.currency()),
+                                SpacedText(left: 'Total', right: rec.total.currency(), style: context.text.large),
+                                ShadSeparator.horizontal(margin: Pads.sm('b')),
+                                SpacedText(left: 'paid amount', right: rec.amount.currency()),
+                                SpacedText(left: 'Due amount', right: rec.due.currency()),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  if (getParti != null)
                     Expanded(
                       child: UserCard.parti(
                         parti: getParti,
@@ -157,7 +187,8 @@ class RecordDetailsView extends HookConsumerWidget {
                         showDue: !getParti.isWalkIn,
                       ),
                     ),
-                ],
+                  ],
+                ),
               ),
             ],
           );

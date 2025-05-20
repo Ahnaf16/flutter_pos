@@ -170,7 +170,7 @@ class InventoryRecord {
     'is_walk_in': isWalkIn,
   };
 
-  Party? get getParti => isWalkIn ? Party.fromWalkIn() : party;
+  Party get getParti => isWalkIn ? Party.fromWalkIn() : party ?? Party.fromWalkIn();
 
   String discountString() => discountType == DiscountType.percentage ? '$discount%' : discount.currency();
 

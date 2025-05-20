@@ -15,7 +15,7 @@ class ReturnRecord {
   });
 
   final String id;
-  final InventoryRecord returnedRec;
+  final InventoryRecord? returnedRec;
   final DateTime returnDate;
   final AppUser returnedBy;
   final num deductedFromAccount;
@@ -29,7 +29,7 @@ class ReturnRecord {
 
   factory ReturnRecord.fromDoc(Document doc) => ReturnRecord(
     id: doc.$id,
-    returnedRec: InventoryRecord.fromMap(doc.data['inventoryRecord']),
+    returnedRec: InventoryRecord.tryParse(doc.data['inventoryRecord']),
     returnDate: DateTime.parse(doc.$createdAt),
     returnedBy: AppUser.fromMap(doc.data['users']),
     note: doc.data['note'],
@@ -41,7 +41,7 @@ class ReturnRecord {
 
   factory ReturnRecord.fromMap(Map<String, dynamic> map) => ReturnRecord(
     id: map.parseAwField(),
-    returnedRec: InventoryRecord.fromMap(map['inventoryRecord']),
+    returnedRec: InventoryRecord.tryParse(map['inventoryRecord']),
     returnDate: DateTime.parse(map.parseAwField('createdAt')),
     returnedBy: AppUser.fromMap(map['users']),
     note: map['note'],
@@ -64,7 +64,7 @@ class ReturnRecord {
 
   QMap toMap() => {
     'id': id,
-    'inventoryRecord': returnedRec.toMap(),
+    'inventoryRecord': returnedRec?.toMap(),
     'createdAt': returnDate.toIso8601String(),
     'users': returnedBy.toMap(),
     'note': note,
@@ -75,7 +75,7 @@ class ReturnRecord {
   };
 
   QMap toAwPost() => {
-    'inventoryRecord': returnedRec.id,
+    'inventoryRecord': returnedRec?.id,
     'users': returnedBy.id,
     'note': note,
     'deductedFromAccount': deductedFromAccount,
@@ -83,4 +83,6 @@ class ReturnRecord {
     'isSale': isSale,
     'stock_qty_pair': detailsQtyPair,
   };
+
+  num get totalReturn => deductedFromAccount + deductedFromParty;
 }

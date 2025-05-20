@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pos/_core/extensions/context_extension.dart';
@@ -12,19 +15,30 @@ import 'package:printing/printing.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class PDFCtrl {
-  Future<pw.ThemeData> theme() async {
-    // final font = await PdfGoogleFonts.nunitoMedium();
+  Future<Uint8List> createWidgetImage(RenderRepaintBoundary boundary) async {
+    final image = await boundary.toImage(pixelRatio: 3.0);
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    return byteData!.buffer.asUint8List();
+  }
 
-    return pw.ThemeData(
-      // paragraphStyle: pw.TextStyle(fontSize: 8, font: font),
-      // defaultTextStyle: pw.TextStyle(fontSize: 10, font: font),
-      // header5: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, font: font),
-      // header4: pw.TextStyle(fontSize: 12, font: font),
+  Future<pw.Document> generatePdfFromBytes(Uint8List bytes) async {
+    final pdf = pw.Document();
+    final image = pw.MemoryImage(bytes);
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (context) {
+          return pw.Align(child: pw.Image(image, width: 350));
+        },
+      ),
     );
+
+    return pdf;
   }
 
   Future<pw.Document> getDoc(List<pw.Widget> widgets) async {
-    final pdf = pw.Document(theme: await theme());
+    final pdf = pw.Document();
     pdf.addPage(
       pw.MultiPage(
         margin: const pw.EdgeInsets.symmetric(horizontal: 15, vertical: 30),

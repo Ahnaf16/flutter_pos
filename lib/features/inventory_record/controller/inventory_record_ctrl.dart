@@ -99,13 +99,13 @@ class InventoryReturnCtrl extends _$InventoryReturnCtrl {
     if (query.isEmpty) {
       state = AsyncValue.data(_searchFrom);
     }
-    final list = _searchFrom.where((e) => (e.returnedRec.party?.name.low.contains(query.low) ?? false)).toList();
+    final list = _searchFrom.where((e) => (e.returnedRec?.party?.name.low.contains(query.low) ?? false)).toList();
     state = AsyncData(list);
   }
 
   void filter({PaymentAccount? account, ShadDateTimeRange? range}) async {
     if (account != null) {
-      state = AsyncData(_searchFrom.where((e) => e.returnedRec.account?.id == account.id).toList());
+      state = AsyncData(_searchFrom.where((e) => e.returnedRec?.account?.id == account.id).toList());
     }
 
     if (range case ShadDateTimeRange(:final start, :final end)) {
