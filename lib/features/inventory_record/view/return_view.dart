@@ -102,8 +102,12 @@ class ReturnView extends HookConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SpacedText(
-                              left: 'Amount',
-                              right: '${data.isSale ? '-' : '+'}${data.deductedFromAccount.currency()}',
+                              left: 'Account',
+                              right: '${data.isSale ? '-' : '+'}${data.adjustAccount.currency()}',
+                            ),
+                            SpacedText(
+                              left: 'Total',
+                              right: '${data.isSale ? '-' : '+'}${data.totalReturn.currency()}',
                             ),
                           ],
                         ),

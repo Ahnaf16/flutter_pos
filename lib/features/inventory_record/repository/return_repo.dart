@@ -36,27 +36,24 @@ class ReturnRepo with AwHandler {
     }
 
     final vatShip = coverVatShip ? (record.vat + record.shipping) : 0;
-    totalPrice = (totalPrice + vatShip) - record.discount;
+    totalPrice = (totalPrice + vatShip) - record.calcDiscount;
 
-    final maxToAcc = record.amount;
+    final accountMax = record.amount;
 
     //! update account amount
     final acc = record.account;
-    final effectiveAccBal = (totalPrice >= maxToAcc ? maxToAcc : totalPrice);
+    final effectiveAccBal = (totalPrice >= accountMax ? accountMax : totalPrice);
     if (acc != null) {
-      final effectiveOp2 = effectiveOp(-effectiveAccBal);
-      final (accErr, accData) = await _updateAccountAmount(acc.id, effectiveOp2).toRecord();
+      final (accErr, accData) = await _updateAccountAmount(acc.id, effectiveOp(-effectiveAccBal)).toRecord();
       if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
     }
     final remaining = totalPrice - effectiveAccBal;
 
     //! update Due
     final Party? parti = record.party;
-    if (parti != null) {
-      if (remaining != 0) {
-        final (partiErr, partiData) = await _updateDue(parti.id, effectiveOp(-remaining), record.type).toRecord();
-        if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
-      }
+    if (parti != null && remaining != 0) {
+      final (partiErr, partiData) = await _updateDue(parti.id, effectiveOp(-remaining), record.type).toRecord();
+      if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
     }
 
     final returnRec = ReturnRecord(
@@ -65,8 +62,8 @@ class ReturnRepo with AwHandler {
       returnDate: dateNow.run(),
       returnedBy: user,
       note: '${data.values.sum} items returned',
-      deductedFromAccount: effectiveAccBal,
-      deductedFromParty: remaining,
+      adjustAccount: effectiveAccBal,
+      adjustFromParty: remaining,
       isSale: isSale,
       detailsQtyPair: detailsQtyPair,
     );

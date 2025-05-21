@@ -8,8 +8,8 @@ class ReturnRecord {
     required this.returnDate,
     required this.returnedBy,
     required this.note,
-    required this.deductedFromAccount,
-    required this.deductedFromParty,
+    required this.adjustAccount,
+    required this.adjustFromParty,
     required this.isSale,
     this.detailsQtyPair = const [],
   });
@@ -18,8 +18,8 @@ class ReturnRecord {
   final InventoryRecord? returnedRec;
   final DateTime returnDate;
   final AppUser returnedBy;
-  final num deductedFromAccount;
-  final num deductedFromParty;
+  final num adjustAccount;
+  final num adjustFromParty;
   final String? note;
   final bool isSale;
 
@@ -33,8 +33,8 @@ class ReturnRecord {
     returnDate: DateTime.parse(doc.$createdAt),
     returnedBy: AppUser.fromMap(doc.data['users']),
     note: doc.data['note'],
-    deductedFromAccount: doc.data['deductedFromAccount'],
-    deductedFromParty: doc.data['deductedFromParty'],
+    adjustAccount: doc.data['deductedFromAccount'],
+    adjustFromParty: doc.data['deductedFromParty'],
     isSale: doc.data['isSale'],
     detailsQtyPair: List<String>.from(doc.data['stock_qty_pair']),
   );
@@ -45,8 +45,8 @@ class ReturnRecord {
     returnDate: DateTime.parse(map.parseAwField('createdAt')),
     returnedBy: AppUser.fromMap(map['users']),
     note: map['note'],
-    deductedFromAccount: map.parseNum('deductedFromAccount'),
-    deductedFromParty: map.parseNum('deductedFromParty'),
+    adjustAccount: map.parseNum('deductedFromAccount'),
+    adjustFromParty: map.parseNum('deductedFromParty'),
     isSale: map.parseBool('isSale'),
     detailsQtyPair: List<String>.from(map['stock_qty_pair']),
   );
@@ -68,8 +68,8 @@ class ReturnRecord {
     'createdAt': returnDate.toIso8601String(),
     'users': returnedBy.toMap(),
     'note': note,
-    'deductedFromAccount': deductedFromAccount,
-    'deductedFromParty': deductedFromParty,
+    'deductedFromAccount': adjustAccount,
+    'deductedFromParty': adjustFromParty,
     'isSale': isSale,
     'stock_qty_pair': detailsQtyPair,
   };
@@ -78,11 +78,11 @@ class ReturnRecord {
     'inventoryRecord': returnedRec?.id,
     'users': returnedBy.id,
     'note': note,
-    'deductedFromAccount': deductedFromAccount,
-    'deductedFromParty': deductedFromParty,
+    'deductedFromAccount': adjustAccount,
+    'deductedFromParty': adjustFromParty,
     'isSale': isSale,
     'stock_qty_pair': detailsQtyPair,
   };
 
-  num get totalReturn => deductedFromAccount + deductedFromParty;
+  num get totalReturn => adjustAccount + adjustFromParty;
 }

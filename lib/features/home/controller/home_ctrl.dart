@@ -43,8 +43,8 @@ class HomeCounters extends _$HomeCounters {
       ('Purchase', RPaths.purchases): purchases.where((e) => !e.status.isReturned).map((e) => e.payable).sum.currency(),
       ('Today\'s Sales', RPaths.sales): todaysSales.map((e) => e.payable).sum.currency(),
       ('Today\'s Purchase', RPaths.purchases): todaysPurchases.map((e) => e.payable).sum.currency(),
-      ('Sales Return', RPaths.salesReturn): returnSales.map((e) => e.deductedFromAccount).sum.currency(),
-      ('Purchase Return', RPaths.purchasesReturn): returnPurchases.map((e) => e.deductedFromAccount).sum.currency(),
+      ('Sales Return', RPaths.salesReturn): returnSales.map((e) => e.adjustAccount).sum.currency(),
+      ('Purchase Return', RPaths.purchasesReturn): returnPurchases.map((e) => e.adjustAccount).sum.currency(),
       ('Customer due', RPaths.customer):
           peoples.where((e) => e.isCustomer && e.hasDue()).map((e) => e.due).sum.currency(),
       ('Supplier due', RPaths.supplier):

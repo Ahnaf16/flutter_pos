@@ -163,8 +163,7 @@ class RecordDetailsView extends HookConsumerWidget {
                                           ),
                                           SpacedText(
                                             left: 'Return amount',
-                                            right:
-                                                (returned.deductedFromAccount + returned.deductedFromParty).currency(),
+                                            right: (returned.adjustAccount + returned.adjustFromParty).currency(),
                                           ),
                                         ],
                                       ),
@@ -197,7 +196,6 @@ class RecordDetailsView extends HookConsumerWidget {
                                             child: const Icon(LuIcons.info),
                                             builder: (context) {
                                               return Text(
-                                                // TODO : check condition
                                                 rec.hasBalance
                                                     ? 'Extra amount paid ${rec.type.isSale ? 'by customer' : 'to supplier'}.'
                                                     : 'Remaining amount to be paid ${rec.type.isSale ? 'by customer' : 'to supplier'}.',

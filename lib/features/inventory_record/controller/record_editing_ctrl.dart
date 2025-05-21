@@ -15,7 +15,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
   @override
   InventoryRecordState build(RecordType type) {
     _config = ref.watch(configCtrlProvider);
-    return InventoryRecordState(type: type);
+    return InventoryRecordState(type: type, parti: type.isPurchase ? null : Party.fromWalkIn());
   }
 
   void addProduct(Product product, {Stock? newStock, WareHouse? warehouse, bool replaceExisting = false}) {
@@ -145,7 +145,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       return submitPurchase();
     } else {
       if (state.isWalkIn && state.hasDue) return (false, 'Clear due for walk-in customer');
-      if (state.isWalkIn && state.hasBalance) return (false, 'Clear excess amount for walk-in customer');
+      if (state.isWalkIn && state.hasBalance) return (false, 'Clear extra amount for walk-in customer');
 
       return submitSale();
     }

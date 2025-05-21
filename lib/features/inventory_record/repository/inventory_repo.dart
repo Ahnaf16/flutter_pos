@@ -14,15 +14,18 @@ class InventoryRepo with AwHandler {
   final String _updateAccountFailure = 'Failed to update account amount';
 
   FutureReport<Document> createSale(InventoryRecordState inventory) async {
+    final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
+    if (err != null || user == null) return left(err ?? const Failure('Unable to get current user'));
+
     //! add details
     final (detailErr, detailsData) = await _createRecordDetails(inventory.details, true).toRecord();
     if (detailErr != null || detailsData == null) return left(detailErr ?? Failure(_generalFailure));
-    final record = inventory.copyWith(details: detailsData).toInventoryRecord();
+    final record = inventory.copyWith(details: detailsData).toInventoryRecord(user);
 
     //! update account amount
     final acc = record.account;
 
-    final payable = inventory.payable;
+    final payable = inventory.amount;
 
     if (acc != null && payable > 0) {
       final (accErr, accData) = await _updateAccountAmount(acc.id, payable).toRecord();
@@ -53,8 +56,11 @@ class InventoryRepo with AwHandler {
   }
 
   FutureReport<Document> createPurchase(InventoryRecordState inventory) async {
+    final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
+    if (err != null || user == null) return left(err ?? const Failure('Unable to get current user'));
+
     //! add details
-    InventoryRecord record = inventory.toInventoryRecord();
+    InventoryRecord record = inventory.toInventoryRecord(user);
     Party? parti = record.party;
     if (parti == null) return left(const Failure('Parti is required when purchasing'));
 

@@ -38,6 +38,8 @@ class InventoryRecord {
     required this.type,
     required this.isWalkIn,
     this.returnRecord,
+    required this.createdBy,
+    required this.calcDiscount,
   });
 
   final String id;
@@ -49,12 +51,16 @@ class InventoryRecord {
   final num vat;
   final num discount;
   final DiscountType discountType;
+
+  /// calculated discount based on discount type
+  final num calcDiscount;
   final num shipping;
   final InventoryStatus status;
   final DateTime date;
   final RecordType type;
   final bool isWalkIn;
   final ReturnRecord? returnRecord;
+  final AppUser createdBy;
 
   factory InventoryRecord.fromDoc(Document doc) {
     final data = doc.data;
@@ -77,6 +83,8 @@ class InventoryRecord {
       type: RecordType.values.byName(data['record_type']),
       isWalkIn: data['is_walk_in'],
       returnRecord: ReturnRecord.tryParse(data['returnRecord']),
+      createdBy: AppUser.fromMap(data['created_by']),
+      calcDiscount: data.parseNum('calculated_discount'),
     );
   }
 
@@ -100,6 +108,8 @@ class InventoryRecord {
       type: RecordType.values.byName(map['record_type']),
       isWalkIn: map.parseBool('is_walk_in'),
       returnRecord: ReturnRecord.tryParse(map['returnRecord']),
+      createdBy: AppUser.fromMap(map['created_by']),
+      calcDiscount: map.parseNum('calculated_discount'),
     );
   }
   static InventoryRecord? tryParse(dynamic value) {
@@ -133,6 +143,8 @@ class InventoryRecord {
       type: map['record_type'] == null ? type : RecordType.values.byName(map['record_type']),
       isWalkIn: map.parseBool('is_walk_in', isWalkIn),
       returnRecord: ReturnRecord.tryParse(map['returnRecord']) ?? returnRecord,
+      createdBy: AppUser.tryParse(map['created_by']) ?? createdBy,
+      calcDiscount: map.parseNum('calculated_discount', fallBack: calcDiscount),
     );
   }
 
@@ -152,6 +164,8 @@ class InventoryRecord {
     'record_type': type.name,
     'is_walk_in': isWalkIn,
     'returnRecord': returnRecord?.toMap(),
+    'created_by': createdBy.toMap(),
+    'calculated_discount': calcDiscount,
   };
 
   Map<String, dynamic> toAwPost() => {
@@ -168,6 +182,8 @@ class InventoryRecord {
     'date': date.toIso8601String(),
     'record_type': type.name,
     'is_walk_in': isWalkIn,
+    'created_by': createdBy.id,
+    'calculated_discount': calcDiscount,
   };
 
   Party get getParti => isWalkIn ? Party.fromWalkIn() : party ?? Party.fromWalkIn();
@@ -196,12 +212,14 @@ class InventoryRecord {
     num? vat,
     num? discount,
     DiscountType? discountType,
+    num? calcDiscount,
     num? shipping,
     InventoryStatus? status,
     DateTime? date,
     RecordType? type,
     bool? isWalkIn,
     ValueGetter<ReturnRecord?>? returnRecord,
+    AppUser? createdBy,
   }) {
     return InventoryRecord(
       id: id ?? this.id,
@@ -213,12 +231,14 @@ class InventoryRecord {
       vat: vat ?? this.vat,
       discount: discount ?? this.discount,
       discountType: discountType ?? this.discountType,
+      calcDiscount: calcDiscount ?? this.calcDiscount,
       shipping: shipping ?? this.shipping,
       status: status ?? this.status,
       date: date ?? this.date,
       type: type ?? this.type,
       isWalkIn: isWalkIn ?? this.isWalkIn,
       returnRecord: returnRecord != null ? returnRecord() : this.returnRecord,
+      createdBy: createdBy ?? this.createdBy,
     );
   }
 }

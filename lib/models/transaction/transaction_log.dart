@@ -19,6 +19,7 @@ class TransactionLog {
     required this.type,
     required this.note,
     required this.adjustBalance,
+    required this.record,
     this.payMethod,
   });
 
@@ -44,6 +45,7 @@ class TransactionLog {
   final String? note;
   final bool adjustBalance;
   final AccountType? payMethod;
+  final InventoryRecord? record;
 
   // final bool transactionFromMe;
 
@@ -63,6 +65,7 @@ class TransactionLog {
     type: TransactionType.values.byName(map['transaction_type']),
     adjustBalance: map.parseBool('adjust_balance'),
     payMethod: AccountType.values.tryByName(map['pay_method']),
+    record: InventoryRecord.tryParse(map['inventoryRecord']),
   );
 
   static TransactionLog? tyrParse(dynamic value) {
@@ -91,6 +94,7 @@ class TransactionLog {
     'adjust_balance': adjustBalance,
     'transaction_from': transactionForm?.toMap(),
     'pay_method': payMethod?.name,
+    'inventoryRecord': record?.toMap(),
   };
 
   QMap toAwPost() => {
@@ -105,6 +109,7 @@ class TransactionLog {
     'note': note,
     'transaction_from': transactionForm?.id,
     'pay_method': payMethod?.name,
+    'inventoryRecord': record?.id,
   };
 
   String? validate() {
@@ -139,6 +144,7 @@ class TransactionLog {
       note: _noteInv(record),
       adjustBalance: false,
       transactionForm: null,
+      record: record,
     );
   }
 
@@ -146,7 +152,6 @@ class TransactionLog {
     return TransactionLog(
       id: '',
       trxNo: nanoid(length: 8, alphabet: '0123456789'),
-
       amount: ex.amount,
       account: ex.account,
       transactedTo: null,
@@ -157,6 +162,7 @@ class TransactionLog {
       note: _noteEx(ex),
       adjustBalance: false,
       transactionForm: null,
+      record: null,
     );
   }
 
@@ -164,11 +170,9 @@ class TransactionLog {
     return TransactionLog(
       id: '',
       trxNo: nanoid(length: 8, alphabet: '0123456789'),
-
-      amount: rec.deductedFromAccount,
-
+      amount: rec.adjustAccount,
       account: rec.returnedRec?.account,
-      transactedTo: null,
+      transactedTo: rec.returnedRec?.party,
       customInfo: {},
       transactionBy: rec.returnedBy,
       date: dateNow.run(),
@@ -176,11 +180,12 @@ class TransactionLog {
       note: _noteRe(rec),
       adjustBalance: false,
       transactionForm: null,
+      record: rec.returnedRec,
     );
   }
 
   static String _noteRe(ReturnRecord rec) {
-    final amount = rec.deductedFromAccount;
+    final amount = rec.adjustAccount;
     final account = rec.returnedRec?.account?.name;
     final date = rec.returnDate.formatDate();
     return ['Returned $amount', rec.isSale ? ' from' : ' to', ' $account', 'on $date'].join(' ');
@@ -234,6 +239,7 @@ class TransactionLog {
     ValueGetter<String?>? note,
     bool? adjustBalance,
     ValueGetter<AccountType?>? payMethod,
+    ValueGetter<InventoryRecord?>? record,
   }) {
     return TransactionLog(
       id: id ?? this.id,
@@ -249,6 +255,7 @@ class TransactionLog {
       note: note != null ? note() : this.note,
       adjustBalance: adjustBalance ?? this.adjustBalance,
       payMethod: payMethod != null ? payMethod() : this.payMethod,
+      record: record != null ? record() : this.record,
     );
   }
 }

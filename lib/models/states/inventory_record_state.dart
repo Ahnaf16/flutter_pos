@@ -12,7 +12,7 @@ class InventoryRecordState {
   final DiscountType discountType;
   final RecordType type;
 
-  const InventoryRecordState({
+  InventoryRecordState({
     required this.type,
     this.parti,
     this.details = const [],
@@ -83,9 +83,9 @@ class InventoryRecordState {
   ///
   /// when has due use the full amount otherwise add the due with the amount
   /// the due, when hasBalance is (-), so the amount will be subtracted
-  num get payable => hasDue ? amount : amount + due;
+  // num get payable => hasDue ? amount : amount + due;
 
-  InventoryRecord toInventoryRecord() {
+  InventoryRecord toInventoryRecord(AppUser user) {
     return InventoryRecord(
       id: '',
       invoiceNo: 'pos${nanoid(length: 8, alphabet: '0123456789')}',
@@ -96,11 +96,13 @@ class InventoryRecordState {
       vat: vat,
       discount: discount,
       discountType: discountType,
+      calcDiscount: calculateDiscount(),
       shipping: shipping,
       status: hasDue ? InventoryStatus.unpaid : InventoryStatus.paid,
       date: DateTime.now(),
       type: type,
       isWalkIn: isWalkIn,
+      createdBy: user,
     );
   }
 }

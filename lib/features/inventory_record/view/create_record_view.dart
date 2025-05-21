@@ -60,19 +60,18 @@ class CreateRecordView extends HookConsumerWidget {
                         ),
                         const ShadSeparator.horizontal(margin: Pads.zero),
                         Expanded(
-                          child: ShadResizablePanelGroup(
-                            axis: Axis.vertical,
-                            showHandle: true,
-                            children: [
-                              //! selected products
-                              ShadResizablePanel(
-                                id: 2,
-                                defaultSize: 0.7,
-                                child: Padding(
-                                  padding: Pads.sm('b'),
+                          child: Padding(
+                            padding: Pads.sm(),
+                            child: Column(
+                              spacing: Insets.sm,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                //! selected products
+                                Expanded(
                                   child: ListView.separated(
                                     padding: Pads.med('blr'),
                                     itemCount: record.details.length,
+                                    shrinkWrap: true,
                                     separatorBuilder: (_, _) => const ShadSeparator.horizontal(),
                                     itemBuilder: (BuildContext context, int index) {
                                       final detail = record.details[index];
@@ -89,53 +88,40 @@ class CreateRecordView extends HookConsumerWidget {
                                     },
                                   ),
                                 ),
-                              ),
-
-                              //! calculations
-                              ShadResizablePanel(
-                                id: 3,
-                                defaultSize: 0.3,
-                                minSize: 0.2,
-                                child: SingleChildScrollView(
-                                  padding: Pads.sm(),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    spacing: Insets.sm,
-                                    children: [
-                                      //! inputs
-                                      Expanded(
-                                        flex: 2,
-                                        child: _Inputs(
-                                          record: record,
-
-                                          onTypeChange: recordCtrl().changeDiscountType,
-                                          onAccountSelect: recordCtrl().changeAccount,
-                                        ),
+                                const ShadSeparator.horizontal(),
+                                //! calculations
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  spacing: Insets.sm,
+                                  children: [
+                                    //! inputs
+                                    Expanded(
+                                      flex: 2,
+                                      child: _Inputs(
+                                        record: record,
+                                        onTypeChange: recordCtrl().changeDiscountType,
+                                        onAccountSelect: recordCtrl().changeAccount,
                                       ),
-                                      const SizedBox(height: 200, child: ShadSeparator.vertical(margin: Pads.zero)),
+                                    ),
 
-                                      //! summary
-                                      Expanded(
-                                        child: _Summary(
-                                          record: record,
+                                    //! summary
+                                    Expanded(
+                                      child: _Summary(
+                                        record: record,
+                                        onSubmit: () async {
+                                          final res = await recordCtrl().submit();
+                                          if (context.mounted) res.showToast(context);
 
-                                          onSubmit: () async {
-                                            final res = await recordCtrl().submit();
-
-                                            if (context.mounted) res.showToast(context);
-
-                                            if (res.success) {
-                                              formKey.currentState?.reset();
-                                              if (context.mounted) context.nPop();
-                                            }
-                                          },
-                                        ),
+                                          if (res.success) {
+                                            formKey.currentState?.reset();
+                                          }
+                                        },
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -252,11 +238,12 @@ class _Summary extends StatelessWidget {
           SpacedText(
             left: 'Total',
             right: record.totalPrice().currency(),
+            crossAxisAlignment: CrossAxisAlignment.center,
             styleBuilder: (l, r) => (l, context.text.large),
           ),
           SpacedText(
-            left: 'Due',
-            right: record.due.currency(),
+            left: record.hasBalance ? 'Extra' : 'Due',
+            right: record.due.abs().currency(),
             styleBuilder: (l, r) {
               return (l, r.textColor(record.hasDue ? context.colors.destructive : null));
             },
@@ -271,29 +258,14 @@ class _Summary extends StatelessWidget {
               rowCrossAxisAlignment: CrossAxisAlignment.center,
               child: Text('The due amount will be deducted from balance', style: context.text.muted.error(context)),
             ),
-          // record have due and parti also have due (parti.due) which can be used to clear due [when purchase]
-          //b: 20, d: (-)10 = 10 final
-          if (record.hasDue && record.partiHasDue)
-            ShadCard(
-              border: Border.all(color: context.colors.destructive),
-              leading: Icon(LuIcons.triangleAlert, color: context.colors.destructive),
-              childPadding: Pads.sm('l'),
-              rowCrossAxisAlignment: CrossAxisAlignment.center,
-              child: Text(
-                'The due amount will be deducted from parti\'s due',
-                style: context.text.muted.error(context),
-              ),
-            ),
+
           if (record.hasBalance && !record.isWalkIn && type.isSale)
             ShadCard(
               border: Border.all(color: context.colors.destructive),
               leading: Icon(LuIcons.triangleAlert, color: context.colors.destructive),
               childPadding: Pads.sm('l'),
               rowCrossAxisAlignment: CrossAxisAlignment.center,
-              child: Text(
-                'The due amount ${record.due.abs().currency()} will be added as balance',
-                style: context.text.muted.error(context),
-              ),
+              child: Text('The extra amount will be added as balance', style: context.text.muted.error(context)),
             ),
           const Gap(Insets.xs),
           SubmitButton(
@@ -489,6 +461,7 @@ class _PartiSection extends HookConsumerWidget {
                   minWidth: 300,
                   placeholder: Text(type.isSale ? 'Customer' : 'Supplier'),
                   itemCount: filtered.length,
+                  initialValue: parti,
                   options: [
                     if (type.isSale) ShadOption(value: Party.fromWalkIn(), child: const Text('Walk-in customer')),
                     if (filtered.isEmpty) Padding(padding: Pads.med('tb'), child: const Text('No Parties found')),
