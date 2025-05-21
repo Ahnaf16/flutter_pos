@@ -38,7 +38,6 @@ class HomeCounters extends _$HomeCounters {
 
     return {
       ('Products', RPaths.products): products.length,
-      ('Total Stock', RPaths.stock): products.map((e) => e.quantity).sum,
       ('Sales', RPaths.sales): sales.where((e) => !e.status.isReturned).map((e) => e.payable).sum.currency(),
       ('Purchase', RPaths.purchases): purchases.where((e) => !e.status.isReturned).map((e) => e.payable).sum.currency(),
       ('Today\'s Sales', RPaths.sales): todaysSales.map((e) => e.payable).sum.currency(),

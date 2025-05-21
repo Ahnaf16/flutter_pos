@@ -1,7 +1,7 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/main.export.dart';
 
-typedef _CustomInfo = List<MapEntry<String, String>>;
+typedef CustomInfo = List<MapEntry<String, String>>;
 
 class CustomInfoFiled extends HookWidget {
   const CustomInfoFiled({
@@ -19,7 +19,7 @@ class CustomInfoFiled extends HookWidget {
   final SMap fixedInitialField;
   final Widget? Function(BuildContext context, VoidCallback addingMethod)? header;
 
-  void _addingMethod(FormFieldState<_CustomInfo> field) {
+  void _addingMethod(FormFieldState<CustomInfo> field) {
     const entry = MapEntry('', '');
     if (field.value?.contains(entry) ?? false) return;
     field.didChange([...?field.value, entry]);
@@ -29,7 +29,7 @@ class CustomInfoFiled extends HookWidget {
   Widget build(BuildContext context) {
     final initials = {...fixedInitialField, ...?initialInfo};
 
-    return FormBuilderField<_CustomInfo>(
+    return FormBuilderField<CustomInfo>(
       name: name ?? 'custom_info',
       initialValue: initials.entries.toList(),
       valueTransformer: (value) {

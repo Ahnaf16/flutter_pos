@@ -13,7 +13,7 @@ class TransactionsRepo with AwHandler {
     return await db.create(_coll, data: log.toAwPost());
   }
 
-  FutureReport<Document> adjustCustomerDue(QMap form) async {
+  FutureReport<Document> adjustCustomerDue(QMap form, [bool isPayment = false]) async {
     final data = QMap.from(form);
     data.addAll({'date': DateTime.now().toIso8601String()});
     TransactionLog log = TransactionLog.fromMap(data);
@@ -26,23 +26,24 @@ class TransactionsRepo with AwHandler {
       log = log.copyWith(transactionBy: () => user);
     }
 
-    Party? fromParti = log.transactionForm;
-    if (fromParti != null && !fromParti.isWalkIn) {
-      final (err, parti) = await _updateDue(fromParti.id, -log.amount).toRecord();
-      if (err != null || parti == null) return left(err ?? const Failure('Unable to update due'));
-      fromParti = Party.fromDoc(parti);
+    Party? parti = isPayment ? log.transactedTo : log.transactionForm;
+
+    if (parti != null && !parti.isWalkIn) {
+      final (err, pDoc) = await _updateDue(parti.id, isPayment ? log.amount : -log.amount).toRecord();
+      if (err != null || pDoc == null) return left(err ?? const Failure('Unable to update due'));
+      parti = Party.fromDoc(pDoc);
     }
 
     final account = log.account;
     if (account != null) {
-      final (err, acc) = await _updateAccountAmount(account.id, log.amount).toRecord();
+      final (err, acc) = await _updateAccountAmount(account.id, isPayment ? -log.amount : log.amount).toRecord();
       if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
     }
 
     return await db.create(_coll, data: log.toAwPost());
   }
 
-  FutureReport<Document> supplierDuePayment(QMap form) async {
+  FutureReport<Document> supplierDuePayment(QMap form, [bool isPayment = true]) async {
     final data = QMap.from(form);
     data.addAll({'date': DateTime.now().toIso8601String()});
     TransactionLog log = TransactionLog.fromMap(data);
@@ -55,16 +56,16 @@ class TransactionsRepo with AwHandler {
       log = log.copyWith(transactionBy: () => user);
     }
 
-    Party? toParti = log.transactedTo;
-    if (toParti != null && !toParti.isWalkIn) {
-      final (err, parti) = await _updateDue(toParti.id, log.amount).toRecord();
-      if (err != null || parti == null) return left(err ?? const Failure('Unable to update due'));
-      toParti = Party.fromDoc(parti);
+    Party? parti = isPayment ? log.transactedTo : log.transactionForm;
+    if (parti != null && !parti.isWalkIn) {
+      final (err, pDoc) = await _updateDue(parti.id, isPayment ? log.amount : -log.amount).toRecord();
+      if (err != null || pDoc == null) return left(err ?? const Failure('Unable to update due'));
+      parti = Party.fromDoc(pDoc);
     }
 
     final account = log.account;
     if (account != null) {
-      final (err, acc) = await _updateAccountAmount(account.id, -log.amount).toRecord();
+      final (err, acc) = await _updateAccountAmount(account.id, isPayment ? -log.amount : log.amount).toRecord();
       if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
     }
 
@@ -88,6 +89,11 @@ class TransactionsRepo with AwHandler {
       final (err, parti) = await _updateDue(fromParti.id, log.amount).toRecord();
       if (err != null || parti == null) return left(err ?? const Failure('Unable to update due'));
       fromParti = Party.fromDoc(parti);
+    }
+    final account = log.account;
+    if (account != null) {
+      final (err, acc) = await _updateAccountAmount(account.id, -log.amount).toRecord();
+      if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
     }
 
     return await db.create(_coll, data: log.toAwPost());

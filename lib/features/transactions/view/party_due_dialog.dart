@@ -358,17 +358,17 @@ class BalanceTransferDialog extends HookConsumerWidget {
                             isRequired: true,
                           ),
                         ),
-                        Expanded(
-                          child: ShadSelectField<AccountType>(
-                            name: 'pay_method',
-                            label: 'Payment method',
-                            hintText: 'Select',
-                            valueTransformer: (value) => value?.name,
-                            options: AccountType.values,
-                            optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name.titleCase)),
-                            selectedBuilder: (_, v) => Text(v.name.titleCase),
-                          ),
-                        ),
+                        // Expanded(
+                        //   child: ShadSelectField<AccountType>(
+                        //     name: 'pay_method',
+                        //     label: 'Payment method',
+                        //     hintText: 'Select',
+                        //     valueTransformer: (value) => value?.name,
+                        //     options: AccountType.values,
+                        //     optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name.titleCase)),
+                        //     selectedBuilder: (_, v) => Text(v.name.titleCase),
+                        //   ),
+                        // ),
                       ],
                     ),
 

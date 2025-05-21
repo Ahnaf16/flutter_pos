@@ -5,6 +5,7 @@ import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/auth/view/login_view.dart';
 import 'package:pos/features/due/view/due_view.dart';
 import 'package:pos/features/due_adjustment/view/due_adjustment_view.dart';
+import 'package:pos/features/due_adjustment/view/due_clearance_view.dart';
 import 'package:pos/features/expense/view/expense_category_view.dart';
 import 'package:pos/features/expense/view/expense_view.dart';
 import 'package:pos/features/home/view/home_view.dart';
@@ -131,7 +132,7 @@ class AppRouter extends Notifier<GoRouter> {
           AppRoute(
             RPaths.customerDueManagement,
             redirect: (_, _) => RolePermissions.manageCustomer.redirect(p),
-            (_) => const DueAdjustmentView(isCustomer: true),
+            (_) => const DueAdjustmentView(),
           ),
           //! supplier
           AppRoute(
@@ -150,7 +151,7 @@ class AppRouter extends Notifier<GoRouter> {
           AppRoute(
             RPaths.supplierDueManagement,
             redirect: (_, _) => RolePermissions.manageSupplier.redirect(p),
-            (_) => const DueAdjustmentView(isCustomer: false),
+            (_) => const DueClearanceView(),
           ),
           //! staffs
           AppRoute(

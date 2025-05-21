@@ -11,6 +11,12 @@ enum AccountType {
     AccountType.bank => {'Account number': '', 'Branch': ''},
     AccountType.mobileBank => {},
   };
+
+  //  CustomInfo fixedKeyValue() => switch (this) {
+  //   AccountType.cash => [],
+  //   AccountType.bank => [const MapEntry('Account No', ''), const MapEntry('Branch', '')],
+  //   AccountType.mobileBank => [],
+  // };
 }
 
 class PaymentAccount {

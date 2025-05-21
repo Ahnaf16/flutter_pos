@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
+import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/transactions/repository/transactions_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -72,20 +73,22 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
     }
   }
 
-  Future<Result> adjustCustomerDue(QMap form) async {
-    final res = await _repo.adjustCustomerDue(form);
+  Future<Result> adjustCustomerDue(QMap form, [bool isPayment = false]) async {
+    final res = await _repo.adjustCustomerDue(form, isPayment);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       ref.invalidate(partiesCtrlProvider);
+      ref.invalidate(paymentAccountsCtrlProvider);
       return rightResult('Due adjusted successfully');
     });
   }
 
-  Future<Result> supplierDuePayment(QMap form) async {
-    final res = await _repo.supplierDuePayment(form);
+  Future<Result> supplierDuePayment(QMap form, [bool isPayment = true]) async {
+    final res = await _repo.supplierDuePayment(form, isPayment);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       ref.invalidate(partiesCtrlProvider);
+      ref.invalidate(paymentAccountsCtrlProvider);
       return rightResult('Due paid successfully');
     });
   }
@@ -95,6 +98,7 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       ref.invalidate(partiesCtrlProvider);
+      ref.invalidate(paymentAccountsCtrlProvider);
       return rightResult('Balance transferred successfully');
     });
   }

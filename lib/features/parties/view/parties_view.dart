@@ -138,7 +138,7 @@ class PartiesView extends HookConsumerWidget {
                                   },
                                   child: const Text('Update'),
                                 ),
-                                if (data.hasDue())
+                                if (data.hasDue() && data.isCustomer)
                                   PopOverButton(
                                     icon: const Icon(LuIcons.handCoins),
                                     onPressed: () {

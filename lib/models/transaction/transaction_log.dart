@@ -138,8 +138,8 @@ class TransactionLog {
     } else {
       if (from == null) return 'Please select a person to transfer from';
       if (from.id == to?.id) return 'Can\'t transfer to same person';
-      if (from.hasDue() && from.due.abs() < amount) return 'Amount can\'t be more than available due';
-      if (from.hasBalance() && from.due.abs() < amount) return 'Amount can\'t be more than available balance';
+      if (from.hasDue() && from.due.abs() < amount) return 'Amount can\'t be more than due';
+      if (from.hasBalance() && from.due.abs() < amount) return 'Amount can\'t be more than balance';
     }
     return null;
   }

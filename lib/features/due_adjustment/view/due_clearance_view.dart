@@ -8,8 +8,8 @@ import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/transactions/controller/transactions_ctrl.dart';
 import 'package:pos/main.export.dart';
 
-class DueAdjustmentView extends HookConsumerWidget {
-  const DueAdjustmentView({super.key});
+class DueClearanceView extends HookConsumerWidget {
+  const DueClearanceView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
@@ -19,13 +19,11 @@ class DueAdjustmentView extends HookConsumerWidget {
     final config = ref.watch(configCtrlProvider);
     final user = ref.watch(authStateSyncProvider).toNullable();
 
-    final partiList = ref.watch(partiesCtrlProvider(true));
+    final partiList = ref.watch(partiesCtrlProvider(false));
     final accountList = ref.watch(paymentAccountsCtrlProvider());
 
-    final isTransfer = useState(false);
-
     return BaseBody(
-      title: 'Customer due adjustment',
+      title: 'Supplier due clearance',
       scrollable: true,
       alignment: Alignment.topLeft,
       body: LimitedWidthBox(
@@ -46,7 +44,7 @@ class DueAdjustmentView extends HookConsumerWidget {
                   error: (e, s) => ErrorView(e, s, prov: partiesCtrlProvider),
                   data: (parties) {
                     return ShadSelectField<Party>(
-                      hintText: 'Select Customer',
+                      hintText: 'Select Supplier',
                       optionBuilder: (_, v, i) => ShadOption(value: v, child: PartyNameBuilder(v)),
                       options: parties,
                       selectedBuilder: (context, value) => Text(value.name),
@@ -161,7 +159,7 @@ class DueAdjustmentView extends HookConsumerWidget {
                           name: 'payment_account',
                           hintText: 'select an account',
                           label: 'Payment account',
-                          isRequired: !isTransfer.value,
+                          isRequired: true,
                           initialValue: config.defaultAccount,
                           options: accounts,
                           valueTransformer: (value) => value?.toMap(),
@@ -175,48 +173,11 @@ class DueAdjustmentView extends HookConsumerWidget {
                   ),
                 ],
               ),
-
               const Gap(Insets.med),
               ShadTextAreaField(name: 'note', label: 'Note'),
-
-              //! transfer balance
-              if (selectedParty.value?.hasBalance() == true) ...[
-                const Gap(Insets.med),
-                ShadCheckbox(
-                  value: isTransfer.value,
-                  onChanged: (v) {
-                    isTransfer.value = v;
-                  },
-                  label: const Text('Transfer balance'),
-                ),
-                if (isTransfer.value) ...[
-                  const Gap(Insets.med),
-                  ShadCard(
-                    padding: Pads.med(),
-                    child: CustomInfoFiled(
-                      fixedInitialField: const {'Name': '', 'Phone': ''},
-                      header: (context, add) {
-                        return Row(
-                          spacing: Insets.med,
-                          children: [
-                            Text('Add custom field', style: context.text.p),
-                            SmallButton(
-                              icon: LuIcons.plus,
-                              variant: ShadButtonVariant.primary,
-                              onPressed: add,
-                              size: 25,
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ],
-
               const Gap(Insets.xl),
 
-              if (selectedParty.value?.hasDue() == true)
+              if (selectedParty.value?.hasBalance() == true)
                 SubmitButton(
                   onPressed: (l) async {
                     final state = formKey.currentState!;
@@ -224,11 +185,9 @@ class DueAdjustmentView extends HookConsumerWidget {
                     final data = QMap.from(state.transformedValues);
                     data.addAll({
                       'date': DateTime.now().toIso8601String(),
-                      'transaction_type': TransactionType.dueAdjustment.name,
-                      'transaction_from': selectedParty.value?.toMap(),
+                      'transaction_type': TransactionType.payment.name,
+                      'transaction_to': selectedParty.value?.toMap(),
                     });
-                    if (!isTransfer.value) data.remove('custom_info');
-
                     final log = TransactionLog.fromMap(data);
                     final err = log.validate();
                     if (err != null) {
@@ -241,25 +200,19 @@ class DueAdjustmentView extends HookConsumerWidget {
                       state.reset();
                     }
                   },
-                  child: const Text('Due payment'),
+                  child: const Text('Make due payment'),
                 ),
-              if (selectedParty.value?.hasBalance() == true)
+              if (selectedParty.value?.hasDue() == true)
                 SubmitButton(
                   onPressed: (l) async {
                     final state = formKey.currentState!;
                     if (!state.saveAndValidate()) return;
                     final data = QMap.from(state.transformedValues);
-
-                    final transfer = isTransfer.value;
-
                     data.addAll({
                       'date': DateTime.now().toIso8601String(),
-                      'transaction_type': (transfer ? TransactionType.transfer : TransactionType.payment).name,
-                      if (transfer) 'transaction_from': selectedParty.value?.toMap(),
-                      if (!transfer) 'transaction_to': selectedParty.value?.toMap(),
+                      'transaction_type': TransactionType.dueAdjustment.name,
+                      'transaction_from': selectedParty.value?.toMap(),
                     });
-                    if (!transfer) data.remove('custom_info');
-
                     final log = TransactionLog.fromMap(data);
 
                     final err = log.validate();
@@ -267,18 +220,13 @@ class DueAdjustmentView extends HookConsumerWidget {
                       return Toast.showErr(context, err);
                     }
 
-                    bool? ok;
-                    if (transfer) {
-                      ok = await showShadDialog<bool>(context: context, builder: (context) => _TransferDialog(log));
-                    } else {
-                      ok = await showShadDialog<bool>(context: context, builder: (context) => _DueClearDialog(log));
-                    }
+                    final ok = await showShadDialog<bool>(context: context, builder: (context) => _DueClearDialog(log));
                     if (ok == true) {
                       selectedParty.value = null;
                       state.reset();
                     }
                   },
-                  child: Text(isTransfer.value ? 'Transfer balance' : 'Clear due'),
+                  child: const Text('Clear supplier Due'),
                 ),
             ],
           ),
@@ -288,16 +236,16 @@ class DueAdjustmentView extends HookConsumerWidget {
   }
 }
 
-class _DueClearDialog extends ConsumerWidget {
-  const _DueClearDialog(this.log);
+class _DuePayDialog extends ConsumerWidget {
+  const _DuePayDialog(this.log);
 
   final TransactionLog log;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ShadDialog(
-      title: const Text('Clear customer due'),
-      description: const Text('Confirm customer due clearance'),
+      title: const Text('Make due payment'),
+      description: const Text('Confirm payment to supplier'),
       actions: [
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         SubmitButton(
@@ -305,7 +253,7 @@ class _DueClearDialog extends ConsumerWidget {
             final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.payment).notifier);
 
             l.truthy();
-            final result = await ctrl.adjustCustomerDue(log.toMap(), true);
+            final result = await ctrl.supplierDuePayment(log.toMap());
             l.falsey();
 
             if (result case final Result r) {
@@ -320,7 +268,7 @@ class _DueClearDialog extends ConsumerWidget {
       child: Text.rich(
         TextSpan(
           children: [
-            TextSpan(text: 'You are about to pay ', style: context.text.muted),
+            TextSpan(text: 'You are about to make a payment of ', style: context.text.muted),
             TextSpan(text: log.amount.currency(), style: context.text.p.bold),
             TextSpan(text: ' to ', style: context.text.muted),
             TextSpan(text: log.transactedTo?.name, style: context.text.p.bold),
@@ -340,24 +288,24 @@ class _DueClearDialog extends ConsumerWidget {
   }
 }
 
-class _DuePayDialog extends ConsumerWidget {
-  const _DuePayDialog(this.log);
+class _DueClearDialog extends ConsumerWidget {
+  const _DueClearDialog(this.log);
 
   final TransactionLog log;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ShadDialog(
-      title: const Text('Customer due payment'),
-      description: const Text('Confirm due payment from customer'),
+      title: const Text('Clear due'),
+      description: const Text('Clear supplier due'),
       actions: [
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         SubmitButton(
           onPressed: (l) async {
-            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.payment).notifier);
+            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.dueAdjustment).notifier);
 
             l.truthy();
-            final result = await ctrl.adjustCustomerDue(log.toMap());
+            final result = await ctrl.supplierDuePayment(log.toMap(), false);
             l.falsey();
 
             if (result case final Result r) {
@@ -384,71 +332,6 @@ class _DuePayDialog extends ConsumerWidget {
             const TextSpan(text: '.\n'),
             TextSpan(text: 'Updated balance : ', style: context.text.muted),
             TextSpan(text: (log.account!.amount + log.amount).currency(), style: context.text.p.bold),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TransferDialog extends ConsumerWidget {
-  const _TransferDialog(this.log);
-
-  final TransactionLog log;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ShadDialog(
-      title: const Text('Transfer balance'),
-      description: const Text('Confirm balance transfer from customer'),
-      actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
-        SubmitButton(
-          onPressed: (l) async {
-            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.transfer).notifier);
-
-            l.truthy();
-            final result = await ctrl.transferBalance(log.toMap());
-            l.falsey();
-
-            if (result case final Result r) {
-              if (!context.mounted) return;
-              r.showToast(context);
-              if (r.success) context.pop(true);
-            }
-          },
-          child: const Text('Confirm'),
-        ),
-      ],
-      child: Text.rich(
-        TextSpan(
-          children: [
-            TextSpan(text: log.transactionForm?.name, style: context.text.p.bold),
-            TextSpan(text: ' is about to transfer  ', style: context.text.muted),
-            TextSpan(text: log.amount.currency(), style: context.text.p.bold),
-            TextSpan(text: ' to:\n', style: context.text.muted),
-            for (final i in log.customInfo.entries) ...[
-              TextSpan(text: '${i.key} : ', style: context.text.muted),
-              TextSpan(text: '${i.value}\n', style: context.text.p),
-            ],
-
-            if (log.account == null) ...[
-              WidgetSpan(
-                child: Icon(LuIcons.info, size: 15, color: context.colors.destructive),
-                alignment: PlaceholderAlignment.middle,
-              ),
-              TextSpan(
-                text: '  No transaction between account will be created because no account was selected.',
-                style: context.text.small.error(context).textHeight(2),
-              ),
-            ] else ...[
-              TextSpan(text: 'Current balance of ', style: context.text.muted),
-              TextSpan(text: '${log.account?.name} : ', style: context.text.p.bold),
-              TextSpan(text: log.account?.amount.currency(), style: context.text.p.bold),
-              const TextSpan(text: '.\n'),
-              TextSpan(text: 'Updated balance : ', style: context.text.muted),
-              TextSpan(text: (log.account!.amount - log.amount).currency(), style: context.text.p.bold),
-            ],
           ],
         ),
       ),
