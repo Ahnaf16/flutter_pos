@@ -70,7 +70,7 @@ class InventoryRecordState {
   num get due => totalPrice() - amount;
 
   bool get hasDue => due > 0;
-  bool get hasBalance => due < 0;
+  bool get hasExtra => due < 0;
 
   bool get partiHasBalance => parti?.due.isNegative ?? false;
   bool get partiHasDue => (parti?.due ?? 0) > 0;

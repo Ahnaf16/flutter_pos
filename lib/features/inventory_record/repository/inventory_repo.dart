@@ -36,7 +36,7 @@ class InventoryRepo with AwHandler {
     Party? parti = record.party;
     // will be null if customer is walk-in
     if (parti != null) {
-      if (inventory.hasDue || inventory.hasBalance) {
+      if (inventory.hasDue || inventory.hasExtra) {
         // _updateDue adds the due with the parti.due. if due is (-) it will be subtracted
         // when hasBalance, due is (-), so -due will subtract due. will be added as balance
         // when hasDue, due is (+), so +due will add due. will be added as due
@@ -80,7 +80,8 @@ class InventoryRepo with AwHandler {
     }
 
     //! update Due
-    if (inventory.hasDue || inventory.hasBalance) {
+    //inventory.extra has been stopped at validation
+    if (inventory.hasDue || inventory.hasExtra) {
       // _updateDue adds the due with the parti.due. if due is (-) it will be subtracted
       // when hasBalance, due is (-), so -(-due) will add due. will be added as due
       // when hasDue, due is (+), so -(+due) will subtract due. will be added as balance

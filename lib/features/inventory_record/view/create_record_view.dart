@@ -242,7 +242,7 @@ class _Summary extends StatelessWidget {
             styleBuilder: (l, r) => (l, context.text.large),
           ),
           SpacedText(
-            left: record.hasBalance ? 'Extra' : 'Due',
+            left: record.hasExtra ? 'Extra' : 'Due',
             right: record.due.abs().currency(),
             styleBuilder: (l, r) {
               return (l, r.textColor(record.hasDue ? context.colors.destructive : null));
@@ -259,7 +259,7 @@ class _Summary extends StatelessWidget {
               child: Text('The due amount will be deducted from balance', style: context.text.muted.error(context)),
             ),
 
-          if (record.hasBalance && !record.isWalkIn && type.isSale)
+          if (record.hasExtra && !record.isWalkIn && type.isSale)
             ShadCard(
               border: Border.all(color: context.colors.destructive),
               leading: Icon(LuIcons.triangleAlert, color: context.colors.destructive),

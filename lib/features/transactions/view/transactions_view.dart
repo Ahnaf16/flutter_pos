@@ -136,19 +136,16 @@ class TrxTable extends StatelessWidget {
       cellAlignment: Alignment.centerLeft,
       cellAlignmentBuilder: (i) => heads.fromName(i).alignment,
       cellBuilderIndexed: (data, head, i) {
+        final String? toName = data.transactedTo?.name;
+        final String? toPhone = data.transactedTo?.phone;
+
+        final String? fromName = data.transactionForm?.name ?? data.transactionBy?.name;
+        final String? fromPhone = data.transactionForm?.phone ?? data.transactionBy?.phone;
+
         return switch (head.name) {
           '#' => DataGridCell(columnName: head.name, value: Text((i + 1).toString())),
-          'To' => DataGridCell(
-            columnName: head.name,
-            value: NameCellBuilder(data.getParti?.name, data.getParti?.phone),
-          ),
-          'From' => DataGridCell(
-            columnName: head.name,
-            value: NameCellBuilder(
-              data.transactionForm?.name ?? data.transactionBy?.name,
-              data.transactionForm?.phone ?? data.transactionBy?.phone,
-            ),
-          ),
+          'To' => DataGridCell(columnName: head.name, value: NameCellBuilder(toName, toPhone)),
+          'From' => DataGridCell(columnName: head.name, value: NameCellBuilder(fromName, fromPhone)),
           'Amount' => DataGridCell(columnName: head.name, value: Text(data.amount.currency())),
           'Account' => DataGridCell(
             columnName: head.name,
@@ -206,7 +203,7 @@ class _TrxViewDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final TransactionLog(getParti: to, transactionBy: user, transactionForm: from) = trx;
+    final TransactionLog(transactedTo: to, transactionBy: user, transactionForm: from) = trx;
     return ShadDialog(
       title: Text('${trx.type.name.titleCase} log'),
       description: Row(

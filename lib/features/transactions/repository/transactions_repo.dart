@@ -55,11 +55,11 @@ class TransactionsRepo with AwHandler {
       log = log.copyWith(transactionBy: () => user);
     }
 
-    Party? fromParti = log.transactionForm;
-    if (fromParti != null && !fromParti.isWalkIn) {
-      final (err, parti) = await _updateDue(fromParti.id, log.amount).toRecord();
+    Party? toParti = log.transactedTo;
+    if (toParti != null && !toParti.isWalkIn) {
+      final (err, parti) = await _updateDue(toParti.id, log.amount).toRecord();
       if (err != null || parti == null) return left(err ?? const Failure('Unable to update due'));
-      fromParti = Party.fromDoc(parti);
+      toParti = Party.fromDoc(parti);
     }
 
     final account = log.account;

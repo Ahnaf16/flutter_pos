@@ -198,29 +198,10 @@ class SupplierDueDialog extends HookConsumerWidget {
 
                   //! user
                   VisibilityField<AppUser>(name: 'transaction_by', data: user, valueTransformer: (v) => v?.toMap()),
+                  VisibilityField<Party>(name: 'transaction_to', data: parti, valueTransformer: (v) => v?.toMap()),
 
-                  Visibility(
-                    maintainState: true,
-                    maintainAnimation: true,
-                    visible: parti == null,
-                    child: ShadSelectField<Party>(
-                      name: 'transaction_from',
-                      hintText: 'Select customer',
-                      initialValue: parti,
-                      enabled: parti == null,
-                      options: parties.where((e) => e.hasDue()).toList(),
-                      valueTransformer: (value) => value?.toMap(),
-                      optionBuilder: (_, v, i) {
-                        return ShadOption(value: v, child: PartyNameBuilder(v));
-                      },
-                      selectedBuilder: (context, v) {
-                        return PartyNameBuilder(v);
-                      },
-                      onChanged: selectedParty.set,
-                    ),
-                  ),
                   const Gap(Insets.med),
-                  UserCard.parti(parti: party, imgSize: 80, showDue: true, forceDue: true),
+                  UserCard.parti(parti: party, imgSize: 80, showDue: true),
 
                   if (party?.hasBalance() == true) ...[
                     const Gap(Insets.med),

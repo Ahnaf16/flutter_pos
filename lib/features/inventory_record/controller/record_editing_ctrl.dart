@@ -141,11 +141,11 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     }
 
     if (type.isPurchase) {
-      if (state.hasBalance) return (false, 'Negative Due amount is not allowed');
+      if (state.hasExtra) return (false, 'Extra amount is not allowed when purchasing');
       return submitPurchase();
     } else {
       if (state.isWalkIn && state.hasDue) return (false, 'Clear due for walk-in customer');
-      if (state.isWalkIn && state.hasBalance) return (false, 'Clear extra amount for walk-in customer');
+      if (state.isWalkIn && state.hasExtra) return (false, 'Clear extra amount for walk-in customer');
 
       return submitSale();
     }

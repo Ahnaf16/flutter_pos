@@ -3,7 +3,21 @@ import 'package:fpdart/fpdart.dart';
 import 'package:nanoid2/nanoid2.dart';
 import 'package:pos/main.export.dart';
 
-enum TransactionType { sale, payment, returned, expanse, transfer, dueAdjustment }
+enum TransactionType {
+  sale,
+  payment,
+  returned,
+  expanse,
+  transfer,
+  dueAdjustment;
+
+  bool get isSale => this == TransactionType.sale;
+  bool get isPayment => this == TransactionType.payment;
+  bool get isReturned => this == TransactionType.returned;
+  bool get isExpanse => this == TransactionType.expanse;
+  bool get isTransfer => this == TransactionType.transfer;
+  bool get isDueAdjustment => this == TransactionType.dueAdjustment;
+}
 
 class TransactionLog {
   const TransactionLog({
@@ -114,17 +128,23 @@ class TransactionLog {
 
   String? validate() {
     final from = transactionForm;
+    final to = transactedTo;
 
     if (amount <= 0) return 'Amount must be greater than 0';
-    if (from == null) return 'Please select a person to transfer from';
-    if (from.id == transactedTo?.id) return 'Can\'t transfer to same person';
-    if (from.hasDue() && from.due.abs() < amount) return 'Amount can\'t be more than available due';
-    if (from.hasBalance() && from.due.abs() < amount) return 'Transfer amount can\'t be more than available balance';
-
+    if (type.isPayment) {
+      if (to == null) return 'Please select a person to make transaction to';
+      if (to.hasDue() && to.due.abs() < amount) return 'Amount can\'t be more than available due';
+      if (to.hasBalance() && to.due.abs() < amount) return 'Amount can\'t be more than available balance';
+    } else {
+      if (from == null) return 'Please select a person to transfer from';
+      if (from.id == to?.id) return 'Can\'t transfer to same person';
+      if (from.hasDue() && from.due.abs() < amount) return 'Amount can\'t be more than available due';
+      if (from.hasBalance() && from.due.abs() < amount) return 'Amount can\'t be more than available balance';
+    }
     return null;
   }
 
-  Party? get getParti => transactedTo;
+  // Party? get getParti => transactedTo;
 
   static TransactionLog fromInventoryRecord(InventoryRecord record, AppUser user) {
     final parti = record.party;

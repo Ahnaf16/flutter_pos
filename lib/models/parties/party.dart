@@ -38,7 +38,7 @@ class Party {
 
   Color dueColor() {
     if (due == 0) return Colors.grey;
-    if (!isCustomer) return (hasBalance() ? Colors.red : Colors.green);
+    // if (!isCustomer) return (hasBalance() ? Colors.red : Colors.green);
     return (hasDue() ? Colors.red : Colors.green);
   }
 

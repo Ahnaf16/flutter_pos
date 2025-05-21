@@ -89,23 +89,16 @@ class PartiesView extends HookConsumerWidget {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  if (data.isCustomer) ...[
-                                    if (data.hasDue())
-                                      SpacedText(
-                                        left: 'Due',
-                                        right: data.due.currency(),
-                                        styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
-                                      )
-                                    else
-                                      SpacedText(
-                                        left: 'Balance',
-                                        right: data.due.abs().currency(),
-                                        styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
-                                      ),
-                                  ] else
+                                  if (data.hasDue())
                                     SpacedText(
                                       left: 'Due',
                                       right: data.due.currency(),
+                                      styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+                                    )
+                                  else
+                                    SpacedText(
+                                      left: 'Balance',
+                                      right: data.due.abs().currency(),
                                       styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
                                     ),
                                 ],
@@ -130,7 +123,8 @@ class PartiesView extends HookConsumerWidget {
                                 PopOverButton(
                                   icon: const Icon(LuIcons.eye),
                                   onPressed: () {
-                                    RPaths.customerDetails(data.id).pushNamed(context);
+                                    if (isCustomer) RPaths.customerDetails(data.id).pushNamed(context);
+                                    if (!isCustomer) RPaths.supplierDetails(data.id).pushNamed(context);
                                   },
                                   child: const Text('View'),
                                 ),
