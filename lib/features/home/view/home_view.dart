@@ -29,11 +29,15 @@ class HomeView extends HookConsumerWidget {
               return Stack(
                 fit: StackFit.expand,
                 children: [
-                  ShadCard(
-                    padding: Pads.med(),
-                    childPadding: Pads.med('t'),
-                    title: OverflowMarquee(child: Text(title, style: context.text.list.op(.5))),
-                    child: OverflowMarquee(child: Text(value.toString(), style: context.text.h4)),
+                  Builder(
+                    builder: (context) {
+                      return ShadCard(
+                        padding: Pads.med(),
+                        childPadding: Pads.med('t'),
+                        title: OverflowMarquee(child: Text(title, style: context.text.list.op(.5))),
+                        child: OverflowMarquee(child: Text(value.toString(), style: context.text.h4)),
+                      );
+                    },
                   ),
 
                   Positioned(

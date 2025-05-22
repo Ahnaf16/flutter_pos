@@ -21,13 +21,20 @@ class PosApp extends HookConsumerWidget {
 
     useEffect(() => null, [theme]);
 
-    return ShadApp.materialRouter(
-      title: kAppName,
-      routerConfig: route,
-      themeMode: theme.mode,
+    return ShadApp.custom(
       theme: theme.theme,
       darkTheme: theme.theme,
-      builder: (context, child) => Layouts.init(context, child),
+      themeMode: theme.mode,
+      appBuilder: (context) => MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        title: kAppName,
+        theme: Theme.of(context),
+        darkTheme: Theme.of(context),
+        routerConfig: route,
+        builder: (context, child) {
+          return ShadAppBuilder(child: child, builder: (context, child) => Layouts.init(context, child));
+        },
+      ),
     );
   }
 }

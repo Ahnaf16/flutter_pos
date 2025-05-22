@@ -1,6 +1,5 @@
 import 'package:appwrite/models.dart';
 import 'package:pos/main.export.dart';
-import 'package:pos/models/config/shop_config.dart';
 
 enum StockDistPolicy { newerFirst, olderFirst }
 
@@ -64,10 +63,9 @@ class Config {
     return Config(
       currencySymbol: map['currency_symbol'] ?? currencySymbol,
       symbolLeft: map['currency_symbol_on_left'] ?? symbolLeft,
-      stockDistPolicy:
-          map['stock_distribution_policy'] == null
-              ? stockDistPolicy
-              : StockDistPolicy.values.byName(map['stock_distribution_policy']),
+      stockDistPolicy: map['stock_distribution_policy'] == null
+          ? stockDistPolicy
+          : StockDistPolicy.values.byName(map['stock_distribution_policy']),
       minimumVersion: map['minimum_version'] ?? minimumVersion,
       defAccount: PaymentAccount.tryParse(map['default_account']) ?? defAccount,
       shop: shop.marge(map),
