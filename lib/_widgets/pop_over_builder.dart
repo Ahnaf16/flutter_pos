@@ -3,7 +3,7 @@ import 'package:pos/main.export.dart';
 class PopOverBuilder extends HookWidget {
   const PopOverBuilder({super.key, required this.children, this.icon, this.actionSpread = false});
 
-  final List<Widget> children;
+  final List<Widget> Function(BuildContext context, Function() hide) children;
   final Widget? icon;
   final bool actionSpread;
 
@@ -12,24 +12,27 @@ class PopOverBuilder extends HookWidget {
     final popCtrl = useMemoized(ShadPopoverController.new);
 
     if (actionSpread) {
-      return Row(mainAxisAlignment: MainAxisAlignment.end, children: children);
+      return Row(mainAxisAlignment: MainAxisAlignment.end, children: children(context, () {}));
     }
 
     return ShadPopover(
       controller: popCtrl,
       padding: Pads.sm(),
       anchor: const ShadAnchorAuto(followerAnchor: Alignment.bottomLeft, offset: Offset(15, 0)),
+      popover:
+          (
+            context,
+          ) {
+            return IntrinsicWidth(
+              child: Column(
+                spacing: Insets.xs,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: children(context, popCtrl.hide),
+              ),
+            );
+          },
       child: ShadButton.ghost(onPressed: () => popCtrl.toggle(), child: const Icon(LuIcons.ellipsisVertical)),
-      popover: (context) {
-        return IntrinsicWidth(
-          child: Column(
-            spacing: Insets.xs,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: children,
-          ),
-        );
-      },
     );
   }
 }

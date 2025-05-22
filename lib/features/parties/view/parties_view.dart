@@ -1,14 +1,13 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
-import 'package:pos/features/parties/view/party_details_view.dart';
 import 'package:pos/features/transactions/view/party_due_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
   TableHeading(name: 'Name'),
-  TableHeading(name: 'Phone', max: 300.0, alignment: Alignment.center),
-  TableHeading(name: 'Due/Balance', max: 200.0),
+  TableHeading(name: 'Phone', max: 500.0, alignment: Alignment.center),
+  TableHeading(name: 'Due/Balance', max: 400.0, alignment: Alignment.center),
   TableHeading(name: 'Action', max: 200.0, alignment: Alignment.centerRight),
 ];
 
@@ -17,7 +16,10 @@ class PartiesView extends HookConsumerWidget {
   final bool isCustomer;
 
   static Future<WalkIn?> showAddDialog(BuildContext context, bool isCustomer) async {
-    return showShadDialog(context: context, builder: (context) => _PartiAddDialog(isCustomer: isCustomer));
+    return showShadDialog(
+      context: context,
+      builder: (context) => _PartiAddDialog(isCustomer: isCustomer),
+    );
   }
 
   @override
@@ -31,7 +33,10 @@ class PartiesView extends HookConsumerWidget {
         ShadButton(
           child: const Text('Create'),
           onPressed: () {
-            showShadDialog(context: context, builder: (context) => _PartiAddDialog(isCustomer: isCustomer));
+            showShadDialog(
+              context: context,
+              builder: (context) => _PartiAddDialog(isCustomer: isCustomer),
+            );
           },
         ),
       ],
@@ -82,34 +87,23 @@ class PartiesView extends HookConsumerWidget {
                       ),
                       'Due/Balance' => DataGridCell(
                         columnName: head.name,
-                        value: Row(
-                          mainAxisSize: MainAxisSize.min,
+                        value: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Flexible(
-                              child: Column(
+                            if (data.hasDue())
+                              SpacedText(
+                                left: 'Due',
+                                right: data.due.currency(),
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (data.hasDue())
-                                    SpacedText(
-                                      left: 'Due',
-                                      right: data.due.currency(),
-                                      styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
-                                    )
-                                  else
-                                    SpacedText(
-                                      left: 'Balance',
-                                      right: data.due.abs().currency(),
-                                      styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
-                                    ),
-                                ],
+                                styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
+                              )
+                            else
+                              SpacedText(
+                                left: 'Balance',
+                                right: data.due.abs().currency(),
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
                               ),
-                            ),
-                            SmallButton(
-                              icon: LuIcons.pen,
-                              onPressed: () {
-                                showShadDialog(context: context, builder: (context) => PartyBalanceDialog(party: data));
-                              },
-                            ),
                           ],
                         ),
                       ),
@@ -119,7 +113,7 @@ class PartiesView extends HookConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             PopOverBuilder(
-                              children: [
+                              children: (context, hide) => [
                                 PopOverButton(
                                   icon: const Icon(LuIcons.eye),
                                   onPressed: () {
@@ -131,6 +125,7 @@ class PartiesView extends HookConsumerWidget {
                                 PopOverButton(
                                   icon: const Icon(LuIcons.pen),
                                   onPressed: () async {
+                                    hide();
                                     await showShadDialog(
                                       context: context,
                                       builder: (context) => _PartiAddDialog(parti: data, isCustomer: isCustomer),
@@ -142,6 +137,7 @@ class PartiesView extends HookConsumerWidget {
                                   PopOverButton(
                                     icon: const Icon(LuIcons.handCoins),
                                     onPressed: () {
+                                      hide();
                                       showShadDialog(
                                         context: context,
                                         builder: (context) => PartyDueDialog(parti: data, type: data.type),
@@ -153,6 +149,7 @@ class PartiesView extends HookConsumerWidget {
                                   PopOverButton(
                                     icon: const Icon(LuIcons.handCoins),
                                     onPressed: () {
+                                      hide();
                                       showShadDialog(
                                         context: context,
                                         builder: (context) => SupplierDueDialog(parti: data, type: data.type),
@@ -164,6 +161,7 @@ class PartiesView extends HookConsumerWidget {
                                   PopOverButton(
                                     icon: const Icon(LuIcons.arrowLeftRight),
                                     onPressed: () {
+                                      hide();
                                       showShadDialog(
                                         context: context,
                                         builder: (context) => BalanceTransferDialog(parti: data, type: data.type),
@@ -173,11 +171,12 @@ class PartiesView extends HookConsumerWidget {
                                   ),
 
                                 PopOverButton(
-                                  icon: const Icon(LuIcons.pen),
+                                  icon: const Icon(LuIcons.trash),
                                   onPressed: () async {
+                                    hide();
                                     await showShadDialog(
                                       context: context,
-                                      builder: (context) => _PartiAddDialog(parti: data, isCustomer: isCustomer),
+                                      builder: (c) => _PartyDeleteDialog(partiCtrl: partiCtrl, data: data),
                                     );
                                   },
                                   isDestructive: true,
@@ -197,6 +196,58 @@ class PartiesView extends HookConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PartyDeleteDialog extends StatelessWidget {
+  const _PartyDeleteDialog({
+    required this.partiCtrl,
+    required this.data,
+  });
+
+  final PartiesCtrl Function() partiCtrl;
+  final Party data;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShadDialog.alert(
+      title: Text('Delete ${data.isCustomer ? 'Customer' : 'Supplier'}'),
+      description: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(text: 'Are you sure you want to delete ${data.name}?\n\n'),
+
+            if (data.due != 0) ...[
+              TextSpan(text: data.name, style: context.text.small.bold),
+              TextSpan(text: ' has ', style: context.text.muted),
+              TextSpan(
+                text: '${data.hasDue() ? 'due' : 'balance'} of ${data.due.abs().currency()}.',
+                style: context.text.small.bold,
+              ),
+
+              TextSpan(
+                text: '\nDeleting without clearing ${data.hasDue() ? 'due' : 'balance'} is not recommended.',
+                style: context.text.small.error(context),
+              ),
+            ] else
+              TextSpan(text: '\nThis action cannot be undone.', style: context.text.small.error(context)),
+          ],
+        ),
+      ),
+      actions: [
+        ShadButton(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        SubmitButton(
+          variant: ShadButtonVariant.destructive,
+          onPressed: (l) async {
+            l.truthy();
+            await partiCtrl().delete(data.id);
+            l.falsey();
+            if (context.mounted) context.nPop();
+          },
+          child: const Text('Delete'),
+        ),
+      ],
     );
   }
 }
@@ -222,7 +273,9 @@ class _PartyNameBuilder extends StatelessWidget {
               Row(
                 spacing: Insets.sm,
                 children: [
-                  Flexible(child: OverflowMarquee(child: Text(parti.name, style: context.text.list))),
+                  Flexible(
+                    child: OverflowMarquee(child: Text(parti.name, style: context.text.list)),
+                  ),
                   if (!parti.isCustomer) ShadBadge.outline(child: Text(parti.type.name)),
                 ],
               ),
@@ -398,7 +451,10 @@ class PartiViewDialog extends HookConsumerWidget {
       title: const Text('Parti'),
       description: Row(
         spacing: Insets.sm,
-        children: [Text('Details of ${parti.name}'), ShadBadge.outline(child: Text(parti.type.name))],
+        children: [
+          Text('Details of ${parti.name}'),
+          ShadBadge.outline(child: Text(parti.type.name)),
+        ],
       ),
 
       actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
@@ -439,27 +495,26 @@ class PartiViewDialog extends HookConsumerWidget {
               styleBuilder: (l, r) => (l, r.bold),
               builder: (r) => Text(r, style: context.text.small.textColor(parti.dueColor())),
               crossAxisAlignment: CrossAxisAlignment.center,
-              trailing:
-                  parti.due == 0
-                      ? null
-                      : ShadTooltip(
-                        child: const Icon(LuIcons.info),
-                        builder: (context) {
-                          return Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(text: '${parti.name} '),
-                                TextSpan(
-                                  text: parti.due.isNegative ? 'Owe' : 'Will pay',
-                                  style: context.text.small.bold,
-                                ),
-                                const TextSpan(text: ' you'),
-                                TextSpan(text: ' ${parti.due.abs().currency()}', style: context.text.small.bold),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+              trailing: parti.due == 0
+                  ? null
+                  : ShadTooltip(
+                      child: const Icon(LuIcons.info),
+                      builder: (context) {
+                        return Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(text: '${parti.name} '),
+                              TextSpan(
+                                text: parti.due.isNegative ? 'Owe' : 'Will pay',
+                                style: context.text.small.bold,
+                              ),
+                              const TextSpan(text: ' you'),
+                              TextSpan(text: ' ${parti.due.abs().currency()}', style: context.text.small.bold),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),

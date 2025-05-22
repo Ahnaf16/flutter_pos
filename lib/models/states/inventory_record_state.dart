@@ -82,8 +82,7 @@ class InventoryRecordState {
   InventoryRecord toInventoryRecord(AppUser user) {
     InventoryStatus status = InventoryStatus.paid;
     if (paidAmount == 0) status = InventoryStatus.unpaid;
-    if (hasDue) status = InventoryStatus.partial;
-    if (hasExtra) status = InventoryStatus.paid;
+    if (paidAmount > 0) status = InventoryStatus.partial;
 
     return InventoryRecord(
       id: '',

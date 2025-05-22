@@ -145,13 +145,13 @@ class RecordTable extends ConsumerWidget {
           'Account' => DataGridCell(columnName: head.name, value: Text(data.account?.name ?? '--')),
           'Status' => DataGridCell(
             columnName: head.name,
-            value: ShadBadge.secondary(child: Text(data.status.name.titleCase)),
+            value: ShadBadge.secondary(child: Text(data.status.name.titleCase)).colored(data.status.color),
           ),
           'Action' => DataGridCell(
             columnName: head.name,
             value: PopOverBuilder(
               actionSpread: actionSpread,
-              children: [
+              children: (context, hide) => [
                 PopOverButton(
                   dense: actionSpread,
                   icon: const Icon(LuIcons.eye),

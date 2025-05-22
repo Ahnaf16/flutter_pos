@@ -36,12 +36,11 @@ class PartiesCtrl extends _$PartiesCtrl {
     if (query.isEmpty) {
       state = AsyncValue.data(_searchFrom);
     }
-    final list =
-        _searchFrom.where((e) {
-          return e.name.low.contains(query.low) ||
-              (e.phone.low.contains(query.low)) ||
-              (e.email?.low.contains(query.low) ?? false);
-        }).toList();
+    final list = _searchFrom.where((e) {
+      return e.name.low.contains(query.low) ||
+          (e.phone.low.contains(query.low)) ||
+          (e.email?.low.contains(query.low) ?? false);
+    }).toList();
     state = AsyncData(list);
   }
 
@@ -56,6 +55,14 @@ class PartiesCtrl extends _$PartiesCtrl {
   Future<Result> checkAvailability(String phone) async {
     final res = await _repo.checkAvailability(phone);
     return res.fold(leftResult, (_) => rightResult('Phone available'));
+  }
+
+  Future<Result> delete(String id) async {
+    final res = await _repo.deleteParty(id);
+    return res.fold(leftResult, (_) {
+      ref.invalidate(partiesCtrlProvider);
+      return rightResult('Deleted successfully');
+    });
   }
 
   Future<Result> updateParti(Party parti, [PFile? file]) async {

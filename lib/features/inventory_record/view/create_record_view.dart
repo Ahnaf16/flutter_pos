@@ -442,7 +442,10 @@ class _PartiSection extends HookConsumerWidget {
     final parti = record.getParti;
 
     return partiList.when(
-      loading: () => Padding(padding: Pads.sm('lrt'), child: const ShadCard(width: 300, child: Loading())),
+      loading: () => Padding(
+        padding: Pads.sm('lrt'),
+        child: const ShadCard(width: 300, child: Loading()),
+      ),
       error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
       data: (parties) {
         final filtered = parties.where((e) => e.name.low.contains(search.value.low)).toList();
@@ -501,7 +504,9 @@ class _PartiSection extends HookConsumerWidget {
                               Text(parti.name),
                               if (parti.due != 0)
                                 Text.rich(
-                                  TextSpan(text: '${parti.hasDue() ? 'Due' : 'Balance'}: ${parti.due.currency()}'),
+                                  TextSpan(
+                                    text: '${parti.hasDue() ? 'Due' : 'Balance'}: ${parti.due.abs().currency()}',
+                                  ),
                                   style: context.text.p.size(12),
                                 ),
                               Text(parti.phone, style: context.text.muted.size(12)),

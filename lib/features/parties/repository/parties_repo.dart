@@ -62,6 +62,10 @@ class PartiesRepo with AwHandler {
     return await db.get(_coll, id).convert(Party.fromDoc);
   }
 
+  FutureReport<Unit> deleteParty(String id) async {
+    return await db.delete(_coll, id);
+  }
+
   FutureReport<Unit> checkAvailability(String phone) async {
     final (err, docs) = await db.getList(_coll, queries: [Query.equal('phone', phone)]).toRecord();
 
