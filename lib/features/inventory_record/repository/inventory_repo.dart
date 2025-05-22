@@ -177,6 +177,15 @@ class InventoryRepo with AwHandler {
     return await repo.addTransaction(transaction);
   }
 
+  FutureReport<Unit> updateUnpaidInvoices(String? partyId, num amount) async {
+    if (partyId == null) return right(unit);
+    final (err, records) = await getRecordFiltered([Query.equal('parties', partyId)]).toRecord();
+    if (err != null || records == null) return left(err ?? const Failure('Unable to get unpaid records'));
+
+    return right(unit);
+  }
+
+  // !---
   FutureReport<Document> updateRecord(InventoryRecord record) async {
     final doc = await db.update(AWConst.collections.inventoryRecord, record.id, data: record.toAwPost());
     return doc;

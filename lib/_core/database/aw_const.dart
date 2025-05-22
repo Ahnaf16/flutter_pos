@@ -38,22 +38,7 @@ class $AWCollections {
   AwId get warehouse => ('6805bdcd00107f585ff2', 'warehouse');
   AwId get dueLog => ('68130121000d796dd775', 'due_adjustment_log');
   AwId get expenseCategory => ('6818e28a0011fa58a4be', 'expense_category');
-
-  List<AwId> get values => [
-    config,
-    expense,
-    inventoryDetails,
-    inventoryRecord,
-    parties,
-    paymentAccount,
-    products,
-    role,
-    stock,
-    transactions,
-    unit,
-    users,
-    warehouse,
-  ];
+  AwId get paymentLog => ('682f0d7700136b44c75b', 'payment_log');
 }
 
 class $AWDocs {

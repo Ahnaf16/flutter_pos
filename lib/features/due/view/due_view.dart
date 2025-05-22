@@ -128,7 +128,6 @@ class _PartyNameBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       spacing: Insets.med,
-      // crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         CircleImage(parti.getPhoto, borderWidth: 1, radius: 20),
@@ -149,7 +148,6 @@ class _PartyNameBuilder extends StatelessWidget {
                 ],
               ),
               Text(parti.phone),
-              if (parti.address != null) Text(parti.address ?? '--', maxLines: 2, overflow: TextOverflow.ellipsis),
               if (parti.hasDue()) Text('Due: ${parti.due.abs().currency()}'),
               if (parti.hasBalance()) Text('Balance: ${parti.due.abs().currency()}'),
             ],

@@ -2,6 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/auth/repository/auth_repo.dart';
+import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
 import 'package:pos/features/parties/repository/parties_repo.dart';
 import 'package:pos/features/payment_accounts/repository/payment_accounts_repo.dart';
 import 'package:pos/main.export.dart';
@@ -16,31 +17,37 @@ class TransactionsRepo with AwHandler {
   FutureReport<Document> adjustCustomerDue(QMap form, [bool isPayment = false]) async {
     final data = QMap.from(form);
     data.addAll({'date': DateTime.now().toIso8601String()});
-    TransactionLog log = TransactionLog.fromMap(data);
+    final TransactionLog log = TransactionLog.fromMap(data);
 
     if (log.validate() != null) return left(Failure(log.validate()!));
 
-    if (log.transactionBy == null) {
-      final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
-      if (err != null || user == null) return left(err ?? const Failure('Unable to get current user'));
-      log = log.copyWith(transactionBy: () => user);
+    // if (log.transactionBy == null) {
+    //   final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
+    //   if (err != null || user == null) return left(err ?? const Failure('Unable to get current user'));
+    //   log = log.copyWith(transactionBy: () => user);
+    // }
+
+    final Party? parti = isPayment ? log.transactedTo : log.transactionForm;
+
+    // if (parti != null && !parti.isWalkIn) {
+    //   final (err, pDoc) = await _updateDue(parti.id, isPayment ? log.amount : -log.amount).toRecord();
+    //   if (err != null || pDoc == null) return left(err ?? const Failure('Unable to update due'));
+    //   parti = Party.fromDoc(pDoc);
+    // }
+
+    // final account = log.account;
+    // if (account != null) {
+    //   final (err, acc) = await _updateAccountAmount(account.id, isPayment ? -log.amount : log.amount).toRecord();
+    //   if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
+    // }
+
+    if (!isPayment) {
+      final (err, _) = await locate<InventoryRepo>().updateUnpaidInvoices(parti?.id, log.amount).toRecord();
+      //! change status for unpaid invoice
     }
 
-    Party? parti = isPayment ? log.transactedTo : log.transactionForm;
-
-    if (parti != null && !parti.isWalkIn) {
-      final (err, pDoc) = await _updateDue(parti.id, isPayment ? log.amount : -log.amount).toRecord();
-      if (err != null || pDoc == null) return left(err ?? const Failure('Unable to update due'));
-      parti = Party.fromDoc(pDoc);
-    }
-
-    final account = log.account;
-    if (account != null) {
-      final (err, acc) = await _updateAccountAmount(account.id, isPayment ? -log.amount : log.amount).toRecord();
-      if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
-    }
-
-    return await db.create(_coll, data: log.toAwPost());
+    // return await db.create(_coll, data: log.toAwPost());
+    return left(const Failure('___WIP___'));
   }
 
   FutureReport<Document> supplierDuePayment(QMap form, [bool isPayment = true]) async {

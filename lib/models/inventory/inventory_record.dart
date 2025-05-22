@@ -26,10 +26,10 @@ enum InventoryStatus {
   bool get isReturned => this == InventoryStatus.returned;
 
   Color get color => switch (this) {
-    paid => Colors.green,
-    partial => Colors.yellow,
-    unpaid => Colors.red,
-    returned => Colors.pink,
+    paid => const Color(0xFF28A745),
+    partial => const Color(0xFF6EC5BB),
+    unpaid => const Color(0xFFDC3545),
+    returned => const Color(0xFF6C757D),
   };
 }
 
