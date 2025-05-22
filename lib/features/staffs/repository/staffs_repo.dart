@@ -65,7 +65,12 @@ class StaffRepo with AwHandler {
     final users = await db
         .getList(
           AWConst.collections.users,
-          queries: [Query.equal('password', hash), Query.equal('is_user_created', false), Query.equal('email', email)],
+          queries: [
+            Query.equal('password', hash),
+            Query.equal('email', email),
+            Query.equal('is_user_created', false),
+            Query.equal('isActive', true),
+          ],
         )
         .convert((r) => r.convertDoc(AppUser.fromDoc));
 
@@ -77,6 +82,16 @@ class StaffRepo with AwHandler {
       AWConst.collections.users,
       user.id,
       data: user.copyWith(warehouse: () => house).toAwPost(),
+    );
+
+    return doc.convert(AppUser.fromDoc);
+  }
+
+  FutureReport<AppUser?> toggleActive(String id, bool isActive) async {
+    final doc = await db.update(
+      AWConst.collections.users,
+      id,
+      data: {'isActive': isActive},
     );
 
     return doc.convert(AppUser.fromDoc);

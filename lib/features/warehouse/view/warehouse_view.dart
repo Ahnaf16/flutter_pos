@@ -78,11 +78,10 @@ class WarehouseView extends HookConsumerWidget {
                             ShadButton.secondary(
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.eye),
-                              onPressed:
-                                  () => showShadDialog(
-                                    context: context,
-                                    builder: (context) => _WarehouseViewDialog(house: data),
-                                  ),
+                              onPressed: () => showShadDialog(
+                                context: context,
+                                builder: (context) => _WarehouseViewDialog(house: data),
+                              ),
                             ),
                             ShadButton.secondary(
                               size: ShadButtonSize.sm,

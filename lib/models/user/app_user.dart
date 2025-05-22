@@ -12,6 +12,7 @@ class AppUser {
     required this.warehouse,
     this.isAccountCreated = false,
     this.password,
+    this.isActive = true,
   });
 
   final String email;
@@ -21,6 +22,7 @@ class AppUser {
   final String? photo;
   final UserRole? role;
   final WareHouse? warehouse;
+  final bool isActive;
 
   /// is the user has been created in auth
   final bool isAccountCreated;
@@ -39,6 +41,7 @@ class AppUser {
       warehouse: WareHouse.tyrParse(data['warehouse']),
       isAccountCreated: data['is_user_created'],
       password: data['password'],
+      isActive: data['isActive'],
     );
   }
 
@@ -53,6 +56,7 @@ class AppUser {
       warehouse: WareHouse.tyrParse(map['warehouse']),
       isAccountCreated: map.parseBool('is_user_created'),
       password: map['password'],
+      isActive: map.parseBool('isActive', true),
     );
   }
 
@@ -78,6 +82,7 @@ class AppUser {
       warehouse: map['warehouse'] == null ? warehouse : WareHouse.tyrParse(map['warehouse']),
       isAccountCreated: map.parseBool('is_user_created', isAccountCreated),
       password: map['password'] ?? password,
+      isActive: map.parseBool('isActive', isActive),
     );
   }
 
@@ -93,6 +98,7 @@ class AppUser {
     'warehouse': warehouse?.toMap(),
     'is_user_created': isAccountCreated,
     'password': password,
+    'isActive': isActive,
   };
   Map<String, dynamic> toAwPost() => {
     'name': name,
@@ -103,6 +109,7 @@ class AppUser {
     'warehouse': warehouse?.id,
     'is_user_created': isAccountCreated,
     'password': password != null ? hashPass(password!) : null,
+    'isActive': isActive,
   };
 
   AppUser copyWith({
@@ -113,6 +120,7 @@ class AppUser {
     ValueGetter<String?>? photo,
     ValueGetter<UserRole?>? role,
     ValueGetter<WareHouse?>? warehouse,
+    bool? isActive,
     bool? isAccountCreated,
     ValueGetter<String?>? password,
   }) {
@@ -124,6 +132,7 @@ class AppUser {
       photo: photo != null ? photo() : this.photo,
       role: role != null ? role() : this.role,
       warehouse: warehouse != null ? warehouse() : this.warehouse,
+      isActive: isActive ?? this.isActive,
       isAccountCreated: isAccountCreated ?? this.isAccountCreated,
       password: password != null ? password() : this.password,
     );

@@ -4,6 +4,7 @@ import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/features/staffs/controller/update_staff_ctrl.dart';
 import 'package:pos/features/user_roles/controller/user_roles_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
+import 'package:pos/features/warehouse/view/create_warehouse_view.dart';
 import 'package:pos/main.export.dart';
 
 class CreateStaffView extends HookConsumerWidget {
@@ -19,9 +20,6 @@ class CreateStaffView extends HookConsumerWidget {
 
     final warehouseList = ref.watch(warehouseCtrlProvider);
     final rolesList = ref.watch(userRolesCtrlProvider);
-
-    final searchRole = useState('');
-    final searchWarehouse = useState('');
 
     final selectedFile = useState<PFile?>(null);
 
@@ -113,79 +111,44 @@ class CreateStaffView extends HookConsumerWidget {
                           ),
 
                           ShadTextField(name: 'phone', label: 'Phone', hintText: 'Enter your phone', isRequired: true),
-                          FormBuilderField<QMap>(
-                            name: 'warehouse',
-                            validator: FormBuilderValidators.required(),
-                            onReset: () {},
-                            builder: (form) {
-                              return ShadInputDecorator(
-                                label: const Text('Choose warehouse').required(),
-                                error: form.errorText == null ? null : Text(form.errorText!),
-                                decoration: context.theme.decoration.copyWith(hasError: form.hasError),
-                                child: warehouseList.maybeWhen(
-                                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                                  data: (warehouses) {
-                                    final filtered = warehouses.where(
-                                      (e) => e.name.low.contains(searchWarehouse.value.low),
-                                    );
-                                    return LimitedWidthBox(
-                                      child: ShadSelect<WareHouse>.withSearch(
-                                        initialValue: WareHouse.tyrParse(form.value),
-                                        placeholder: const Text('Warehouse'),
-                                        options: [
-                                          if (filtered.isEmpty)
-                                            Padding(
-                                              padding: Pads.padding(v: 24),
-                                              child: const Text('No warehouses found'),
-                                            ),
-                                          ...filtered.map((house) {
-                                            return ShadOption(value: house, child: Text(house.name));
-                                          }),
-                                        ],
-                                        selectedOptionBuilder: (context, v) => Text(v.name),
-                                        onSearchChanged: searchWarehouse.set,
-                                        allowDeselection: true,
-                                        onChanged: (v) => form.didChange(v?.toMap()),
-                                      ),
-                                    );
+                          warehouseList.maybeWhen(
+                            orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                            data: (warehouses) {
+                              return ShadSelectField<WareHouse>(
+                                name: 'warehouse',
+                                initialValue: updating?.warehouse,
+                                hintText: 'Warehouse',
+                                label: 'Choose warehouse',
+                                isRequired: true,
+                                options: warehouses,
+                                optionBuilder: (context, value, index) =>
+                                    ShadOption(value: value, child: Text(value.name)),
+                                selectedBuilder: (context, v) => Text(v.name),
+                                searchBuilder: (item) => item.name,
+                                outsideTrailing: ShadIconButton.outline(
+                                  icon: const Icon(LuIcons.plus),
+                                  onPressed: () {
+                                    showShadDialog(context: context, builder: (context) => const AddWarehouseDialog());
                                   },
                                 ),
                               );
                             },
                           ),
 
-                          FormBuilderField<QMap>(
-                            name: 'role',
-                            validator: FormBuilderValidators.required(),
-                            builder: (form) {
-                              return ShadInputDecorator(
-                                label: const Text('Choose a role').required(),
-                                error: form.errorText == null ? null : Text(form.errorText!),
-                                decoration: context.theme.decoration.copyWith(hasError: form.hasError),
-                                child: rolesList.maybeWhen(
-                                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                                  data: (roles) {
-                                    final filtered = roles.where((e) => e.name.low.contains(searchRole.value.low));
-                                    return LimitedWidthBox(
-                                      child: ShadSelect<UserRole>.withSearch(
-                                        initialValue: UserRole.tyrParse(form.value),
-                                        placeholder: const Text('Role'),
-                                        options: [
-                                          if (filtered.isEmpty)
-                                            Padding(padding: Pads.padding(v: 24), child: const Text('No roles found')),
-
-                                          ...filtered.map((role) {
-                                            return ShadOption(value: role, child: Text(role.name));
-                                          }),
-                                        ],
-                                        selectedOptionBuilder: (context, v) => Text(v.name),
-                                        onSearchChanged: searchRole.set,
-                                        allowDeselection: true,
-                                        onChanged: (v) => form.didChange(v?.toMap()),
-                                      ),
-                                    );
-                                  },
-                                ),
+                          rolesList.maybeWhen(
+                            orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                            data: (roles) {
+                              return ShadSelectField<UserRole>(
+                                name: 'role',
+                                initialValue: updating?.role,
+                                label: 'Choose a role',
+                                hintText: 'Role',
+                                isRequired: true,
+                                options: roles,
+                                optionBuilder: (context, value, index) =>
+                                    ShadOption(value: value, child: Text(value.name)),
+                                selectedBuilder: (context, v) => Text(v.name),
+                                searchBuilder: (item) => item.name,
                               );
                             },
                           ),

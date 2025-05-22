@@ -304,6 +304,7 @@ class StockTransferView extends HookConsumerWidget {
                   type: RecordType.sale,
                   userHouse: user?.warehouse,
                   onProductSelect: (p, _, w) {
+                    if (p.quantity <= 0) return;
                     tCtrl().setProduct(p);
                     final changedStock = tCtrl().setFrom(w);
                     WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -34,4 +34,16 @@ class UpdateStaffCtrl extends _$UpdateStaffCtrl {
       return rightResult('Staff updated successfully');
     });
   }
+
+  Future<Result> toggleActive() async {
+    final current = await future;
+
+    if (current == null) return (false, 'User not found');
+
+    final res = await _repo.toggleActive(current.id, !current.isActive);
+    return res.fold(leftResult, (r) {
+      ref.invalidate(staffsCtrlProvider);
+      return rightResult('Staff ${current.isActive ? 'deactivated' : 'activated'} successfully');
+    });
+  }
 }

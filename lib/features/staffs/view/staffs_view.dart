@@ -1,10 +1,17 @@
 import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
+import 'package:pos/features/staffs/controller/update_staff_ctrl.dart';
 import 'package:pos/features/user_roles/controller/user_roles_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('Name', double.nan), ('Role', 200.0), ('Warehouse', 200.0), ('Action', 260.0)];
+const _headings = [
+  TableHeading.positional('Name'),
+  TableHeading.positional('Role', 200.0, Alignment.center),
+  TableHeading.positional('Warehouse', 200.0, Alignment.center),
+  TableHeading.positional('Active', 200.0, Alignment.center),
+  TableHeading.positional('Action', 260.0, Alignment.centerRight),
+];
 
 class StaffsView extends HookConsumerWidget {
   const StaffsView({super.key});
@@ -82,52 +89,80 @@ class StaffsView extends HookConsumerWidget {
               loading: () => const Loading(),
               error: (e, s) => ErrorView(e, s, prov: staffsCtrlProvider),
               data: (staffs) {
-                return DataTableBuilder<AppUser, (String, double)>(
+                return DataTableBuilder<AppUser, TableHeading>(
                   rowHeight: 100,
                   items: staffs,
                   headings: _headings,
                   headingBuilder: (heading) {
                     return GridColumn(
-                      columnName: heading.$1,
+                      columnName: heading.name,
                       columnWidthMode: ColumnWidthMode.fill,
-                      maximumWidth: heading.$2,
+                      maximumWidth: heading.max,
                       minimumWidth: 200,
                       label: Container(
                         padding: Pads.med(),
-                        alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
-                        child: Text(heading.$1),
+                        alignment: heading.alignment,
+                        child: Text(heading.name),
                       ),
                     );
                   },
-                  cellAlignment: Alignment.centerLeft,
+                  cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
                   cellBuilder: (data, head) {
-                    return switch (head.$1) {
-                      'Name' => DataGridCell(columnName: head.$1, value: _nameCellBuilder(data)),
-                      'Warehouse' => DataGridCell(columnName: head.$1, value: Text(data.warehouse?.name ?? '--')),
-                      'Role' => DataGridCell(columnName: head.$1, value: Text(data.role?.name ?? '--')),
+                    return switch (head.name) {
+                      'Name' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data)),
+                      'Warehouse' => DataGridCell(columnName: head.name, value: Text(data.warehouse?.name ?? '--')),
+                      'Role' => DataGridCell(columnName: head.name, value: Text(data.role?.name ?? '--')),
+                      'Active' => DataGridCell(
+                        columnName: head.name,
+                        value: ShadBadge(
+                          child: Text(data.isActive ? 'Active' : 'Inactive'),
+                        ).colored(data.isActive ? Colors.green : Colors.red),
+                      ),
                       'Action' => DataGridCell(
-                        columnName: head.$1,
-                        value: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            ShadButton.secondary(
-                              size: ShadButtonSize.sm,
-                              leading: const Icon(LuIcons.eye),
-                              onPressed:
-                                  () => showShadDialog(
-                                    context: context,
-                                    builder: (context) => _StaffViewDialog(user: data),
-                                  ),
+                        columnName: head.name,
+                        value: PopOverBuilder(
+                          children: (context, hide) => [
+                            PopOverButton(
+                              icon: const Icon(LuIcons.eye),
+                              onPressed: () {
+                                hide();
+                                showShadDialog(
+                                  context: context,
+                                  builder: (context) => _StaffViewDialog(user: data),
+                                );
+                              },
+                              child: const Text('View'),
                             ),
-                            ShadButton.secondary(
-                              size: ShadButtonSize.sm,
-                              leading: const Icon(LuIcons.pen),
-                              onPressed: () => RPaths.editStaffs(data.id).pushNamed(context),
+                            PopOverButton(
+                              icon: const Icon(LuIcons.pen),
+                              onPressed: () {
+                                hide();
+                                RPaths.editStaffs(data.id).pushNamed(context);
+                              },
+                              child: const Text('Edit'),
+                            ),
+
+                            PopOverButton(
+                              icon: Icon(data.isActive ? LuIcons.powerOff : LuIcons.power),
+                              isDestructive: true,
+                              onPressed: () async {
+                                hide();
+                                if (!data.isActive) {
+                                  await ref.read(updateStaffCtrlProvider(data.id).notifier).toggleActive();
+                                  return;
+                                }
+                                if (data.isActive && staffs.where((e) => e.isActive).length == 1) {
+                                  if (context.mounted) Toast.showErr(context, 'At least one staff must be active');
+                                } else {
+                                  await ref.read(updateStaffCtrlProvider(data.id).notifier).toggleActive();
+                                }
+                              },
+                              child: Text(data.isActive ? 'Deactivate' : 'Activate'),
                             ),
                           ],
                         ),
                       ),
-                      _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                      _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
                     };
                   },
                 );
@@ -204,14 +239,20 @@ class _StaffViewDialog extends HookConsumerWidget {
               left: 'Role',
               right: user.role?.name ?? '--',
               styleBuilder: (l, r) => (l, r.bold),
-              builder: (r) => ShadBadge(padding: Pads.padding(v: Insets.xs, h: Insets.med), child: Text(r)),
+              builder: (r) => ShadBadge(
+                padding: Pads.padding(v: Insets.xs, h: Insets.med),
+                child: Text(r),
+              ),
               crossAxisAlignment: CrossAxisAlignment.center,
             ),
             SpacedText(
               left: 'Warehouse',
               right: user.warehouse?.name ?? '--',
               styleBuilder: (l, r) => (l, r.bold),
-              builder: (r) => ShadBadge(padding: Pads.padding(v: Insets.xs, h: Insets.med), child: Text(r)),
+              builder: (r) => ShadBadge(
+                padding: Pads.padding(v: Insets.xs, h: Insets.med),
+                child: Text(r),
+              ),
               crossAxisAlignment: CrossAxisAlignment.center,
             ),
           ],

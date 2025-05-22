@@ -15,7 +15,7 @@ class AuthCtrl extends _$AuthCtrl {
     final user = await _repo.currentUser();
     return user.fold((l) => null, (r) {
       ref.read(authStateSyncProvider.notifier)._set(r);
-
+      if (!r.isActive) return null;
       return r;
     });
   }
@@ -32,10 +32,10 @@ class AuthCtrl extends _$AuthCtrl {
   Future<Result> signIn(String email, String password) async {
     final res = await _repo.signIn(email, password);
 
-    return res.fold(leftResult, (r) {
-      ref.invalidateSelf();
+    return res.fold(leftResult, (r) async {
+      final user = await ref.refresh(authCtrlProvider.future);
       ref.invalidate(currentUserProvider);
-      return rightResult('Login successful');
+      return user == null ? leftResult(const Failure('Failed to login')) : rightResult('Login successful');
     });
   }
 
@@ -48,7 +48,11 @@ class AuthCtrl extends _$AuthCtrl {
 @Riverpod(keepAlive: true)
 class AuthStateSync extends _$AuthStateSync {
   void _set(AppUser user) {
-    state = some(user);
+    if (user.isActive) {
+      state = some(user);
+    } else {
+      state = none();
+    }
   }
 
   @override
@@ -62,6 +66,7 @@ FutureOr<AppUser?> currentUser(Ref ref) async {
   final repo = locate<AuthRepo>();
   final user = await repo.currentUser();
   return user.fold(identityNull, (r) {
+    if (!r.isActive) return null;
     ref.read(viewingWHProvider.notifier).updateHouse(r.warehouse);
     return r;
   });
