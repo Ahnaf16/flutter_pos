@@ -49,11 +49,11 @@ class BaseBody extends StatelessWidget {
     if (scrollable) {
       child = SingleChildScrollView(child: child);
     }
-    return Scaffold(
-      appBar:
-          noAPPBar
-              ? null
-              : KAppBar(
+    return SelectionArea(
+      child: Scaffold(
+        appBar: noAPPBar
+            ? null
+            : KAppBar(
                 title: title,
                 actions: actions,
                 leading: leading,
@@ -62,13 +62,16 @@ class BaseBody extends StatelessWidget {
                 actionGap: actionGap,
                 actionGapEnd: actionGapEnd,
               ),
-      floatingActionButton: floatingActionButton,
-      body: Column(
-        children: [
-          if (appBarSeparator) const ShadSeparator.horizontal(margin: Pads.zero),
-          if (isLoading) const ShadProgress(minHeight: 1),
-          Expanded(child: Align(alignment: alignment, child: child)),
-        ],
+        floatingActionButton: floatingActionButton,
+        body: Column(
+          children: [
+            if (appBarSeparator) const ShadSeparator.horizontal(margin: Pads.zero),
+            if (isLoading) const ShadProgress(minHeight: 1),
+            Expanded(
+              child: Align(alignment: alignment, child: child),
+            ),
+          ],
+        ),
       ),
     );
   }

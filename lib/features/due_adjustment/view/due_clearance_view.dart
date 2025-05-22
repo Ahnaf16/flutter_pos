@@ -187,6 +187,7 @@ class DueClearanceView extends HookConsumerWidget {
                       'date': DateTime.now().toIso8601String(),
                       'transaction_type': TransactionType.payment.name,
                       'transaction_to': selectedParty.value?.toMap(),
+                      'transacted_to_shop': false,
                     });
                     final log = TransactionLog.fromMap(data);
                     final err = log.validate();
@@ -212,6 +213,7 @@ class DueClearanceView extends HookConsumerWidget {
                       'date': DateTime.now().toIso8601String(),
                       'transaction_type': TransactionType.dueAdjustment.name,
                       'transaction_from': selectedParty.value?.toMap(),
+                      'transacted_to_shop': true,
                     });
                     final log = TransactionLog.fromMap(data);
 

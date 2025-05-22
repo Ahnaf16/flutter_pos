@@ -226,6 +226,7 @@ class DueAdjustmentView extends HookConsumerWidget {
                       'date': DateTime.now().toIso8601String(),
                       'transaction_type': TransactionType.dueAdjustment.name,
                       'transaction_from': selectedParty.value?.toMap(),
+                      'transacted_to_shop': true,
                     });
                     if (!isTransfer.value) data.remove('custom_info');
 

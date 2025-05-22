@@ -84,7 +84,10 @@ class InventoryRecordView extends HookConsumerWidget {
                 ),
               ),
               const Gap(Insets.xs),
-              ShadDatePicker.range(key: ValueKey(type), onRangeChanged: (v) => invCtrl().filter(range: v)),
+              ShadDatePicker.range(
+                key: ValueKey(type),
+                onRangeChanged: (v) => invCtrl().filter(range: v),
+              ),
               ShadIconButton.raw(
                 icon: const Icon(LuIcons.x),
                 onPressed: () => invCtrl().filter(),
@@ -149,32 +152,6 @@ class RecordTable extends ConsumerWidget {
             value: PopOverBuilder(
               actionSpread: actionSpread,
               children: [
-                // if (!parti.isWalkIn) ...[
-                //   if (parti.hasDue() && data.hasDue)
-                //     PopOverButton(
-                //       dense: actionSpread,
-                //       icon: const Icon(LuIcons.handCoins),
-                //       onPressed: () {
-                //         showShadDialog(
-                //           context: context,
-                //           builder: (context) => PartyDueDialog(parti: parti, type: parti.type),
-                //         );
-                //       },
-                //       child: const Text('Due adjustment'),
-                //     ),
-                //   if (parti.hasBalance() && !parti.isCustomer && data.hasDue)
-                //     PopOverButton(
-                //       dense: actionSpread,
-                //       icon: const Icon(LuIcons.handCoins),
-                //       onPressed: () {
-                //         showShadDialog(
-                //           context: context,
-                //           builder: (context) => SupplierDueDialog(parti: parti, type: parti.type),
-                //         );
-                //       },
-                //       child: const Text('Due clearance'),
-                //     ),
-                // ],
                 PopOverButton(
                   dense: actionSpread,
                   icon: const Icon(LuIcons.eye),
@@ -204,7 +181,10 @@ class RecordTable extends ConsumerWidget {
                     icon: const Icon(LuIcons.undo2),
                     isDestructive: true,
                     onPressed: () {
-                      showShadDialog(context: context, builder: (context) => ReturnRecordDialog(inventory: data));
+                      showShadDialog(
+                        context: context,
+                        builder: (context) => ReturnRecordDialog(inventory: data),
+                      );
                     },
                     child: const Text('Return'),
                   ),
@@ -220,21 +200,27 @@ class RecordTable extends ConsumerWidget {
   Widget _nameCellBuilder(Party? parti) {
     return Builder(
       builder: (context) {
-        return Column(
-          spacing: Insets.xs,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GestureDetector(
-              onTap: () {
-                if (parti == null) return;
-                showShadDialog(context: context, builder: (context) => PartiViewDialog(parti: parti));
-              },
-              child: OverflowMarquee(child: Text(parti?.name ?? '--', style: context.text.list)),
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () {
+              if (parti == null) return;
+              showShadDialog(
+                context: context,
+                builder: (context) => PartiViewDialog(parti: parti),
+              );
+            },
+            child: Column(
+              spacing: Insets.xs,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OverflowMarquee(child: Text(parti?.name ?? '--', style: context.text.list)),
+                if (parti != null) OverflowMarquee(child: Text('Phone: ${parti.phone}')),
+                if (parti?.email != null) OverflowMarquee(child: Text('Email: ${parti!.email}')),
+              ],
             ),
-            if (parti != null) OverflowMarquee(child: Text('Phone: ${parti.phone}')),
-            if (parti?.email != null) OverflowMarquee(child: Text('Email: ${parti!.email}')),
-          ],
+          ),
         );
       },
     );
@@ -248,17 +234,30 @@ class RecordTable extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (final p in details.takeFirst(2))
-              GestureDetector(
-                onTap: () {
-                  showShadDialog(context: context, builder: (context) => ProductViewDialog(product: p.product));
-                },
-                child: Row(
-                  spacing: Insets.xs,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(child: Text(p.product.name, style: context.text.small, maxLines: 1)),
-                    Text(' (${p.quantity})', style: context.text.muted.size(12)),
-                  ],
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    showShadDialog(
+                      context: context,
+                      builder: (context) => ProductViewDialog(product: p.product),
+                    );
+                  },
+                  child: Row(
+                    spacing: Insets.xs,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          p.product.name,
+                          style: context.text.small,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(' (${p.quantity})', style: context.text.muted.size(12)),
+                    ],
+                  ),
                 ),
               ),
 
@@ -278,7 +277,7 @@ class RecordTable extends ConsumerWidget {
           children: [
             SpacedText(
               left: data.type == RecordType.purchase ? 'Paid' : 'Received',
-              right: data.amount.currency(),
+              right: data.paidAmount.currency(),
               crossAxisAlignment: CrossAxisAlignment.center,
               styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
             ),

@@ -156,7 +156,7 @@ class InvInvoiceWidget extends HookConsumerWidget {
                 ),
               SpacedText(
                 left: 'Paid amount',
-                right: rec.amount.currency(),
+                right: rec.paidAmount.currency(),
                 style: context.text.list,
                 spaced: true,
                 styleBuilder: (l, r) => (l, r.bold),

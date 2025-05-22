@@ -71,11 +71,27 @@ class DueView extends HookConsumerWidget {
                               right: data.amount.abs().currency(),
                               styleBuilder: (l, r) => (l, r.bold),
                             ),
-                            SpacedText(left: 'Post amount', right: data.postAmount.currency()),
+                            SpacedText(
+                              left: 'Before',
+                              right: data.oldAmount.currency(),
+                              styleBuilder: (l, r) {
+                                return (l, r.textColor(data.oldAmount > 0 ? Colors.red : Colors.green));
+                              },
+                            ),
+                            SpacedText(
+                              left: 'After',
+                              right: data.postAmount.currency(),
+                              styleBuilder: (l, r) {
+                                return (l, r.textColor(data.postAmount > 0 ? Colors.red : Colors.green));
+                              },
+                            ),
                           ],
                         ),
                       ),
-                      'Date' => DataGridCell(columnName: head.$1, value: Center(child: Text(data.date.formatDate()))),
+                      'Date' => DataGridCell(
+                        columnName: head.$1,
+                        value: Center(child: Text(data.date.formatDate())),
+                      ),
                       'Action' => DataGridCell(
                         columnName: head.$1,
                         value: Row(
@@ -84,11 +100,10 @@ class DueView extends HookConsumerWidget {
                             ShadButton.secondary(
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.eye),
-                              onPressed:
-                                  () => showShadDialog(
-                                    context: context,
-                                    builder: (context) => _PartiViewDialog(log: data),
-                                  ),
+                              onPressed: () => showShadDialog(
+                                context: context,
+                                builder: (context) => _PartiViewDialog(log: data),
+                              ),
                             ),
                           ],
                         ),
@@ -127,12 +142,16 @@ class _PartyNameBuilder extends StatelessWidget {
               Row(
                 spacing: Insets.sm,
                 children: [
-                  Flexible(child: OverflowMarquee(child: Text(parti.name, style: context.text.list))),
+                  Flexible(
+                    child: OverflowMarquee(child: Text(parti.name, style: context.text.list)),
+                  ),
                   if (!parti.isCustomer) ShadBadge.outline(child: Text(parti.type.name)),
                 ],
               ),
               Text(parti.phone),
               if (parti.address != null) Text(parti.address ?? '--', maxLines: 2, overflow: TextOverflow.ellipsis),
+              if (parti.hasDue()) Text('Due: ${parti.due.abs().currency()}'),
+              if (parti.hasBalance()) Text('Balance: ${parti.due.abs().currency()}'),
             ],
           ),
         ),
@@ -207,30 +226,29 @@ class _PartiViewDialog extends HookConsumerWidget {
                           styleBuilder: (l, r) => (l, r.bold),
                           builder: (r) => Text(r, style: context.text.small.textColor(parti.dueColor())),
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          trailing:
-                              parti.due == 0
-                                  ? null
-                                  : ShadTooltip(
-                                    child: const Icon(LuIcons.info),
-                                    builder: (context) {
-                                      return Text.rich(
-                                        TextSpan(
-                                          children: [
-                                            TextSpan(text: '${parti.name} '),
-                                            TextSpan(
-                                              text: parti.due.isNegative ? 'Owe' : 'Will pay',
-                                              style: context.text.small.bold,
-                                            ),
-                                            const TextSpan(text: ' you'),
-                                            TextSpan(
-                                              text: ' ${parti.due.abs().currency()}',
-                                              style: context.text.small.bold,
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ),
+                          trailing: parti.due == 0
+                              ? null
+                              : ShadTooltip(
+                                  child: const Icon(LuIcons.info),
+                                  builder: (context) {
+                                    return Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          TextSpan(text: '${parti.name} '),
+                                          TextSpan(
+                                            text: parti.due.isNegative ? 'Owe' : 'Will pay',
+                                            style: context.text.small.bold,
+                                          ),
+                                          const TextSpan(text: ' you'),
+                                          TextSpan(
+                                            text: ' ${parti.due.abs().currency()}',
+                                            style: context.text.small.bold,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
                         ),
                       ],
                     ),

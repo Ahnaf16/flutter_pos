@@ -354,6 +354,13 @@ class _RenderOverflowMarqueeLayout extends RenderShiftedBox
   }
 
   @override
+  void visitChildren(RenderObjectVisitor visitor) {
+    if (child != null) {
+      visitor(child!);
+    }
+  }
+
+  @override
   void performLayout() {
     final child = this.child;
     if (child != null) {

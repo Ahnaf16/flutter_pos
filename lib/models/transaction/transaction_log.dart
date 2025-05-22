@@ -17,6 +17,15 @@ enum TransactionType {
   bool get isExpanse => this == TransactionType.expanse;
   bool get isTransfer => this == TransactionType.transfer;
   bool get isDueAdjustment => this == TransactionType.dueAdjustment;
+
+  Color get color => switch (this) {
+    sale => Colors.blue,
+    payment => Colors.green,
+    returned => Colors.red,
+    expanse => Colors.orange,
+    transfer => Colors.purple,
+    dueAdjustment => Colors.purple,
+  };
 }
 
 class TransactionLog {
@@ -34,6 +43,7 @@ class TransactionLog {
     required this.note,
     required this.adjustBalance,
     required this.record,
+    required this.transactedToShop,
     this.payMethod,
   });
 
@@ -60,6 +70,7 @@ class TransactionLog {
   final bool adjustBalance;
   final AccountType? payMethod;
   final InventoryRecord? record;
+  final bool transactedToShop;
 
   // final bool transactionFromMe;
 
@@ -80,6 +91,7 @@ class TransactionLog {
     adjustBalance: map.parseBool('adjust_balance'),
     payMethod: AccountType.values.tryByName(map['pay_method']),
     record: InventoryRecord.tryParse(map['inventoryRecord']),
+    transactedToShop: map.parseBool('transacted_to_shop'),
   );
 
   static TransactionLog? tyrParse(dynamic value) {
@@ -109,6 +121,7 @@ class TransactionLog {
     'transaction_from': transactionForm?.toMap(),
     'pay_method': payMethod?.name,
     'inventoryRecord': record?.toMap(),
+    'transacted_to_shop': transactedToShop,
   };
 
   QMap toAwPost() => {
@@ -124,6 +137,7 @@ class TransactionLog {
     'transaction_from': transactionForm?.id,
     'pay_method': payMethod?.name,
     'inventoryRecord': record?.id,
+    'transacted_to_shop': transactedToShop,
   };
 
   String? validate() {
@@ -144,16 +158,21 @@ class TransactionLog {
     return null;
   }
 
-  // Party? get getParti => transactedTo;
+  ({String? name, String? phone}) get effectiveTo {
+    if (transactedToShop) return (name: transactionBy?.name, phone: transactionBy?.phone);
+    if (type.isTransfer) return (name: customInfo['Name'], phone: customInfo['Phone']);
+    return (name: transactedTo?.name, phone: transactedTo?.phone);
+  }
 
   static TransactionLog fromInventoryRecord(InventoryRecord record, AppUser user) {
     final parti = record.party;
     return TransactionLog(
       id: '',
       trxNo: nanoid(length: 8, alphabet: '0123456789'),
-      amount: record.amount,
+      amount: record.paidAmount,
       account: record.account,
-      transactedTo: parti,
+      transactedTo: record.type.isSale ? null : parti,
+      transactionForm: record.type.isSale ? parti : null,
       customInfo: {},
       transactionBy: user,
       date: dateNow.run(),
@@ -163,8 +182,8 @@ class TransactionLog {
       },
       note: _noteInv(record),
       adjustBalance: false,
-      transactionForm: null,
       record: record,
+      transactedToShop: record.type.isSale,
     );
   }
 
@@ -183,24 +202,27 @@ class TransactionLog {
       adjustBalance: false,
       transactionForm: null,
       record: null,
+      transactedToShop: false,
     );
   }
 
   static TransactionLog fromReturn(ReturnRecord rec) {
+    final isSale = rec.returnedRec?.type.isSale ?? false;
     return TransactionLog(
       id: '',
       trxNo: nanoid(length: 8, alphabet: '0123456789'),
       amount: rec.adjustAccount,
       account: rec.returnedRec?.account,
-      transactedTo: rec.returnedRec?.party,
+      transactedTo: rec.isSale ? rec.returnedRec?.party : null,
+      transactionForm: rec.isSale ? null : rec.returnedRec?.party,
       customInfo: {},
       transactionBy: rec.returnedBy,
       date: dateNow.run(),
       type: TransactionType.returned,
       note: _noteRe(rec),
       adjustBalance: false,
-      transactionForm: null,
       record: rec.returnedRec,
+      transactedToShop: !isSale,
     );
   }
 
@@ -229,7 +251,7 @@ class TransactionLog {
 
     final length = record.details.length;
     final item = length == 1 ? 'item' : 'items';
-    final amount = record.amount;
+    final amount = record.paidAmount;
     final preposition = isSale ? 'to' : 'from';
     final name = parti?.name;
     final date = record.date.formatDate();
@@ -260,6 +282,7 @@ class TransactionLog {
     bool? adjustBalance,
     ValueGetter<AccountType?>? payMethod,
     ValueGetter<InventoryRecord?>? record,
+    bool? transactedToShop,
   }) {
     return TransactionLog(
       id: id ?? this.id,
@@ -276,6 +299,7 @@ class TransactionLog {
       adjustBalance: adjustBalance ?? this.adjustBalance,
       payMethod: payMethod != null ? payMethod() : this.payMethod,
       record: record != null ? record() : this.record,
+      transactedToShop: transactedToShop ?? this.transactedToShop,
     );
   }
 }

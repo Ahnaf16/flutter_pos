@@ -160,7 +160,7 @@ class Product {
       houseId == null ? stock : stock.where((e) => e.warehouse?.id == houseId).toList();
 
   Stock? getLatestStock([String? warehouseId]) {
-    List<Stock> filteredStock = stock;
+    List<Stock> filteredStock = stock.whereNot((e) => e.quantity == 0).toList();
 
     if (warehouseId != null) {
       filteredStock = stocksByHouse(warehouseId);

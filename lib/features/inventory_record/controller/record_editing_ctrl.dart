@@ -24,6 +24,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     if (type.isSale) {
       stock = product.getEffectiveStock(_config.stockDistPolicy, warehouse?.id);
     }
+
     if (stock == null) {
       final msg = type.isSale ? 'Product out of stock' : 'Add a stock first';
       Toast.showErr(Ctx.context, msg);
@@ -133,7 +134,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     if (state.parti == null) {
       return (false, 'Please select a ${type.isSale ? 'customer' : 'supplier'}');
     }
-    if (state.account == null && state.amount > 0) {
+    if (state.account == null && state.paidAmount > 0) {
       return (false, 'Please select a payment account');
     }
     if (state.details.isEmpty) {

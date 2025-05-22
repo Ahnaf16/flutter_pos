@@ -39,6 +39,20 @@ extension ShadButtonEx on ShadButton {
   ShadButton compact() => ShadButton.ghost(padding: Pads.zero, height: 24, gap: 24, child: child);
 }
 
+extension ShadBadgeEx on ShadBadge {
+  ShadBadge colored(Color color) => ShadBadge(
+    backgroundColor: color.op1,
+    foregroundColor: color,
+    hoverBackgroundColor: onPressed != null ? color.op2 : color.op1,
+    cursor: cursor,
+    key: key,
+    onPressed: onPressed,
+    padding: padding,
+    shape: shape,
+    child: child,
+  );
+}
+
 extension ColorEX on Color {
   Color op(double opacity) => withValues(alpha: opacity);
   Color get op1 => op(.1);

@@ -7,16 +7,30 @@ enum RecordType {
 
   bool get isSale => this == RecordType.sale;
   bool get isPurchase => this == RecordType.purchase;
+
+  Color get color => switch (this) {
+    RecordType.sale => Colors.blue,
+    RecordType.purchase => Colors.orange,
+  };
 }
 
 enum InventoryStatus {
   paid,
+  partial,
   unpaid,
   returned;
 
   bool get isPaid => this == InventoryStatus.paid;
+  bool get isPartial => this == InventoryStatus.partial;
   bool get isUnpaid => this == InventoryStatus.unpaid;
   bool get isReturned => this == InventoryStatus.returned;
+
+  Color get color => switch (this) {
+    paid => Colors.green,
+    partial => Colors.yellow,
+    unpaid => Colors.red,
+    returned => Colors.pink,
+  };
 }
 
 enum DiscountType { flat, percentage }
@@ -27,7 +41,9 @@ class InventoryRecord {
     required this.invoiceNo,
     required this.party,
     required this.details,
-    required this.amount,
+    required this.paidAmount,
+    required this.initialPayAmount,
+
     required this.account,
     required this.vat,
     required this.discount,
@@ -46,7 +62,13 @@ class InventoryRecord {
   final String invoiceNo;
   final Party? party;
   final List<InventoryDetails> details;
-  final num amount;
+
+  /// the total paid amount. this can be updated
+  final num paidAmount;
+
+  /// tha amount that was paid initially. do not update this field
+  final num initialPayAmount;
+
   final PaymentAccount? account;
   final num vat;
   final num discount;
@@ -72,7 +94,8 @@ class InventoryRecord {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
       },
-      amount: data['amount'],
+      paidAmount: data['amount'],
+      initialPayAmount: data['initial_pay_amount'],
       account: PaymentAccount.tryParse(data['payment_account']),
       vat: data['vat'],
       discount: data['discount'],
@@ -97,7 +120,8 @@ class InventoryRecord {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
       },
-      amount: map.parseNum('amount'),
+      paidAmount: map.parseNum('amount'),
+      initialPayAmount: map.parseNum('initial_pay_amount'),
       account: PaymentAccount.tryParse(map['payment_account']),
       vat: map.parseNum('vat'),
       discount: map.parseNum('discount'),
@@ -132,7 +156,8 @@ class InventoryRecord {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => details,
       },
-      amount: map.parseNum('amount', fallBack: amount),
+      paidAmount: map.parseNum('amount', fallBack: paidAmount),
+      initialPayAmount: map.parseNum('initial_pay_amount', fallBack: initialPayAmount),
       account: PaymentAccount.tryParse(map['payment_account']) ?? account,
       vat: map.parseNum('vat', fallBack: vat),
       discount: map.parseNum('discount', fallBack: discount),
@@ -153,7 +178,8 @@ class InventoryRecord {
     'invoice_no': invoiceNo,
     'parties': party?.toMap(),
     'inventory_details': details.map((e) => e.toMap()).toList(),
-    'amount': amount,
+    'amount': paidAmount,
+    'initial_pay_amount': initialPayAmount,
     'payment_account': account?.toMap(),
     'vat': vat,
     'discount': discount,
@@ -172,7 +198,8 @@ class InventoryRecord {
     'parties': party?.id,
     'invoice_no': invoiceNo,
     'inventory_details': details.map((e) => e.id).toList(),
-    'amount': amount,
+    'amount': paidAmount,
+    'initial_pay_amount': initialPayAmount,
     'payment_account': account?.id,
     'vat': vat,
     'discount': discount,
@@ -195,19 +222,20 @@ class InventoryRecord {
   num get subtotal => details.map((e) => e.totalPrice()).sum;
   num get total => (subtotal + shipping + vat) - calculateDiscount();
 
-  num get due => total - amount;
+  num get due => total - paidAmount;
 
   bool get hasDue => due > 0;
   bool get hasBalance => due < 0;
 
-  num get payable => hasDue ? amount : amount + due;
+  num get payable => hasDue ? paidAmount : paidAmount + due;
 
   InventoryRecord copyWith({
     String? id,
     String? invoiceNo,
     ValueGetter<Party?>? party,
     List<InventoryDetails>? details,
-    num? amount,
+    num? paidAmount,
+    num? initialPayAmount,
     ValueGetter<PaymentAccount?>? account,
     num? vat,
     num? discount,
@@ -226,7 +254,8 @@ class InventoryRecord {
       invoiceNo: invoiceNo ?? this.invoiceNo,
       party: party != null ? party() : this.party,
       details: details ?? this.details,
-      amount: amount ?? this.amount,
+      paidAmount: paidAmount ?? this.paidAmount,
+      initialPayAmount: initialPayAmount ?? this.initialPayAmount,
       account: account != null ? account() : this.account,
       vat: vat ?? this.vat,
       discount: discount ?? this.discount,

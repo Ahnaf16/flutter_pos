@@ -22,7 +22,7 @@ class RecordDetailsView extends HookConsumerWidget {
         error: (e, s) => ErrorView(e, s, prov: recordDetailsProvider),
         data: (rec) {
           if (rec == null) return const ErrorDisplay('No record found');
-          final InventoryRecord(:getParti, :details, :amount, :account, returnRecord: returned) = rec;
+          final InventoryRecord(:getParti, :details, paidAmount: amount, :account, returnRecord: returned) = rec;
           return Column(
             spacing: Insets.med,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,7 +62,10 @@ class RecordDetailsView extends HookConsumerWidget {
                     ShadButton.destructive(
                       leading: const Text('Return'),
                       onPressed: () {
-                        showShadDialog(context: context, builder: (context) => ReturnRecordDialog(inventory: rec));
+                        showShadDialog(
+                          context: context,
+                          builder: (context) => ReturnRecordDialog(inventory: rec),
+                        );
                       },
                     ),
                 ],
@@ -184,24 +187,23 @@ class RecordDetailsView extends HookConsumerWidget {
                                 SpacedText(left: 'Vat', right: rec.vat.currency()),
                                 SpacedText(left: 'Total', right: rec.total.currency(), style: context.text.large),
                                 ShadSeparator.horizontal(margin: Pads.sm('b')),
-                                SpacedText(left: 'paid amount', right: rec.amount.currency()),
+                                SpacedText(left: 'paid amount', right: rec.paidAmount.currency()),
                                 SpacedText(
                                   left: rec.hasBalance ? 'Extra amount' : 'Due amount',
                                   right: rec.due.currency(),
                                   crossAxisAlignment: CrossAxisAlignment.center,
-                                  trailing:
-                                      rec.due == 0
-                                          ? null
-                                          : ShadTooltip(
-                                            child: const Icon(LuIcons.info),
-                                            builder: (context) {
-                                              return Text(
-                                                rec.hasBalance
-                                                    ? 'Extra amount paid ${rec.type.isSale ? 'by customer' : 'to supplier'}.'
-                                                    : 'Remaining amount to be paid ${rec.type.isSale ? 'by customer' : 'to supplier'}.',
-                                              );
-                                            },
-                                          ),
+                                  trailing: rec.due == 0
+                                      ? null
+                                      : ShadTooltip(
+                                          child: const Icon(LuIcons.info),
+                                          builder: (context) {
+                                            return Text(
+                                              rec.hasBalance
+                                                  ? 'Extra amount paid ${rec.type.isSale ? 'by customer' : 'to supplier'}.'
+                                                  : 'Remaining amount to be paid ${rec.type.isSale ? 'by customer' : 'to supplier'}.',
+                                            );
+                                          },
+                                        ),
                                 ),
                               ],
                             ),

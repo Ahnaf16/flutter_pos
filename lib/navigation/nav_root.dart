@@ -337,6 +337,7 @@ class NavButton extends HookWidget {
     return MouseRegion(
       onEnter: (_) => hovered.value = true,
       onExit: (_) => hovered.value = false,
+      cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: onPressed,
         onTapDown: (_) => tapDown.value = true,

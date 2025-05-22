@@ -25,7 +25,7 @@ class InventoryRepo with AwHandler {
     //! update account amount
     final acc = record.account;
 
-    final payable = inventory.amount;
+    final payable = inventory.paidAmount;
 
     if (acc != null && payable > 0) {
       final (accErr, accData) = await _updateAccountAmount(acc.id, payable).toRecord();
@@ -70,7 +70,7 @@ class InventoryRepo with AwHandler {
 
     //! update account amount
     final acc = record.account;
-    final payable = inventory.hasDue ? record.amount : record.amount + inventory.due;
+    final payable = inventory.hasDue ? record.paidAmount : record.paidAmount + inventory.due;
 
     // when amount is more then total, we only add the total price to the account. the remaining will go to users due/balance
     // (-) amount because it is a purchase and _updateAccountAmount adds the amount.

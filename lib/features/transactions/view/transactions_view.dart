@@ -87,7 +87,10 @@ class TransactionsView extends HookConsumerWidget {
                 ),
               ),
               const Gap(Insets.xs),
-              ShadDatePicker.range(key: ValueKey(type), onRangeChanged: (v) => trxCtrl().filter(range: v)),
+              ShadDatePicker.range(
+                key: ValueKey(type),
+                onRangeChanged: (v) => trxCtrl().filter(range: v),
+              ),
               ShadIconButton.raw(
                 icon: const Icon(LuIcons.x),
                 onPressed: () => trxCtrl().filter(),
@@ -136,11 +139,11 @@ class TrxTable extends StatelessWidget {
       cellAlignment: Alignment.centerLeft,
       cellAlignmentBuilder: (i) => heads.fromName(i).alignment,
       cellBuilderIndexed: (data, head, i) {
-        final String? toName = data.transactedTo?.name;
-        final String? toPhone = data.transactedTo?.phone;
+        final toName = data.effectiveTo.name;
+        final toPhone = data.effectiveTo.phone;
 
-        final String? fromName = data.transactionForm?.name ?? data.transactionBy?.name;
-        final String? fromPhone = data.transactionForm?.phone ?? data.transactionBy?.phone;
+        final fromName = data.transactionForm?.name ?? data.transactionBy?.name;
+        final fromPhone = data.transactionForm?.phone ?? data.transactionBy?.phone;
 
         return switch (head.name) {
           '#' => DataGridCell(columnName: head.name, value: Text((i + 1).toString())),
@@ -153,9 +156,12 @@ class TrxTable extends StatelessWidget {
           ),
           'Type' => DataGridCell(
             columnName: head.name,
-            value: ShadBadge.secondary(child: Text(data.type.name.titleCase)),
+            value: ShadBadge.secondary(child: Text(data.type.name.titleCase)).colored(data.type.color),
           ),
-          'Date' => DataGridCell(columnName: head.name, value: Center(child: Text(data.date.formatDate()))),
+          'Date' => DataGridCell(
+            columnName: head.name,
+            value: Center(child: Text(data.date.formatDate())),
+          ),
           'Action' => DataGridCell(
             columnName: head.name,
             value: Row(
@@ -165,7 +171,10 @@ class TrxTable extends StatelessWidget {
                   size: ShadButtonSize.sm,
                   leading: const Icon(LuIcons.eye),
                   onPressed: () {
-                    showShadDialog(context: context, builder: (context) => _TrxViewDialog(trx: data));
+                    showShadDialog(
+                      context: context,
+                      builder: (context) => _TrxViewDialog(trx: data),
+                    );
                   },
                 ),
               ],
@@ -208,7 +217,10 @@ class _TrxViewDialog extends HookConsumerWidget {
       title: Text('${trx.type.name.titleCase} log'),
       description: Row(
         spacing: Insets.sm,
-        children: [Text('Details of a ${trx.type.name}'), ShadBadge.secondary(child: Text(trx.type.name.titleCase))],
+        children: [
+          Text('Details of a ${trx.type.name}'),
+          ShadBadge.secondary(child: Text(trx.type.name.titleCase)),
+        ],
       ),
 
       actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],

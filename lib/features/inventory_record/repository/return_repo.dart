@@ -38,7 +38,7 @@ class ReturnRepo with AwHandler {
     final vatShip = coverVatShip ? (record.vat + record.shipping) : 0;
     totalPrice = (totalPrice + vatShip) - record.calcDiscount;
 
-    final accountMax = record.amount;
+    final accountMax = record.paidAmount;
 
     //! update account amount
     final acc = record.account;

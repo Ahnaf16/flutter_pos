@@ -5,7 +5,7 @@ class InventoryRecordState {
   final Party? parti;
   final List<InventoryDetails> details;
   final PaymentAccount? account;
-  final num amount;
+  final num paidAmount;
   final num vat;
   final num shipping;
   final num discount;
@@ -17,7 +17,7 @@ class InventoryRecordState {
     this.parti,
     this.details = const [],
     this.account,
-    this.amount = 0,
+    this.paidAmount = 0,
     this.vat = 0,
     this.discount = 0,
     this.discountType = DiscountType.flat,
@@ -28,7 +28,7 @@ class InventoryRecordState {
     'parti': parti?.toMap(),
     'details': details.map((e) => e.toMap()).toList(),
     'account': account?.toMap(),
-    'amount': amount,
+    'amount': paidAmount,
     'vat': vat,
     'discount': discount,
     'discountType': discountType.name,
@@ -52,7 +52,7 @@ class InventoryRecordState {
       parti: parti != null ? parti() : this.parti,
       details: details ?? this.details,
       account: account != null ? account() : this.account,
-      amount: amount ?? this.amount,
+      paidAmount: amount ?? paidAmount,
       vat: vat ?? this.vat,
       shipping: shipping ?? this.shipping,
       discount: discount ?? this.discount,
@@ -67,7 +67,7 @@ class InventoryRecordState {
 
   num totalPrice() => (subtotal() + shipping + vat) - calculateDiscount();
 
-  num get due => totalPrice() - amount;
+  num get due => totalPrice() - paidAmount;
 
   bool get hasDue => due > 0;
   bool get hasExtra => due < 0;
@@ -79,26 +79,26 @@ class InventoryRecordState {
 
   bool get isWalkIn => parti?.isWalkIn ?? true;
 
-  /// amount added/subtracted from the account
-  ///
-  /// when has due use the full amount otherwise add the due with the amount
-  /// the due, when hasBalance is (-), so the amount will be subtracted
-  // num get payable => hasDue ? amount : amount + due;
-
   InventoryRecord toInventoryRecord(AppUser user) {
+    InventoryStatus status = InventoryStatus.paid;
+    if (paidAmount == 0) status = InventoryStatus.unpaid;
+    if (hasDue) status = InventoryStatus.partial;
+    if (hasExtra) status = InventoryStatus.paid;
+
     return InventoryRecord(
       id: '',
       invoiceNo: 'pos${nanoid(length: 8, alphabet: '0123456789')}',
       party: parti,
       details: details,
       account: account,
-      amount: amount,
+      paidAmount: paidAmount,
+      initialPayAmount: paidAmount,
       vat: vat,
       discount: discount,
       discountType: discountType,
       calcDiscount: calculateDiscount(),
       shipping: shipping,
-      status: hasDue ? InventoryStatus.unpaid : InventoryStatus.paid,
+      status: status,
       date: DateTime.now(),
       type: type,
       isWalkIn: isWalkIn,

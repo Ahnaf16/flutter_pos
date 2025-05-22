@@ -95,7 +95,9 @@ class _Invoice extends StatelessWidget {
             children: [
               Expanded(flex: 2, child: Text('Product')),
               Expanded(child: Center(child: Text('Qty'))),
-              Expanded(child: Align(alignment: Alignment.centerRight, child: Text('Price'))),
+              Expanded(
+                child: Align(alignment: Alignment.centerRight, child: Text('Price')),
+              ),
             ],
           ),
           Divider(color: PdfColors.black),
@@ -107,7 +109,9 @@ class _Invoice extends StatelessWidget {
                   child: Text('${rec.details.indexWhere((e) => e.id == item.id) + 1}.  ${item.product.name}'),
                 ),
                 Expanded(child: Center(child: Text(item.quantity.toString()))),
-                Expanded(child: Align(alignment: Alignment.centerRight, child: Text(item.price.currency()))),
+                Expanded(
+                  child: Align(alignment: Alignment.centerRight, child: Text(item.price.currency())),
+                ),
               ],
             ),
             _gapH(Insets.xs),
@@ -156,7 +160,7 @@ class _Invoice extends StatelessWidget {
             ),
           _SpacedText(
             left: 'Paid amount',
-            right: rec.amount.currency(),
+            right: rec.paidAmount.currency(),
             spaced: true,
             styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
           ),
