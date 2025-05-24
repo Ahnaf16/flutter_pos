@@ -65,11 +65,11 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   slang_build_runner: ^4.7.0
-  custom_lint: ^0.7.0
-  riverpod_lint: ^2.3.13
+  custom_lint: ^0.7.5
+  riverpod_lint: ^2.6.5
   riverpod_generator: ^2.4.3
   build_runner: ^2.4.12
-  shared_preferences_gen: ^0.1.1
+  # shared_preferences_gen: ^0.1.1
 
 flutter:
   uses-material-design: true

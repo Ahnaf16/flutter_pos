@@ -54,6 +54,8 @@ class StockRepo with AwHandler {
     final (err, st) = await createStock(sendingStock.toMap()).toRecord();
     if (err != null || st == null) return left(err ?? const Failure('Unable to create stock'));
 
+    await _createLog(tState, Stock.fromDoc(st));
+
     // update product stock
     final (pErr, product) = await _linkStockToProduct(Stock.fromDoc(st), tState.product!).toRecord();
     if (pErr != null || product == null) return left(pErr ?? const Failure('Unable to link stock to product'));
@@ -66,9 +68,20 @@ class StockRepo with AwHandler {
     return await repo.linkStockToProduct(stock, product.id);
   }
 
+  FutureReport<Document> _createLog(StockTransferState tState, Stock stock) async {
+    final log = StockTransferLog.fromStockState(tState, stock);
+    final doc = await db.create(AWConst.collections.stockTransferLog, data: log.toAwPost());
+    return doc;
+  }
+
   FutureReport<Unit> deleteStock(String id) async {
     final doc = await db.delete(AWConst.collections.stock, id);
-
     return doc;
+  }
+
+  FutureReport<List<StockTransferLog>> getStockLogs() async {
+    return await db
+        .getList(AWConst.collections.stockTransferLog)
+        .convert((docs) => docs.convertDoc(StockTransferLog.fromDoc));
   }
 }

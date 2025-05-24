@@ -6,7 +6,7 @@ part of 'update_staff_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$updateStaffCtrlHash() => r'558d057011d44af4a820d56d5bfcaca28e1a7085';
+String _$updateStaffCtrlHash() => r'1ff245ead073a4a1ca6dd9a57115a7b9a993896e';
 
 /// Copied from Dart SDK
 class _SystemHash {

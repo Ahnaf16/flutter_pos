@@ -6,7 +6,8 @@ part of 'payment_accounts_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$paymentAccountsCtrlHash() => r'1af92776988dfeb16c86827f8de8556970d267b6';
+String _$paymentAccountsCtrlHash() =>
+    r'70145f00bc38811786c897264e0d1ac9cb0b4014';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,10 +30,13 @@ class _SystemHash {
   }
 }
 
-abstract class _$PaymentAccountsCtrl extends BuildlessAutoDisposeAsyncNotifier<List<PaymentAccount>> {
+abstract class _$PaymentAccountsCtrl
+    extends BuildlessAutoDisposeAsyncNotifier<List<PaymentAccount>> {
   late final bool onlyActive;
 
-  FutureOr<List<PaymentAccount>> build([bool onlyActive = true]);
+  FutureOr<List<PaymentAccount>> build([
+    bool onlyActive = true,
+  ]);
 }
 
 /// See also [PaymentAccountsCtrl].
@@ -40,18 +44,27 @@ abstract class _$PaymentAccountsCtrl extends BuildlessAutoDisposeAsyncNotifier<L
 const paymentAccountsCtrlProvider = PaymentAccountsCtrlFamily();
 
 /// See also [PaymentAccountsCtrl].
-class PaymentAccountsCtrlFamily extends Family<AsyncValue<List<PaymentAccount>>> {
+class PaymentAccountsCtrlFamily
+    extends Family<AsyncValue<List<PaymentAccount>>> {
   /// See also [PaymentAccountsCtrl].
   const PaymentAccountsCtrlFamily();
 
   /// See also [PaymentAccountsCtrl].
-  PaymentAccountsCtrlProvider call([bool onlyActive = true]) {
-    return PaymentAccountsCtrlProvider(onlyActive);
+  PaymentAccountsCtrlProvider call([
+    bool onlyActive = true,
+  ]) {
+    return PaymentAccountsCtrlProvider(
+      onlyActive,
+    );
   }
 
   @override
-  PaymentAccountsCtrlProvider getProviderOverride(covariant PaymentAccountsCtrlProvider provider) {
-    return call(provider.onlyActive);
+  PaymentAccountsCtrlProvider getProviderOverride(
+    covariant PaymentAccountsCtrlProvider provider,
+  ) {
+    return call(
+      provider.onlyActive,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -62,26 +75,32 @@ class PaymentAccountsCtrlFamily extends Family<AsyncValue<List<PaymentAccount>>>
   static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies => _allTransitiveDependencies;
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
 
   @override
   String? get name => r'paymentAccountsCtrlProvider';
 }
 
 /// See also [PaymentAccountsCtrl].
-class PaymentAccountsCtrlProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<PaymentAccountsCtrl, List<PaymentAccount>> {
+class PaymentAccountsCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
+    PaymentAccountsCtrl, List<PaymentAccount>> {
   /// See also [PaymentAccountsCtrl].
-  PaymentAccountsCtrlProvider([bool onlyActive = true])
-    : this._internal(
-        () => PaymentAccountsCtrl()..onlyActive = onlyActive,
-        from: paymentAccountsCtrlProvider,
-        name: r'paymentAccountsCtrlProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$paymentAccountsCtrlHash,
-        dependencies: PaymentAccountsCtrlFamily._dependencies,
-        allTransitiveDependencies: PaymentAccountsCtrlFamily._allTransitiveDependencies,
-        onlyActive: onlyActive,
-      );
+  PaymentAccountsCtrlProvider([
+    bool onlyActive = true,
+  ]) : this._internal(
+          () => PaymentAccountsCtrl()..onlyActive = onlyActive,
+          from: paymentAccountsCtrlProvider,
+          name: r'paymentAccountsCtrlProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$paymentAccountsCtrlHash,
+          dependencies: PaymentAccountsCtrlFamily._dependencies,
+          allTransitiveDependencies:
+              PaymentAccountsCtrlFamily._allTransitiveDependencies,
+          onlyActive: onlyActive,
+        );
 
   PaymentAccountsCtrlProvider._internal(
     super._createNotifier, {
@@ -96,8 +115,12 @@ class PaymentAccountsCtrlProvider
   final bool onlyActive;
 
   @override
-  FutureOr<List<PaymentAccount>> runNotifierBuild(covariant PaymentAccountsCtrl notifier) {
-    return notifier.build(onlyActive);
+  FutureOr<List<PaymentAccount>> runNotifierBuild(
+    covariant PaymentAccountsCtrl notifier,
+  ) {
+    return notifier.build(
+      onlyActive,
+    );
   }
 
   @override
@@ -117,13 +140,15 @@ class PaymentAccountsCtrlProvider
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<PaymentAccountsCtrl, List<PaymentAccount>> createElement() {
+  AutoDisposeAsyncNotifierProviderElement<PaymentAccountsCtrl,
+      List<PaymentAccount>> createElement() {
     return _PaymentAccountsCtrlProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is PaymentAccountsCtrlProvider && other.onlyActive == onlyActive;
+    return other is PaymentAccountsCtrlProvider &&
+        other.onlyActive == onlyActive;
   }
 
   @override
@@ -137,19 +162,19 @@ class PaymentAccountsCtrlProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin PaymentAccountsCtrlRef on AutoDisposeAsyncNotifierProviderRef<List<PaymentAccount>> {
+mixin PaymentAccountsCtrlRef
+    on AutoDisposeAsyncNotifierProviderRef<List<PaymentAccount>> {
   /// The parameter `onlyActive` of this provider.
   bool get onlyActive;
 }
 
 class _PaymentAccountsCtrlProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<PaymentAccountsCtrl, List<PaymentAccount>>
-    with PaymentAccountsCtrlRef {
+    extends AutoDisposeAsyncNotifierProviderElement<PaymentAccountsCtrl,
+        List<PaymentAccount>> with PaymentAccountsCtrlRef {
   _PaymentAccountsCtrlProviderElement(super.provider);
 
   @override
   bool get onlyActive => (origin as PaymentAccountsCtrlProvider).onlyActive;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

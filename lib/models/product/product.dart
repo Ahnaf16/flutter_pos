@@ -218,6 +218,16 @@ class Product {
 
     return filteredStock;
   }
+
+  List<Stock> nonEmptyStocks([String? warehouseId]) {
+    List<Stock> filteredStock = stock;
+
+    if (warehouseId != null) {
+      filteredStock = stocksByHouse(warehouseId);
+    }
+
+    return filteredStock.where((e) => e.quantity > 0).toList();
+  }
 }
 
 class _ProductFiled {

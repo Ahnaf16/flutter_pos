@@ -20,7 +20,7 @@ final viewingWHProvider = NotifierProvider<ViewingWH, WareHouse?>.internal(
 );
 
 typedef _$ViewingWH = Notifier<WareHouse?>;
-String _$homeCountersHash() => r'e0e55171269ca528587803703c0ef65730c0b478';
+String _$homeCountersHash() => r'2f2a4743cade0250e5b1ad0995d2636c33def69a';
 
 /// See also [HomeCounters].
 @ProviderFor(HomeCounters)

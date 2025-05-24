@@ -78,7 +78,6 @@ class StockTransferState {
     final stock = Stock(
       id: '',
       purchasePrice: purchasePrice ?? 0,
-      // salesPrice: salesPrice ?? 0,
       quantity: quantity,
       warehouse: to,
       createdAt: DateTime.now(),

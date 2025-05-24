@@ -15,6 +15,7 @@ export 'states/inventory_record_state.dart';
 export 'states/stock_transfer_state.dart';
 export 'transaction/expense.dart';
 export 'transaction/payment_log.dart';
+export 'transaction/stock_transfer_log.dart';
 export 'transaction/transaction_log.dart';
 export 'user/app_user.dart';
 export 'user/role_permissions.dart';

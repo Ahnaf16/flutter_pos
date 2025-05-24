@@ -5,60 +5,142 @@ class ProductDetailsView extends ConsumerWidget {
   const ProductDetailsView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context, ref) {
     final id = context.param('id');
-
     final product = ref.watch(productDetailsProvider(id));
 
     return BaseBody(
       title: 'Product Details',
+      scrollable: true,
+      alignment: Alignment.topLeft,
       body: product.when(
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: productDetailsProvider),
         data: (product) {
           if (product == null) return const ErrorDisplay('Product not found');
-          return Column(
-            spacing: Insets.med,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (product.photo != null) HostedImage.square(product.getPhoto, dimension: 80, radius: Corners.med),
+          return LimitedWidthBox(
+            maxWidth: 800,
+            center: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  spacing: Insets.med,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ShadCard(
+                      expanded: false,
+                      child: HostedImage.square(product.getPhoto, dimension: 150, radius: Corners.med),
+                    ),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: Insets.med,
+                        children: [
+                          Row(
+                            spacing: Insets.sm,
+                            children: [
+                              Text(product.name, style: context.text.h3),
+                              if (product.manufacturer != null)
+                                ShadBadge.outline(
+                                  child: Text(
+                                    '${product.manufacturer}',
+                                    style: context.text.muted.size(12).textHeight(1),
+                                  ),
+                                ),
+                            ],
+                          ),
 
-              SpacedText(left: 'Name', right: product.name, styleBuilder: (l, r) => (l, r.bold)),
-              SpacedText(
-                left: 'Manufacturer',
-                right: product.manufacturer ?? '--',
-                styleBuilder: (l, r) => (l, r.bold),
-              ),
-              SpacedText(
-                left: 'Total Stock',
-                right: '${product.quantity} ${product.unitName}',
-                styleBuilder: (l, r) => (l, r.bold),
-              ),
-              SpacedText(
-                left: 'SKU',
-                right: product.sku ?? '--',
-                styleBuilder: (l, r) => (l, r.bold),
-                trailing: SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(product.sku)),
-              ),
-              SpacedText(
-                left: 'Sale price',
-                right: product.salePrice.currency(),
-                styleBuilder: (l, r) => (l, r.bold),
-                trailing: SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(product.sku)),
-              ),
-
-              const Gap(Insets.xs),
-              if (product.stock.isNotEmpty) const Text('Stock Locations:'),
-              for (final stock in product.stock)
-                SpacedText(
-                  left: stock.warehouse?.name ?? '--',
-                  right: '${stock.quantity} ${product.unitName}  |  Purchase ${stock.purchasePrice}',
-                  styleBuilder: (l, r) => (l, r.bold),
+                          Text(
+                            'SKU: ${product.sku}',
+                            style: context.text.muted.size(12).textHeight(1),
+                          ),
+                          Row(
+                            spacing: Insets.sm,
+                            children: [
+                              ShadBadge.secondary(
+                                child: Text(
+                                  '${product.quantity}${product.unitName}',
+                                ),
+                              ),
+                              ShadBadge.secondary(
+                                child: Text('${product.nonEmptyStocks().length} Stocks'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              const Gap(Insets.xs),
-              if (product.description != null) ...[const Text('Description:'), Text(product.description ?? '--')],
-            ],
+
+                if (product.description != null) ...[
+                  const Gap(Insets.lg),
+                  ShadCard(
+                    title: Text('Description', style: context.text.list),
+                    child: Text(product.description ?? ''),
+                  ),
+                ],
+                const Gap(Insets.lg),
+
+                ShadCard(
+                  child: ShadAccordion<int>(
+                    initialValue: 1,
+                    children: [
+                      ShadAccordionItem<int>(
+                        value: 1,
+                        padding: Pads.sm(),
+                        separator: const ShadSeparator.horizontal(margin: Pads.zero),
+                        title: const Text('Stocks'),
+                        child: ListView.separated(
+                          itemCount: product.nonEmptyStocks().length,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          separatorBuilder: (_, __) => const ShadSeparator.horizontal(margin: Pads.zero),
+
+                          itemBuilder: (BuildContext context, int index) {
+                            final stock = product.nonEmptyStocks()[index];
+                            return Padding(
+                              padding: Pads.med(),
+                              child: Row(
+                                spacing: Insets.sm,
+                                children: [
+                                  Expanded(
+                                    child: SpacedText(
+                                      left: 'Purchase',
+                                      right: (stock.purchasePrice).currency(),
+                                      style: context.text.muted,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      styleBuilder: (l, r) => (l, context.text.small),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: CenterLeft(
+                                      child: ShadBadge(child: Text(stock.warehouse?.name ?? '--')),
+                                    ),
+                                  ),
+
+                                  Expanded(
+                                    child: CenterRight(
+                                      child: Text(
+                                        '${stock.quantity} ${product.unitName}',
+                                        style: context.text.list.textColor(
+                                          stock.quantity > 0 ? Colors.green : Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),

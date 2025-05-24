@@ -20,7 +20,7 @@ final configCtrlProvider = NotifierProvider<ConfigCtrl, Config>.internal(
 );
 
 typedef _$ConfigCtrl = Notifier<Config>;
-String _$configCtrlAsyncHash() => r'fa8b79dc773bf0c082f23a40ac83ee8a6b01d68c';
+String _$configCtrlAsyncHash() => r'160d7817680467a326bf3dd7daa72365185a89a5';
 
 /// See also [ConfigCtrlAsync].
 @ProviderFor(ConfigCtrlAsync)

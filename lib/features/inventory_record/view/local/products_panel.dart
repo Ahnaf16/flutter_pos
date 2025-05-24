@@ -75,8 +75,9 @@ class ProductsPanel extends HookConsumerWidget {
                               top: 3,
                               right: 3,
                               child: ShadBadge.raw(
-                                variant:
-                                    product.quantity <= 0 ? ShadBadgeVariant.destructive : ShadBadgeVariant.secondary,
+                                variant: product.quantity <= 0
+                                    ? ShadBadgeVariant.destructive
+                                    : ShadBadgeVariant.secondary,
                                 child: Text('$qty${product.unitName}'),
                               ),
                             ),
@@ -106,15 +107,14 @@ class ProductsPanel extends HookConsumerWidget {
                                   color: hovering ? context.colors.border.op7 : Colors.transparent,
                                   alignment: Alignment.center,
                                   borderRadius: Corners.med,
-                                  child:
-                                      hovering
-                                          ? DecoContainer(
-                                            color: context.colors.primary.op9,
-                                            borderRadius: Corners.circle,
-                                            padding: Pads.sm(),
-                                            child: Icon(LuIcons.plus, color: context.colors.primaryForeground),
-                                          )
-                                          : null,
+                                  child: hovering
+                                      ? DecoContainer(
+                                          color: context.colors.primary.op9,
+                                          borderRadius: Corners.circle,
+                                          padding: Pads.sm(),
+                                          child: Icon(LuIcons.plus, color: context.colors.primaryForeground),
+                                        )
+                                      : null,
                                 ),
                               ),
                             ],
@@ -151,6 +151,12 @@ class _AddStockDialog extends HookConsumerWidget {
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         ShadButton(
           onPressed: () {
+            if (stock.value.purchasePrice <= 0) return Toast.showErr(context, 'Purchase price must be greater than 0');
+
+            if (stock.value.quantity <= 0) return Toast.showErr(context, 'Quantity must be greater than 0');
+
+            if (stock.value.warehouse == null) return Toast.showErr(context, 'Select a warehouse');
+
             context.nPop(stock.value);
           },
           child: const Text('Add'),

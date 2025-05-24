@@ -39,6 +39,7 @@ class $AWCollections {
   AwId get dueLog => ('68130121000d796dd775', 'due_adjustment_log');
   AwId get expenseCategory => ('6818e28a0011fa58a4be', 'expense_category');
   AwId get paymentLog => ('682f0d7700136b44c75b', 'payment_log');
+  AwId get stockTransferLog => ('683216330007e2e89e34', 'stock_transfer_log');
 }
 
 class $AWDocs {

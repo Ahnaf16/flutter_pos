@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_annotation/shared_preferences_annotation.dart';
 
-part 'sp.g.dart';
+part 'sp.gen.dart';
 
 /// Short hand for [SharedPreferences]
 typedef SP = SharedPreferences;

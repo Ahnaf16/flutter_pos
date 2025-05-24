@@ -1,7 +1,6 @@
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/features/products/view/product_filter_fields.dart';
-import 'package:pos/features/products/view/product_view_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -79,10 +78,11 @@ class ProductsView extends HookConsumerWidget {
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.eye),
                               onPressed: () {
-                                showShadDialog(
-                                  context: context,
-                                  builder: (context) => ProductViewDialog(product: data),
-                                );
+                                RPaths.productDetails(data.id).pushNamed(context);
+                                // showShadDialog(
+                                //   context: context,
+                                //   builder: (context) => ProductViewDialog(product: data),
+                                // );
                               },
                             ),
                             ShadButton.secondary(

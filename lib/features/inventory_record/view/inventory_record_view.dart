@@ -274,6 +274,7 @@ class RecordTable extends ConsumerWidget {
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
+          spacing: Insets.xs,
           children: [
             SpacedText(
               left: data.type == RecordType.purchase ? 'Paid' : 'Received',
