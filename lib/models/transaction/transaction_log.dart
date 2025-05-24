@@ -45,12 +45,15 @@ class TransactionLog {
     required this.record,
     required this.transactedToShop,
     this.payMethod,
+    required this.transferredToAccount,
+    required this.isBetweenAccount,
   });
 
   final String id;
   final String trxNo;
   final num amount;
   final PaymentAccount? account;
+  final PaymentAccount? transferredToAccount;
 
   /// to whom the transaction was made. can be null when type is manual
   final Party? transactedTo;
@@ -71,6 +74,7 @@ class TransactionLog {
   final AccountType? payMethod;
   final InventoryRecord? record;
   final bool transactedToShop;
+  final bool isBetweenAccount;
 
   // final bool transactionFromMe;
 
@@ -81,6 +85,7 @@ class TransactionLog {
     trxNo: map['trx_no'] ?? '',
     amount: map.parseNum('amount'),
     account: PaymentAccount.tryParse(map['payment_account']),
+    transferredToAccount: PaymentAccount.tryParse(map['transferredToAccount']),
     transactedTo: Party.tryParse(map['transaction_to']),
     transactionForm: Party.tryParse(map['transaction_from']),
     customInfo: map.parseCustomInfo('custom_info'),
@@ -92,6 +97,7 @@ class TransactionLog {
     payMethod: AccountType.values.tryByName(map['pay_method']),
     record: InventoryRecord.tryParse(map['inventoryRecord']),
     transactedToShop: map.parseBool('transacted_to_shop'),
+    isBetweenAccount: map.parseBool('betweenAccount'),
   );
 
   static TransactionLog? tyrParse(dynamic value) {
@@ -122,6 +128,8 @@ class TransactionLog {
     'pay_method': payMethod?.name,
     'inventoryRecord': record?.toMap(),
     'transacted_to_shop': transactedToShop,
+    'betweenAccount': isBetweenAccount,
+    'transferredToAccount': transferredToAccount?.toMap(),
   };
 
   QMap toAwPost() => {
@@ -138,14 +146,24 @@ class TransactionLog {
     'pay_method': payMethod?.name,
     'inventoryRecord': record?.id,
     'transacted_to_shop': transactedToShop,
+    'transferredToAccount': transferredToAccount?.id,
+    'betweenAccount': isBetweenAccount,
   };
 
   String? validate() {
     final from = transactionForm;
     final to = transactedTo;
+    final accTo = transferredToAccount;
+    final acc = account;
 
     if (amount <= 0) return 'Amount must be greater than 0';
-    if (type.isPayment) {
+
+    if (isBetweenAccount) {
+      if (accTo == null) return 'Please select an account to transfer to';
+      if (acc == null) return 'Please select an account to transfer from';
+      if (acc.id == accTo.id) return 'Can\'t transfer to same account';
+      if (acc.amount < amount) return 'Amount can\'t be more than available balance';
+    } else if (type.isPayment) {
       if (to == null) return 'Please select a person to make transaction to';
       if (to.hasDue() && to.due.abs() < amount) return 'Amount can\'t be more than available due';
       if (to.hasBalance() && to.due.abs() < amount) return 'Amount can\'t be more than available balance';
@@ -160,8 +178,21 @@ class TransactionLog {
 
   ({String? name, String? phone}) get effectiveTo {
     if (transactedToShop) return (name: transactionBy?.name, phone: transactionBy?.phone);
+
+    if (isBetweenAccount) return (name: transferredToAccount?.name, phone: null);
+
     if (type.isTransfer) return (name: customInfo['Name'], phone: customInfo['Phone']);
+
     return (name: transactedTo?.name, phone: transactedTo?.phone);
+  }
+
+  ({String? name, String? phone}) get effectiveFrom {
+    if (isBetweenAccount) return (name: account?.name, phone: null);
+
+    final fromName = transactionForm?.name ?? transactionBy?.name;
+    final fromPhone = transactionForm?.phone ?? transactionBy?.phone;
+
+    return (name: fromName, phone: fromPhone);
   }
 
   static TransactionLog fromInventoryRecord(InventoryRecord record, AppUser user) {
@@ -184,6 +215,8 @@ class TransactionLog {
       adjustBalance: false,
       record: record,
       transactedToShop: record.type.isSale,
+      isBetweenAccount: false,
+      transferredToAccount: null,
     );
   }
 
@@ -203,6 +236,8 @@ class TransactionLog {
       transactionForm: null,
       record: null,
       transactedToShop: false,
+      isBetweenAccount: false,
+      transferredToAccount: null,
     );
   }
 
@@ -223,6 +258,29 @@ class TransactionLog {
       adjustBalance: false,
       record: rec.returnedRec,
       transactedToShop: !isSale,
+      isBetweenAccount: false,
+      transferredToAccount: null,
+    );
+  }
+
+  static TransactionLog fromTransferState(AccBalanceTransferState tState) {
+    return TransactionLog(
+      id: '',
+      trxNo: nanoid(length: 8, alphabet: '0123456789'),
+      amount: tState.amount,
+      account: tState.from,
+      transactedTo: null,
+      transactionForm: null,
+      customInfo: {},
+      transactionBy: null,
+      date: dateNow.run(),
+      type: TransactionType.transfer,
+      note: 'Transferred ${tState.amount} from ${tState.from?.name} to ${tState.to?.name}',
+      adjustBalance: false,
+      record: null,
+      transactedToShop: false,
+      isBetweenAccount: true,
+      transferredToAccount: tState.to,
     );
   }
 
@@ -272,6 +330,7 @@ class TransactionLog {
     String? trxNo,
     num? amount,
     ValueGetter<PaymentAccount?>? account,
+    ValueGetter<PaymentAccount?>? transferredToAccount,
     ValueGetter<Party?>? transactedTo,
     ValueGetter<Party?>? transactionForm,
     SMap? customInfo,
@@ -283,12 +342,14 @@ class TransactionLog {
     ValueGetter<AccountType?>? payMethod,
     ValueGetter<InventoryRecord?>? record,
     bool? transactedToShop,
+    bool? isBetweenAccount,
   }) {
     return TransactionLog(
       id: id ?? this.id,
       trxNo: trxNo ?? this.trxNo,
       amount: amount ?? this.amount,
       account: account != null ? account() : this.account,
+      transferredToAccount: transferredToAccount != null ? transferredToAccount() : this.transferredToAccount,
       transactedTo: transactedTo != null ? transactedTo() : this.transactedTo,
       transactionForm: transactionForm != null ? transactionForm() : this.transactionForm,
       customInfo: customInfo ?? this.customInfo,
@@ -300,6 +361,7 @@ class TransactionLog {
       payMethod: payMethod != null ? payMethod() : this.payMethod,
       record: record != null ? record() : this.record,
       transactedToShop: transactedToShop ?? this.transactedToShop,
+      isBetweenAccount: isBetweenAccount ?? this.isBetweenAccount,
     );
   }
 }

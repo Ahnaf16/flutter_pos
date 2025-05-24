@@ -142,8 +142,8 @@ class TrxTable extends StatelessWidget {
         final toName = data.effectiveTo.name;
         final toPhone = data.effectiveTo.phone;
 
-        final fromName = data.transactionForm?.name ?? data.transactionBy?.name;
-        final fromPhone = data.transactionForm?.phone ?? data.transactionBy?.phone;
+        final fromName = data.effectiveFrom.name;
+        final fromPhone = data.effectiveFrom.phone;
 
         return switch (head.name) {
           '#' => DataGridCell(columnName: head.name, value: Text((i + 1).toString())),

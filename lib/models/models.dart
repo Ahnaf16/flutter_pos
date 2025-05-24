@@ -10,6 +10,7 @@ export 'parties/party.dart';
 export 'product/product.dart';
 export 'product/product_unit.dart';
 export 'product/stock.dart';
+export 'states/acc_balance_transfer_state.dart';
 export 'states/inventory_record_state.dart';
 export 'states/stock_transfer_state.dart';
 export 'transaction/expense.dart';

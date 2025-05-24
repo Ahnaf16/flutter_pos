@@ -36,7 +36,7 @@ class AccountAddDialog extends HookConsumerWidget {
               final updated = acc?.marge(data);
               if (updated == null) return;
               l.truthy();
-              result = await ctrl.updateUnit(updated);
+              result = await ctrl.updateAccount(updated);
               l.falsey();
             }
 
@@ -61,7 +61,10 @@ class AccountAddDialog extends HookConsumerWidget {
             children: [
               Row(
                 children: [
-                  Expanded(flex: 2, child: ShadTextField(name: 'name', label: 'Name', isRequired: true)),
+                  Expanded(
+                    flex: 2,
+                    child: ShadTextField(name: 'name', label: 'Name', isRequired: true),
+                  ),
                   Expanded(
                     child: ShadSelectField<AccountType>(
                       name: 'type',

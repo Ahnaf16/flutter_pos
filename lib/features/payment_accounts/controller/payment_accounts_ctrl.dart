@@ -48,16 +48,32 @@ class PaymentAccountsCtrl extends _$PaymentAccountsCtrl {
   Future<Result> createAccount(QMap form) async {
     final res = await _repo.createAccount(form);
     return res.fold(leftResult, (r) {
-      ref.invalidateSelf();
+      ref.invalidate(paymentAccountsCtrlProvider);
       return rightResult('Payment account created successfully');
     });
   }
 
-  Future<Result> updateUnit(PaymentAccount acc) async {
+  Future<Result> updateAccount(PaymentAccount acc) async {
     final res = await _repo.updateAccount(acc);
     return res.fold(leftResult, (r) {
-      ref.invalidateSelf();
+      ref.invalidate(paymentAccountsCtrlProvider);
       return rightResult('Payment account updated successfully');
+    });
+  }
+
+  Future<Result> transferBalance(AccBalanceTransferState state) async {
+    final res = await _repo.transfer(state);
+    return res.fold(leftResult, (r) {
+      ref.invalidate(paymentAccountsCtrlProvider);
+      return rightResult('Balance successfully transferred');
+    });
+  }
+
+  Future<Result> delete(PaymentAccount acc) async {
+    final res = await _repo.deleteAccount(acc.id);
+    return res.fold(leftResult, (r) {
+      ref.invalidate(paymentAccountsCtrlProvider);
+      return rightResult('Account deleted successfully');
     });
   }
 
