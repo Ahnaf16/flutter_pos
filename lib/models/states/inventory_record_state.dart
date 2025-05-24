@@ -102,6 +102,7 @@ class InventoryRecordState {
       type: type,
       isWalkIn: isWalkIn,
       createdBy: user,
+      paymentLogs: [],
     );
   }
 }

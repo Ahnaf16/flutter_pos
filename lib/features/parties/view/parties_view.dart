@@ -1,13 +1,15 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
-import 'package:pos/features/transactions/view/party_due_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
   TableHeading(name: 'Name'),
   TableHeading(name: 'Phone', max: 500.0, alignment: Alignment.center),
-  TableHeading(name: 'Due/Balance', max: 400.0, alignment: Alignment.center),
+  TableHeading(
+    name: 'Due/Balance',
+    max: 400.0,
+  ),
   TableHeading(name: 'Action', max: 200.0, alignment: Alignment.centerRight),
 ];
 
@@ -94,14 +96,12 @@ class PartiesView extends HookConsumerWidget {
                               SpacedText(
                                 left: 'Due',
                                 right: data.due.currency(),
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
                               )
                             else
                               SpacedText(
                                 left: 'Balance',
                                 right: data.due.abs().currency(),
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 styleBuilder: (r, l) => (r, context.text.small.textColor(data.dueColor())),
                               ),
                           ],
@@ -133,41 +133,31 @@ class PartiesView extends HookConsumerWidget {
                                   },
                                   child: const Text('Update'),
                                 ),
-                                if (data.hasDue() && data.isCustomer)
+                                if (data.isCustomer && data.due != 0)
                                   PopOverButton(
-                                    icon: const Icon(LuIcons.handCoins),
+                                    icon: Icon(data.hasDue() ? LuIcons.handCoins : LuIcons.arrowLeftRight),
                                     onPressed: () {
                                       hide();
-                                      showShadDialog(
-                                        context: context,
-                                        builder: (context) => PartyDueDialog(parti: data, type: data.type),
-                                      );
+                                      if (data.hasDue()) {
+                                        RPaths.customerDueManagement.pushNamed(context, extra: data);
+                                      }
+
+                                      if (data.hasBalance()) {
+                                        final query = {'isTransfer': 'true'};
+                                        RPaths.customerDueManagement.pushNamed(context, query: query, extra: data);
+                                      }
                                     },
-                                    child: const Text('Due adjustment'),
+                                    child: Text(data.hasDue() ? 'Due adjustment' : 'Transfer Balance'),
                                   ),
+
                                 if (data.hasBalance() && !data.isCustomer)
                                   PopOverButton(
                                     icon: const Icon(LuIcons.handCoins),
                                     onPressed: () {
                                       hide();
-                                      showShadDialog(
-                                        context: context,
-                                        builder: (context) => SupplierDueDialog(parti: data, type: data.type),
-                                      );
+                                      RPaths.supplierDueManagement.pushNamed(context, extra: data);
                                     },
                                     child: const Text('Due clearance'),
-                                  ),
-                                if (data.hasBalance() && data.isCustomer)
-                                  PopOverButton(
-                                    icon: const Icon(LuIcons.arrowLeftRight),
-                                    onPressed: () {
-                                      hide();
-                                      showShadDialog(
-                                        context: context,
-                                        builder: (context) => BalanceTransferDialog(parti: data, type: data.type),
-                                      );
-                                    },
-                                    child: const Text('Transfer Balance'),
                                   ),
 
                                 PopOverButton(

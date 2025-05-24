@@ -56,6 +56,7 @@ class InventoryRecord {
     this.returnRecord,
     required this.createdBy,
     required this.calcDiscount,
+    required this.paymentLogs,
   });
 
   final String id;
@@ -83,6 +84,7 @@ class InventoryRecord {
   final bool isWalkIn;
   final ReturnRecord? returnRecord;
   final AppUser createdBy;
+  final List<PaymentLog> paymentLogs;
 
   factory InventoryRecord.fromDoc(Document doc) {
     final data = doc.data;
@@ -108,6 +110,10 @@ class InventoryRecord {
       returnRecord: ReturnRecord.tryParse(data['returnRecord']),
       createdBy: AppUser.fromMap(data['created_by']),
       calcDiscount: data.parseNum('calculated_discount'),
+      paymentLogs: switch (data['paymentLogs']) {
+        final List l => l.map((e) => PaymentLog.tryParse(e)).nonNulls.toList(),
+        _ => [],
+      },
     );
   }
 
@@ -134,6 +140,10 @@ class InventoryRecord {
       returnRecord: ReturnRecord.tryParse(map['returnRecord']),
       createdBy: AppUser.fromMap(map['created_by']),
       calcDiscount: map.parseNum('calculated_discount'),
+      paymentLogs: switch (map['paymentLogs']) {
+        final List l => l.map((e) => PaymentLog.tryParse(e)).nonNulls.toList(),
+        _ => [],
+      },
     );
   }
   static InventoryRecord? tryParse(dynamic value) {
@@ -170,6 +180,10 @@ class InventoryRecord {
       returnRecord: ReturnRecord.tryParse(map['returnRecord']) ?? returnRecord,
       createdBy: AppUser.tryParse(map['created_by']) ?? createdBy,
       calcDiscount: map.parseNum('calculated_discount', fallBack: calcDiscount),
+      paymentLogs: switch (map['paymentLogs']) {
+        final List l => l.map((e) => PaymentLog.tryParse(e)).nonNulls.toList(),
+        _ => paymentLogs,
+      },
     );
   }
 
@@ -192,6 +206,7 @@ class InventoryRecord {
     'returnRecord': returnRecord?.toMap(),
     'created_by': createdBy.toMap(),
     'calculated_discount': calcDiscount,
+    'paymentLogs': paymentLogs.map((e) => e.toMap()).toList(),
   };
 
   Map<String, dynamic> toAwPost() => {
@@ -211,6 +226,7 @@ class InventoryRecord {
     'is_walk_in': isWalkIn,
     'created_by': createdBy.id,
     'calculated_discount': calcDiscount,
+    'paymentLogs': paymentLogs.map((e) => e.id).toList(),
   };
 
   Party get getParti => isWalkIn ? Party.fromWalkIn() : party ?? Party.fromWalkIn();
@@ -248,6 +264,7 @@ class InventoryRecord {
     bool? isWalkIn,
     ValueGetter<ReturnRecord?>? returnRecord,
     AppUser? createdBy,
+    List<PaymentLog>? paymentLogs,
   }) {
     return InventoryRecord(
       id: id ?? this.id,
@@ -268,6 +285,7 @@ class InventoryRecord {
       isWalkIn: isWalkIn ?? this.isWalkIn,
       returnRecord: returnRecord != null ? returnRecord() : this.returnRecord,
       createdBy: createdBy ?? this.createdBy,
+      paymentLogs: paymentLogs ?? this.paymentLogs,
     );
   }
 }

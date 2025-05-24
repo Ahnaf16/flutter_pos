@@ -12,9 +12,10 @@ class DueClearanceView extends HookConsumerWidget {
   const DueClearanceView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final extra = context.tryGetExtra<Party>();
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
 
-    final selectedParty = useState<Party?>(null);
+    final selectedParty = useState<Party?>(extra);
 
     final config = ref.watch(configCtrlProvider);
     final user = ref.watch(authStateSyncProvider).toNullable();
@@ -44,6 +45,7 @@ class DueClearanceView extends HookConsumerWidget {
                   error: (e, s) => ErrorView(e, s, prov: partiesCtrlProvider),
                   data: (parties) {
                     return ShadSelectField<Party>(
+                      initialValue: extra,
                       hintText: 'Select Supplier',
                       optionBuilder: (_, v, i) => ShadOption(value: v, child: PartyNameBuilder(v)),
                       options: parties,

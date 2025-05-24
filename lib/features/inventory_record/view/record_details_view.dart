@@ -146,7 +146,7 @@ class RecordDetailsView extends HookConsumerWidget {
                                         SpacedText(
                                           left: 'Status',
                                           right: rec.status.name.titleCase,
-                                          builder: (v) => ShadBadge(child: Text(v)),
+                                          builder: (v) => ShadBadge(child: Text(v)).colored(rec.status.color),
                                         ),
                                       ],
                                     ),
@@ -208,20 +208,17 @@ class RecordDetailsView extends HookConsumerWidget {
                               ],
                             ),
                           ),
+                          if (!context.layout.isDesktop)
+                            Expanded(
+                              child: _RightSection(getParti: getParti, isSale: isSale, logs: rec.paymentLogs),
+                            ),
                         ],
                       ),
                     ),
-                    Expanded(
-                      child: UserCard.parti(
-                        parti: getParti,
-                        title: isSale ? 'Customer' : 'Supplier',
-                        titleStyle: context.text.large.copyWith(color: context.colors.cardForeground),
-                        childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
-                        imgSize: 80,
-                        showDue: !getParti.isWalkIn,
-                        direction: Axis.vertical,
+                    if (context.layout.isDesktop)
+                      Expanded(
+                        child: _RightSection(getParti: getParti, isSale: isSale, logs: rec.paymentLogs),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -229,6 +226,55 @@ class RecordDetailsView extends HookConsumerWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _RightSection extends StatelessWidget {
+  const _RightSection({
+    required this.getParti,
+    required this.isSale,
+    required this.logs,
+  });
+
+  final Party getParti;
+  final bool isSale;
+  final List<PaymentLog> logs;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      spacing: Insets.med,
+      children: [
+        UserCard.parti(
+          parti: getParti,
+          title: isSale ? 'Customer' : 'Supplier',
+          titleStyle: context.text.large.copyWith(color: context.colors.cardForeground),
+          childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
+          imgSize: 80,
+          showDue: !getParti.isWalkIn,
+          direction: Axis.vertical,
+        ),
+        if (logs.isNotEmpty)
+          ShadCard(
+            title: const Text('Payment Logs'),
+            childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
+            child: Column(
+              spacing: Insets.med,
+              children: [
+                for (final log in logs)
+                  Padding(
+                    padding: Pads.med('tb'),
+                    child: SpacedText(
+                      left: log.paymentDate.formatDate('MMM dd, yyyy hh:mm a'),
+                      right: log.payAmount.currency(),
+                      styleBuilder: (l, r) => (l, r.bold.success()),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

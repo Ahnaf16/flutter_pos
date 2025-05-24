@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
@@ -179,10 +181,51 @@ class InventoryRepo with AwHandler {
 
   FutureReport<Unit> updateUnpaidInvoices(String? partyId, num amount) async {
     if (partyId == null) return right(unit);
-    final (err, records) = await getRecordFiltered([Query.equal('parties', partyId)]).toRecord();
+    final (err, records) = await getRecordFiltered([
+      Query.equal('parties', partyId),
+      Query.or([
+        Query.equal('status', InventoryStatus.unpaid.name),
+        Query.equal('status', InventoryStatus.partial.name),
+      ]),
+    ]).toRecord();
     if (err != null || records == null) return left(err ?? const Failure('Unable to get unpaid records'));
 
+    for (final rec in records) {
+      if (amount <= 0) break;
+
+      final remainingDue = rec.due;
+      final paidAmount = min(amount, remainingDue);
+
+      final updatedRec = rec.copyWith(
+        paidAmount: rec.paidAmount + paidAmount,
+        status: paidAmount == remainingDue ? InventoryStatus.paid : InventoryStatus.partial,
+      );
+
+      cat(updatedRec.status, 'status');
+      cat(updatedRec.paidAmount, 'paidAmount');
+
+      final (updateErr, updateData) = await updateRecord(updatedRec).toRecord();
+      if (updateErr != null || updateData == null) return left(updateErr ?? const Failure('Unable to update record'));
+
+      final (logErr, logData) = await _createPaymentLog(updatedRec, paidAmount).toRecord();
+      if (logErr != null || logData == null) return left(updateErr ?? const Failure('Unable to update record'));
+
+      amount -= paidAmount;
+    }
+
     return right(unit);
+  }
+
+  FutureReport<Document> _createPaymentLog(InventoryRecord record, num amount) async {
+    final log = PaymentLog(
+      id: '',
+      record: record,
+      paymentDate: DateTime.now(),
+      payAmount: amount,
+      note: 'From due clarence',
+    );
+    final doc = await db.create(AWConst.collections.paymentLog, data: log.toAwPost());
+    return doc;
   }
 
   // !---

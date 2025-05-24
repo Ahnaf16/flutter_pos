@@ -13,9 +13,12 @@ class DueAdjustmentView extends HookConsumerWidget {
   const DueAdjustmentView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final extra = context.tryGetExtra<Party>();
+    final transfer = context.query('isTransfer') == 'true';
+
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
 
-    final selectedParty = useState<Party?>(null);
+    final selectedParty = useState<Party?>(extra);
 
     final config = ref.watch(configCtrlProvider);
     final user = ref.watch(authStateSyncProvider).toNullable();
@@ -23,7 +26,7 @@ class DueAdjustmentView extends HookConsumerWidget {
     final partiList = ref.watch(partiesCtrlProvider(true));
     final accountList = ref.watch(paymentAccountsCtrlProvider());
 
-    final isTransfer = useState(false);
+    final isTransfer = useState(transfer);
 
     return BaseBody(
       title: 'Customer due adjustment',
@@ -52,6 +55,7 @@ class DueAdjustmentView extends HookConsumerWidget {
                         error: (e, s) => ErrorView(e, s, prov: partiesCtrlProvider),
                         data: (parties) {
                           return ShadSelectField<Party>(
+                            initialValue: extra,
                             hintText: 'Select Customer',
                             optionBuilder: (_, v, i) => ShadOption(value: v, child: PartyNameBuilder(v)),
                             options: parties,
