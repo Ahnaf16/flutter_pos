@@ -1,4 +1,5 @@
 import 'package:appwrite/models.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 
 class ProductUnitRepo with AwHandler {
@@ -19,5 +20,11 @@ class ProductUnitRepo with AwHandler {
 
   FutureReport<ProductUnit> getUnitById(String id) async {
     return await db.get(AWConst.collections.unit, id).convert(ProductUnit.fromDoc);
+  }
+
+  FutureReport<Unit> deleteUnit(ProductUnit unit) async {
+    final doc = await db.delete(AWConst.collections.unit, unit.id);
+
+    return doc;
   }
 }

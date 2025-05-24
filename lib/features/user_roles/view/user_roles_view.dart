@@ -75,17 +75,49 @@ class UserRolesView extends HookConsumerWidget {
                   value: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.eye),
+                      PopOverButton(
+                        dense: true,
+                        icon: const Icon(LuIcons.eye),
                         onPressed: () {
-                          showShadDialog(context: context, builder: (context) => _RoleViewDialog(role: data));
+                          showShadDialog(
+                            context: context,
+                            builder: (context) => _RoleViewDialog(role: data),
+                          );
                         },
                       ),
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.pen),
+                      PopOverButton(
+                        dense: true,
+                        icon: const Icon(LuIcons.pen),
                         onPressed: () => RPaths.editRole(data.id).pushNamed(context),
+                      ),
+                      PopOverButton(
+                        dense: true,
+                        icon: const Icon(LuIcons.trash),
+                        isDestructive: true,
+                        onPressed: () {
+                          showShadDialog(
+                            context: context,
+                            builder: (c) {
+                              return ShadDialog.alert(
+                                title: const Text('Delete user role'),
+                                description: Text('This will delete ${data.name} role permanently.'),
+                                actions: [
+                                  ShadButton(onPressed: () => c.nPop(), child: const Text('Cancel')),
+                                  ShadButton.destructive(
+                                    onPressed: () async {
+                                      final res = await ref.read(userRolesCtrlProvider.notifier).delete(data);
+                                      if (c.mounted) {
+                                        res.showToast(c);
+                                        c.nPop();
+                                      }
+                                    },
+                                    child: const Text('Delete'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                       ),
                     ],
                   ),

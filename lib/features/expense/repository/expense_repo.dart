@@ -59,4 +59,10 @@ class ExpenseRepo with AwHandler {
         .getList(AWConst.collections.expenseCategory)
         .convert((docs) => docs.convertDoc(ExpenseCategory.fromDoc));
   }
+
+  FutureReport<Unit> deleteCategory(ExpenseCategory category) async {
+    final doc = await db.delete(AWConst.collections.expenseCategory, category.id);
+
+    return doc;
+  }
 }

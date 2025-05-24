@@ -32,4 +32,12 @@ class UserRolesCtrl extends _$UserRolesCtrl {
       return rightResult('Role updated successfully');
     });
   }
+
+  Future<Result> delete(UserRole role) async {
+    final res = await _repo.deleteRole(role, true);
+    return await res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      return rightResult('Role deleted successfully');
+    });
+  }
 }

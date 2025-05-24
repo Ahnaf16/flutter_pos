@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 
 class UserRolesRepo with AwHandler {
@@ -17,13 +18,23 @@ class UserRolesRepo with AwHandler {
 
   FutureReport<Document> updateRole(UserRole role, [bool checkUser = false]) async {
     if (checkUser) {
-      final (err, docs) =
-          await db.getList(AWConst.collections.users, queries: [Query.equal('role', role.id)]).toRecord();
-
-      cat(docs?.total, 'docs');
+      final (err, docs) = await db
+          .getList(AWConst.collections.users, queries: [Query.equal('role', role.id)])
+          .toRecord();
 
       if ((docs?.total ?? 0) > 0) return failure('Cannot update role as it is assigned to users');
     }
     return await db.update(AWConst.collections.role, role.id, data: role.toAwPost());
+  }
+
+  FutureReport<Unit> deleteRole(UserRole role, [bool checkUser = false]) async {
+    if (checkUser) {
+      final (err, docs) = await db
+          .getList(AWConst.collections.users, queries: [Query.equal('role', role.id)])
+          .toRecord();
+
+      if ((docs?.total ?? 0) > 0) return failure('Cannot delete role as it is assigned to users');
+    }
+    return await db.delete(AWConst.collections.role, role.id);
   }
 }

@@ -10,7 +10,7 @@ class UnitView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final productList = ref.watch(unitCtrlProvider);
+    final unitList = ref.watch(unitCtrlProvider);
 
     return BaseBody(
       title: 'Product Unit',
@@ -22,7 +22,7 @@ class UnitView extends HookConsumerWidget {
           },
         ),
       ],
-      body: productList.when(
+      body: unitList.when(
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: unitCtrlProvider),
         data: (products) {
@@ -55,11 +55,39 @@ class UnitView extends HookConsumerWidget {
                   value: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.pen),
-                        onPressed:
-                            () => showShadDialog(context: context, builder: (context) => UnitAddDialog(unit: data)),
+                      PopOverButton(
+                        icon: const Icon(LuIcons.pen),
+                        dense: true,
+                        onPressed: () => showShadDialog(
+                          context: context,
+                          builder: (context) => UnitAddDialog(unit: data),
+                        ),
+                      ),
+                      PopOverButton(
+                        icon: const Icon(LuIcons.trash),
+                        isDestructive: true,
+                        dense: true,
+                        onPressed: () {
+                          showShadDialog(
+                            context: context,
+                            builder: (c) {
+                              return ShadDialog.alert(
+                                title: const Text('Delete Product unit'),
+                                description: Text('This will delete ${data.name} permanently.'),
+                                actions: [
+                                  ShadButton(onPressed: () => c.nPop(), child: const Text('Cancel')),
+                                  ShadButton.destructive(
+                                    onPressed: () async {
+                                      await ref.read(unitCtrlProvider.notifier).delete(data);
+                                      if (c.mounted) c.nPop();
+                                    },
+                                    child: const Text('Delete'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                       ),
                     ],
                   ),

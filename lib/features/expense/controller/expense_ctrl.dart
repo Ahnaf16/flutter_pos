@@ -32,12 +32,11 @@ class ExpenseCtrl extends _$ExpenseCtrl {
       state = AsyncValue.data(_searchFrom);
     }
     query = query.low;
-    final list =
-        _searchFrom.where((e) {
-          return e.expenseBy.name.low.contains(query) ||
-              e.expenseBy.phone.low.contains(query) ||
-              e.expenseBy.email.low.contains(query);
-        }).toList();
+    final list = _searchFrom.where((e) {
+      return e.expenseBy.name.low.contains(query) ||
+          e.expenseBy.phone.low.contains(query) ||
+          e.expenseBy.email.low.contains(query);
+    }).toList();
     state = AsyncData(list);
   }
 
@@ -103,6 +102,14 @@ class ExpenseCategoryCtrl extends _$ExpenseCategoryCtrl {
     return await res.fold(leftResult, (r) async {
       state = await AsyncValue.guard(() async => build());
       return rightResult('Category updated successfully');
+    });
+  }
+
+  Future<Result> delete(ExpenseCategory category) async {
+    final res = await _repo.deleteCategory(category);
+    return await res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      return rightResult('Category deleted successfully');
     });
   }
 }

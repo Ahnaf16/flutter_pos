@@ -55,14 +55,39 @@ class ExpenseCategoryView extends HookConsumerWidget {
                   value: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ShadButton.secondary(
-                        size: ShadButtonSize.sm,
-                        leading: const Icon(LuIcons.pen),
-                        onPressed:
-                            () => showShadDialog(
-                              context: context,
-                              builder: (context) => ExCategoryAddDialog(category: data),
-                            ),
+                      PopOverButton(
+                        icon: const Icon(LuIcons.pen),
+                        dense: true,
+                        onPressed: () => showShadDialog(
+                          context: context,
+                          builder: (context) => ExCategoryAddDialog(category: data),
+                        ),
+                      ),
+                      PopOverButton(
+                        icon: const Icon(LuIcons.trash),
+                        isDestructive: true,
+                        dense: true,
+                        onPressed: () {
+                          showShadDialog(
+                            context: context,
+                            builder: (c) {
+                              return ShadDialog.alert(
+                                title: const Text('Delete Category'),
+                                description: Text('This will delete ${data.name} permanently.'),
+                                actions: [
+                                  ShadButton(onPressed: () => c.nPop(), child: const Text('Cancel')),
+                                  ShadButton.destructive(
+                                    onPressed: () async {
+                                      await ref.read(expenseCategoryCtrlProvider.notifier).delete(data);
+                                      if (c.mounted) c.nPop();
+                                    },
+                                    child: const Text('Delete'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                       ),
                     ],
                   ),

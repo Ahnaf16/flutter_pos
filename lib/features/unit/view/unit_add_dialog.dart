@@ -57,7 +57,6 @@ class UnitAddDialog extends HookConsumerWidget {
             spacing: Insets.med,
             children: [
               ShadTextField(name: 'name', label: 'Name', hintText: 'eg. Kilogram', isRequired: true),
-              ShadTextField(name: 'unit_name', label: 'Unit code', hintText: 'eg. kg', isRequired: true),
             ],
           ),
         ),

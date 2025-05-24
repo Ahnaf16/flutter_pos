@@ -40,4 +40,13 @@ class UnitCtrl extends _$UnitCtrl {
       return rightResult('Unit updated successfully');
     });
   }
+
+  Future<Result> delete(ProductUnit unit) async {
+    final res = await _repo.deleteUnit(unit);
+
+    return res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      return rightResult('Unit deleted successfully');
+    });
+  }
 }
