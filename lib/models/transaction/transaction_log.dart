@@ -189,10 +189,12 @@ class TransactionLog {
   ({String? name, String? phone}) get effectiveFrom {
     if (isBetweenAccount) return (name: account?.name, phone: null);
 
+    final isWalkIn = transactionForm?.isWalkIn ?? (type.isSale);
+
     final fromName = transactionForm?.name ?? transactionBy?.name;
     final fromPhone = transactionForm?.phone ?? transactionBy?.phone;
 
-    return (name: fromName, phone: fromPhone);
+    return (name: isWalkIn ? 'Walk In' : fromName, phone: isWalkIn ? null : fromPhone);
   }
 
   static TransactionLog fromInventoryRecord(InventoryRecord record, AppUser user) {

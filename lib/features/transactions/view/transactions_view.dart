@@ -235,38 +235,41 @@ class _TrxViewDialog extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: Insets.med,
           children: [
-            Row(
-              spacing: Insets.med,
-              children: [
-                Expanded(
-                  child: ShadCard(
-                    childPadding: Pads.sm('t'),
-                    title: Text('From', style: context.text.list),
-                    child: Column(
-                      spacing: Insets.sm,
-                      children: [
-                        SpacedText(left: 'Name', right: trx.effectiveFrom.name ?? '--'),
-                        if (trx.effectiveFrom.phone != null)
-                          SpacedText(left: 'Phone', right: trx.effectiveFrom.phone ?? '--'),
-                      ],
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: Insets.med,
+                children: [
+                  Expanded(
+                    child: ShadCard(
+                      childPadding: Pads.sm('t'),
+                      title: Text('From', style: context.text.list),
+                      child: Column(
+                        spacing: Insets.sm,
+                        children: [
+                          SpacedText(left: 'Name', right: trx.effectiveFrom.name ?? '--'),
+                          if (trx.effectiveFrom.phone != null)
+                            SpacedText(left: 'Phone', right: trx.effectiveFrom.phone ?? '--'),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: ShadCard(
-                    childPadding: Pads.sm('t'),
-                    title: Text('To', style: context.text.list),
-                    child: Column(
-                      spacing: Insets.sm,
-                      children: [
-                        SpacedText(left: 'Name', right: trx.effectiveTo.name ?? '--'),
-                        if (trx.effectiveTo.phone != null)
-                          SpacedText(left: 'Phone', right: trx.effectiveTo.phone ?? '--'),
-                      ],
+                  Expanded(
+                    child: ShadCard(
+                      childPadding: Pads.sm('t'),
+                      title: Text('To', style: context.text.list),
+                      child: Column(
+                        spacing: Insets.sm,
+                        children: [
+                          SpacedText(left: 'Name', right: trx.effectiveTo.name ?? '--'),
+                          if (trx.effectiveTo.phone != null)
+                            SpacedText(left: 'Phone', right: trx.effectiveTo.phone ?? '--'),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
 
             //! trx info

@@ -17,6 +17,10 @@ class DueView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dueList = ref.watch(dueLogCtrlProvider);
     final dueCtrl = useCallback(() => ref.read(dueLogCtrlProvider.notifier));
+
+    final calKeyResetter = useState(false);
+    final calKey = useMemoized(() => UniqueKey(), [calKeyResetter.value]);
+
     return BaseBody(
       title: 'Due logs',
       body: Column(
@@ -33,10 +37,16 @@ class DueView extends HookConsumerWidget {
                   showClearButton: true,
                 ),
               ),
-              ShadDatePicker.range(onRangeChanged: (v) => dueCtrl().filter(range: v)),
+              ShadDatePicker.range(
+                key: calKey,
+                onRangeChanged: (v) => dueCtrl().filter(range: v),
+              ),
               ShadIconButton.raw(
                 icon: const Icon(LuIcons.x),
-                onPressed: () => dueCtrl().filter(),
+                onPressed: () {
+                  calKeyResetter.toggle();
+                  dueCtrl().filter();
+                },
                 variant: ShadButtonVariant.destructive,
               ),
             ],
