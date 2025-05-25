@@ -5,6 +5,7 @@ import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
+  TableHeading.positional('#', 80.0),
   TableHeading.positional('From'),
   TableHeading.positional('By'),
   TableHeading.positional('Amount', 300.0),
@@ -56,7 +57,10 @@ class ReturnView extends HookConsumerWidget {
               ),
 
               const Gap(Insets.xs),
-              ShadDatePicker.range(key: ValueKey(isSale), onRangeChanged: (v) => invCtrl().filter(range: v)),
+              ShadDatePicker.range(
+                key: ValueKey(isSale),
+                onRangeChanged: (v) => invCtrl().filter(range: v),
+              ),
               ShadIconButton.raw(
                 icon: const Icon(LuIcons.x),
                 onPressed: () => invCtrl().filter(),
@@ -87,6 +91,10 @@ class ReturnView extends HookConsumerWidget {
                   cellAlignmentBuilder: (i) => _headings.fromName(i).alignment,
                   cellBuilder: (data, head) {
                     return switch (head.name) {
+                      '#' => DataGridCell(
+                        columnName: head.name,
+                        value: Text((inventories.indexOf(data) + 1).toString()),
+                      ),
                       'From' => DataGridCell(
                         columnName: head.name,
                         value: NameCellBuilder(data.returnedRec?.getParti.name, data.returnedRec?.getParti.phone),

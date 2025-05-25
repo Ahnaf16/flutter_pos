@@ -4,7 +4,14 @@ import 'package:pos/features/products/view/product_filter_fields.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('Name', double.nan), ('Warehouse', 150.0), ('Stock', 100.0), ('Pricing', 200.0), ('Action', 200.0)];
+const _headings = [
+  TableHeading.positional('#', 60.0),
+  TableHeading.positional('Name'),
+  TableHeading.positional('Warehouse', 150.0),
+  TableHeading.positional('Stock', 100.0),
+  TableHeading.positional('Pricing', 200.0),
+  TableHeading.positional('Action', 200.0),
+];
 
 class ProductsView extends HookConsumerWidget {
   const ProductsView({super.key});
@@ -36,41 +43,45 @@ class ProductsView extends HookConsumerWidget {
               loading: () => const Loading(),
               error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
               data: (products) {
-                return DataTableBuilder<Product, (String, double)>(
+                return DataTableBuilder<Product, TableHeading>(
                   rowHeight: 120,
                   items: products,
                   headings: _headings,
                   headingBuilder: (heading) {
                     return GridColumn(
-                      columnName: heading.$1,
+                      columnName: heading.name,
                       columnWidthMode: ColumnWidthMode.fill,
-                      maximumWidth: heading.$2,
+                      maximumWidth: heading.max,
                       minimumWidth: 200,
                       label: Container(
                         padding: Pads.med(),
-                        alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
-                        child: Text(heading.$1),
+                        alignment: heading.alignment,
+                        child: Text(heading.name),
                       ),
                     );
                   },
-                  cellAlignment: Alignment.centerLeft,
+                  cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
                   cellBuilder: (data, head) {
                     final hId = (viewingWh == null) ? null : viewingWh.id;
-                    return switch (head.$1) {
-                      'Name' => DataGridCell(columnName: head.$1, value: nameCellBuilder(data)),
+                    return switch (head.name) {
+                      '#' => DataGridCell(
+                        columnName: head.name,
+                        value: Text((products.indexWhere((e) => e.id == data.id) + 1).toString()),
+                      ),
+                      'Name' => DataGridCell(columnName: head.name, value: nameCellBuilder(data)),
                       'Warehouse' => DataGridCell(
-                        columnName: head.$1,
+                        columnName: head.name,
                         value: Text(
                           data.stocksByHouse(hId).firstWhereOrNull((e) => e.warehouse != null)?.warehouse?.name ?? '--',
                         ),
                       ),
                       'Stock' => DataGridCell(
-                        columnName: head.$1,
+                        columnName: head.name,
                         value: Text('${data.quantityByHouse(hId)}${data.unitName}'),
                       ),
-                      'Pricing' => DataGridCell(columnName: head.$1, value: _priceCellBuilder(data)),
+                      'Pricing' => DataGridCell(columnName: head.name, value: _priceCellBuilder(data)),
                       'Action' => DataGridCell(
-                        columnName: head.$1,
+                        columnName: head.name,
                         value: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -79,10 +90,6 @@ class ProductsView extends HookConsumerWidget {
                               leading: const Icon(LuIcons.eye),
                               onPressed: () {
                                 RPaths.productDetails(data.id).pushNamed(context);
-                                // showShadDialog(
-                                //   context: context,
-                                //   builder: (context) => ProductViewDialog(product: data),
-                                // );
                               },
                             ),
                             ShadButton.secondary(
@@ -120,7 +127,7 @@ class ProductsView extends HookConsumerWidget {
                           ],
                         ),
                       ),
-                      _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                      _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
                     };
                   },
                 );
@@ -146,14 +153,18 @@ class ProductsView extends HookConsumerWidget {
       );
     },
   );
-  static Widget nameCellBuilder(Product product, [double gap = Insets.xs, double imgSize = 40]) => Builder(
+  static Widget nameCellBuilder(Product? product, [double gap = Insets.xs, double imgSize = 40]) => Builder(
     builder: (context) {
+      if (product == null) return const Text('Unknown product');
       return Row(
         spacing: Insets.med,
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          HostedImage.square(product.getPhoto, radius: Corners.sm, dimension: imgSize),
+          ShadCard(
+            expanded: false,
+            child: HostedImage.square(product.getPhoto, radius: Corners.sm, dimension: imgSize),
+          ),
 
           Flexible(
             child: Column(

@@ -30,7 +30,7 @@ class StockTransferLog {
       to: WareHouse.tyrParse(map['to']),
       stock: Stock.tryParse(map['stock']),
       date: DateTime.parse(map['date']),
-      user: AppUser.fromMap(map['user']),
+      user: AppUser.tryParse(map['user']),
     );
   }
 

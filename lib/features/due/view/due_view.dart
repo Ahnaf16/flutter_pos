@@ -2,7 +2,13 @@ import 'package:pos/features/due/controller/due_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('Name', double.nan), ('Amount', 350.0), ('Date', 250.0), ('Action', 100.0)];
+const _headings = [
+  TableHeading.positional('#', 80.0),
+  TableHeading.positional('Name'),
+  TableHeading.positional('Amount', 350.0),
+  TableHeading.positional('Date', 250.0),
+  TableHeading.positional('Action', 100.0),
+];
 
 class DueView extends HookConsumerWidget {
   const DueView({super.key});
@@ -40,27 +46,28 @@ class DueView extends HookConsumerWidget {
               loading: () => const Loading(),
               error: (e, s) => ErrorView(e, s, prov: dueLogCtrlProvider),
               data: (dues) {
-                return DataTableBuilder<DueLog, (String, double)>(
+                return DataTableBuilder<DueLog, TableHeading>(
                   rowHeight: 100,
                   items: dues,
                   headings: _headings,
                   headingBuilderIndexed: (heading, i) {
-                    Alignment alignment = i == _headings.length - 1 ? Alignment.centerRight : Alignment.centerLeft;
-                    if (i == 2) alignment = Alignment.center;
+                    final alignment = heading.alignment;
                     return GridColumn(
-                      columnName: heading.$1,
+                      columnName: heading.name,
                       columnWidthMode: ColumnWidthMode.fill,
-                      maximumWidth: heading.$2,
+                      maximumWidth: heading.max,
                       minimumWidth: 200,
-                      label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.$1)),
+                      label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
                     );
                   },
                   cellAlignment: Alignment.centerLeft,
+                  cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
                   cellBuilder: (data, head) {
-                    return switch (head.$1) {
-                      'Name' => DataGridCell(columnName: head.$1, value: _PartyNameBuilder(data.parti)),
+                    return switch (head.name) {
+                      '#' => DataGridCell(columnName: head.name, value: Text((dues.indexOf(data) + 1).toString())),
+                      'Name' => DataGridCell(columnName: head.name, value: _PartyNameBuilder(data.parti)),
                       'Amount' => DataGridCell(
-                        columnName: head.$1,
+                        columnName: head.name,
                         value: Column(
                           spacing: Insets.xs,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,11 +96,11 @@ class DueView extends HookConsumerWidget {
                         ),
                       ),
                       'Date' => DataGridCell(
-                        columnName: head.$1,
+                        columnName: head.name,
                         value: Center(child: Text(data.date.formatDate())),
                       ),
                       'Action' => DataGridCell(
-                        columnName: head.$1,
+                        columnName: head.name,
                         value: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -108,7 +115,7 @@ class DueView extends HookConsumerWidget {
                           ],
                         ),
                       ),
-                      _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                      _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
                     };
                   },
                 );

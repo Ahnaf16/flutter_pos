@@ -21,9 +21,6 @@ class RPaths {
   static RPath createProduct = const RPath('/create_product');
   static RPath editProduct(String id) => RPath('/edit_product', {'id': id});
 
-  // stock
-  static RPath stock = const RPath('/stock');
-
   // unit
   static RPath unit = const RPath('/unit');
 
@@ -70,6 +67,7 @@ class RPaths {
 
   // stockTransfer
   static RPath stockTransfer = const RPath('/stock_transfer');
+  static RPath stockLog = const RPath('/stock_transfer_log');
 
   // expense
   static RPath expense = const RPath('/expense');

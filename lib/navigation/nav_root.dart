@@ -368,7 +368,6 @@ List<(String text, IconData? icon, RPath? path)> _items(List<RolePermissions> p)
       if (p.contains(RolePermissions.makeSale)) ('New Sale', LuIcons.shoppingCart, RPaths.createSales),
       ('Inventory', null, null),
       if (p.contains(RolePermissions.manageProduct)) ('Products', LuIcons.box, RPaths.products),
-      // if (p.contains(RolePermissions.manageStock)) ('Stock', LuIcons.arrowUp01, RPaths.stock),
       if (p.contains(RolePermissions.manageUnit)) ('Unit', LuIcons.ruler, RPaths.unit),
     ],
     if (RolePermissions.isInGroup(p, RolePermissions.salesGroup)) ...[
@@ -397,6 +396,7 @@ List<(String text, IconData? icon, RPath? path)> _items(List<RolePermissions> p)
       ('Logistics', null, null),
       if (p.contains(RolePermissions.manageWarehouse)) ('Warehouse', LuIcons.gitBranch, RPaths.warehouse),
       if (p.contains(RolePermissions.transferStock)) ('Stock Transfer', LuIcons.arrowUpDown, RPaths.stockTransfer),
+      if (p.contains(RolePermissions.manageStock)) ('Stock logs', LuIcons.arrowUp01, RPaths.stockLog),
     ],
     if (RolePermissions.isInGroup(p, RolePermissions.accountingGroup)) ...[
       ('Accounting', null, null),

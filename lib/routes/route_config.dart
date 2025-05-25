@@ -22,7 +22,7 @@ import 'package:pos/features/products/view/products_view.dart';
 import 'package:pos/features/settings/view/settings_view.dart';
 import 'package:pos/features/staffs/view/create_staff_view.dart';
 import 'package:pos/features/staffs/view/staffs_view.dart';
-import 'package:pos/features/stock/view/stock_view.dart';
+import 'package:pos/features/stockTransfer/view/stock_transfer_logs_view.dart';
 import 'package:pos/features/stockTransfer/view/stock_transfer_view.dart';
 import 'package:pos/features/transactions/view/transactions_view.dart';
 import 'package:pos/features/unit/view/unit_view.dart';
@@ -74,8 +74,7 @@ class AppRouter extends Notifier<GoRouter> {
               AppRoute(RPaths.productDetails(':id'), (_) => const ProductDetailsView(), parentKey: _shell),
             ],
           ),
-          //! stock
-          AppRoute(RPaths.stock, redirect: (_, _) => RolePermissions.manageStock.redirect(p), (_) => const StockView()),
+
           //! unit
           AppRoute(RPaths.unit, redirect: (_, _) => RolePermissions.manageUnit.redirect(p), (_) => const UnitView()),
 
@@ -190,6 +189,12 @@ class AppRouter extends Notifier<GoRouter> {
             redirect: (_, _) => RolePermissions.transferStock.redirect(p),
             (_) => const StockTransferView(),
           ),
+          //! stock log
+          AppRoute(
+            RPaths.stockLog,
+            redirect: (_, _) => RolePermissions.manageStock.redirect(p),
+            (_) => const StockTransferLogsView(),
+          ),
 
           //! payment accounts
           AppRoute(
@@ -231,7 +236,12 @@ class AppRouter extends Notifier<GoRouter> {
       navigatorKey: _root,
       redirect: redirect,
       initialLocation: rootPath,
-      routes: [ShellRoute(routes: _routes(permissions), builder: (_, s, c) => AppRoot(key: s.pageKey, child: c))],
+      routes: [
+        ShellRoute(
+          routes: _routes(permissions),
+          builder: (_, s, c) => AppRoot(key: s.pageKey, child: c),
+        ),
+      ],
       errorBuilder: (_, state) => ErrorRoutePage(error: state.error?.message),
     );
   }

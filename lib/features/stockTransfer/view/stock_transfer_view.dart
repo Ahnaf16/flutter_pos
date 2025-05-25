@@ -23,6 +23,8 @@ class StockTransferView extends HookConsumerWidget {
     final StockTransferState(:product, :from, :to, :quantity) = transferState;
     final tCtrl = useCallback(() => ref.read(stockTransferCtrlProvider.notifier));
 
+    final selectedFrom = useState<WareHouse?>(null);
+
     return BaseBody(
       title: 'Stock Transfer',
       padding: context.layout.pagePadding.copyWith(top: 5, bottom: 15),
@@ -232,6 +234,7 @@ class StockTransferView extends HookConsumerWidget {
                                                 return ShadOption(value: value, child: Text(value.name));
                                               },
                                               onChanged: (v) {
+                                                selectedFrom.value = v;
                                                 final changedStock = tCtrl().setFrom(v);
                                                 final state = formKey.currentState!;
                                                 state.patchValue(changedStock.transformValues((_, v) => '$v'));
@@ -243,7 +246,7 @@ class StockTransferView extends HookConsumerWidget {
                                               label: 'To',
                                               hintText: 'Select transfer destination',
                                               selectedBuilder: (context, value) => Text(value.name),
-                                              options: warehouses,
+                                              options: warehouses.where((e) => e.id != selectedFrom.value?.id).toList(),
                                               optionBuilder: (_, value, _) {
                                                 return ShadOption(value: value, child: Text(value.name));
                                               },

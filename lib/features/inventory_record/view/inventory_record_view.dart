@@ -11,6 +11,7 @@ import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
+  TableHeading.positional('#', 60.0),
   TableHeading.positional('Parti'),
   TableHeading.positional('Product', 400.0),
   TableHeading.positional('Amount', 300.0),
@@ -139,6 +140,7 @@ class RecordTable extends ConsumerWidget {
       cellAlignmentBuilder: (h) => heads.fromName(h).alignment,
       cellBuilder: (data, head) {
         return switch (head.name) {
+          '#' => DataGridCell(columnName: head.name, value: Text((inventories.indexOf(data) + 1).toString())),
           'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
           'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data.details)),
           'Amount' => DataGridCell(columnName: head.name, value: _amountBuilder(data)),
