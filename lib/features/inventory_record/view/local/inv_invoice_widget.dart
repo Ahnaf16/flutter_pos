@@ -1,4 +1,4 @@
-import 'package:pdf/pdf.dart' show PdfPageFormat;
+import 'package:open_filex/open_filex.dart';
 import 'package:pos/main.export.dart';
 
 class InvInvoiceWidget extends HookConsumerWidget {
@@ -25,10 +25,22 @@ class InvInvoiceWidget extends HookConsumerWidget {
             final ctrl = PDFCtrl();
             l.truthy();
             final pdf = await InvoicePDF(rec, config).fullPDF();
-            final doc = await ctrl.getDoc(pdf, PdfPageFormat.a4);
-            await ctrl.save(doc, rec.invoiceNo);
+            final doc = await ctrl.getDoc(pdf);
+            final path = await ctrl.save(doc, rec.invoiceNo);
             l.falsey();
-            if (context.mounted) Toast.show(context, 'Invoice download');
+            if (context.mounted) {
+              Toast.show(
+                context,
+                'Invoice download',
+                action: (id) {
+                  if (path == null) return null;
+                  return ShadIconButton.ghost(
+                    icon: const Icon(LuIcons.externalLink),
+                    onPressed: () => OpenFilex.open(path),
+                  );
+                },
+              );
+            }
           },
           child: const Text('Print Invoice'),
         ),

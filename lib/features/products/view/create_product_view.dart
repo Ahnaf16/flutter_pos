@@ -77,7 +77,7 @@ class CreateProductView extends HookConsumerWidget {
                 recordCtrl().setInputsFromMap(data['record'] ?? {});
                 recordCtrl().addProduct(product.copyWith(id: createdId.value), newStock: stock, replaceExisting: true);
 
-                final (ok, msg) = await recordCtrl().submit();
+                final ((ok, msg), inv) = await recordCtrl().submit();
                 l.falsey();
                 if (!ok && context.mounted) return Toast.showErr(context, msg);
                 if (ok) return context.pop();

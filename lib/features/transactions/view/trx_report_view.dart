@@ -1,3 +1,4 @@
+import 'package:open_filex/open_filex.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pos/_core/common/pdf_service/statements_pdf.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
@@ -26,9 +27,21 @@ class TrxReportView extends HookConsumerWidget {
             final ctrl = PDFCtrl();
             final pdf = await StatementsPdf(trx, config, range.value?.start, range.value?.end).fullPDF();
             final doc = await ctrl.getDoc(pdf, PdfPageFormat.a4);
-            await ctrl.save(doc, 'statements_${DateTime.now().formatDate('yyyy-MM-dd_HH-mm')}');
+            final path = await ctrl.save(doc, 'statements_${DateTime.now().formatDate('yyyy-MM-dd_HH-mm')}');
             l.falsey();
-            if (context.mounted) Toast.show(context, 'Statement download');
+            if (context.mounted) {
+              Toast.show(
+                context,
+                'Statement download',
+                action: (id) {
+                  if (path == null) return null;
+                  return ShadIconButton.ghost(
+                    icon: const Icon(LuIcons.externalLink),
+                    onPressed: () => OpenFilex.open(path),
+                  );
+                },
+              );
+            }
           },
           child: const Text('Download'),
         ),

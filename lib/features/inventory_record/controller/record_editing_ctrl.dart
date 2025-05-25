@@ -1,6 +1,7 @@
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
 import 'package:pos/features/inventory_record/repository/return_repo.dart';
+import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -128,47 +129,50 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     );
   }
 
-  Future<Result> submit() async {
-    // cat(state.toMap(), 'submit');
-
+  Future<(Result, InventoryRecord?)> submit() async {
     if (state.parti == null) {
-      return (false, 'Please select a ${type.isSale ? 'customer' : 'supplier'}');
+      return ((false, 'Please select a ${type.isSale ? 'customer' : 'supplier'}'), null);
     }
     if (state.account == null && state.paidAmount > 0) {
-      return (false, 'Please select a payment account');
+      return ((false, 'Please select a payment account'), null);
     }
     if (state.details.isEmpty) {
-      return (false, 'Please select at least one product');
+      return ((false, 'Please select at least one product'), null);
     }
 
     if (type.isPurchase) {
-      if (state.hasExtra) return (false, 'Extra amount is not allowed when purchasing');
+      if (state.hasExtra) return ((false, 'Extra amount is not allowed when purchasing'), null);
       return submitPurchase();
     } else {
-      if (state.isWalkIn && state.hasDue) return (false, 'Clear due for walk-in customer');
-      if (state.isWalkIn && state.hasExtra) return (false, 'Clear extra amount for walk-in customer');
+      if (state.isWalkIn && state.hasDue) return ((false, 'Clear due for walk-in customer'), null);
+      if (state.isWalkIn && state.hasExtra) return ((false, 'Clear extra amount for walk-in customer'), null);
 
       return submitSale();
     }
   }
 
-  Future<Result> submitPurchase() async {
+  Future<(Result, InventoryRecord?)> submitPurchase() async {
     final res = await _repo.createPurchase(state);
 
-    return res.fold(leftResult, (r) {
+    return res.fold((l) => (leftResult(l), null), (r) {
       ref.invalidate(inventoryCtrlProvider);
+      ref.invalidate(paymentAccountsCtrlProvider);
       ref.invalidateSelf();
-      return (true, 'Record created successfully');
+      final inv = InventoryRecord.tryParse(r);
+      return ((true, 'Record created successfully'), inv);
     });
   }
 
-  Future<Result> submitSale() async {
+  Future<(Result, InventoryRecord?)> submitSale() async {
     final res = await _repo.createSale(state);
 
-    return res.fold(leftResult, (r) {
+    return res.fold((l) => (leftResult(l), null), (r) {
       ref.invalidate(inventoryCtrlProvider);
+      ref.invalidate(paymentAccountsCtrlProvider);
+
       ref.invalidateSelf();
-      return (true, 'Record created successfully');
+      final inv = InventoryRecord.tryParse(r);
+      return ((true, 'Record created successfully'), inv);
     });
   }
 

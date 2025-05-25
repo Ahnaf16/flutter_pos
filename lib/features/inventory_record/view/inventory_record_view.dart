@@ -30,6 +30,8 @@ class InventoryRecordView extends HookConsumerWidget {
     final inventoryList = ref.watch(inventoryCtrlProvider(type));
     final invCtrl = useCallback(() => ref.read(inventoryCtrlProvider(type).notifier), [type]);
     final accountList = ref.watch(paymentAccountsCtrlProvider());
+    final calKeyResetter = useState(false);
+    final calKey = useMemoized(() => UniqueKey(), [type, calKeyResetter.value]);
 
     return BaseBody(
       title: 'All ${type.name}',
@@ -86,12 +88,15 @@ class InventoryRecordView extends HookConsumerWidget {
               ),
               const Gap(Insets.xs),
               ShadDatePicker.range(
-                key: ValueKey(type),
+                key: calKey,
                 onRangeChanged: (v) => invCtrl().filter(range: v),
               ),
               ShadIconButton.raw(
                 icon: const Icon(LuIcons.x),
-                onPressed: () => invCtrl().filter(),
+                onPressed: () {
+                  calKeyResetter.toggle();
+                  invCtrl().filter();
+                },
                 variant: ShadButtonVariant.destructive,
               ),
             ],

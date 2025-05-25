@@ -43,13 +43,11 @@ class ProductDetailsView extends ConsumerWidget {
                               Text(product.name, style: context.text.h3),
                               if (product.manufacturer != null)
                                 ShadBadge.outline(
-                                  child: Text(
-                                    '${product.manufacturer}',
-                                    style: context.text.muted.size(12).textHeight(1),
-                                  ),
+                                  child: Text('${product.manufacturer}', style: context.text.muted),
                                 ),
                             ],
                           ),
+                          Text(product.salePrice.currency(), style: context.text.h4.primary(context)),
 
                           Text(
                             'SKU: ${product.sku}',
@@ -82,63 +80,63 @@ class ProductDetailsView extends ConsumerWidget {
                   ),
                 ],
                 const Gap(Insets.lg),
+                if (product.nonEmptyStocks().isNotEmpty)
+                  ShadCard(
+                    child: ShadAccordion<int>(
+                      initialValue: 1,
+                      children: [
+                        ShadAccordionItem<int>(
+                          value: 1,
+                          padding: Pads.sm(),
+                          separator: const ShadSeparator.horizontal(margin: Pads.zero),
+                          title: const Text('Stocks'),
+                          child: ListView.separated(
+                            itemCount: product.nonEmptyStocks().length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            separatorBuilder: (_, __) => const ShadSeparator.horizontal(margin: Pads.zero),
 
-                ShadCard(
-                  child: ShadAccordion<int>(
-                    initialValue: 1,
-                    children: [
-                      ShadAccordionItem<int>(
-                        value: 1,
-                        padding: Pads.sm(),
-                        separator: const ShadSeparator.horizontal(margin: Pads.zero),
-                        title: const Text('Stocks'),
-                        child: ListView.separated(
-                          itemCount: product.nonEmptyStocks().length,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          separatorBuilder: (_, __) => const ShadSeparator.horizontal(margin: Pads.zero),
-
-                          itemBuilder: (BuildContext context, int index) {
-                            final stock = product.nonEmptyStocks()[index];
-                            return Padding(
-                              padding: Pads.med(),
-                              child: Row(
-                                spacing: Insets.sm,
-                                children: [
-                                  Expanded(
-                                    child: SpacedText(
-                                      left: 'Purchase',
-                                      right: (stock.purchasePrice).currency(),
-                                      style: context.text.muted,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      styleBuilder: (l, r) => (l, context.text.small),
+                            itemBuilder: (BuildContext context, int index) {
+                              final stock = product.nonEmptyStocks()[index];
+                              return Padding(
+                                padding: Pads.med(),
+                                child: Row(
+                                  spacing: Insets.sm,
+                                  children: [
+                                    Expanded(
+                                      child: SpacedText(
+                                        left: 'Purchase',
+                                        right: (stock.purchasePrice).currency(),
+                                        style: context.text.muted,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        styleBuilder: (l, r) => (l, context.text.small),
+                                      ),
                                     ),
-                                  ),
-                                  Expanded(
-                                    child: CenterLeft(
-                                      child: ShadBadge(child: Text(stock.warehouse?.name ?? '--')),
+                                    Expanded(
+                                      child: CenterLeft(
+                                        child: ShadBadge(child: Text(stock.warehouse?.name ?? '--')),
+                                      ),
                                     ),
-                                  ),
 
-                                  Expanded(
-                                    child: CenterRight(
-                                      child: Text(
-                                        '${stock.quantity} ${product.unitName}',
-                                        style: context.text.list.textColor(
-                                          stock.quantity > 0 ? Colors.green : Colors.red,
+                                    Expanded(
+                                      child: CenterRight(
+                                        child: Text(
+                                          '${stock.quantity} ${product.unitName}',
+                                          style: context.text.list.textColor(
+                                            stock.quantity > 0 ? Colors.green : Colors.red,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           );

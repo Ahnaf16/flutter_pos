@@ -24,19 +24,19 @@ const _headings = [
 ];
 
 class TransactionsView extends HookConsumerWidget {
-  const TransactionsView({super.key, this.type});
-
-  final TransactionType? type;
+  const TransactionsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final trxList = ref.watch(transactionLogCtrlProvider(type));
-    final trxCtrl = useCallback(() => ref.read(transactionLogCtrlProvider(type).notifier), [type]);
+    final trxList = ref.watch(transactionLogCtrlProvider());
+    final trxCtrl = useCallback(() => ref.read(transactionLogCtrlProvider().notifier));
 
     final accountList = ref.watch(paymentAccountsCtrlProvider());
+    final calKeyResetter = useState(false);
+    final calKey = useMemoized(() => UniqueKey(), [calKeyResetter.value]);
 
     return BaseBody(
-      title: type == TransactionType.transfer ? 'Money transfer' : 'Transaction logs',
+      title: 'Transaction logs',
       actions: [
         ShadButton.outline(
           child: const Text('Generate Report'),
@@ -47,13 +47,6 @@ class TransactionsView extends HookConsumerWidget {
             );
           },
         ),
-        if (type == TransactionType.transfer)
-          ShadButton(
-            onPressed: () {
-              showShadDialog(context: context, builder: (context) => const _TransferDialog());
-            },
-            child: const Text('Transfer money'),
-          ),
       ],
       body: Column(
         spacing: Insets.med,
@@ -97,12 +90,15 @@ class TransactionsView extends HookConsumerWidget {
               ),
               const Gap(Insets.xs),
               ShadDatePicker.range(
-                key: ValueKey(type),
+                key: calKey,
                 onRangeChanged: (v) => trxCtrl().filter(range: v),
               ),
               ShadIconButton.raw(
                 icon: const Icon(LuIcons.x),
-                onPressed: () => trxCtrl().filter(),
+                onPressed: () {
+                  calKeyResetter.toggle();
+                  trxCtrl().filter();
+                },
                 variant: ShadButtonVariant.destructive,
               ),
             ],

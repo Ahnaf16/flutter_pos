@@ -3,11 +3,13 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/features/inventory_record/view/local/discount_type_pop_over.dart';
+import 'package:pos/features/inventory_record/view/local/inv_invoice_widget.dart';
 import 'package:pos/features/inventory_record/view/local/products_panel.dart';
 import 'package:pos/features/inventory_record/view/payment_account_select.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class CreateRecordView extends HookConsumerWidget {
@@ -109,11 +111,20 @@ class CreateRecordView extends HookConsumerWidget {
                                       child: _Summary(
                                         record: record,
                                         onSubmit: () async {
-                                          final res = await recordCtrl().submit();
+                                          final (res, inv) = await recordCtrl().submit();
                                           if (context.mounted) res.showToast(context);
 
                                           if (res.success) {
                                             formKey.currentState?.reset();
+
+                                            final config = await ref.read(configCtrlAsyncProvider.future);
+                                            if (!context.mounted) return;
+                                            if (inv != null) {
+                                              await showShadDialog(
+                                                context: context,
+                                                builder: (context) => InvInvoiceWidget(rec: inv, config: config),
+                                              );
+                                            }
                                           }
                                         },
                                       ),
