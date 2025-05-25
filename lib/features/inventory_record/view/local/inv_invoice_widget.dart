@@ -1,3 +1,4 @@
+import 'package:pdf/pdf.dart' show PdfPageFormat;
 import 'package:pos/main.export.dart';
 
 class InvInvoiceWidget extends HookConsumerWidget {
@@ -24,7 +25,7 @@ class InvInvoiceWidget extends HookConsumerWidget {
             final ctrl = PDFCtrl();
             l.truthy();
             final pdf = await InvoicePDF(rec, config).fullPDF();
-            final doc = await ctrl.getDoc(pdf);
+            final doc = await ctrl.getDoc(pdf, PdfPageFormat.a4);
             await ctrl.save(doc, rec.invoiceNo);
             l.falsey();
             if (context.mounted) Toast.show(context, 'Invoice download');

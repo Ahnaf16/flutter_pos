@@ -152,126 +152,6 @@ class _TransactionsByPartiProviderElement
   String? get parti => (origin as TransactionsByPartiProvider).parti;
 }
 
-String _$trxFilteredHash() => r'20c4ea49766fcca7ea645849d44c34b8876b66d5';
-
-/// See also [trxFiltered].
-@ProviderFor(trxFiltered)
-const trxFilteredProvider = TrxFilteredFamily();
-
-/// See also [trxFiltered].
-class TrxFilteredFamily extends Family<AsyncValue<List<TransactionLog>>> {
-  /// See also [trxFiltered].
-  const TrxFilteredFamily();
-
-  /// See also [trxFiltered].
-  TrxFilteredProvider call(List<String> query) {
-    return TrxFilteredProvider(query);
-  }
-
-  @override
-  TrxFilteredProvider getProviderOverride(
-    covariant TrxFilteredProvider provider,
-  ) {
-    return call(provider.query);
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'trxFilteredProvider';
-}
-
-/// See also [trxFiltered].
-class TrxFilteredProvider
-    extends AutoDisposeFutureProvider<List<TransactionLog>> {
-  /// See also [trxFiltered].
-  TrxFilteredProvider(List<String> query)
-    : this._internal(
-        (ref) => trxFiltered(ref as TrxFilteredRef, query),
-        from: trxFilteredProvider,
-        name: r'trxFilteredProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$trxFilteredHash,
-        dependencies: TrxFilteredFamily._dependencies,
-        allTransitiveDependencies: TrxFilteredFamily._allTransitiveDependencies,
-        query: query,
-      );
-
-  TrxFilteredProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.query,
-  }) : super.internal();
-
-  final List<String> query;
-
-  @override
-  Override overrideWith(
-    FutureOr<List<TransactionLog>> Function(TrxFilteredRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: TrxFilteredProvider._internal(
-        (ref) => create(ref as TrxFilteredRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        query: query,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<List<TransactionLog>> createElement() {
-    return _TrxFilteredProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is TrxFilteredProvider && other.query == query;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, query.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin TrxFilteredRef on AutoDisposeFutureProviderRef<List<TransactionLog>> {
-  /// The parameter `query` of this provider.
-  List<String> get query;
-}
-
-class _TrxFilteredProviderElement
-    extends AutoDisposeFutureProviderElement<List<TransactionLog>>
-    with TrxFilteredRef {
-  _TrxFilteredProviderElement(super.provider);
-
-  @override
-  List<String> get query => (origin as TrxFilteredProvider).query;
-}
-
 String _$transactionLogCtrlHash() =>
     r'70262ff6675cb03a358826d42b17fe76e72cb657';
 
@@ -420,5 +300,21 @@ class _TransactionLogCtrlProviderElement
   TransactionType? get type => (origin as TransactionLogCtrlProvider).type;
 }
 
+String _$trxFilteredHash() => r'4e7fdaf8edaced5db6da512f3d2e780943539140';
+
+/// See also [TrxFiltered].
+@ProviderFor(TrxFiltered)
+final trxFilteredProvider =
+    AutoDisposeNotifierProvider<TrxFiltered, List<TransactionLog>>.internal(
+      TrxFiltered.new,
+      name: r'trxFilteredProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$trxFilteredHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$TrxFiltered = AutoDisposeNotifier<List<TransactionLog>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

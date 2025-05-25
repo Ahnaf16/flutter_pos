@@ -1,8 +1,8 @@
 export 'common/failure.dart';
 export 'common/file_picker.dart';
 export 'common/parser.dart';
+export 'common/pdf_service/invoice_pdf.dart';
 export 'common/pdf_service/pdf_ctrl.dart';
-export 'common/pdf_service/pdf_widgets.dart';
 export 'common/toaster.dart';
 export 'common/utils.dart';
 export 'database/aw_const.dart';

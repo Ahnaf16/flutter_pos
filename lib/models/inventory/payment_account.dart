@@ -140,4 +140,29 @@ class PaymentAccount {
       customInfo: customInfo ?? this.customInfo,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is PaymentAccount &&
+        other.id == id &&
+        other.name == name &&
+        other.description == description &&
+        other.amount == amount &&
+        other.isActive == isActive &&
+        other.type == type &&
+        other.customInfo == customInfo;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        name.hashCode ^
+        description.hashCode ^
+        amount.hashCode ^
+        isActive.hashCode ^
+        type.hashCode ^
+        customInfo.hashCode;
+  }
 }

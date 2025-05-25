@@ -54,9 +54,9 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
       final filteredList = _searchFrom.where((entry) {
         final date = entry.date.justDate;
         if (start != null && end != null) {
-          return date.isAfter(start.justDate) && date.isBefore(end.nextDay.justDate);
+          return date.isAfterOrEqualTo(start.justDate) && date.isBefore(end.nextDay.justDate);
         } else if (start != null) {
-          return date.isAfter(start.justDate);
+          return date.isAfterOrEqualTo(start.justDate);
         } else if (end != null) {
           return date.isBefore(end.nextDay.justDate);
         }
@@ -113,8 +113,32 @@ Future<List<TransactionLog>> transactionsByParti(Ref ref, String? parti) async {
 }
 
 @riverpod
-Future<List<TransactionLog>> trxFiltered(Ref ref, List<String> query) async {
-  final repo = locate<TransactionsRepo>();
-  final result = await repo.getTransactionLogs(null, query);
-  return result.fold((l) => [], (r) => r);
+class TrxFiltered extends _$TrxFiltered {
+  final _repo = locate<TransactionsRepo>();
+  @override
+  List<TransactionLog> build() {
+    return [];
+  }
+
+  Future<List<TransactionLog>> filter(ShadDateTimeRange? range, TransactionType? type) async {
+    final result = await _repo.getTransactionLogs(
+      null,
+      [_createRangeQuery(range), if (type != null) Query.equal('transaction_type', type.name)].nonNulls.toList(),
+    );
+    state = result.fold((l) => [], (r) => r);
+    return state;
+  }
+
+  String? _createRangeQuery(ShadDateTimeRange? range) {
+    if (range case ShadDateTimeRange(:final start, :final end)) {
+      if (start != null && end != null) {
+        return Query.between('date', start.justDate.toIso8601String(), end.nextDay.justDate.toIso8601String());
+      } else if (start != null) {
+        return Query.greaterThan('date', start.justDate.toIso8601String());
+      } else if (end != null) {
+        return Query.lessThan('date', end.nextDay.justDate.toIso8601String());
+      }
+    }
+    return null;
+  }
 }

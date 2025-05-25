@@ -107,7 +107,7 @@ class TransactionLog {
       if (value case final Map map) return TransactionLog.fromMap(map.toStringKey());
       return null;
     } catch (e, s) {
-      catErr('', e, s);
+      catErr('TransactionLog.tryParse', e, s);
       return null;
     }
   }
