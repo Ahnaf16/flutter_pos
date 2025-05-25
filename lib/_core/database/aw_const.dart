@@ -10,7 +10,6 @@ class AWConst {
 
   // static const String endpoint = 'https://fra.cloud.appwrite.io/v1';
   // static const String endpoint = 'https://localhost/v1';
-  // static const String endpoint = 'https://pos.igensolutions.limited/v1';
   static const String endpoint = 'https://pos.igensolutions.limited:2083/v1';
 
   static const AwId projectId = ('68048fb0003cd8a04477', 'flutter_pos');
