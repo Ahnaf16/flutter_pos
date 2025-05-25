@@ -7,6 +7,7 @@ import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.d
 import 'package:pos/features/payment_accounts/view/local/account_name_builder.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/transactions/controller/transactions_ctrl.dart';
+import 'package:pos/features/transactions/view/trx_report_view.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -38,6 +39,15 @@ class TransactionsView extends HookConsumerWidget {
     return BaseBody(
       title: type == TransactionType.transfer ? 'Money transfer' : 'Transaction logs',
       actions: [
+        ShadButton.outline(
+          child: const Text('Generate Report'),
+          onPressed: () {
+            showShadDialog(
+              context: context,
+              builder: (context) => const TrxReportView(),
+            );
+          },
+        ),
         if (type == TransactionType.transfer)
           ShadButton(
             onPressed: () {

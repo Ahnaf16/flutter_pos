@@ -11,18 +11,21 @@ String _$stockTransferListCtrlHash() =>
 
 /// See also [StockTransferListCtrl].
 @ProviderFor(StockTransferListCtrl)
-final stockTransferListCtrlProvider = AutoDisposeAsyncNotifierProvider<
-    StockTransferListCtrl, List<StockTransferLog>>.internal(
-  StockTransferListCtrl.new,
-  name: r'stockTransferListCtrlProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$stockTransferListCtrlHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final stockTransferListCtrlProvider =
+    AutoDisposeAsyncNotifierProvider<
+      StockTransferListCtrl,
+      List<StockTransferLog>
+    >.internal(
+      StockTransferListCtrl.new,
+      name: r'stockTransferListCtrlProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$stockTransferListCtrlHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
-typedef _$StockTransferListCtrl
-    = AutoDisposeAsyncNotifier<List<StockTransferLog>>;
+typedef _$StockTransferListCtrl =
+    AutoDisposeAsyncNotifier<List<StockTransferLog>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

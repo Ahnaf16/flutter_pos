@@ -33,9 +33,7 @@ abstract class _$RecordEditingCtrl
     extends BuildlessAutoDisposeNotifier<InventoryRecordState> {
   late final RecordType type;
 
-  InventoryRecordState build(
-    RecordType type,
-  );
+  InventoryRecordState build(RecordType type);
 }
 
 /// See also [RecordEditingCtrl].
@@ -48,21 +46,15 @@ class RecordEditingCtrlFamily extends Family<InventoryRecordState> {
   const RecordEditingCtrlFamily();
 
   /// See also [RecordEditingCtrl].
-  RecordEditingCtrlProvider call(
-    RecordType type,
-  ) {
-    return RecordEditingCtrlProvider(
-      type,
-    );
+  RecordEditingCtrlProvider call(RecordType type) {
+    return RecordEditingCtrlProvider(type);
   }
 
   @override
   RecordEditingCtrlProvider getProviderOverride(
     covariant RecordEditingCtrlProvider provider,
   ) {
-    return call(
-      provider.type,
-    );
+    return call(provider.type);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -81,24 +73,26 @@ class RecordEditingCtrlFamily extends Family<InventoryRecordState> {
 }
 
 /// See also [RecordEditingCtrl].
-class RecordEditingCtrlProvider extends AutoDisposeNotifierProviderImpl<
-    RecordEditingCtrl, InventoryRecordState> {
+class RecordEditingCtrlProvider
+    extends
+        AutoDisposeNotifierProviderImpl<
+          RecordEditingCtrl,
+          InventoryRecordState
+        > {
   /// See also [RecordEditingCtrl].
-  RecordEditingCtrlProvider(
-    RecordType type,
-  ) : this._internal(
-          () => RecordEditingCtrl()..type = type,
-          from: recordEditingCtrlProvider,
-          name: r'recordEditingCtrlProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$recordEditingCtrlHash,
-          dependencies: RecordEditingCtrlFamily._dependencies,
-          allTransitiveDependencies:
-              RecordEditingCtrlFamily._allTransitiveDependencies,
-          type: type,
-        );
+  RecordEditingCtrlProvider(RecordType type)
+    : this._internal(
+        () => RecordEditingCtrl()..type = type,
+        from: recordEditingCtrlProvider,
+        name: r'recordEditingCtrlProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$recordEditingCtrlHash,
+        dependencies: RecordEditingCtrlFamily._dependencies,
+        allTransitiveDependencies:
+            RecordEditingCtrlFamily._allTransitiveDependencies,
+        type: type,
+      );
 
   RecordEditingCtrlProvider._internal(
     super._createNotifier, {
@@ -113,12 +107,8 @@ class RecordEditingCtrlProvider extends AutoDisposeNotifierProviderImpl<
   final RecordType type;
 
   @override
-  InventoryRecordState runNotifierBuild(
-    covariant RecordEditingCtrl notifier,
-  ) {
-    return notifier.build(
-      type,
-    );
+  InventoryRecordState runNotifierBuild(covariant RecordEditingCtrl notifier) {
+    return notifier.build(type);
   }
 
   @override
@@ -139,7 +129,7 @@ class RecordEditingCtrlProvider extends AutoDisposeNotifierProviderImpl<
 
   @override
   AutoDisposeNotifierProviderElement<RecordEditingCtrl, InventoryRecordState>
-      createElement() {
+  createElement() {
     return _RecordEditingCtrlProviderElement(this);
   }
 
@@ -166,12 +156,17 @@ mixin RecordEditingCtrlRef
 }
 
 class _RecordEditingCtrlProviderElement
-    extends AutoDisposeNotifierProviderElement<RecordEditingCtrl,
-        InventoryRecordState> with RecordEditingCtrlRef {
+    extends
+        AutoDisposeNotifierProviderElement<
+          RecordEditingCtrl,
+          InventoryRecordState
+        >
+    with RecordEditingCtrlRef {
   _RecordEditingCtrlProviderElement(super.provider);
 
   @override
   RecordType get type => (origin as RecordEditingCtrlProvider).type;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

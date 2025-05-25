@@ -33,9 +33,7 @@ abstract class _$UpdateProductCtrl
     extends BuildlessAutoDisposeAsyncNotifier<Product?> {
   late final String? id;
 
-  FutureOr<Product?> build(
-    String? id,
-  );
+  FutureOr<Product?> build(String? id);
 }
 
 /// See also [UpdateProductCtrl].
@@ -48,21 +46,15 @@ class UpdateProductCtrlFamily extends Family<AsyncValue<Product?>> {
   const UpdateProductCtrlFamily();
 
   /// See also [UpdateProductCtrl].
-  UpdateProductCtrlProvider call(
-    String? id,
-  ) {
-    return UpdateProductCtrlProvider(
-      id,
-    );
+  UpdateProductCtrlProvider call(String? id) {
+    return UpdateProductCtrlProvider(id);
   }
 
   @override
   UpdateProductCtrlProvider getProviderOverride(
     covariant UpdateProductCtrlProvider provider,
   ) {
-    return call(
-      provider.id,
-    );
+    return call(provider.id);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -84,21 +76,19 @@ class UpdateProductCtrlFamily extends Family<AsyncValue<Product?>> {
 class UpdateProductCtrlProvider
     extends AutoDisposeAsyncNotifierProviderImpl<UpdateProductCtrl, Product?> {
   /// See also [UpdateProductCtrl].
-  UpdateProductCtrlProvider(
-    String? id,
-  ) : this._internal(
-          () => UpdateProductCtrl()..id = id,
-          from: updateProductCtrlProvider,
-          name: r'updateProductCtrlProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$updateProductCtrlHash,
-          dependencies: UpdateProductCtrlFamily._dependencies,
-          allTransitiveDependencies:
-              UpdateProductCtrlFamily._allTransitiveDependencies,
-          id: id,
-        );
+  UpdateProductCtrlProvider(String? id)
+    : this._internal(
+        () => UpdateProductCtrl()..id = id,
+        from: updateProductCtrlProvider,
+        name: r'updateProductCtrlProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$updateProductCtrlHash,
+        dependencies: UpdateProductCtrlFamily._dependencies,
+        allTransitiveDependencies:
+            UpdateProductCtrlFamily._allTransitiveDependencies,
+        id: id,
+      );
 
   UpdateProductCtrlProvider._internal(
     super._createNotifier, {
@@ -113,12 +103,8 @@ class UpdateProductCtrlProvider
   final String? id;
 
   @override
-  FutureOr<Product?> runNotifierBuild(
-    covariant UpdateProductCtrl notifier,
-  ) {
-    return notifier.build(
-      id,
-    );
+  FutureOr<Product?> runNotifierBuild(covariant UpdateProductCtrl notifier) {
+    return notifier.build(id);
   }
 
   @override
@@ -139,7 +125,7 @@ class UpdateProductCtrlProvider
 
   @override
   AutoDisposeAsyncNotifierProviderElement<UpdateProductCtrl, Product?>
-      createElement() {
+  createElement() {
     return _UpdateProductCtrlProviderElement(this);
   }
 
@@ -172,5 +158,6 @@ class _UpdateProductCtrlProviderElement
   @override
   String? get id => (origin as UpdateProductCtrlProvider).id;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

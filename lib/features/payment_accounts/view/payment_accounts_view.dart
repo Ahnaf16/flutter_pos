@@ -1,7 +1,6 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/payment_accounts/view/account_add_dialog.dart';
-import 'package:pos/features/payment_accounts/view/account_report_view.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -26,15 +25,6 @@ class PaymentAccountsView extends HookConsumerWidget {
     return BaseBody(
       title: 'Payment Accounts',
       actions: [
-        ShadButton.outline(
-          child: const Text('Generate Report'),
-          onPressed: () {
-            showShadDialog(
-              context: context,
-              builder: (context) => const AccountReportView(),
-            );
-          },
-        ),
         ShadButton(
           child: const Text('Add a account'),
           onPressed: () {

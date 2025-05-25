@@ -13,8 +13,9 @@ String _$configCtrlHash() => r'bf5b3f4e53159760a5c34d3e862e5fcbb6ec8af8';
 final configCtrlProvider = NotifierProvider<ConfigCtrl, Config>.internal(
   ConfigCtrl.new,
   name: r'configCtrlProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$configCtrlHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$configCtrlHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -26,14 +27,14 @@ String _$configCtrlAsyncHash() => r'160d7817680467a326bf3dd7daa72365185a89a5';
 @ProviderFor(ConfigCtrlAsync)
 final configCtrlAsyncProvider =
     AsyncNotifierProvider<ConfigCtrlAsync, Config>.internal(
-  ConfigCtrlAsync.new,
-  name: r'configCtrlAsyncProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$configCtrlAsyncHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      ConfigCtrlAsync.new,
+      name: r'configCtrlAsyncProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$configCtrlAsyncHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$ConfigCtrlAsync = AsyncNotifier<Config>;
 // ignore_for_file: type=lint

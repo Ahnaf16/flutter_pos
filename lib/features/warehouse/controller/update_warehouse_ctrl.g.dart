@@ -34,9 +34,7 @@ abstract class _$UpdateWarehouseCtrl
     extends BuildlessAutoDisposeAsyncNotifier<WareHouse?> {
   late final String? id;
 
-  FutureOr<WareHouse?> build(
-    String? id,
-  );
+  FutureOr<WareHouse?> build(String? id);
 }
 
 /// See also [UpdateWarehouseCtrl].
@@ -49,21 +47,15 @@ class UpdateWarehouseCtrlFamily extends Family<AsyncValue<WareHouse?>> {
   const UpdateWarehouseCtrlFamily();
 
   /// See also [UpdateWarehouseCtrl].
-  UpdateWarehouseCtrlProvider call(
-    String? id,
-  ) {
-    return UpdateWarehouseCtrlProvider(
-      id,
-    );
+  UpdateWarehouseCtrlProvider call(String? id) {
+    return UpdateWarehouseCtrlProvider(id);
   }
 
   @override
   UpdateWarehouseCtrlProvider getProviderOverride(
     covariant UpdateWarehouseCtrlProvider provider,
   ) {
-    return call(
-      provider.id,
-    );
+    return call(provider.id);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -82,24 +74,23 @@ class UpdateWarehouseCtrlFamily extends Family<AsyncValue<WareHouse?>> {
 }
 
 /// See also [UpdateWarehouseCtrl].
-class UpdateWarehouseCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
-    UpdateWarehouseCtrl, WareHouse?> {
+class UpdateWarehouseCtrlProvider
+    extends
+        AutoDisposeAsyncNotifierProviderImpl<UpdateWarehouseCtrl, WareHouse?> {
   /// See also [UpdateWarehouseCtrl].
-  UpdateWarehouseCtrlProvider(
-    String? id,
-  ) : this._internal(
-          () => UpdateWarehouseCtrl()..id = id,
-          from: updateWarehouseCtrlProvider,
-          name: r'updateWarehouseCtrlProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$updateWarehouseCtrlHash,
-          dependencies: UpdateWarehouseCtrlFamily._dependencies,
-          allTransitiveDependencies:
-              UpdateWarehouseCtrlFamily._allTransitiveDependencies,
-          id: id,
-        );
+  UpdateWarehouseCtrlProvider(String? id)
+    : this._internal(
+        () => UpdateWarehouseCtrl()..id = id,
+        from: updateWarehouseCtrlProvider,
+        name: r'updateWarehouseCtrlProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$updateWarehouseCtrlHash,
+        dependencies: UpdateWarehouseCtrlFamily._dependencies,
+        allTransitiveDependencies:
+            UpdateWarehouseCtrlFamily._allTransitiveDependencies,
+        id: id,
+      );
 
   UpdateWarehouseCtrlProvider._internal(
     super._createNotifier, {
@@ -117,9 +108,7 @@ class UpdateWarehouseCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
   FutureOr<WareHouse?> runNotifierBuild(
     covariant UpdateWarehouseCtrl notifier,
   ) {
-    return notifier.build(
-      id,
-    );
+    return notifier.build(id);
   }
 
   @override
@@ -140,7 +129,7 @@ class UpdateWarehouseCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
 
   @override
   AutoDisposeAsyncNotifierProviderElement<UpdateWarehouseCtrl, WareHouse?>
-      createElement() {
+  createElement() {
     return _UpdateWarehouseCtrlProviderElement(this);
   }
 
@@ -167,12 +156,14 @@ mixin UpdateWarehouseCtrlRef
 }
 
 class _UpdateWarehouseCtrlProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<UpdateWarehouseCtrl,
-        WareHouse?> with UpdateWarehouseCtrlRef {
+    extends
+        AutoDisposeAsyncNotifierProviderElement<UpdateWarehouseCtrl, WareHouse?>
+    with UpdateWarehouseCtrlRef {
   _UpdateWarehouseCtrlProviderElement(super.provider);
 
   @override
   String? get id => (origin as UpdateWarehouseCtrlProvider).id;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

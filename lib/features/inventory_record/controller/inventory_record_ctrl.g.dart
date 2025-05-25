@@ -39,21 +39,15 @@ class RecordsByPartiFamily extends Family<AsyncValue<List<InventoryRecord>>> {
   const RecordsByPartiFamily();
 
   /// See also [recordsByParti].
-  RecordsByPartiProvider call(
-    String? parti,
-  ) {
-    return RecordsByPartiProvider(
-      parti,
-    );
+  RecordsByPartiProvider call(String? parti) {
+    return RecordsByPartiProvider(parti);
   }
 
   @override
   RecordsByPartiProvider getProviderOverride(
     covariant RecordsByPartiProvider provider,
   ) {
-    return call(
-      provider.parti,
-    );
+    return call(provider.parti);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -75,24 +69,19 @@ class RecordsByPartiFamily extends Family<AsyncValue<List<InventoryRecord>>> {
 class RecordsByPartiProvider
     extends AutoDisposeFutureProvider<List<InventoryRecord>> {
   /// See also [recordsByParti].
-  RecordsByPartiProvider(
-    String? parti,
-  ) : this._internal(
-          (ref) => recordsByParti(
-            ref as RecordsByPartiRef,
-            parti,
-          ),
-          from: recordsByPartiProvider,
-          name: r'recordsByPartiProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$recordsByPartiHash,
-          dependencies: RecordsByPartiFamily._dependencies,
-          allTransitiveDependencies:
-              RecordsByPartiFamily._allTransitiveDependencies,
-          parti: parti,
-        );
+  RecordsByPartiProvider(String? parti)
+    : this._internal(
+        (ref) => recordsByParti(ref as RecordsByPartiRef, parti),
+        from: recordsByPartiProvider,
+        name: r'recordsByPartiProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$recordsByPartiHash,
+        dependencies: RecordsByPartiFamily._dependencies,
+        allTransitiveDependencies:
+            RecordsByPartiFamily._allTransitiveDependencies,
+        parti: parti,
+      );
 
   RecordsByPartiProvider._internal(
     super._createNotifier, {
@@ -171,21 +160,15 @@ class RecordDetailsFamily extends Family<AsyncValue<InventoryRecord?>> {
   const RecordDetailsFamily();
 
   /// See also [recordDetails].
-  RecordDetailsProvider call(
-    String? id,
-  ) {
-    return RecordDetailsProvider(
-      id,
-    );
+  RecordDetailsProvider call(String? id) {
+    return RecordDetailsProvider(id);
   }
 
   @override
   RecordDetailsProvider getProviderOverride(
     covariant RecordDetailsProvider provider,
   ) {
-    return call(
-      provider.id,
-    );
+    return call(provider.id);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -207,24 +190,19 @@ class RecordDetailsFamily extends Family<AsyncValue<InventoryRecord?>> {
 class RecordDetailsProvider
     extends AutoDisposeFutureProvider<InventoryRecord?> {
   /// See also [recordDetails].
-  RecordDetailsProvider(
-    String? id,
-  ) : this._internal(
-          (ref) => recordDetails(
-            ref as RecordDetailsRef,
-            id,
-          ),
-          from: recordDetailsProvider,
-          name: r'recordDetailsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$recordDetailsHash,
-          dependencies: RecordDetailsFamily._dependencies,
-          allTransitiveDependencies:
-              RecordDetailsFamily._allTransitiveDependencies,
-          id: id,
-        );
+  RecordDetailsProvider(String? id)
+    : this._internal(
+        (ref) => recordDetails(ref as RecordDetailsRef, id),
+        from: recordDetailsProvider,
+        name: r'recordDetailsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$recordDetailsHash,
+        dependencies: RecordDetailsFamily._dependencies,
+        allTransitiveDependencies:
+            RecordDetailsFamily._allTransitiveDependencies,
+        id: id,
+      );
 
   RecordDetailsProvider._internal(
     super._createNotifier, {
@@ -297,9 +275,7 @@ abstract class _$InventoryCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<InventoryRecord>> {
   late final RecordType? type;
 
-  FutureOr<List<InventoryRecord>> build(
-    RecordType? type,
-  );
+  FutureOr<List<InventoryRecord>> build(RecordType? type);
 }
 
 /// See also [InventoryCtrl].
@@ -312,21 +288,15 @@ class InventoryCtrlFamily extends Family<AsyncValue<List<InventoryRecord>>> {
   const InventoryCtrlFamily();
 
   /// See also [InventoryCtrl].
-  InventoryCtrlProvider call(
-    RecordType? type,
-  ) {
-    return InventoryCtrlProvider(
-      type,
-    );
+  InventoryCtrlProvider call(RecordType? type) {
+    return InventoryCtrlProvider(type);
   }
 
   @override
   InventoryCtrlProvider getProviderOverride(
     covariant InventoryCtrlProvider provider,
   ) {
-    return call(
-      provider.type,
-    );
+    return call(provider.type);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -345,24 +315,26 @@ class InventoryCtrlFamily extends Family<AsyncValue<List<InventoryRecord>>> {
 }
 
 /// See also [InventoryCtrl].
-class InventoryCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
-    InventoryCtrl, List<InventoryRecord>> {
+class InventoryCtrlProvider
+    extends
+        AutoDisposeAsyncNotifierProviderImpl<
+          InventoryCtrl,
+          List<InventoryRecord>
+        > {
   /// See also [InventoryCtrl].
-  InventoryCtrlProvider(
-    RecordType? type,
-  ) : this._internal(
-          () => InventoryCtrl()..type = type,
-          from: inventoryCtrlProvider,
-          name: r'inventoryCtrlProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$inventoryCtrlHash,
-          dependencies: InventoryCtrlFamily._dependencies,
-          allTransitiveDependencies:
-              InventoryCtrlFamily._allTransitiveDependencies,
-          type: type,
-        );
+  InventoryCtrlProvider(RecordType? type)
+    : this._internal(
+        () => InventoryCtrl()..type = type,
+        from: inventoryCtrlProvider,
+        name: r'inventoryCtrlProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$inventoryCtrlHash,
+        dependencies: InventoryCtrlFamily._dependencies,
+        allTransitiveDependencies:
+            InventoryCtrlFamily._allTransitiveDependencies,
+        type: type,
+      );
 
   InventoryCtrlProvider._internal(
     super._createNotifier, {
@@ -380,9 +352,7 @@ class InventoryCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
   FutureOr<List<InventoryRecord>> runNotifierBuild(
     covariant InventoryCtrl notifier,
   ) {
-    return notifier.build(
-      type,
-    );
+    return notifier.build(type);
   }
 
   @override
@@ -403,7 +373,7 @@ class InventoryCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
 
   @override
   AutoDisposeAsyncNotifierProviderElement<InventoryCtrl, List<InventoryRecord>>
-      createElement() {
+  createElement() {
     return _InventoryCtrlProviderElement(this);
   }
 
@@ -430,8 +400,12 @@ mixin InventoryCtrlRef
 }
 
 class _InventoryCtrlProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<InventoryCtrl,
-        List<InventoryRecord>> with InventoryCtrlRef {
+    extends
+        AutoDisposeAsyncNotifierProviderElement<
+          InventoryCtrl,
+          List<InventoryRecord>
+        >
+    with InventoryCtrlRef {
   _InventoryCtrlProviderElement(super.provider);
 
   @override
@@ -445,9 +419,7 @@ abstract class _$InventoryReturnCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<ReturnRecord>> {
   late final bool? isSale;
 
-  FutureOr<List<ReturnRecord>> build(
-    bool? isSale,
-  );
+  FutureOr<List<ReturnRecord>> build(bool? isSale);
 }
 
 /// See also [InventoryReturnCtrl].
@@ -460,21 +432,15 @@ class InventoryReturnCtrlFamily extends Family<AsyncValue<List<ReturnRecord>>> {
   const InventoryReturnCtrlFamily();
 
   /// See also [InventoryReturnCtrl].
-  InventoryReturnCtrlProvider call(
-    bool? isSale,
-  ) {
-    return InventoryReturnCtrlProvider(
-      isSale,
-    );
+  InventoryReturnCtrlProvider call(bool? isSale) {
+    return InventoryReturnCtrlProvider(isSale);
   }
 
   @override
   InventoryReturnCtrlProvider getProviderOverride(
     covariant InventoryReturnCtrlProvider provider,
   ) {
-    return call(
-      provider.isSale,
-    );
+    return call(provider.isSale);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -493,24 +459,26 @@ class InventoryReturnCtrlFamily extends Family<AsyncValue<List<ReturnRecord>>> {
 }
 
 /// See also [InventoryReturnCtrl].
-class InventoryReturnCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
-    InventoryReturnCtrl, List<ReturnRecord>> {
+class InventoryReturnCtrlProvider
+    extends
+        AutoDisposeAsyncNotifierProviderImpl<
+          InventoryReturnCtrl,
+          List<ReturnRecord>
+        > {
   /// See also [InventoryReturnCtrl].
-  InventoryReturnCtrlProvider(
-    bool? isSale,
-  ) : this._internal(
-          () => InventoryReturnCtrl()..isSale = isSale,
-          from: inventoryReturnCtrlProvider,
-          name: r'inventoryReturnCtrlProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$inventoryReturnCtrlHash,
-          dependencies: InventoryReturnCtrlFamily._dependencies,
-          allTransitiveDependencies:
-              InventoryReturnCtrlFamily._allTransitiveDependencies,
-          isSale: isSale,
-        );
+  InventoryReturnCtrlProvider(bool? isSale)
+    : this._internal(
+        () => InventoryReturnCtrl()..isSale = isSale,
+        from: inventoryReturnCtrlProvider,
+        name: r'inventoryReturnCtrlProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$inventoryReturnCtrlHash,
+        dependencies: InventoryReturnCtrlFamily._dependencies,
+        allTransitiveDependencies:
+            InventoryReturnCtrlFamily._allTransitiveDependencies,
+        isSale: isSale,
+      );
 
   InventoryReturnCtrlProvider._internal(
     super._createNotifier, {
@@ -528,9 +496,7 @@ class InventoryReturnCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
   FutureOr<List<ReturnRecord>> runNotifierBuild(
     covariant InventoryReturnCtrl notifier,
   ) {
-    return notifier.build(
-      isSale,
-    );
+    return notifier.build(isSale);
   }
 
   @override
@@ -550,8 +516,11 @@ class InventoryReturnCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<InventoryReturnCtrl,
-      List<ReturnRecord>> createElement() {
+  AutoDisposeAsyncNotifierProviderElement<
+    InventoryReturnCtrl,
+    List<ReturnRecord>
+  >
+  createElement() {
     return _InventoryReturnCtrlProviderElement(this);
   }
 
@@ -578,12 +547,17 @@ mixin InventoryReturnCtrlRef
 }
 
 class _InventoryReturnCtrlProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<InventoryReturnCtrl,
-        List<ReturnRecord>> with InventoryReturnCtrlRef {
+    extends
+        AutoDisposeAsyncNotifierProviderElement<
+          InventoryReturnCtrl,
+          List<ReturnRecord>
+        >
+    with InventoryReturnCtrlRef {
   _InventoryReturnCtrlProviderElement(super.provider);
 
   @override
   bool? get isSale => (origin as InventoryReturnCtrlProvider).isSale;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -34,9 +34,7 @@ abstract class _$PaymentAccountsCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<PaymentAccount>> {
   late final bool onlyActive;
 
-  FutureOr<List<PaymentAccount>> build([
-    bool onlyActive = true,
-  ]);
+  FutureOr<List<PaymentAccount>> build([bool onlyActive = true]);
 }
 
 /// See also [PaymentAccountsCtrl].
@@ -50,21 +48,15 @@ class PaymentAccountsCtrlFamily
   const PaymentAccountsCtrlFamily();
 
   /// See also [PaymentAccountsCtrl].
-  PaymentAccountsCtrlProvider call([
-    bool onlyActive = true,
-  ]) {
-    return PaymentAccountsCtrlProvider(
-      onlyActive,
-    );
+  PaymentAccountsCtrlProvider call([bool onlyActive = true]) {
+    return PaymentAccountsCtrlProvider(onlyActive);
   }
 
   @override
   PaymentAccountsCtrlProvider getProviderOverride(
     covariant PaymentAccountsCtrlProvider provider,
   ) {
-    return call(
-      provider.onlyActive,
-    );
+    return call(provider.onlyActive);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -83,24 +75,26 @@ class PaymentAccountsCtrlFamily
 }
 
 /// See also [PaymentAccountsCtrl].
-class PaymentAccountsCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
-    PaymentAccountsCtrl, List<PaymentAccount>> {
+class PaymentAccountsCtrlProvider
+    extends
+        AutoDisposeAsyncNotifierProviderImpl<
+          PaymentAccountsCtrl,
+          List<PaymentAccount>
+        > {
   /// See also [PaymentAccountsCtrl].
-  PaymentAccountsCtrlProvider([
-    bool onlyActive = true,
-  ]) : this._internal(
-          () => PaymentAccountsCtrl()..onlyActive = onlyActive,
-          from: paymentAccountsCtrlProvider,
-          name: r'paymentAccountsCtrlProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$paymentAccountsCtrlHash,
-          dependencies: PaymentAccountsCtrlFamily._dependencies,
-          allTransitiveDependencies:
-              PaymentAccountsCtrlFamily._allTransitiveDependencies,
-          onlyActive: onlyActive,
-        );
+  PaymentAccountsCtrlProvider([bool onlyActive = true])
+    : this._internal(
+        () => PaymentAccountsCtrl()..onlyActive = onlyActive,
+        from: paymentAccountsCtrlProvider,
+        name: r'paymentAccountsCtrlProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$paymentAccountsCtrlHash,
+        dependencies: PaymentAccountsCtrlFamily._dependencies,
+        allTransitiveDependencies:
+            PaymentAccountsCtrlFamily._allTransitiveDependencies,
+        onlyActive: onlyActive,
+      );
 
   PaymentAccountsCtrlProvider._internal(
     super._createNotifier, {
@@ -118,9 +112,7 @@ class PaymentAccountsCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
   FutureOr<List<PaymentAccount>> runNotifierBuild(
     covariant PaymentAccountsCtrl notifier,
   ) {
-    return notifier.build(
-      onlyActive,
-    );
+    return notifier.build(onlyActive);
   }
 
   @override
@@ -140,8 +132,11 @@ class PaymentAccountsCtrlProvider extends AutoDisposeAsyncNotifierProviderImpl<
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<PaymentAccountsCtrl,
-      List<PaymentAccount>> createElement() {
+  AutoDisposeAsyncNotifierProviderElement<
+    PaymentAccountsCtrl,
+    List<PaymentAccount>
+  >
+  createElement() {
     return _PaymentAccountsCtrlProviderElement(this);
   }
 
@@ -169,12 +164,17 @@ mixin PaymentAccountsCtrlRef
 }
 
 class _PaymentAccountsCtrlProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<PaymentAccountsCtrl,
-        List<PaymentAccount>> with PaymentAccountsCtrlRef {
+    extends
+        AutoDisposeAsyncNotifierProviderElement<
+          PaymentAccountsCtrl,
+          List<PaymentAccount>
+        >
+    with PaymentAccountsCtrlRef {
   _PaymentAccountsCtrlProviderElement(super.provider);
 
   @override
   bool get onlyActive => (origin as PaymentAccountsCtrlProvider).onlyActive;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

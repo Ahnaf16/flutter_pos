@@ -12,13 +12,14 @@ String _$dueLogCtrlHash() => r'1f82eae58c3d4dccdf416e1713ced5dfd09ac1c5';
 @ProviderFor(DueLogCtrl)
 final dueLogCtrlProvider =
     AutoDisposeAsyncNotifierProvider<DueLogCtrl, List<DueLog>>.internal(
-  DueLogCtrl.new,
-  name: r'dueLogCtrlProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$dueLogCtrlHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      DueLogCtrl.new,
+      name: r'dueLogCtrlProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$dueLogCtrlHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$DueLogCtrl = AutoDisposeAsyncNotifier<List<DueLog>>;
 // ignore_for_file: type=lint

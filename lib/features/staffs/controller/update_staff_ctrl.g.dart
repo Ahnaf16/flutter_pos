@@ -33,9 +33,7 @@ abstract class _$UpdateStaffCtrl
     extends BuildlessAutoDisposeAsyncNotifier<AppUser?> {
   late final String? id;
 
-  FutureOr<AppUser?> build(
-    String? id,
-  );
+  FutureOr<AppUser?> build(String? id);
 }
 
 /// See also [UpdateStaffCtrl].
@@ -48,21 +46,15 @@ class UpdateStaffCtrlFamily extends Family<AsyncValue<AppUser?>> {
   const UpdateStaffCtrlFamily();
 
   /// See also [UpdateStaffCtrl].
-  UpdateStaffCtrlProvider call(
-    String? id,
-  ) {
-    return UpdateStaffCtrlProvider(
-      id,
-    );
+  UpdateStaffCtrlProvider call(String? id) {
+    return UpdateStaffCtrlProvider(id);
   }
 
   @override
   UpdateStaffCtrlProvider getProviderOverride(
     covariant UpdateStaffCtrlProvider provider,
   ) {
-    return call(
-      provider.id,
-    );
+    return call(provider.id);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -84,21 +76,19 @@ class UpdateStaffCtrlFamily extends Family<AsyncValue<AppUser?>> {
 class UpdateStaffCtrlProvider
     extends AutoDisposeAsyncNotifierProviderImpl<UpdateStaffCtrl, AppUser?> {
   /// See also [UpdateStaffCtrl].
-  UpdateStaffCtrlProvider(
-    String? id,
-  ) : this._internal(
-          () => UpdateStaffCtrl()..id = id,
-          from: updateStaffCtrlProvider,
-          name: r'updateStaffCtrlProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$updateStaffCtrlHash,
-          dependencies: UpdateStaffCtrlFamily._dependencies,
-          allTransitiveDependencies:
-              UpdateStaffCtrlFamily._allTransitiveDependencies,
-          id: id,
-        );
+  UpdateStaffCtrlProvider(String? id)
+    : this._internal(
+        () => UpdateStaffCtrl()..id = id,
+        from: updateStaffCtrlProvider,
+        name: r'updateStaffCtrlProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$updateStaffCtrlHash,
+        dependencies: UpdateStaffCtrlFamily._dependencies,
+        allTransitiveDependencies:
+            UpdateStaffCtrlFamily._allTransitiveDependencies,
+        id: id,
+      );
 
   UpdateStaffCtrlProvider._internal(
     super._createNotifier, {
@@ -113,12 +103,8 @@ class UpdateStaffCtrlProvider
   final String? id;
 
   @override
-  FutureOr<AppUser?> runNotifierBuild(
-    covariant UpdateStaffCtrl notifier,
-  ) {
-    return notifier.build(
-      id,
-    );
+  FutureOr<AppUser?> runNotifierBuild(covariant UpdateStaffCtrl notifier) {
+    return notifier.build(id);
   }
 
   @override
@@ -139,7 +125,7 @@ class UpdateStaffCtrlProvider
 
   @override
   AutoDisposeAsyncNotifierProviderElement<UpdateStaffCtrl, AppUser?>
-      createElement() {
+  createElement() {
     return _UpdateStaffCtrlProviderElement(this);
   }
 
@@ -172,5 +158,6 @@ class _UpdateStaffCtrlProviderElement
   @override
   String? get id => (origin as UpdateStaffCtrlProvider).id;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

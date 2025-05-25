@@ -12,13 +12,14 @@ String _$expenseCtrlHash() => r'9da4686ffdaa5e2d182bb9abece07634455a8158';
 @ProviderFor(ExpenseCtrl)
 final expenseCtrlProvider =
     AutoDisposeAsyncNotifierProvider<ExpenseCtrl, List<Expense>>.internal(
-  ExpenseCtrl.new,
-  name: r'expenseCtrlProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$expenseCtrlHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      ExpenseCtrl.new,
+      name: r'expenseCtrlProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$expenseCtrlHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$ExpenseCtrl = AutoDisposeAsyncNotifier<List<Expense>>;
 String _$expenseCategoryCtrlHash() =>
@@ -26,16 +27,19 @@ String _$expenseCategoryCtrlHash() =>
 
 /// See also [ExpenseCategoryCtrl].
 @ProviderFor(ExpenseCategoryCtrl)
-final expenseCategoryCtrlProvider = AutoDisposeAsyncNotifierProvider<
-    ExpenseCategoryCtrl, List<ExpenseCategory>>.internal(
-  ExpenseCategoryCtrl.new,
-  name: r'expenseCategoryCtrlProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$expenseCategoryCtrlHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final expenseCategoryCtrlProvider =
+    AutoDisposeAsyncNotifierProvider<
+      ExpenseCategoryCtrl,
+      List<ExpenseCategory>
+    >.internal(
+      ExpenseCategoryCtrl.new,
+      name: r'expenseCategoryCtrlProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$expenseCategoryCtrlHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$ExpenseCategoryCtrl = AutoDisposeAsyncNotifier<List<ExpenseCategory>>;
 // ignore_for_file: type=lint

@@ -12,13 +12,14 @@ String _$staffsCtrlHash() => r'e234a996a47087b20e16d558d6db1e2dd58e107f';
 @ProviderFor(StaffsCtrl)
 final staffsCtrlProvider =
     AutoDisposeAsyncNotifierProvider<StaffsCtrl, List<AppUser>>.internal(
-  StaffsCtrl.new,
-  name: r'staffsCtrlProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$staffsCtrlHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      StaffsCtrl.new,
+      name: r'staffsCtrlProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$staffsCtrlHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$StaffsCtrl = AutoDisposeAsyncNotifier<List<AppUser>>;
 // ignore_for_file: type=lint

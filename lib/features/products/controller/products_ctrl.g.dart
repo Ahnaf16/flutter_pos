@@ -39,21 +39,15 @@ class ProductDetailsFamily extends Family<AsyncValue<Product?>> {
   const ProductDetailsFamily();
 
   /// See also [productDetails].
-  ProductDetailsProvider call(
-    String? id,
-  ) {
-    return ProductDetailsProvider(
-      id,
-    );
+  ProductDetailsProvider call(String? id) {
+    return ProductDetailsProvider(id);
   }
 
   @override
   ProductDetailsProvider getProviderOverride(
     covariant ProductDetailsProvider provider,
   ) {
-    return call(
-      provider.id,
-    );
+    return call(provider.id);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -74,24 +68,19 @@ class ProductDetailsFamily extends Family<AsyncValue<Product?>> {
 /// See also [productDetails].
 class ProductDetailsProvider extends AutoDisposeFutureProvider<Product?> {
   /// See also [productDetails].
-  ProductDetailsProvider(
-    String? id,
-  ) : this._internal(
-          (ref) => productDetails(
-            ref as ProductDetailsRef,
-            id,
-          ),
-          from: productDetailsProvider,
-          name: r'productDetailsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$productDetailsHash,
-          dependencies: ProductDetailsFamily._dependencies,
-          allTransitiveDependencies:
-              ProductDetailsFamily._allTransitiveDependencies,
-          id: id,
-        );
+  ProductDetailsProvider(String? id)
+    : this._internal(
+        (ref) => productDetails(ref as ProductDetailsRef, id),
+        from: productDetailsProvider,
+        name: r'productDetailsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$productDetailsHash,
+        dependencies: ProductDetailsFamily._dependencies,
+        allTransitiveDependencies:
+            ProductDetailsFamily._allTransitiveDependencies,
+        id: id,
+      );
 
   ProductDetailsProvider._internal(
     super._createNotifier, {
@@ -150,7 +139,8 @@ mixin ProductDetailsRef on AutoDisposeFutureProviderRef<Product?> {
 }
 
 class _ProductDetailsProviderElement
-    extends AutoDisposeFutureProviderElement<Product?> with ProductDetailsRef {
+    extends AutoDisposeFutureProviderElement<Product?>
+    with ProductDetailsRef {
   _ProductDetailsProviderElement(super.provider);
 
   @override
@@ -163,13 +153,14 @@ String _$productsCtrlHash() => r'aed2956cdfc051a8bec77ba5234e300f6894fcd6';
 @ProviderFor(ProductsCtrl)
 final productsCtrlProvider =
     AutoDisposeAsyncNotifierProvider<ProductsCtrl, List<Product>>.internal(
-  ProductsCtrl.new,
-  name: r'productsCtrlProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$productsCtrlHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      ProductsCtrl.new,
+      name: r'productsCtrlProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$productsCtrlHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$ProductsCtrl = AutoDisposeAsyncNotifier<List<Product>>;
 // ignore_for_file: type=lint

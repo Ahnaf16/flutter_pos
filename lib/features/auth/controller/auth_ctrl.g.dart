@@ -13,8 +13,9 @@ String _$currentUserHash() => r'20d86c7a5597cff88b31aa0e878818cb272e5bd6';
 final currentUserProvider = FutureProvider<AppUser?>.internal(
   currentUser,
   name: r'currentUserProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$currentUserHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentUserHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -28,13 +29,14 @@ String _$authCtrlHash() => r'215feb227083a2fe65acf6ee609dca5b555b933f';
 @ProviderFor(AuthCtrl)
 final authCtrlProvider =
     AutoDisposeAsyncNotifierProvider<AuthCtrl, AppUser?>.internal(
-  AuthCtrl.new,
-  name: r'authCtrlProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$authCtrlHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      AuthCtrl.new,
+      name: r'authCtrlProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$authCtrlHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$AuthCtrl = AutoDisposeAsyncNotifier<AppUser?>;
 String _$authStateSyncHash() => r'cdf79882efd28862604decad839a71e6266ddde5';
@@ -43,14 +45,14 @@ String _$authStateSyncHash() => r'cdf79882efd28862604decad839a71e6266ddde5';
 @ProviderFor(AuthStateSync)
 final authStateSyncProvider =
     NotifierProvider<AuthStateSync, Option<AppUser>>.internal(
-  AuthStateSync.new,
-  name: r'authStateSyncProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$authStateSyncHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      AuthStateSync.new,
+      name: r'authStateSyncProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$authStateSyncHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$AuthStateSync = Notifier<Option<AppUser>>;
 // ignore_for_file: type=lint

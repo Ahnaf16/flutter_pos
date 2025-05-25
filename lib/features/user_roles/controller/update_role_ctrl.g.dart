@@ -33,9 +33,7 @@ abstract class _$UpdateRoleCtrl
     extends BuildlessAutoDisposeAsyncNotifier<UserRole?> {
   late final String? id;
 
-  FutureOr<UserRole?> build(
-    String? id,
-  );
+  FutureOr<UserRole?> build(String? id);
 }
 
 /// See also [UpdateRoleCtrl].
@@ -48,21 +46,15 @@ class UpdateRoleCtrlFamily extends Family<AsyncValue<UserRole?>> {
   const UpdateRoleCtrlFamily();
 
   /// See also [UpdateRoleCtrl].
-  UpdateRoleCtrlProvider call(
-    String? id,
-  ) {
-    return UpdateRoleCtrlProvider(
-      id,
-    );
+  UpdateRoleCtrlProvider call(String? id) {
+    return UpdateRoleCtrlProvider(id);
   }
 
   @override
   UpdateRoleCtrlProvider getProviderOverride(
     covariant UpdateRoleCtrlProvider provider,
   ) {
-    return call(
-      provider.id,
-    );
+    return call(provider.id);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -84,21 +76,19 @@ class UpdateRoleCtrlFamily extends Family<AsyncValue<UserRole?>> {
 class UpdateRoleCtrlProvider
     extends AutoDisposeAsyncNotifierProviderImpl<UpdateRoleCtrl, UserRole?> {
   /// See also [UpdateRoleCtrl].
-  UpdateRoleCtrlProvider(
-    String? id,
-  ) : this._internal(
-          () => UpdateRoleCtrl()..id = id,
-          from: updateRoleCtrlProvider,
-          name: r'updateRoleCtrlProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$updateRoleCtrlHash,
-          dependencies: UpdateRoleCtrlFamily._dependencies,
-          allTransitiveDependencies:
-              UpdateRoleCtrlFamily._allTransitiveDependencies,
-          id: id,
-        );
+  UpdateRoleCtrlProvider(String? id)
+    : this._internal(
+        () => UpdateRoleCtrl()..id = id,
+        from: updateRoleCtrlProvider,
+        name: r'updateRoleCtrlProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$updateRoleCtrlHash,
+        dependencies: UpdateRoleCtrlFamily._dependencies,
+        allTransitiveDependencies:
+            UpdateRoleCtrlFamily._allTransitiveDependencies,
+        id: id,
+      );
 
   UpdateRoleCtrlProvider._internal(
     super._createNotifier, {
@@ -113,12 +103,8 @@ class UpdateRoleCtrlProvider
   final String? id;
 
   @override
-  FutureOr<UserRole?> runNotifierBuild(
-    covariant UpdateRoleCtrl notifier,
-  ) {
-    return notifier.build(
-      id,
-    );
+  FutureOr<UserRole?> runNotifierBuild(covariant UpdateRoleCtrl notifier) {
+    return notifier.build(id);
   }
 
   @override
@@ -139,7 +125,7 @@ class UpdateRoleCtrlProvider
 
   @override
   AutoDisposeAsyncNotifierProviderElement<UpdateRoleCtrl, UserRole?>
-      createElement() {
+  createElement() {
     return _UpdateRoleCtrlProviderElement(this);
   }
 
@@ -172,5 +158,6 @@ class _UpdateRoleCtrlProviderElement
   @override
   String? get id => (origin as UpdateRoleCtrlProvider).id;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

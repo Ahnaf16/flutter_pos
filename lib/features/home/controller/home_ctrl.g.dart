@@ -13,8 +13,9 @@ String _$viewingWHHash() => r'4b8f7e3a91701ffbeb869c5f99e83c0c7a1355a9';
 final viewingWHProvider = NotifierProvider<ViewingWH, WareHouse?>.internal(
   ViewingWH.new,
   name: r'viewingWHProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$viewingWHHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$viewingWHHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -24,15 +25,19 @@ String _$homeCountersHash() => r'2f2a4743cade0250e5b1ad0995d2636c33def69a';
 
 /// See also [HomeCounters].
 @ProviderFor(HomeCounters)
-final homeCountersProvider = AutoDisposeNotifierProvider<HomeCounters,
-    Map<(String, RPath), dynamic>>.internal(
-  HomeCounters.new,
-  name: r'homeCountersProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$homeCountersHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final homeCountersProvider =
+    AutoDisposeNotifierProvider<
+      HomeCounters,
+      Map<(String, RPath), dynamic>
+    >.internal(
+      HomeCounters.new,
+      name: r'homeCountersProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$homeCountersHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$HomeCounters = AutoDisposeNotifier<Map<(String, RPath), dynamic>>;
 // ignore_for_file: type=lint

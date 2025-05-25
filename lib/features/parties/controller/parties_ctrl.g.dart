@@ -39,21 +39,15 @@ class PartyDetailsFamily extends Family<AsyncValue<Party?>> {
   const PartyDetailsFamily();
 
   /// See also [partyDetails].
-  PartyDetailsProvider call(
-    String? id,
-  ) {
-    return PartyDetailsProvider(
-      id,
-    );
+  PartyDetailsProvider call(String? id) {
+    return PartyDetailsProvider(id);
   }
 
   @override
   PartyDetailsProvider getProviderOverride(
     covariant PartyDetailsProvider provider,
   ) {
-    return call(
-      provider.id,
-    );
+    return call(provider.id);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -74,24 +68,19 @@ class PartyDetailsFamily extends Family<AsyncValue<Party?>> {
 /// See also [partyDetails].
 class PartyDetailsProvider extends AutoDisposeFutureProvider<Party?> {
   /// See also [partyDetails].
-  PartyDetailsProvider(
-    String? id,
-  ) : this._internal(
-          (ref) => partyDetails(
-            ref as PartyDetailsRef,
-            id,
-          ),
-          from: partyDetailsProvider,
-          name: r'partyDetailsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$partyDetailsHash,
-          dependencies: PartyDetailsFamily._dependencies,
-          allTransitiveDependencies:
-              PartyDetailsFamily._allTransitiveDependencies,
-          id: id,
-        );
+  PartyDetailsProvider(String? id)
+    : this._internal(
+        (ref) => partyDetails(ref as PartyDetailsRef, id),
+        from: partyDetailsProvider,
+        name: r'partyDetailsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$partyDetailsHash,
+        dependencies: PartyDetailsFamily._dependencies,
+        allTransitiveDependencies:
+            PartyDetailsFamily._allTransitiveDependencies,
+        id: id,
+      );
 
   PartyDetailsProvider._internal(
     super._createNotifier, {
@@ -150,7 +139,8 @@ mixin PartyDetailsRef on AutoDisposeFutureProviderRef<Party?> {
 }
 
 class _PartyDetailsProviderElement
-    extends AutoDisposeFutureProviderElement<Party?> with PartyDetailsRef {
+    extends AutoDisposeFutureProviderElement<Party?>
+    with PartyDetailsRef {
   _PartyDetailsProviderElement(super.provider);
 
   @override
@@ -163,9 +153,7 @@ abstract class _$PartiesCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<Party>> {
   late final bool? isCustomer;
 
-  FutureOr<List<Party>> build(
-    bool? isCustomer,
-  );
+  FutureOr<List<Party>> build(bool? isCustomer);
 }
 
 /// See also [PartiesCtrl].
@@ -178,21 +166,15 @@ class PartiesCtrlFamily extends Family<AsyncValue<List<Party>>> {
   const PartiesCtrlFamily();
 
   /// See also [PartiesCtrl].
-  PartiesCtrlProvider call(
-    bool? isCustomer,
-  ) {
-    return PartiesCtrlProvider(
-      isCustomer,
-    );
+  PartiesCtrlProvider call(bool? isCustomer) {
+    return PartiesCtrlProvider(isCustomer);
   }
 
   @override
   PartiesCtrlProvider getProviderOverride(
     covariant PartiesCtrlProvider provider,
   ) {
-    return call(
-      provider.isCustomer,
-    );
+    return call(provider.isCustomer);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -214,21 +196,18 @@ class PartiesCtrlFamily extends Family<AsyncValue<List<Party>>> {
 class PartiesCtrlProvider
     extends AutoDisposeAsyncNotifierProviderImpl<PartiesCtrl, List<Party>> {
   /// See also [PartiesCtrl].
-  PartiesCtrlProvider(
-    bool? isCustomer,
-  ) : this._internal(
-          () => PartiesCtrl()..isCustomer = isCustomer,
-          from: partiesCtrlProvider,
-          name: r'partiesCtrlProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$partiesCtrlHash,
-          dependencies: PartiesCtrlFamily._dependencies,
-          allTransitiveDependencies:
-              PartiesCtrlFamily._allTransitiveDependencies,
-          isCustomer: isCustomer,
-        );
+  PartiesCtrlProvider(bool? isCustomer)
+    : this._internal(
+        () => PartiesCtrl()..isCustomer = isCustomer,
+        from: partiesCtrlProvider,
+        name: r'partiesCtrlProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$partiesCtrlHash,
+        dependencies: PartiesCtrlFamily._dependencies,
+        allTransitiveDependencies: PartiesCtrlFamily._allTransitiveDependencies,
+        isCustomer: isCustomer,
+      );
 
   PartiesCtrlProvider._internal(
     super._createNotifier, {
@@ -243,12 +222,8 @@ class PartiesCtrlProvider
   final bool? isCustomer;
 
   @override
-  FutureOr<List<Party>> runNotifierBuild(
-    covariant PartiesCtrl notifier,
-  ) {
-    return notifier.build(
-      isCustomer,
-    );
+  FutureOr<List<Party>> runNotifierBuild(covariant PartiesCtrl notifier) {
+    return notifier.build(isCustomer);
   }
 
   @override
@@ -269,7 +244,7 @@ class PartiesCtrlProvider
 
   @override
   AutoDisposeAsyncNotifierProviderElement<PartiesCtrl, List<Party>>
-      createElement() {
+  createElement() {
     return _PartiesCtrlProviderElement(this);
   }
 
@@ -302,5 +277,6 @@ class _PartiesCtrlProviderElement
   @override
   bool? get isCustomer => (origin as PartiesCtrlProvider).isCustomer;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
