@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
+import 'package:pos/features/products/view/create_product_dialog.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
 
@@ -34,6 +35,15 @@ class ProductsPanel extends HookConsumerWidget {
                   hintText: 'Search',
                   onChanged: (v) => productCtrl().search(v ?? ''),
                   showClearButton: true,
+                  outsideTrailing: type.isSale
+                      ? null
+                      : ShadButton.outline(
+                          leading: const Icon(LuIcons.plus),
+                          onPressed: () => showShadDialog(
+                            context: context,
+                            builder: (context) => const CreateProductDialog(),
+                          ),
+                        ),
                 ),
               ),
 

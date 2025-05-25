@@ -1,6 +1,5 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
-import 'package:pos/features/auth/view/user_card.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/party_name_builder.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
@@ -222,14 +221,13 @@ class _TrxViewDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final TransactionLog(transactedTo: to, transactionBy: user, transactionForm: from) = trx;
     return ShadDialog(
       title: Text('${trx.type.name.titleCase} log'),
       description: Row(
         spacing: Insets.sm,
         children: [
           Text('Details of a ${trx.type.name}'),
-          ShadBadge.secondary(child: Text(trx.type.name.titleCase)),
+          ShadBadge(child: Text(trx.type.name.titleCase)).colored(trx.type.color),
         ],
       ),
 
@@ -241,14 +239,39 @@ class _TrxViewDialog extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: Insets.med,
           children: [
-            //! from
-            if (from != null) UserCard.parti(imgSize: 70, parti: from, title: 'Transaction from', showDue: true),
-
-            //! parti
-            if (to != null) UserCard.parti(imgSize: 70, parti: to, title: 'Transacted To', showDue: true),
-
-            // //! user
-            // if (user != null) UserCard.user(imgSize: 70, user: user, title: '${trx.type.name.titleCase} By'),
+            Row(
+              spacing: Insets.med,
+              children: [
+                Expanded(
+                  child: ShadCard(
+                    childPadding: Pads.sm('t'),
+                    title: Text('From', style: context.text.list),
+                    child: Column(
+                      spacing: Insets.sm,
+                      children: [
+                        SpacedText(left: 'Name', right: trx.effectiveFrom.name ?? '--'),
+                        if (trx.effectiveFrom.phone != null)
+                          SpacedText(left: 'Phone', right: trx.effectiveFrom.phone ?? '--'),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ShadCard(
+                    childPadding: Pads.sm('t'),
+                    title: Text('To', style: context.text.list),
+                    child: Column(
+                      spacing: Insets.sm,
+                      children: [
+                        SpacedText(left: 'Name', right: trx.effectiveTo.name ?? '--'),
+                        if (trx.effectiveTo.phone != null)
+                          SpacedText(left: 'Phone', right: trx.effectiveTo.phone ?? '--'),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
 
             //! trx info
             const Gap(Insets.sm),
