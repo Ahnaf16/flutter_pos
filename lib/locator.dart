@@ -34,7 +34,7 @@ final fileUtil = locate<FileUtil>();
 Future<void> initDependencies() async {
   final sp = await SP.getInstance();
 
-  final client = Client(endPoint: AWConst.endpoint, selfSigned: true);
+  final client = Client(endPoint: AWConst.endpoint);
   client.setProject(AWConst.projectId.id).setSelfSigned();
 
   final account = Account(client);

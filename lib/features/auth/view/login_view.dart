@@ -85,16 +85,17 @@ class LoginView extends HookConsumerWidget {
 
                     const Gap(Insets.sm),
                     Text('By clicking login, you agree to our terms and conditions', style: context.text.muted),
-                    if (!kReleaseMode)
-                      Row(
-                        children: [
-                          ShadButton.outline(
-                            child: const Text('Admin'),
-                            onPressed: () {
-                              email.text = 'admin@gmail.com';
-                              password.text = '12341234';
-                            },
-                          ),
+
+                    Row(
+                      children: [
+                        ShadButton.outline(
+                          child: const Text('Admin'),
+                          onPressed: () {
+                            email.text = 'admin@gmail.com';
+                            password.text = '12341234';
+                          },
+                        ),
+                        if (!kReleaseMode)
                           ShadButton.outline(
                             child: const Text('Tr'),
                             onPressed: () {
@@ -102,8 +103,8 @@ class LoginView extends HookConsumerWidget {
                               password.text = '12341234';
                             },
                           ),
-                        ],
-                      ),
+                      ],
+                    ),
                   ],
                 ),
               ),
