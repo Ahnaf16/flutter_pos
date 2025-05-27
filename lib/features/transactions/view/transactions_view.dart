@@ -108,7 +108,7 @@ class TransactionsView extends HookConsumerWidget {
               loading: () => const Loading(),
               error: (e, s) => ErrorView(e, s, prov: transactionLogCtrlProvider),
               data: (dues) {
-                return TrxTable(logs: dues);
+                return TrxTable(logs: dues, showFooter: true);
               },
             ),
           ),
@@ -119,10 +119,11 @@ class TransactionsView extends HookConsumerWidget {
 }
 
 class TrxTable extends StatelessWidget {
-  const TrxTable({super.key, required this.logs, this.excludes = const []});
-  final List<TransactionLog> logs;
+  const TrxTable({super.key, required this.logs, this.excludes = const [], this.showFooter = false});
 
+  final List<TransactionLog> logs;
   final List<String> excludes;
+  final bool showFooter;
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +147,6 @@ class TrxTable extends StatelessWidget {
       cellBuilderIndexed: (data, head, i) {
         final toName = data.effectiveTo.name;
         final toPhone = data.effectiveTo.phone;
-
         final fromName = data.effectiveFrom.name;
         final fromPhone = data.effectiveFrom.phone;
 
@@ -154,7 +154,7 @@ class TrxTable extends StatelessWidget {
           '#' => DataGridCell(columnName: head.name, value: Text((i + 1).toString())),
           'To' => DataGridCell(columnName: head.name, value: NameCellBuilder(toName, toPhone)),
           'From' => DataGridCell(columnName: head.name, value: NameCellBuilder(fromName, fromPhone)),
-          'Amount' => DataGridCell(columnName: head.name, value: Text(data.amount.currency())),
+          'Amount' => DataGridCell(columnName: head.name, value: data.amount),
           'Account' => DataGridCell(
             columnName: head.name,
             value: ShadBadge.secondary(child: Text(data.account?.name.titleCase ?? '--')),
@@ -188,6 +188,36 @@ class TrxTable extends StatelessWidget {
           _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
         };
       },
+
+      footer: DecoContainer(
+        color: context.colors.border,
+        padding: Pads.med(),
+        height: 80,
+        child: Row(
+          children: [
+            Expanded(
+              child: SpacedText(
+                left: 'Total sale: ',
+                right: logs.fromTypes([TransactionType.sale]).map((e) => e.amount).sum.currency(),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                styleBuilder: (l, r) => (l, context.text.list.bold),
+              ),
+            ),
+            Expanded(
+              child: SpacedText(
+                left: 'Total Payment: ',
+                right: logs
+                    .fromTypes([TransactionType.payment, TransactionType.expanse])
+                    .map((e) => e.amount)
+                    .sum
+                    .currency(),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                styleBuilder: (l, r) => (l, context.text.list.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

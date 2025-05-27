@@ -73,12 +73,16 @@ class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
               widget.headingBuilderIndexed?.call(widget.headings[i], i) ?? widget.headingBuilder!(widget.headings[i]),
           ],
           footer: widget.footer,
+          footerFrozenRowsCount: 1,
         ),
       ),
     );
     if (widget.items.isEmpty) {
       return Column(
-        children: [SizedBox(height: 60, child: sfDataGrid), const Flexible(child: EmptyWidget('No Item Found'))],
+        children: [
+          SizedBox(height: 60, child: sfDataGrid),
+          const Flexible(child: EmptyWidget('No Item Found')),
+        ],
       );
     }
 
@@ -128,8 +132,28 @@ class _DataSource<T, R> extends DataGridSource {
               ),
             )
           else
-            Text(cell.value.toString()),
+            Padding(
+              padding: padding ?? Pads.med(),
+              child: Align(
+                alignment: alignmentBuilder?.call(cell.columnName) ?? alignment ?? Alignment.center,
+                child: Text(cell.value is num ? (cell.value as num).currency() : cell.value.toString()),
+              ),
+            ),
       ],
+    );
+  }
+
+  @override
+  Widget? buildTableSummaryCellWidget(summaryRow, summaryColumn, rowColumnIndex, summaryValue) {
+    return Padding(
+      padding: padding ?? Pads.med(),
+      child: Align(
+        alignment: alignmentBuilder?.call(summaryColumn?.columnName ?? '') ?? alignment ?? Alignment.center,
+        child: Text(
+          'Total: ${(Parser.toNum(summaryValue) ?? 0).currency()}',
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+      ),
     );
   }
 }

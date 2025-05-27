@@ -367,3 +367,9 @@ class TransactionLog {
     );
   }
 }
+
+extension TransactionLogEx on List<TransactionLog> {
+  List<TransactionLog> fromTypes(List<TransactionType> types) {
+    return where((e) => types.contains(e.type)).toList();
+  }
+}
