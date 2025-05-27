@@ -73,7 +73,7 @@ class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
               widget.headingBuilderIndexed?.call(widget.headings[i], i) ?? widget.headingBuilder!(widget.headings[i]),
           ],
           footer: widget.footer,
-          footerFrozenRowsCount: 1,
+          footerFrozenRowsCount: widget.footer != null ? 1 : 0,
         ),
       ),
     );

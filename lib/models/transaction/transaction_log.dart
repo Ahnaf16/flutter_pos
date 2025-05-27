@@ -26,6 +26,8 @@ enum TransactionType {
     transfer => Colors.purple,
     dueAdjustment => Colors.purple,
   };
+
+  static List<TransactionType> get payments => [payment, returned];
 }
 
 class TransactionLog {

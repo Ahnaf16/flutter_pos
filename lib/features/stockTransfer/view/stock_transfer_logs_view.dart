@@ -8,7 +8,7 @@ const _headings = [
   TableHeading.positional('Product'),
   TableHeading.positional('From', 200.0),
   TableHeading.positional('To', 200.0),
-  TableHeading.positional('Pricing', 300.0),
+  TableHeading.positional('Transfer Qty', 300.0),
   TableHeading.positional('Date', 200.0, Alignment.centerRight),
 ];
 
@@ -59,9 +59,19 @@ class StockTransferLogsView extends HookConsumerWidget {
                   columnName: head.name,
                   value: Text(data.to?.name ?? '--'),
                 ),
-                'Pricing' => DataGridCell(
+                'Transfer Qty' => DataGridCell(
                   columnName: head.name,
-                  value: SpacedText(left: 'Purchase', right: data.stock?.purchasePrice.currency() ?? '--'),
+                  value: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: Insets.xs,
+                    children: [
+                      SpacedText(
+                        left: 'Qty',
+                        right: data.stock == null ? '--' : '${data.stock?.quantity} ${data.product?.unitName}',
+                      ),
+                      SpacedText(left: 'Purchase', right: data.stock?.purchasePrice.currency() ?? '--'),
+                    ],
+                  ),
                 ),
                 'Date' => DataGridCell(columnName: head.name, value: Text(data.date.formatDate())),
                 _ => DataGridCell(columnName: head.name, value: Text(data.toString())),

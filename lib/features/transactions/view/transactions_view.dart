@@ -194,26 +194,33 @@ class TrxTable extends StatelessWidget {
         padding: Pads.med(),
         height: 80,
         child: Row(
+          spacing: Insets.xl,
           children: [
-            Expanded(
-              child: SpacedText(
-                left: 'Total sale: ',
-                right: logs.fromTypes([TransactionType.sale]).map((e) => e.amount).sum.currency(),
-                crossAxisAlignment: CrossAxisAlignment.center,
-                styleBuilder: (l, r) => (l, context.text.list.bold),
-              ),
+            SpacedText(
+              left: 'Total in ',
+              right: logs.fromTypes([TransactionType.sale]).map((e) => e.amount).sum.currency(),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              useFlexible: false,
+              style: context.text.list.success(),
+              styleBuilder: (l, r) => (l, r.bold),
             ),
-            Expanded(
-              child: SpacedText(
-                left: 'Total Payment: ',
-                right: logs
-                    .fromTypes([TransactionType.payment, TransactionType.expanse])
-                    .map((e) => e.amount)
-                    .sum
-                    .currency(),
-                crossAxisAlignment: CrossAxisAlignment.center,
-                styleBuilder: (l, r) => (l, context.text.list.bold),
-              ),
+            const ShadSeparator.vertical(margin: Pads.zero, color: Colors.black),
+            SpacedText(
+              left: 'Total Out ',
+              right: logs.fromTypes(TransactionType.payments).map((e) => e.amount).sum.currency(),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              useFlexible: false,
+              style: context.text.list.error(context),
+              styleBuilder: (l, r) => (l, r.bold),
+            ),
+            const ShadSeparator.vertical(margin: Pads.zero, color: Colors.black),
+            SpacedText(
+              left: 'Total Return ',
+              right: logs.fromTypes([TransactionType.returned]).map((e) => e.amount).sum.currency(),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              useFlexible: false,
+              style: context.text.list.textColor(Colors.grey.shade600),
+              styleBuilder: (l, r) => (l, r.bold),
             ),
           ],
         ),

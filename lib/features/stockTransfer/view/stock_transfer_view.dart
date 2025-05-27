@@ -185,7 +185,11 @@ class StockTransferView extends HookConsumerWidget {
                                                   children: [
                                                     TextSpan(
                                                       text: '${product.quantityByHouse(from?.id)} ${product.unitName}',
-                                                      style: context.text.p.bold,
+                                                      style: context.text.lead.textColor(
+                                                        product.quantityByHouse(from?.id) > 0
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                      ),
                                                     ),
                                                     if (quantity > 0)
                                                       TextSpan(
