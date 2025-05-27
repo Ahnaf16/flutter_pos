@@ -41,9 +41,9 @@ class TransactionsRepo with AwHandler {
       if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
     }
 
+    //! change status for unpaid invoice
     if (!isPayment) {
-      final (_, _) = await locate<InventoryRepo>().updateUnpaidInvoices(parti?.id, log.amount).toRecord();
-      //! change status for unpaid invoice
+      await locate<InventoryRepo>().updateUnpaidInvoices(parti?.id, log.amount);
     }
 
     return await db.create(_coll, data: log.toAwPost());
@@ -74,6 +74,11 @@ class TransactionsRepo with AwHandler {
     if (account != null) {
       final (err, acc) = await _updateAccountAmount(account.id, isPayment ? -log.amount : log.amount).toRecord();
       if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
+    }
+
+    //! change status for unpaid invoice
+    if (isPayment) {
+      await locate<InventoryRepo>().updateUnpaidInvoices(parti?.id, log.amount);
     }
 
     return await db.create(_coll, data: log.toAwPost());

@@ -229,7 +229,10 @@ class InventoryRecord {
     'paymentLogs': paymentLogs.map((e) => e.id).toList(),
   };
 
-  Party get getParti => isWalkIn ? Party.fromWalkIn() : party ?? Party.fromWalkIn();
+  Party get getParti {
+    final guest = Party.fromWalkIn(type.isSale ? null : 'In House');
+    return isWalkIn ? guest : party ?? guest;
+  }
 
   String discountString() => discountType == DiscountType.percentage ? '$discount%' : discount.currency();
 

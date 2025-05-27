@@ -129,8 +129,8 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     );
   }
 
-  Future<(Result, InventoryRecord?)> submit() async {
-    if (state.parti == null) {
+  Future<(Result, InventoryRecord?)> submit({bool ignoreParty = false}) async {
+    if (state.parti == null && !ignoreParty) {
       return ((false, 'Please select a ${type.isSale ? 'customer' : 'supplier'}'), null);
     }
     if (state.account == null && state.paidAmount > 0) {
@@ -142,7 +142,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
 
     if (type.isPurchase) {
       if (state.hasExtra) return ((false, 'Extra amount is not allowed when purchasing'), null);
-      return submitPurchase();
+      return submitPurchase(ignoreParty: ignoreParty);
     } else {
       if (state.isWalkIn && state.hasDue) return ((false, 'Clear due for walk-in customer'), null);
       if (state.isWalkIn && state.hasExtra) return ((false, 'Clear extra amount for walk-in customer'), null);
@@ -151,8 +151,8 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     }
   }
 
-  Future<(Result, InventoryRecord?)> submitPurchase() async {
-    final res = await _repo.createPurchase(state);
+  Future<(Result, InventoryRecord?)> submitPurchase({bool ignoreParty = false}) async {
+    final res = await _repo.createPurchase(state, ignoreParty: ignoreParty);
 
     return res.fold((l) => (leftResult(l), null), (r) {
       ref.invalidate(inventoryCtrlProvider);

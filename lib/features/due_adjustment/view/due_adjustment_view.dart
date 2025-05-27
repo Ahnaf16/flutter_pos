@@ -1,6 +1,6 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
-import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
+import 'package:pos/features/due_adjustment/view/related_records.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/party_name_builder.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
@@ -30,414 +30,287 @@ class DueAdjustmentView extends HookConsumerWidget {
 
     return BaseBody(
       title: 'Customer due adjustment',
-
       alignment: Alignment.topLeft,
-      body: Flex(
-        direction: context.layout.isDesktop ? Axis.horizontal : Axis.vertical,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: Insets.med,
-        children: [
-          ShadCard(
-            height: context.layout.isDesktop ? double.maxFinite : null,
-            child: FormBuilder(
-              key: formKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //! user
-                    VisibilityField<AppUser>(name: 'transaction_by', data: user, valueTransformer: (v) => v?.toMap()),
-                    LimitedWidthBox(
-                      maxWidth: 500,
-                      center: false,
-                      child: partiList.when(
-                        loading: () => const Loading(),
-                        error: (e, s) => ErrorView(e, s, prov: partiesCtrlProvider),
-                        data: (parties) {
-                          return ShadSelectField<Party>(
-                            initialValue: extra,
-                            hintText: 'Select Customer',
-                            optionBuilder: (_, v, i) => ShadOption(value: v, child: PartyNameBuilder(v)),
-                            options: parties,
-                            selectedBuilder: (context, value) => Text(value.name),
-                            onChanged: (v) {
-                              selectedParty.set(v);
-                            },
-                            valueTransformer: (v) => v?.toMap(),
-                          );
-                        },
+      body: LimitedWidthBox(
+        maxWidth: Layouts.maxContentWidth,
+        child: Flex(
+          direction: context.layout.isDesktop ? Axis.horizontal : Axis.vertical,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: Insets.med,
+          children: [
+            ShadCard(
+              height: context.layout.isDesktop ? double.maxFinite : null,
+              child: FormBuilder(
+                key: formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //! user
+                      VisibilityField<AppUser>(name: 'transaction_by', data: user, valueTransformer: (v) => v?.toMap()),
+                      LimitedWidthBox(
+                        maxWidth: 500,
+                        center: false,
+                        child: partiList.when(
+                          loading: () => const Loading(),
+                          error: (e, s) => ErrorView(e, s, prov: partiesCtrlProvider),
+                          data: (parties) {
+                            return ShadSelectField<Party>(
+                              initialValue: extra,
+                              hintText: 'Select Customer',
+                              optionBuilder: (_, v, i) => ShadOption(value: v, child: PartyNameBuilder(v)),
+                              options: parties,
+                              selectedBuilder: (context, value) => Text(value.name),
+                              onChanged: (v) {
+                                selectedParty.set(v);
+                              },
+                              valueTransformer: (v) => v?.toMap(),
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                    const Gap(Insets.med),
-                    if (selectedParty.value != null)
-                      Row(
-                        spacing: Insets.med,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ShadCard(
-                            expanded: false,
-                            height: 80,
-                            width: 80,
-                            padding: Pads.zero,
-                            child: FittedBox(child: HostedImage.square(selectedParty.value!.getPhoto, dimension: 80)),
-                          ),
-                          Flexible(
-                            child: Padding(
-                              padding: Pads.sm('t'),
-                              child: Column(
-                                spacing: Insets.sm,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SpacedText(
-                                    left: 'Name',
-                                    right: selectedParty.value?.name ?? '--',
-                                    styleBuilder: (l, r) => (l, r.bold),
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                  ),
-                                  SpacedText(
-                                    left: 'Phone',
-                                    right: selectedParty.value?.phone ?? '--',
-                                    styleBuilder: (l, r) => (l, r.bold),
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                  ),
-                                  if (selectedParty.value?.email != null)
+                      const Gap(Insets.med),
+                      if (selectedParty.value != null)
+                        Row(
+                          spacing: Insets.med,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ShadCard(
+                              expanded: false,
+                              height: 80,
+                              width: 80,
+                              padding: Pads.zero,
+                              child: FittedBox(child: HostedImage.square(selectedParty.value!.getPhoto, dimension: 80)),
+                            ),
+                            Flexible(
+                              child: Padding(
+                                padding: Pads.sm('t'),
+                                child: Column(
+                                  spacing: Insets.sm,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
                                     SpacedText(
-                                      left: 'Email',
-                                      right: selectedParty.value?.email ?? '--',
+                                      left: 'Name',
+                                      right: selectedParty.value?.name ?? '--',
                                       styleBuilder: (l, r) => (l, r.bold),
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                     ),
-                                  if (selectedParty.value?.address != null)
                                     SpacedText(
-                                      left: 'Address',
-                                      right: selectedParty.value?.address ?? '--',
+                                      left: 'Phone',
+                                      right: selectedParty.value?.phone ?? '--',
                                       styleBuilder: (l, r) => (l, r.bold),
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                     ),
+                                    if (selectedParty.value?.email != null)
+                                      SpacedText(
+                                        left: 'Email',
+                                        right: selectedParty.value?.email ?? '--',
+                                        styleBuilder: (l, r) => (l, r.bold),
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                      ),
+                                    if (selectedParty.value?.address != null)
+                                      SpacedText(
+                                        left: 'Address',
+                                        right: selectedParty.value?.address ?? '--',
+                                        styleBuilder: (l, r) => (l, r.bold),
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                      ),
 
-                                  if (selectedParty.value!.hasBalance())
-                                    Text.rich(
-                                      TextSpan(
-                                        text: 'You owe ',
-                                        children: [
-                                          TextSpan(text: '"${selectedParty.value!.name}" : '),
-                                          TextSpan(
-                                            text: selectedParty.value!.due.abs().currency(),
-                                            style: const TextStyle(color: Colors.red),
-                                          ),
-                                        ],
+                                    if (selectedParty.value!.hasBalance())
+                                      Text.rich(
+                                        TextSpan(
+                                          text: 'Payable to "${selectedParty.value!.name}" : ',
+                                          children: [
+                                            TextSpan(
+                                              text: selectedParty.value!.due.abs().currency(),
+                                              style: const TextStyle(color: Colors.red),
+                                            ),
+                                          ],
+                                        ),
+                                        style: context.text.list,
                                       ),
-                                      style: context.text.list,
-                                    ),
-                                  if (selectedParty.value!.hasDue())
-                                    Text.rich(
-                                      TextSpan(
-                                        text: '"${selectedParty.value!.name}" ',
-                                        children: [
-                                          const TextSpan(text: 'owes you : '),
-                                          TextSpan(
-                                            text: selectedParty.value!.due.abs().currency(),
-                                            style: const TextStyle(color: Colors.green),
-                                          ),
-                                        ],
+                                    if (selectedParty.value!.hasDue())
+                                      Text.rich(
+                                        TextSpan(
+                                          text: 'Receivable from "${selectedParty.value!.name}" :  ',
+                                          children: [
+                                            TextSpan(
+                                              text: selectedParty.value!.due.abs().currency(),
+                                              style: const TextStyle(color: Colors.green),
+                                            ),
+                                          ],
+                                        ),
+                                        style: context.text.list,
                                       ),
-                                      style: context.text.list,
-                                    ),
-                                ],
+                                  ],
+                                ),
                               ),
+                            ),
+                          ],
+                        ),
+
+                      const Gap(Insets.med),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ShadTextField(
+                              name: 'amount',
+                              hintText: 'Amount',
+                              label: 'Amount',
+                              numeric: true,
+                              isRequired: true,
+                            ),
+                          ),
+                          Expanded(
+                            child: accountList.maybeWhen(
+                              orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                              data: (accounts) {
+                                return ShadSelectField<PaymentAccount>(
+                                  name: 'payment_account',
+                                  hintText: 'select an account',
+                                  label: 'Payment account',
+                                  isRequired: !isTransfer.value,
+                                  initialValue: config.defaultAccount,
+                                  options: accounts,
+                                  valueTransformer: (value) => value?.toMap(),
+                                  optionBuilder: (_, v, i) {
+                                    return ShadOption(value: v, child: AccountNameBuilder(v));
+                                  },
+                                  selectedBuilder: (_, v) => AccountNameBuilder(v),
+                                );
+                              },
                             ),
                           ),
                         ],
                       ),
 
-                    const Gap(Insets.med),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ShadTextField(
-                            name: 'amount',
-                            hintText: 'Amount',
-                            label: 'Amount',
-                            numeric: true,
-                            isRequired: true,
-                          ),
-                        ),
-                        Expanded(
-                          child: accountList.maybeWhen(
-                            orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                            data: (accounts) {
-                              return ShadSelectField<PaymentAccount>(
-                                name: 'payment_account',
-                                hintText: 'select an account',
-                                label: 'Payment account',
-                                isRequired: !isTransfer.value,
-                                initialValue: config.defaultAccount,
-                                options: accounts,
-                                valueTransformer: (value) => value?.toMap(),
-                                optionBuilder: (_, v, i) {
-                                  return ShadOption(value: v, child: AccountNameBuilder(v));
-                                },
-                                selectedBuilder: (_, v) => AccountNameBuilder(v),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const Gap(Insets.med),
-                    ShadTextAreaField(name: 'note', label: 'Note'),
-
-                    //! transfer balance
-                    if (selectedParty.value?.hasBalance() == true) ...[
                       const Gap(Insets.med),
-                      ShadCheckbox(
-                        value: isTransfer.value,
-                        onChanged: (v) {
-                          isTransfer.value = v;
-                        },
-                        label: const Text('Transfer balance'),
-                      ),
-                      if (isTransfer.value) ...[
+                      ShadTextAreaField(name: 'note', label: 'Note'),
+
+                      //! transfer balance
+                      if (selectedParty.value?.hasBalance() == true) ...[
                         const Gap(Insets.med),
-                        ShadCard(
-                          padding: Pads.med(),
-                          child: CustomInfoFiled(
-                            fixedInitialField: const {'Name': '', 'Phone': ''},
-                            header: (context, add) {
-                              return Row(
-                                spacing: Insets.med,
-                                children: [
-                                  Text('Add custom field', style: context.text.p),
-                                  SmallButton(
-                                    icon: LuIcons.plus,
-                                    variant: ShadButtonVariant.primary,
-                                    onPressed: add,
-                                    size: 25,
-                                  ),
-                                ],
-                              );
-                            },
+                        ShadCheckbox(
+                          value: isTransfer.value,
+                          onChanged: (v) {
+                            isTransfer.value = v;
+                          },
+                          label: const Text('Transfer balance'),
+                        ),
+                        if (isTransfer.value) ...[
+                          const Gap(Insets.med),
+                          ShadCard(
+                            padding: Pads.med(),
+                            child: CustomInfoFiled(
+                              fixedInitialField: const {'Name': '', 'Phone': ''},
+                              header: (context, add) {
+                                return Row(
+                                  spacing: Insets.med,
+                                  children: [
+                                    Text('Add custom field', style: context.text.p),
+                                    SmallButton(
+                                      icon: LuIcons.plus,
+                                      variant: ShadButtonVariant.primary,
+                                      onPressed: add,
+                                      size: 25,
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                           ),
-                        ),
+                        ],
                       ],
-                    ],
 
-                    const Gap(Insets.xl),
+                      const Gap(Insets.xl),
 
-                    if (selectedParty.value?.hasDue() == true)
-                      SubmitButton(
-                        onPressed: (l) async {
-                          final state = formKey.currentState!;
-                          if (!state.saveAndValidate()) return;
-                          final data = QMap.from(state.transformedValues);
-                          data.addAll({
-                            'date': DateTime.now().toIso8601String(),
-                            'transaction_type': TransactionType.dueAdjustment.name,
-                            'transaction_from': selectedParty.value?.toMap(),
-                            'transacted_to_shop': true,
-                          });
-                          if (!isTransfer.value) data.remove('custom_info');
+                      if (selectedParty.value?.hasDue() == true)
+                        SubmitButton(
+                          onPressed: (l) async {
+                            final state = formKey.currentState!;
+                            if (!state.saveAndValidate()) return;
+                            final data = QMap.from(state.transformedValues);
+                            data.addAll({
+                              'date': DateTime.now().toIso8601String(),
+                              'transaction_type': TransactionType.dueAdjustment.name,
+                              'transaction_from': selectedParty.value?.toMap(),
+                              'transacted_to_shop': true,
+                            });
+                            if (!isTransfer.value) data.remove('custom_info');
 
-                          final log = TransactionLog.fromMap(data);
-                          final err = log.validate();
-                          if (err != null) {
-                            return Toast.showErr(context, err);
-                          }
+                            final log = TransactionLog.fromMap(data);
+                            final err = log.validate();
+                            if (err != null) {
+                              return Toast.showErr(context, err);
+                            }
 
-                          final ok = await showShadDialog<bool>(
-                            context: context,
-                            builder: (context) => _DuePayDialog(log),
-                          );
-                          if (ok == true) {
-                            selectedParty.value = null;
-                            state.reset();
-                          }
-                        },
-                        child: const Text('Due payment'),
-                      ),
-                    if (selectedParty.value?.hasBalance() == true)
-                      SubmitButton(
-                        onPressed: (l) async {
-                          final state = formKey.currentState!;
-                          if (!state.saveAndValidate()) return;
-                          final data = QMap.from(state.transformedValues);
-
-                          final transfer = isTransfer.value;
-
-                          data.addAll({
-                            'date': DateTime.now().toIso8601String(),
-                            'transaction_type': (transfer ? TransactionType.transfer : TransactionType.payment).name,
-                            if (transfer) 'transaction_from': selectedParty.value?.toMap(),
-                            if (!transfer) 'transaction_to': selectedParty.value?.toMap(),
-                          });
-                          if (!transfer) data.remove('custom_info');
-
-                          final log = TransactionLog.fromMap(data);
-
-                          final err = log.validate();
-                          if (err != null) {
-                            return Toast.showErr(context, err);
-                          }
-
-                          bool? ok;
-                          if (transfer) {
-                            ok = await showShadDialog<bool>(
+                            final ok = await showShadDialog<bool>(
                               context: context,
-                              builder: (context) => _TransferDialog(log),
+                              builder: (context) => _DuePayDialog(log),
                             );
-                          } else {
-                            ok = await showShadDialog<bool>(
-                              context: context,
-                              builder: (context) => _DueClearDialog(log),
-                            );
-                          }
-                          if (ok == true) {
-                            selectedParty.value = null;
-                            state.reset();
-                          }
-                        },
-                        child: Text(isTransfer.value ? 'Transfer balance' : 'Clear due'),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ).conditionalExpanded(context.layout.isDesktop, 2),
-
-          if (selectedParty.value?.hasDue() == true)
-            _RelatedRecords(party: selectedParty.value!).conditionalExpanded(context.layout.isDesktop),
-        ],
-      ),
-    );
-  }
-}
-
-class _RelatedRecords extends ConsumerWidget {
-  const _RelatedRecords({
-    required this.party,
-  });
-  final Party party;
-
-  @override
-  Widget build(BuildContext context, ref) {
-    final inventoryList = ref.watch(recordsByPartiProvider(party.id));
-
-    return ShadCard(
-      title: Text('Unpaid/Partial invoices', style: context.text.p),
-      height: context.layout.isDesktop ? double.maxFinite : null,
-      childPadding: Pads.med('t'),
-      child: inventoryList.when(
-        loading: () => const Loading(),
-        error: (e, s) => ErrorView(e, s, prov: inventoryCtrlProvider),
-        data: (inventories) {
-          inventories = inventories.where((e) => e.status.isUnpaid || e.status.isPartial).toList();
-          return ListView.separated(
-            shrinkWrap: true,
-            itemCount: inventories.length,
-            separatorBuilder: (_, _) => const Gap(Insets.med),
-            itemBuilder: (BuildContext context, int index) {
-              final rec = inventories[index];
-              return _InvCard(
-                rec: rec,
-                index: index,
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _InvCard extends HookWidget {
-  const _InvCard({
-    required this.rec,
-    required this.index,
-  });
-
-  final InventoryRecord rec;
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    final hovering = useState(false);
-    return MouseRegion(
-      onEnter: (event) => hovering.truthy(),
-      onExit: (event) => hovering.falsey(),
-
-      child: Stack(
-        children: [
-          ShadCard(
-            padding: Pads.padding(v: Insets.med, h: Insets.sm),
-            child: Row(
-              spacing: Insets.med,
-              children: [
-                Text((index + 1).toString()),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (final p in rec.details.takeFirst(2))
-                        Text(
-                          p.product.name.showUntil(15),
-                          style: context.text.small,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                            if (ok == true) {
+                              selectedParty.value = null;
+                              state.reset();
+                            }
+                          },
+                          child: const Text('Due payment'),
                         ),
-                      if (rec.details.length > 2)
-                        Text('+ ${rec.details.length - 2} more', style: context.text.muted.size(12)),
+                      if (selectedParty.value?.hasBalance() == true)
+                        SubmitButton(
+                          onPressed: (l) async {
+                            final state = formKey.currentState!;
+                            if (!state.saveAndValidate()) return;
+                            final data = QMap.from(state.transformedValues);
+
+                            final transfer = isTransfer.value;
+
+                            data.addAll({
+                              'date': DateTime.now().toIso8601String(),
+                              'transaction_type': (transfer ? TransactionType.transfer : TransactionType.payment).name,
+                              if (transfer) 'transaction_from': selectedParty.value?.toMap(),
+                              if (!transfer) 'transaction_to': selectedParty.value?.toMap(),
+                            });
+                            if (!transfer) data.remove('custom_info');
+
+                            final log = TransactionLog.fromMap(data);
+
+                            final err = log.validate();
+                            if (err != null) {
+                              return Toast.showErr(context, err);
+                            }
+
+                            bool? ok;
+                            if (transfer) {
+                              ok = await showShadDialog<bool>(
+                                context: context,
+                                builder: (context) => _TransferDialog(log),
+                              );
+                            } else {
+                              ok = await showShadDialog<bool>(
+                                context: context,
+                                builder: (context) => _DueClearDialog(log),
+                              );
+                            }
+                            if (ok == true) {
+                              selectedParty.value = null;
+                              state.reset();
+                            }
+                          },
+                          child: Text(isTransfer.value ? 'Transfer balance' : 'Clear due'),
+                        ),
                     ],
                   ),
                 ),
-                Expanded(
-                  child: Column(
-                    spacing: Insets.xs,
-                    children: [
-                      SpacedText(
-                        left: 'Paid',
-                        right: rec.paidAmount.currency(),
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
-                      ),
-
-                      SpacedText(
-                        left: 'Total',
-                        right: rec.total.currency(),
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
-                      ),
-                      SpacedText(
-                        left: 'Due',
-                        right: rec.due.currency(),
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold.error(context)),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  spacing: Insets.xs,
-                  children: [
-                    ShadBadge(child: Text(rec.status.name)).colored(rec.status.color),
-                    Text(rec.date.formatDate()),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          if (hovering.value)
-            Positioned(
-              top: 3,
-              right: 3,
-              child: SmallButton(
-                icon: LuIcons.squareArrowOutUpRight,
-                onPressed: () => RPaths.saleDetails(rec.id).pushNamed(context),
               ),
-            ),
-        ],
+            ).conditionalExpanded(context.layout.isDesktop, 2),
+
+            if (selectedParty.value != null)
+              RelatedRecords(
+                party: selectedParty.value!,
+                unpaid: selectedParty.value?.hasDue() == true,
+              ).conditionalExpanded(context.layout.isDesktop),
+          ],
+        ),
       ),
     );
   }

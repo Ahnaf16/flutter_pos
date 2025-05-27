@@ -189,9 +189,10 @@ class RecordDetailsView extends HookConsumerWidget {
                                 ShadSeparator.horizontal(margin: Pads.sm('b')),
                                 SpacedText(left: 'paid amount', right: rec.paidAmount.currency()),
                                 SpacedText(
-                                  left: rec.hasBalance ? 'Extra amount' : 'Due amount',
-                                  right: rec.due.currency(),
+                                  left: rec.hasDue ? 'Due amount' : 'Extra amount',
+                                  right: rec.due.abs().currency(),
                                   crossAxisAlignment: CrossAxisAlignment.center,
+                                  styleBuilder: (l, r) => (l, r.textColor(rec.hasDue ? Colors.red : Colors.green)),
                                   trailing: rec.due == 0
                                       ? null
                                       : ShadTooltip(

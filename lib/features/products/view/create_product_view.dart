@@ -77,7 +77,7 @@ class CreateProductView extends HookConsumerWidget {
                 recordCtrl().setInputsFromMap(data['record'] ?? {});
                 recordCtrl().addProduct(product.copyWith(id: createdId.value), newStock: stock, replaceExisting: true);
 
-                final ((ok, msg), inv) = await recordCtrl().submit();
+                final ((ok, msg), inv) = await recordCtrl().submit(ignoreParty: true);
                 l.falsey();
                 if (!ok && context.mounted) return Toast.showErr(context, msg);
                 if (ok) return context.pop();
@@ -386,7 +386,7 @@ class _InitialStock extends HookConsumerWidget {
                         name: 'record.supplier',
                         label: 'Supplier',
                         hintText: 'Select supplier',
-                        isRequired: true,
+                        // isRequired: true,
                         options: parties,
                         selectedBuilder: (context, value) => Text(value.name),
                         optionBuilder: (_, value, _) {
@@ -452,7 +452,7 @@ class _InitialStock extends HookConsumerWidget {
                     label: 'Paid amount',
                     keyboardType: TextInputType.number,
                     numeric: true,
-                    isRequired: true,
+                    // isRequired: true,
                   ),
                 ),
               ],

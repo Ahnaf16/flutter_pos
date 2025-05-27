@@ -313,10 +313,11 @@ class RecordTable extends ConsumerWidget {
               ),
             if (data.due != 0)
               SpacedText(
-                left: 'Due',
-                right: data.due.currency(),
+                left: data.hasDue ? 'Due' : 'Extra',
+                right: data.due.abs().currency(),
                 crossAxisAlignment: CrossAxisAlignment.center,
-                styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.error(context)),
+                styleBuilder: (l, r) =>
+                    (context.text.muted.textHeight(1.1), r.textColor(data.hasDue ? Colors.red : Colors.green)),
               ),
             SpacedText(
               left: 'Total',

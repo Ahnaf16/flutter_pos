@@ -57,14 +57,14 @@ class InventoryRepo with AwHandler {
     // return left(const Failure('___'));
   }
 
-  FutureReport<Document> createPurchase(InventoryRecordState inventory) async {
+  FutureReport<Document> createPurchase(InventoryRecordState inventory, {bool ignoreParty = false}) async {
     final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
     if (err != null || user == null) return left(err ?? const Failure('Unable to get current user'));
 
     //! add details
     InventoryRecord record = inventory.toInventoryRecord(user);
     Party? parti = record.party;
-    if (parti == null) return left(const Failure('Parti is required when purchasing'));
+    if (parti == null && !ignoreParty) return left(const Failure('Parti is required when purchasing'));
 
     final (detailErr, detailsData) = await _createRecordDetails(inventory.details, false).toRecord();
     if (detailErr != null || detailsData == null) return left(detailErr ?? Failure(_generalFailure));
@@ -83,13 +83,15 @@ class InventoryRepo with AwHandler {
 
     //! update Due
     //inventory.extra has been stopped at validation
-    if (inventory.hasDue || inventory.hasExtra) {
-      // _updateDue adds the due with the parti.due. if due is (-) it will be subtracted
-      // when hasBalance, due is (-), so -(-due) will add due. will be added as due
-      // when hasDue, due is (+), so -(+due) will subtract due. will be added as balance
-      final (partiErr, partiData) = await _updateDue(parti.id, -inventory.due, record.type).toRecord();
-      if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
-      parti = Party.fromDoc(partiData);
+    if (parti != null) {
+      if (inventory.hasDue || inventory.hasExtra) {
+        // _updateDue adds the due with the parti.due. if due is (-) it will be subtracted
+        // when hasBalance, due is (-), so -(-due) will add due. will be added as due
+        // when hasDue, due is (+), so -(+due) will subtract due. will be added as balance
+        final (partiErr, partiData) = await _updateDue(parti.id, -inventory.due, record.type).toRecord();
+        if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
+        parti = Party.fromDoc(partiData);
+      }
     }
 
     // //! add transaction log
@@ -200,9 +202,6 @@ class InventoryRepo with AwHandler {
         paidAmount: rec.paidAmount + paidAmount,
         status: paidAmount == remainingDue ? InventoryStatus.paid : InventoryStatus.partial,
       );
-
-      cat(updatedRec.status, 'status');
-      cat(updatedRec.paidAmount, 'paidAmount');
 
       final (updateErr, updateData) = await updateRecord(updatedRec).toRecord();
       if (updateErr != null || updateData == null) return left(updateErr ?? const Failure('Unable to update record'));
