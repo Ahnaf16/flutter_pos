@@ -3,7 +3,7 @@ description: "A new Flutter project."
 
 publish_to: "none"
 
-version: 1.0.2+2
+version: 1.0.5+5
 
 environment:
   sdk: ^3.8.0
@@ -60,6 +60,7 @@ dependencies:
   path_provider: ^2.1.5
   universal_html: ^2.2.4
   fl_chart: ^1.0.0
+  embed_annotation: ^1.2.2
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +71,7 @@ dev_dependencies:
   riverpod_lint: ^2.6.5
   riverpod_generator: ^2.6.5
   build_runner: ^2.4.15
+  embed: ^1.4.1
   # shared_preferences_gen: ^0.1.1
 
 dependency_overrides:

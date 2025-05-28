@@ -1,6 +1,4 @@
-.PHONY: all run_dev_web run_dev_mobile run_unit clean upgrade lint format build_dev_mobile help watch gen run_stg_mobile run_prd_mobile build_apk_dev build_apk_stg build_apk_prd purge 
-
-all: lint format run_dev_mobile
+.PHONY: clean builder_run assets_gen
 
 # Adding a help file: https://gist.github.com/prwhite/8168133#gistcomment-1313022
 help: ## This help dialog.
@@ -19,15 +17,7 @@ clean: ## Cleans the environment
 	@rm -rf pubspec.lock
 	@flutter clean
 	@flutter pub get
-
-format: ## Formats the code
-	@echo "╠ Formatting the code"
-	@dart format lib .
-
-lint: ## Lints the code
-	@echo "╠ Verifying code..."
-	@dart analyze . || (echo "Error in project"; exit 1)
-
+ 
 builder_run:
 	@echo "╠ Running build runner..."
 	@fvm flutter pub run build_runner build --delete-conflicting-outputs
@@ -37,7 +27,9 @@ assets_gen: ## generates assets using flutter-gen and adds inline html preview f
 	@fluttergen
 	@dart run bin/gen_assets_preview.dart || (echo "Error in project"; exit 1)
 
-keystore_info: ## get keystore info
-	@echo "╠ Getting keystore info..."
-	@echo keytool -list -v -keystore /Users/ahnafsakil/DEVELOPMENT/Flutter_projects/qhub360/android/app/upload-keystore.jks -alias upload -storepass qhub_key -keypass qhub_key
+ 
+build_web: ## build for web
+	@echo "╠ building web release"
+	@fvm flutter build web --no-tree-shake-icons
+
  

@@ -224,7 +224,7 @@ class _BarDataCtrlProviderElement
   int get month => (origin as BarDataCtrlProvider).month;
 }
 
-String _$pieDataCtrlHash() => r'ae41c12137ee26574fe862f47b70057039a27f49';
+String _$pieDataCtrlHash() => r'9a3e0bd24ec99dd527b7ff158f35854a6a9c8ead';
 
 /// See also [PieDataCtrl].
 @ProviderFor(PieDataCtrl)
