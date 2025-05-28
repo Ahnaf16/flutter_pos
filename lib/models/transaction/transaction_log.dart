@@ -50,7 +50,6 @@ class TransactionLog {
     required this.transferredToAccount,
     required this.isBetweenAccount,
     required this.isIncome,
-    this.accountMeta,
   });
 
   final String id;
@@ -83,8 +82,6 @@ class TransactionLog {
   /// null when transfer between account or return
   final bool? isIncome;
 
-  final SMap? accountMeta;
-
   factory TransactionLog.fromDoc(Document doc) => TransactionLog.fromMap(doc.data);
 
   factory TransactionLog.fromMap(Map<String, dynamic> map) => TransactionLog(
@@ -106,7 +103,6 @@ class TransactionLog {
     transactedToShop: map.parseBool('transacted_to_shop'),
     isBetweenAccount: map.parseBool('betweenAccount'),
     isIncome: map.parseBool('is_income'),
-    accountMeta: map.parseCustomInfo('account_meta'),
   );
 
   static TransactionLog? tyrParse(dynamic value) {
@@ -140,7 +136,6 @@ class TransactionLog {
     'betweenAccount': isBetweenAccount,
     'transferredToAccount': transferredToAccount?.toMap(),
     'is_income': isIncome,
-    'account_meta': accountMeta?.toCustomList(),
   };
 
   QMap toAwPost() => {
@@ -160,7 +155,6 @@ class TransactionLog {
     'transferredToAccount': transferredToAccount?.id,
     'betweenAccount': isBetweenAccount,
     'is_income': isIncome,
-    'account_meta': accountMeta?.toCustomList(),
   };
 
   String? validate() {

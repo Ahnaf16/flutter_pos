@@ -154,10 +154,23 @@ class TrxTable extends StatelessWidget {
           '#' => DataGridCell(columnName: head.name, value: Text((i + 1).toString())),
           'To' => DataGridCell(columnName: head.name, value: NameCellBuilder(toName, toPhone)),
           'From' => DataGridCell(columnName: head.name, value: NameCellBuilder(fromName, fromPhone)),
-          'Amount' => DataGridCell(columnName: head.name, value: data.amount),
+          'Amount' => DataGridCell(
+            columnName: head.name,
+            value: Text(data.amount.currency(), style: context.text.list),
+          ),
           'Account' => DataGridCell(
             columnName: head.name,
-            value: ShadBadge.secondary(child: Text(data.account?.name.titleCase ?? '--')),
+            value: Column(
+              spacing: Insets.xs,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Row(),
+                Text(data.account?.name.titleCase ?? '--', style: context.text.list),
+                if (data.customInfo case {'pre': final pre}) SpacedText(left: 'Pre', right: pre),
+                if (data.customInfo case {'post': final post}) SpacedText(left: 'Post', right: post),
+              ],
+            ),
           ),
           'Type' => DataGridCell(
             columnName: head.name,
@@ -201,7 +214,7 @@ class TrxTable extends StatelessWidget {
               right: logs.where((e) => e.isIncome == true).map((e) => e.amount).sum.currency(),
               crossAxisAlignment: CrossAxisAlignment.center,
               useFlexible: false,
-              style: context.text.list.success(),
+              style: context.text.list.primary(context),
               styleBuilder: (l, r) => (l, r.bold),
             ),
             const ShadSeparator.vertical(margin: Pads.zero, color: Colors.black),
