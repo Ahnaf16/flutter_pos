@@ -1,5 +1,6 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
+import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/party_name_builder.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
@@ -103,6 +104,7 @@ class TransactionsView extends HookConsumerWidget {
               ),
             ],
           ),
+          const FilterBar(),
           Expanded(
             child: trxList.when(
               loading: () => const Loading(),

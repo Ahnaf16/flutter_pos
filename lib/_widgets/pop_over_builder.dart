@@ -19,19 +19,16 @@ class PopOverBuilder extends HookWidget {
       controller: popCtrl,
       padding: Pads.sm(),
       anchor: const ShadAnchorAuto(followerAnchor: Alignment.bottomLeft, offset: Offset(15, 0)),
-      popover:
-          (
-            context,
-          ) {
-            return IntrinsicWidth(
-              child: Column(
-                spacing: Insets.xs,
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: children(context, popCtrl.hide),
-              ),
-            );
-          },
+      popover: (context) {
+        return IntrinsicWidth(
+          child: Column(
+            spacing: Insets.xs,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: children(context, popCtrl.hide),
+          ),
+        );
+      },
       child: ShadButton.ghost(onPressed: () => popCtrl.toggle(), child: const Icon(LuIcons.ellipsisVertical)),
     );
   }
