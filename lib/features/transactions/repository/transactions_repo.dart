@@ -21,6 +21,8 @@ class TransactionsRepo with AwHandler {
 
     if (log.validate() != null) return left(Failure(log.validate()!));
 
+    log = log.copyWith(isIncome: () => !isPayment);
+
     if (log.transactionBy == null) {
       final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
       if (err != null || user == null) return left(err ?? const Failure('Unable to get current user'));
@@ -37,7 +39,9 @@ class TransactionsRepo with AwHandler {
 
     final account = log.account;
     if (account != null) {
-      final (err, acc) = await _updateAccountAmount(account.id, isPayment ? -log.amount : log.amount).toRecord();
+      final amount = isPayment ? -log.amount : log.amount;
+      log = log.copyWith(customInfo: {'pre': account.amount.currency(), 'post': (account.amount + amount).currency()});
+      final (err, acc) = await _updateAccountAmount(account.id, amount).toRecord();
       if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
     }
 
@@ -57,6 +61,8 @@ class TransactionsRepo with AwHandler {
 
     if (log.validate() != null) return left(Failure(log.validate()!));
 
+    log = log.copyWith(isIncome: () => !isPayment);
+
     if (log.transactionBy == null) {
       final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
       if (err != null || user == null) return left(err ?? const Failure('Unable to get current user'));
@@ -72,7 +78,9 @@ class TransactionsRepo with AwHandler {
 
     final account = log.account;
     if (account != null) {
-      final (err, acc) = await _updateAccountAmount(account.id, isPayment ? -log.amount : log.amount).toRecord();
+      final amount = isPayment ? -log.amount : log.amount;
+      log = log.copyWith(customInfo: {'pre': account.amount.currency(), 'post': (account.amount + amount).currency()});
+      final (err, acc) = await _updateAccountAmount(account.id, amount).toRecord();
       if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
     }
 
@@ -90,6 +98,8 @@ class TransactionsRepo with AwHandler {
     TransactionLog log = TransactionLog.fromMap(data);
     if (log.validate() != null) return left(Failure(log.validate()!));
 
+    log = log.copyWith(isIncome: () => false);
+
     if (log.transactionBy == null) {
       final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
       if (err != null || user == null) return left(err ?? const Failure('Unable to get current user'));
@@ -104,6 +114,9 @@ class TransactionsRepo with AwHandler {
     }
     final account = log.account;
     if (account != null) {
+      log = log.copyWith(
+        customInfo: {'pre': account.amount.currency(), 'post': (account.amount - log.amount).currency()},
+      );
       final (err, acc) = await _updateAccountAmount(account.id, -log.amount).toRecord();
       if (err != null || acc == null) return left(err ?? const Failure('Unable to update account amount'));
     }

@@ -172,12 +172,19 @@ class InventoryRepo with AwHandler {
     return await repo.updateDue(parti, due, !due.isNegative, 'Due created from ${type.name}');
   }
 
-  FutureReport<Document> _addTransactionLog(InventoryRecord record) async {
+  FutureReport<Document> _addTransactionLog(InventoryRecord rec) async {
     final repo = locate<TransactionsRepo>();
     final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
     if (err != null || user == null) return left(err ?? const Failure('Unable to getting current user'));
 
-    final transaction = TransactionLog.fromInventoryRecord(record, user);
+    final acc = rec.account;
+    final sale = rec.type.isSale;
+
+    final transaction = TransactionLog.fromInventoryRecord(rec, user).copyWith(
+      customInfo: acc == null
+          ? null
+          : {'pre': acc.amount.currency(), 'post': (acc.amount + (sale ? rec.paidAmount : -rec.paidAmount)).currency()},
+    );
     return await repo.addTransaction(transaction);
   }
 

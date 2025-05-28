@@ -84,27 +84,6 @@ class PaymentAccount {
     );
   }
 
-  // static SMap _parseCustomInfo(dynamic data) {
-  //   final map = <String, String>{};
-  //   if (data case final List list) {
-  //     for (final info in list) {
-  //       final parts = info.toString().split(':~:');
-  //       if (parts.length == 2) {
-  //         map[parts[0]] = parts[1];
-  //       }
-  //     }
-  //   }
-  //   return map;
-  // }
-
-  // static List<String> _customToList(SMap map) {
-  //   final list = <String>[];
-  //   for (final entry in map.entries) {
-  //     list.add('${entry.key}:~:${entry.value}');
-  //   }
-  //   return list;
-  // }
-
   Map<String, dynamic> toMap() {
     return {
       'id': id,

@@ -23,7 +23,7 @@ enum TransactionType {
     payment => Colors.green,
     returned => Colors.red,
     expanse => Colors.orange,
-    transfer => Colors.purple,
+    transfer => Colors.pink,
     dueAdjustment => Colors.purple,
   };
 
@@ -49,6 +49,8 @@ class TransactionLog {
     this.payMethod,
     required this.transferredToAccount,
     required this.isBetweenAccount,
+    required this.isIncome,
+    this.accountMeta,
   });
 
   final String id;
@@ -78,7 +80,10 @@ class TransactionLog {
   final bool transactedToShop;
   final bool isBetweenAccount;
 
-  // final bool transactionFromMe;
+  /// null when transfer between account or return
+  final bool? isIncome;
+
+  final SMap? accountMeta;
 
   factory TransactionLog.fromDoc(Document doc) => TransactionLog.fromMap(doc.data);
 
@@ -100,6 +105,8 @@ class TransactionLog {
     record: InventoryRecord.tryParse(map['inventoryRecord']),
     transactedToShop: map.parseBool('transacted_to_shop'),
     isBetweenAccount: map.parseBool('betweenAccount'),
+    isIncome: map.parseBool('is_income'),
+    accountMeta: map.parseCustomInfo('account_meta'),
   );
 
   static TransactionLog? tyrParse(dynamic value) {
@@ -132,6 +139,8 @@ class TransactionLog {
     'transacted_to_shop': transactedToShop,
     'betweenAccount': isBetweenAccount,
     'transferredToAccount': transferredToAccount?.toMap(),
+    'is_income': isIncome,
+    'account_meta': accountMeta?.toCustomList(),
   };
 
   QMap toAwPost() => {
@@ -150,6 +159,8 @@ class TransactionLog {
     'transacted_to_shop': transactedToShop,
     'transferredToAccount': transferredToAccount?.id,
     'betweenAccount': isBetweenAccount,
+    'is_income': isIncome,
+    'account_meta': accountMeta?.toCustomList(),
   };
 
   String? validate() {
@@ -221,6 +232,7 @@ class TransactionLog {
       transactedToShop: record.type.isSale,
       isBetweenAccount: false,
       transferredToAccount: null,
+      isIncome: record.type.isSale,
     );
   }
 
@@ -242,6 +254,7 @@ class TransactionLog {
       transactedToShop: false,
       isBetweenAccount: false,
       transferredToAccount: null,
+      isIncome: false,
     );
   }
 
@@ -264,6 +277,7 @@ class TransactionLog {
       transactedToShop: !isSale,
       isBetweenAccount: false,
       transferredToAccount: null,
+      isIncome: null,
     );
   }
 
@@ -285,6 +299,7 @@ class TransactionLog {
       transactedToShop: false,
       isBetweenAccount: true,
       transferredToAccount: tState.to,
+      isIncome: null,
     );
   }
 
@@ -347,6 +362,7 @@ class TransactionLog {
     ValueGetter<InventoryRecord?>? record,
     bool? transactedToShop,
     bool? isBetweenAccount,
+    ValueGetter<bool?>? isIncome,
   }) {
     return TransactionLog(
       id: id ?? this.id,
@@ -366,6 +382,7 @@ class TransactionLog {
       record: record != null ? record() : this.record,
       transactedToShop: transactedToShop ?? this.transactedToShop,
       isBetweenAccount: isBetweenAccount ?? this.isBetweenAccount,
+      isIncome: isIncome != null ? isIncome() : this.isIncome,
     );
   }
 }
