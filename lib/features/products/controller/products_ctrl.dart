@@ -24,7 +24,7 @@ class ProductsCtrl extends _$ProductsCtrl {
         return [];
       },
       (r) {
-        final p = r.filterHouse(viewingWh);
+        final p = r.filterHouse(viewingWh.viewing);
         _searchFrom.clear();
         _searchFrom.addAll(p);
         return p;

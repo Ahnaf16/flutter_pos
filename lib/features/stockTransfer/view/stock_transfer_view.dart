@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:pos/features/auth/controller/auth_ctrl.dart';
+import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/inventory_record/view/local/products_panel.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/stockTransfer/controller/stock_transfer_ctrl.dart';
@@ -14,7 +14,7 @@ class StockTransferView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
-    final user = ref.watch(authStateSyncProvider).toNullable();
+    final viewingWh = ref.watch(viewingWHProvider);
     final policy = ref.watch(configCtrlProvider.select((e) => e.stockDistPolicy));
 
     final warehouseList = ref.watch(warehouseCtrlProvider);
@@ -231,7 +231,7 @@ class StockTransferView extends HookConsumerWidget {
                                               label: 'From',
                                               hintText: 'Select to transfer from',
                                               initialValue: transferState.from,
-                                              enabled: user?.warehouse?.isDefault == true,
+                                              enabled: viewingWh.my?.isDefault == true,
                                               options: warehouses,
                                               selectedBuilder: (context, value) => Text(value.name),
                                               optionBuilder: (_, value, _) {
@@ -309,7 +309,7 @@ class StockTransferView extends HookConsumerWidget {
                 maxSize: .4,
                 child: ProductsPanel(
                   type: RecordType.sale,
-                  userHouse: user?.warehouse,
+                  userHouse: viewingWh.viewing,
                   onProductSelect: (p, _, w) {
                     if (p.quantity <= 0) return;
                     tCtrl().setProduct(p);

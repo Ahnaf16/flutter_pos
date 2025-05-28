@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:nanoid2/nanoid2.dart';
-import 'package:pos/features/auth/controller/auth_ctrl.dart';
+import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/features/inventory_record/view/local/discount_type_pop_over.dart';
 import 'package:pos/features/inventory_record/view/payment_account_select.dart';
@@ -290,7 +290,9 @@ class _InitialStock extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authStateSyncProvider).toNullable();
+    // final user = ref.watch(authStateSyncProvider).toNullable();
+    final viewingWh = ref.watch(viewingWHProvider);
+
     final warehouseList = ref.watch(warehouseCtrlProvider);
     final partiList = ref.watch(partiesCtrlProvider(false));
 
@@ -411,8 +413,8 @@ class _InitialStock extends HookConsumerWidget {
                         name: 'stock.warehouse',
                         label: 'Warehouse',
                         hintText: 'Select warehouse',
-                        initialValue: user?.warehouse,
-                        enabled: user?.warehouse?.isDefault == true,
+                        initialValue: viewingWh.my,
+                        enabled: viewingWh.my?.isDefault == true,
                         isRequired: true,
                         options: warehouses,
                         selectedBuilder: (context, value) => Text(value.name),

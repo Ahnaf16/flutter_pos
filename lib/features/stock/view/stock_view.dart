@@ -53,8 +53,10 @@ class StockView extends HookConsumerWidget {
                   slivers: [
                     MultiSliver(
                       children: [
-                        SliverToBoxAdapter(child: CenterLeft(child: ProductFilterFields(productCtrl: productCtrl))),
-                        for (final product in products) _ProductSection(model: product, wh: viewingWh),
+                        SliverToBoxAdapter(
+                          child: CenterLeft(child: ProductFilterFields(productCtrl: productCtrl)),
+                        ),
+                        for (final product in products) _ProductSection(model: product, wh: viewingWh.viewing),
                       ],
                     ),
                   ],
@@ -176,7 +178,9 @@ class _ProductHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShadDecorator(
-      decoration: ShadDecoration(border: ShadBorder(bottom: ShadBorderSide(width: 1, color: context.colors.border))),
+      decoration: ShadDecoration(
+        border: ShadBorder(bottom: ShadBorderSide(width: 1, color: context.colors.border)),
+      ),
       child: Padding(
         padding: Pads.padding(top: topInset * 2, bottom: topInset, h: topInset),
         child: Row(

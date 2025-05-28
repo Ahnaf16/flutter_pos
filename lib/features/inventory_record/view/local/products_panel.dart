@@ -23,7 +23,7 @@ class ProductsPanel extends HookConsumerWidget {
       loading: () => const Loading(),
       error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
       data: (products) {
-        final hId = (viewingWh == null) ? null : viewingWh.id;
+        final hId = (viewingWh.viewing == null) ? null : viewingWh.viewing!.id;
         return IntrinsicWidth(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -98,7 +98,7 @@ class ProductsPanel extends HookConsumerWidget {
                         return GestureDetector(
                           onTap: () async {
                             if (type.isSale) {
-                              onProductSelect(product, null, viewingWh);
+                              onProductSelect(product, null, viewingWh.viewing);
                             } else {
                               final res = await showShadDialog<Stock>(
                                 barrierDismissible: false,
@@ -148,8 +148,8 @@ class _AddStockDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final viewingWh = ref.watch(viewingWHProvider);
     final warehouseList = ref.watch(warehouseCtrlProvider);
-    final searchWarehouse = useState('');
 
     final stock = useState<Stock>(Stock.empty(ID.unique()));
 
@@ -161,11 +161,13 @@ class _AddStockDialog extends HookConsumerWidget {
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         ShadButton(
           onPressed: () {
+            if (stock.value.warehouse == null) {
+              stock.value = stock.value.copyWith(warehouse: () => viewingWh.my);
+            }
+
             if (stock.value.purchasePrice <= 0) return Toast.showErr(context, 'Purchase price must be greater than 0');
-
             if (stock.value.quantity <= 0) return Toast.showErr(context, 'Quantity must be greater than 0');
-
-            if (stock.value.warehouse == null) return Toast.showErr(context, 'Select a warehouse');
+            if (stock.value.warehouse == null) return Toast.showErr(context, 'Warehouse is required');
 
             context.nPop(stock.value);
           },
@@ -213,32 +215,25 @@ class _AddStockDialog extends HookConsumerWidget {
                 ),
                 Expanded(
                   flex: 2,
-                  child: ShadInputDecorator(
-                    label: const Text('Choose warehouse').required(),
-                    child: warehouseList.maybeWhen(
-                      orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                      data: (warehouses) {
-                        final filtered = warehouses.where((e) => e.name.low.contains(searchWarehouse.value.low));
-                        return LimitedWidthBox(
-                          child: ShadSelect<WareHouse>.withSearch(
-                            placeholder: const Text('Warehouse'),
-                            options: [
-                              if (filtered.isEmpty)
-                                Padding(padding: Pads.padding(v: 24), child: const Text('No warehouses found')),
-                              ...filtered.map((house) {
-                                return ShadOption(value: house, child: Text(house.name));
-                              }),
-                            ],
-                            selectedOptionBuilder: (context, v) => Text(v.name),
-                            onSearchChanged: searchWarehouse.set,
-                            allowDeselection: true,
-                            onChanged: (value) {
-                              stock.value = stock.value.copyWith(warehouse: () => value);
-                            },
-                          ),
-                        );
-                      },
-                    ),
+                  child: warehouseList.maybeWhen(
+                    orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                    data: (warehouses) {
+                      return LimitedWidthBox(
+                        child: ShadSelectField<WareHouse>(
+                          label: 'Choose warehouse',
+                          hintText: 'Warehouse',
+                          initialValue: viewingWh.my,
+                          enabled: viewingWh.my?.isDefault == true,
+                          options: warehouses,
+                          optionBuilder: (context, value, index) => ShadOption(value: value, child: Text(value.name)),
+                          selectedBuilder: (context, v) => Text(v.name),
+                          searchBuilder: (item) => item.name,
+                          onChanged: (value) {
+                            stock.value = stock.value.copyWith(warehouse: () => value);
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],

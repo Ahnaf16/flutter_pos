@@ -198,7 +198,7 @@ class TrxTable extends StatelessWidget {
           children: [
             SpacedText(
               left: 'Total in ',
-              right: logs.fromTypes([TransactionType.sale]).map((e) => e.amount).sum.currency(),
+              right: logs.where((e) => e.isIncome == true).map((e) => e.amount).sum.currency(),
               crossAxisAlignment: CrossAxisAlignment.center,
               useFlexible: false,
               style: context.text.list.success(),
@@ -207,7 +207,7 @@ class TrxTable extends StatelessWidget {
             const ShadSeparator.vertical(margin: Pads.zero, color: Colors.black),
             SpacedText(
               left: 'Total Out ',
-              right: logs.fromTypes(TransactionType.payments).map((e) => e.amount).sum.currency(),
+              right: logs.where((e) => e.isIncome == false).map((e) => e.amount).sum.currency(),
               crossAxisAlignment: CrossAxisAlignment.center,
               useFlexible: false,
               style: context.text.list.error(context),

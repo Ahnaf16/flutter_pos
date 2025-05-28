@@ -128,7 +128,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
         if (houseList.value.isNotEmpty)
           ShadSelect<WareHouse>(
             maxWidth: 200,
-            initialValue: viewingWh,
+            initialValue: viewingWh.viewing,
             placeholder: const Text('All'),
             decoration: ShadDecoration(
               border: ShadBorder.all(),

@@ -119,6 +119,7 @@ class CreateRecordView extends HookConsumerWidget {
 
                                             final config = await ref.read(configCtrlAsyncProvider.future);
                                             if (!context.mounted) return;
+
                                             if (inv != null) {
                                               await showShadDialog(
                                                 context: context,

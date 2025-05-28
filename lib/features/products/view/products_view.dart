@@ -62,7 +62,7 @@ class ProductsView extends HookConsumerWidget {
                   },
                   cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
                   cellBuilder: (data, head) {
-                    final hId = (viewingWh == null) ? null : viewingWh.id;
+                    final hId = (viewingWh.viewing == null) ? null : viewingWh.viewing!.id;
                     return switch (head.name) {
                       '#' => DataGridCell(
                         columnName: head.name,

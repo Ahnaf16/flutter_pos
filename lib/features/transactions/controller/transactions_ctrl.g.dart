@@ -153,7 +153,7 @@ class _TransactionsByPartiProviderElement
 }
 
 String _$transactionLogCtrlHash() =>
-    r'70262ff6675cb03a358826d42b17fe76e72cb657';
+    r'e6eab2987c18e33ee2c018434ab04d1e8c00a1ed';
 
 abstract class _$TransactionLogCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<TransactionLog>> {
@@ -300,7 +300,7 @@ class _TransactionLogCtrlProviderElement
   TransactionType? get type => (origin as TransactionLogCtrlProvider).type;
 }
 
-String _$trxFilteredHash() => r'4e7fdaf8edaced5db6da512f3d2e780943539140';
+String _$trxFilteredHash() => r'5a8d5467c78af689e49c53c65e1c44a85f593857';
 
 /// See also [TrxFiltered].
 @ProviderFor(TrxFiltered)

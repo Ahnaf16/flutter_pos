@@ -2,6 +2,7 @@ import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.d
 import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
 import 'package:pos/features/inventory_record/repository/return_repo.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
+import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -155,6 +156,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     final res = await _repo.createPurchase(state, ignoreParty: ignoreParty);
 
     return res.fold((l) => (leftResult(l), null), (r) {
+      ref.invalidate(productsCtrlProvider);
       ref.invalidate(inventoryCtrlProvider);
       ref.invalidate(paymentAccountsCtrlProvider);
       ref.invalidateSelf();
@@ -167,6 +169,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     final res = await _repo.createSale(state);
 
     return res.fold((l) => (leftResult(l), null), (r) {
+      ref.invalidate(productsCtrlProvider);
       ref.invalidate(inventoryCtrlProvider);
       ref.invalidate(paymentAccountsCtrlProvider);
 
