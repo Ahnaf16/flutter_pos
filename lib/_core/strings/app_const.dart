@@ -7,3 +7,4 @@ const kScrollPhysics = AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysi
 String kError([String? errorOn]) => 'Something went wrong${kDebugMode ? ' [${errorOn ?? ''}]' : ''}';
 
 const kAppName = 'POS System';
+const kVersion = 'v1.0.4';
