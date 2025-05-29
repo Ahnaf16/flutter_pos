@@ -51,12 +51,12 @@ class TransactionsView extends HookConsumerWidget {
         spacing: Insets.med,
         children: [
           FilterBar(
+            hintText: 'Search by name, email or phone',
             types: TransactionType.values,
             accounts: accountList,
             onSearch: (q) => trxCtrl().search(q),
             onReset: () => trxCtrl().refresh(),
-            allowDate: true,
-            allowDateTo: true,
+            showDateRange: true,
           ),
           Expanded(
             child: trxList.when(

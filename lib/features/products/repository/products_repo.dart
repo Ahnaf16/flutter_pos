@@ -61,8 +61,13 @@ class ProductRepo with AwHandler {
     return await updateProduct(product.copyWith(stock: [...product.stock, stock]), include: [Product.fields.stock]);
   }
 
-  FutureReport<List<Product>> getProducts({WareHouse? warehouse}) async {
-    return await db.getList(AWConst.collections.products).convert((docs) => docs.convertDoc(Product.fromDoc));
+  FutureReport<List<Product>> getProducts({WareHouse? warehouse, FilterState? fl}) async {
+    final query = <String?>[];
+    if (fl != null) query.add(fl.queryBuilder(FilterType.unit, 'unit'));
+
+    return await db
+        .getList(AWConst.collections.products, queries: query.nonNulls.toList())
+        .convert((docs) => docs.convertDoc(Product.fromDoc));
   }
 
   FutureReport<Product> getProductById(String id) async {

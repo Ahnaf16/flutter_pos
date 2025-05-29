@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:pos/features/filter/controller/filter_ctrl.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/products/repository/products_repo.dart';
 import 'package:pos/main.export.dart';
@@ -14,9 +15,10 @@ class ProductsCtrl extends _$ProductsCtrl {
 
   @override
   Future<List<Product>> build() async {
+    final units = ref.watch(filterCtrlProvider.select((s) => s.units));
     final viewingWh = ref.watch(viewingWHProvider);
 
-    final staffs = await _repo.getProducts();
+    final staffs = await _repo.getProducts(fl: FilterState(units: units));
 
     return staffs.fold(
       (l) {
@@ -37,20 +39,20 @@ class ProductsCtrl extends _$ProductsCtrl {
       state = AsyncValue.data(_searchFrom);
     }
 
-    state = AsyncData(_searchFrom.where((e) => e.name.low.contains(query)).toList());
+    state = AsyncData(
+      _searchFrom.where(
+        (e) {
+          return e.name.low.contains(query) ||
+              (e.manufacturer?.low.contains(query) ?? false) ||
+              (e.sku?.low.contains(query) ?? false);
+        },
+      ).toList(),
+    );
   }
 
-  void filter({WareHouse? wh, ProductUnit? unit}) async {
-    if (wh != null) {
-      state = AsyncData(_searchFrom.filterHouse(wh, false));
-    }
-    if (unit != null) {
-      state = AsyncData(_searchFrom.where((e) => e.unit?.id == unit.id).toList());
-    }
-
-    if (wh == null && unit == null) {
-      state = AsyncData(_searchFrom);
-    }
+  void refresh() async {
+    state = AsyncValue.data(_searchFrom);
+    ref.invalidateSelf();
   }
 
   Future<(Result, String?)> createProduct(Product product, [PFile? file]) async {

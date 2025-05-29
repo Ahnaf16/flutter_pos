@@ -6,6 +6,7 @@ enum FilterType {
   dateTo,
   house,
   account,
+  unit,
   type;
 
   IconData get icon {
@@ -14,6 +15,7 @@ enum FilterType {
       dateTo => LuIcons.calendarArrowUp,
       house => LuIcons.warehouse,
       account => LuIcons.creditCard,
+      unit => LuIcons.creditCard,
       type => LuIcons.tags,
     };
   }
@@ -24,6 +26,7 @@ enum FilterType {
       dateTo => 'To',
       house => 'Warehouse',
       account => 'Account',
+      unit => 'Unit',
       type => 'Type',
     };
   }
@@ -34,6 +37,7 @@ enum FilterType {
   bool get isHouse => this == FilterType.house;
   bool get isAccount => this == FilterType.account;
   bool get isType => this == FilterType.type;
+  bool get isUnit => this == FilterType.unit;
 }
 
 class FilterState {
@@ -44,6 +48,7 @@ class FilterState {
     this.houses = const [],
     this.accounts = const [],
     this.trxTypes = const [],
+    this.units = const [],
   });
 
   final String? query;
@@ -52,6 +57,7 @@ class FilterState {
   final List<WareHouse> houses;
   final List<PaymentAccount> accounts;
   final List<TransactionType> trxTypes;
+  final List<ProductUnit> units;
 
   FilterState copyWith({
     ValueGetter<String?>? query,
@@ -60,6 +66,7 @@ class FilterState {
     ValueGetter<List<WareHouse>>? houses,
     ValueGetter<List<PaymentAccount>>? accounts,
     ValueGetter<List<TransactionType>>? trxTypes,
+    ValueGetter<List<ProductUnit>>? units,
   }) {
     return FilterState(
       query: query != null ? query() : this.query,
@@ -68,6 +75,7 @@ class FilterState {
       houses: houses != null ? houses() : this.houses,
       accounts: accounts != null ? accounts() : this.accounts,
       trxTypes: trxTypes != null ? trxTypes() : this.trxTypes,
+      units: units != null ? units() : this.units,
     );
   }
 
@@ -81,13 +89,31 @@ class FilterState {
       names.addAll({FilterType.type: '${trxTypes.first.name.titleCase} and ${trxTypes.length - 1} more'});
     }
 
+    //!
     if (accounts.length == 1) {
-      names.addAll({FilterType.account: accounts.first.name.titleCase});
+      names.addAll({FilterType.account: accounts.first.name});
     }
     if (accounts.length > 1) {
-      names.addAll({FilterType.account: '${accounts.first.name.titleCase} and ${accounts.length - 1} more'});
+      names.addAll({FilterType.account: '${accounts.first.name} and ${accounts.length - 1} more'});
     }
 
+    //!
+    if (units.length == 1) {
+      names.addAll({FilterType.unit: units.first.name});
+    }
+    if (units.length > 1) {
+      names.addAll({FilterType.unit: '${units.first.name} and ${units.length - 1} more'});
+    }
+
+    //!
+    if (houses.length == 1) {
+      names.addAll({FilterType.house: houses.first.name});
+    }
+    if (houses.length > 1) {
+      names.addAll({FilterType.house: '${houses.first.name} and ${houses.length - 1} more'});
+    }
+
+    //!
     if (from != null && to != null) {
       names.addAll({FilterType.dateFrom: '${from!.formatDate('MMM dd, yyyy')} to ${to!.formatDate('MMM dd, yyyy')}'});
     }
@@ -130,6 +156,12 @@ class FilterState {
         {
           if (trxTypes.length == 1) return Query.equal(key, trxTypes.first.name);
           if (trxTypes.length > 1) return Query.or([for (final t in trxTypes) Query.equal(key, t.name)]);
+          return null;
+        }
+      case FilterType.unit:
+        {
+          if (units.length == 1) return Query.equal(key, units.first.id);
+          if (units.length > 1) return Query.or([for (final t in units) Query.equal(key, t.id)]);
           return null;
         }
     }

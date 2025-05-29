@@ -13,19 +13,21 @@ class FilterBar extends HookConsumerWidget {
     this.accounts = const [],
     this.houses = const [],
     this.types = const [],
-    this.allowDate = false,
-    this.allowDateTo = false,
+    this.units = const [],
+    this.showDateRange = false,
     this.onSearch,
     this.onReset,
+    this.hintText,
   });
 
   final List<PaymentAccount> accounts;
   final List<WareHouse> houses;
   final List<TransactionType> types;
-  final bool allowDate;
-  final bool allowDateTo;
+  final List<ProductUnit> units;
+  final bool showDateRange;
   final Function(String q)? onSearch;
   final VoidCallback? onReset;
+  final String? hintText;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,10 +45,10 @@ class FilterBar extends HookConsumerWidget {
           children: [
             if (onSearch != null)
               LimitedWidthBox(
-                maxWidth: 250,
+                maxWidth: 450,
                 child: ShadTextField(
                   controller: searchCtrl,
-                  hintText: 'Search',
+                  hintText: hintText ?? 'Search',
                   leading: const Icon(LuIcons.search),
                   onChanged: (v) => onSearch?.call((v ?? '').low),
                   showClearButton: true,
@@ -98,7 +100,45 @@ class FilterBar extends HookConsumerWidget {
                             );
                           },
                         ),
-                      if (allowDate)
+                      if (houses.isNotEmpty)
+                        FilterTile(
+                          leading: FilterType.house.icon,
+                          text: 'Warehouse',
+                          onPressed: () {
+                            _push(
+                              context,
+                              _ListItemBuilder<WareHouse>(
+                                title: 'Warehouse',
+                                values: houses,
+                                nameBuilder: (value) => value.name,
+                                isSelected: (fState, type) => fState.houses.contains(type),
+                                onSelect: (value) => ctrl().copyWith(houses: (s) => {...s, value}.toList()),
+                                onRemove: (value) =>
+                                    ctrl().copyWith(houses: (s) => s.whereNot((e) => e == value).toList()),
+                              ),
+                            );
+                          },
+                        ),
+                      if (units.isNotEmpty)
+                        FilterTile(
+                          leading: FilterType.unit.icon,
+                          text: 'Product unit',
+                          onPressed: () {
+                            _push(
+                              context,
+                              _ListItemBuilder<ProductUnit>(
+                                title: 'Product unit',
+                                values: units,
+                                nameBuilder: (value) => value.name,
+                                isSelected: (fState, type) => fState.units.contains(type),
+                                onSelect: (value) => ctrl().copyWith(units: (s) => {...s, value}.toList()),
+                                onRemove: (value) =>
+                                    ctrl().copyWith(units: (s) => s.whereNot((e) => e == value).toList()),
+                              ),
+                            );
+                          },
+                        ),
+                      if (showDateRange)
                         FilterTile(
                           leading: FilterType.dateFrom.icon,
                           text: 'Date range',
