@@ -269,7 +269,7 @@ class _RecordDetailsProviderElement
   String? get id => (origin as RecordDetailsProvider).id;
 }
 
-String _$inventoryCtrlHash() => r'0d25e172a44c8ecc46eb12a3af3fe301feb900ff';
+String _$inventoryCtrlHash() => r'32a2e1cac4a51ce6bf52664b65b30ae05a85ae59';
 
 abstract class _$InventoryCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<InventoryRecord>> {
@@ -413,7 +413,7 @@ class _InventoryCtrlProviderElement
 }
 
 String _$inventoryReturnCtrlHash() =>
-    r'9f18b0c211726d951c5659107e3b24a004d77510';
+    r'c620b0503eb70ffb024d7828f788627722c4baae';
 
 abstract class _$InventoryReturnCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<ReturnRecord>> {

@@ -165,14 +165,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (user != null) ...[
-                  Row(
-                    spacing: Insets.sm,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(user.name, style: context.text.large),
-                      ShadButton(onPressed: () {}, child: const Icon(LuIcons.pen)).compact(),
-                    ],
-                  ),
+                  Text(user.name, style: context.text.large),
                   Text(user.email, style: context.text.muted),
                   Text(user.phone, style: context.text.muted),
                   const Gap(Insets.med),
@@ -194,6 +187,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
                   leading: Icon(themeMode == ThemeMode.dark ? LucideIcons.sun : LucideIcons.moon),
                   child: Text(themeMode == ThemeMode.dark ? 'Light mode' : 'Dark mode'),
                 ),
+                Text(kVersion, style: context.text.muted.size(12)),
               ],
             );
           },

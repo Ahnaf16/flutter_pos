@@ -41,7 +41,7 @@ final homeCountersProvider =
     );
 
 typedef _$HomeCounters = AutoDisposeNotifier<Map<(String, RPath), dynamic>>;
-String _$barDataCtrlHash() => r'1738cf1fbf84394a01072ec374f8344ef3f67de9';
+String _$barDataCtrlHash() => r'51b222e4c61b8806902566e5ec3c49daf89f941b';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -224,7 +224,7 @@ class _BarDataCtrlProviderElement
   int get month => (origin as BarDataCtrlProvider).month;
 }
 
-String _$pieDataCtrlHash() => r'9a3e0bd24ec99dd527b7ff158f35854a6a9c8ead';
+String _$pieDataCtrlHash() => r'b5dbb497fc116de4fa402d3bf8b4b8751f19bf4a';
 
 /// See also [PieDataCtrl].
 @ProviderFor(PieDataCtrl)

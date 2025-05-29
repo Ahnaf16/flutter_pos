@@ -7,7 +7,7 @@ part of 'transactions_ctrl.dart';
 // **************************************************************************
 
 String _$transactionsByPartiHash() =>
-    r'364956c6e6eedb5043b7be2d7b248c41ca1a903b';
+    r'bebb72fdeb4f182e86e2465fbd0fb4e51e78e5d1';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -153,7 +153,7 @@ class _TransactionsByPartiProviderElement
 }
 
 String _$transactionLogCtrlHash() =>
-    r'c4b9967605570b16c510c4c6a3ca970e1c2f1469';
+    r'c5ee4b4bfe81265ba7c6273ba326c7618942fbc3';
 
 /// See also [TransactionLogCtrl].
 @ProviderFor(TransactionLogCtrl)
@@ -172,7 +172,7 @@ final transactionLogCtrlProvider =
     );
 
 typedef _$TransactionLogCtrl = AutoDisposeAsyncNotifier<List<TransactionLog>>;
-String _$trxFilteredHash() => r'545935a1596899ceb6ee832f243ec781e72165d9';
+String _$trxFilteredHash() => r'5a8d5467c78af689e49c53c65e1c44a85f593857';
 
 /// See also [TrxFiltered].
 @ProviderFor(TrxFiltered)
