@@ -1,4 +1,3 @@
-import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/auth/repository/auth_repo.dart';
@@ -141,8 +140,18 @@ class TransactionsRepo with AwHandler {
     return await repo.updateDue(parti, due, !due.isNegative, '');
   }
 
-  FutureReport<List<TransactionLog>> getTransactionLogs([TransactionType? type, List<String>? queries]) async {
-    final q = [if (type != null) Query.equal('transaction_type', type.name), ...?queries];
-    return await db.getList(_coll, queries: q).convert((docs) => docs.convertDoc(TransactionLog.fromDoc));
+  FutureReport<List<TransactionLog>> getTransactionLogs([FilterState? fl, List<String>? queries]) async {
+    final query = <String?>[...?queries];
+
+    if (fl != null) {
+      query.add(fl.queryBuilder(FilterType.account, 'payment_account'));
+      query.add(fl.queryBuilder(FilterType.type, 'transaction_type'));
+      query.add(fl.queryBuilder(FilterType.dateFrom, 'date'));
+      query.add(fl.queryBuilder(FilterType.dateTo, 'date'));
+    }
+
+    return await db
+        .getList(_coll, queries: query.nonNulls.toList())
+        .convert((docs) => docs.convertDoc(TransactionLog.fromDoc));
   }
 }

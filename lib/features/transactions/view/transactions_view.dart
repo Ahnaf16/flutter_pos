@@ -29,12 +29,10 @@ class TransactionsView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final trxList = ref.watch(transactionLogCtrlProvider());
-    final trxCtrl = useCallback(() => ref.read(transactionLogCtrlProvider().notifier));
+    final trxList = ref.watch(transactionLogCtrlProvider);
+    final trxCtrl = useCallback(() => ref.read(transactionLogCtrlProvider.notifier));
 
-    final accountList = ref.watch(paymentAccountsCtrlProvider());
-    final calKeyResetter = useState(false);
-    final calKey = useMemoized(() => UniqueKey(), [calKeyResetter.value]);
+    final accountList = ref.watch(paymentAccountsCtrlProvider()).maybeList();
 
     return BaseBody(
       title: 'Transaction logs',
@@ -52,59 +50,14 @@ class TransactionsView extends HookConsumerWidget {
       body: Column(
         spacing: Insets.med,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: ShadTextField(
-                  hintText: 'Search',
-                  onChanged: (v) => trxCtrl().search(v ?? ''),
-                  showClearButton: true,
-                ),
-              ),
-
-              Expanded(
-                child: accountList.maybeWhen(
-                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                  data: (accounts) {
-                    return ShadSelectField<PaymentAccount>(
-                      hintText: 'Account',
-                      options: accounts,
-                      selectedBuilder: (context, value) => Text(value.name),
-                      optionBuilder: (_, value, _) {
-                        return ShadOption(value: value, child: Text(value.name));
-                      },
-                      onChanged: (v) => trxCtrl().filter(account: v),
-                    );
-                  },
-                ),
-              ),
-              Expanded(
-                child: ShadSelectField<TransactionType>(
-                  hintText: 'Type',
-                  options: TransactionType.values,
-                  selectedBuilder: (context, value) => Text(value.name.titleCase),
-                  optionBuilder: (_, value, _) {
-                    return ShadOption(value: value, child: Text(value.name.titleCase));
-                  },
-                  onChanged: (v) => trxCtrl().filter(type: v),
-                ),
-              ),
-              const Gap(Insets.xs),
-              ShadDatePicker.range(
-                key: calKey,
-                onRangeChanged: (v) => trxCtrl().filter(range: v),
-              ),
-              ShadIconButton.raw(
-                icon: const Icon(LuIcons.x),
-                onPressed: () {
-                  calKeyResetter.toggle();
-                  trxCtrl().filter();
-                },
-                variant: ShadButtonVariant.destructive,
-              ),
-            ],
+          FilterBar(
+            types: TransactionType.values,
+            accounts: accountList,
+            onSearch: (q) => trxCtrl().search(q),
+            onReset: () => trxCtrl().refresh(),
+            allowDate: true,
+            allowDateTo: true,
           ),
-          const FilterBar(),
           Expanded(
             child: trxList.when(
               loading: () => const Loading(),

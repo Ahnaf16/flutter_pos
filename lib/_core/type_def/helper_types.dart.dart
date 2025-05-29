@@ -6,6 +6,8 @@ import 'package:pos/main.export.dart';
 typedef FromMapT<T> = T Function(QMap map);
 typedef ToMapT<T> = Map Function(T data);
 
+typedef ListValueGetter<T> = List<T> Function(List<T> input);
+
 typedef QMap = Map<String, dynamic>;
 typedef SMap = Map<String, String>;
 

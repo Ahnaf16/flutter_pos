@@ -330,7 +330,7 @@ class _DueClearDialog extends ConsumerWidget {
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         SubmitButton(
           onPressed: (l) async {
-            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.payment).notifier);
+            final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
             final result = await ctrl.adjustCustomerDue(log.toMap(), true);
@@ -382,7 +382,7 @@ class _DuePayDialog extends ConsumerWidget {
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         SubmitButton(
           onPressed: (l) async {
-            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.payment).notifier);
+            final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
             final result = await ctrl.adjustCustomerDue(log.toMap());
@@ -433,7 +433,7 @@ class _TransferDialog extends ConsumerWidget {
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         SubmitButton(
           onPressed: (l) async {
-            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.transfer).notifier);
+            final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
             final result = await ctrl.transferBalance(log.toMap());

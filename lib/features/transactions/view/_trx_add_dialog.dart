@@ -29,7 +29,7 @@ class _TransferDialog extends HookConsumerWidget {
             if (!state.saveAndValidate()) return;
             final data = QMap.from(state.transformedValues);
 
-            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.transfer).notifier);
+            final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
             final result = await ctrl.adjustCustomerDue(data);

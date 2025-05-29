@@ -73,7 +73,7 @@ class BarDataCtrl extends _$BarDataCtrl {
   Map<int, List<TransactionLog>> build(TableType type, int month) {
     final now = DateTime.now();
 
-    final trx = ref.watch(transactionLogCtrlProvider()).maybeList().where((e) => e.date.year == now.year);
+    final trx = ref.watch(transactionLogCtrlProvider).maybeList().where((e) => e.date.year == now.year);
 
     final data = <int, List<TransactionLog>>{};
 
@@ -98,7 +98,7 @@ class BarDataCtrl extends _$BarDataCtrl {
 class PieDataCtrl extends _$PieDataCtrl {
   @override
   Map<TransactionType, List<TransactionLog>> build() {
-    final trx = ref.watch(transactionLogCtrlProvider()).maybeList().groupListsBy((e) => e.type);
+    final trx = ref.watch(transactionLogCtrlProvider).maybeList().groupListsBy((e) => e.type);
 
     final data = <TransactionType, List<TransactionLog>>{};
 

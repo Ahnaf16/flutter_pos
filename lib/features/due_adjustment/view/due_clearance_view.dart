@@ -274,7 +274,7 @@ class _DuePayDialog extends ConsumerWidget {
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         SubmitButton(
           onPressed: (l) async {
-            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.payment).notifier);
+            final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
             final result = await ctrl.supplierDuePayment(log.toMap());
@@ -326,7 +326,7 @@ class _DueClearDialog extends ConsumerWidget {
         ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
         SubmitButton(
           onPressed: (l) async {
-            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.dueAdjustment).notifier);
+            final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
             final result = await ctrl.supplierDuePayment(log.toMap(), false);

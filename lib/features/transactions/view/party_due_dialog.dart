@@ -39,7 +39,7 @@ class PartyDueDialog extends HookConsumerWidget {
             if (!state.saveAndValidate()) return;
             final data = QMap.from(state.transformedValues);
 
-            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.dueAdjustment).notifier);
+            final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
             final result = await ctrl.adjustCustomerDue(data);
@@ -160,7 +160,7 @@ class SupplierDueDialog extends HookConsumerWidget {
             if (!state.saveAndValidate()) return;
             final data = QMap.from(state.transformedValues);
 
-            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.payment).notifier);
+            final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
             final result = await ctrl.supplierDuePayment(data);
@@ -281,7 +281,7 @@ class BalanceTransferDialog extends HookConsumerWidget {
 
             cat(data);
 
-            final ctrl = ref.read(transactionLogCtrlProvider(TransactionType.transfer).notifier);
+            final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
             final result = await ctrl.transferBalance(data);
