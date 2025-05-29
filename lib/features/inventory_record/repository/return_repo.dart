@@ -66,6 +66,7 @@ class ReturnRepo with AwHandler {
       adjustFromParty: remaining,
       isSale: isSale,
       detailsQtyPair: detailsQtyPair,
+      account: acc,
     );
 
     //! update record
@@ -116,9 +117,16 @@ class ReturnRepo with AwHandler {
     return await repo.addTransaction(transaction);
   }
 
-  FutureReport<List<ReturnRecord>> getRecords(bool? isSale) async {
+  FutureReport<List<ReturnRecord>> getRecords(bool? isSale, [FilterState? fl]) async {
+    final query = <String?>[];
+    if (isSale != null) query.add(Query.equal('isSale', isSale));
+    if (fl != null) {
+      query.add(fl.queryBuilder(FilterType.account, 'paymentAccount'));
+      query.add(fl.queryBuilder(FilterType.dateFrom, '\$createdAt'));
+      query.add(fl.queryBuilder(FilterType.dateTo, '\$createdAt'));
+    }
     return await db
-        .getList(AWConst.collections.returnRecord, queries: [if (isSale != null) Query.equal('isSale', isSale)])
+        .getList(AWConst.collections.returnRecord, queries: query.nonNulls.toList())
         .convert((docs) => docs.convertDoc(ReturnRecord.fromDoc));
   }
 

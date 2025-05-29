@@ -7,6 +7,8 @@ enum FilterType {
   house,
   account,
   unit,
+  status,
+  roles,
   type;
 
   IconData get icon {
@@ -15,7 +17,9 @@ enum FilterType {
       dateTo => LuIcons.calendarArrowUp,
       house => LuIcons.warehouse,
       account => LuIcons.creditCard,
-      unit => LuIcons.creditCard,
+      unit => LuIcons.ruler,
+      status => LuIcons.circleDashed,
+      roles => LuIcons.shield,
       type => LuIcons.tags,
     };
   }
@@ -27,6 +31,8 @@ enum FilterType {
       house => 'Warehouse',
       account => 'Account',
       unit => 'Unit',
+      status => 'Status',
+      roles => 'Role',
       type => 'Type',
     };
   }
@@ -38,6 +44,8 @@ enum FilterType {
   bool get isAccount => this == FilterType.account;
   bool get isType => this == FilterType.type;
   bool get isUnit => this == FilterType.unit;
+  bool get isStatus => this == FilterType.status;
+  bool get isRole => this == FilterType.roles;
 }
 
 class FilterState {
@@ -49,6 +57,8 @@ class FilterState {
     this.accounts = const [],
     this.trxTypes = const [],
     this.units = const [],
+    this.statuses = const [],
+    this.roles = const [],
   });
 
   final String? query;
@@ -58,6 +68,8 @@ class FilterState {
   final List<PaymentAccount> accounts;
   final List<TransactionType> trxTypes;
   final List<ProductUnit> units;
+  final List<InventoryStatus> statuses;
+  final List<UserRole> roles;
 
   FilterState copyWith({
     ValueGetter<String?>? query,
@@ -67,6 +79,8 @@ class FilterState {
     ValueGetter<List<PaymentAccount>>? accounts,
     ValueGetter<List<TransactionType>>? trxTypes,
     ValueGetter<List<ProductUnit>>? units,
+    ValueGetter<List<InventoryStatus>>? statuses,
+    ValueGetter<List<UserRole>>? roles,
   }) {
     return FilterState(
       query: query != null ? query() : this.query,
@@ -76,6 +90,8 @@ class FilterState {
       accounts: accounts != null ? accounts() : this.accounts,
       trxTypes: trxTypes != null ? trxTypes() : this.trxTypes,
       units: units != null ? units() : this.units,
+      statuses: statuses != null ? statuses() : this.statuses,
+      roles: roles != null ? roles() : this.roles,
     );
   }
 
@@ -89,6 +105,13 @@ class FilterState {
       names.addAll({FilterType.type: '${trxTypes.first.name.titleCase} and ${trxTypes.length - 1} more'});
     }
 
+    //!
+    if (statuses.length == 1) {
+      names.addAll({FilterType.status: statuses.first.name.titleCase});
+    }
+    if (statuses.length > 1) {
+      names.addAll({FilterType.status: '${statuses.first.name.titleCase} and ${statuses.length - 1} more'});
+    }
     //!
     if (accounts.length == 1) {
       names.addAll({FilterType.account: accounts.first.name});
@@ -114,6 +137,14 @@ class FilterState {
     }
 
     //!
+    if (roles.length == 1) {
+      names.addAll({FilterType.house: roles.first.name});
+    }
+    if (roles.length > 1) {
+      names.addAll({FilterType.house: '${roles.first.name} and ${roles.length - 1} more'});
+    }
+
+    //!
     if (from != null && to != null) {
       names.addAll({FilterType.dateFrom: '${from!.formatDate('MMM dd, yyyy')} to ${to!.formatDate('MMM dd, yyyy')}'});
     }
@@ -126,7 +157,7 @@ class FilterState {
 
   String? queryBuilder(FilterType type, String key) {
     if (type.isDateRange && from != null && to != null) {
-      return Query.between(key, from!.justDate.toIso8601String(), to!.justDate.toIso8601String());
+      return Query.between(key, from!.justDate.toIso8601String(), to!.nextDay.justDate.toIso8601String());
     }
 
     switch (type) {
@@ -162,6 +193,18 @@ class FilterState {
         {
           if (units.length == 1) return Query.equal(key, units.first.id);
           if (units.length > 1) return Query.or([for (final t in units) Query.equal(key, t.id)]);
+          return null;
+        }
+      case FilterType.status:
+        {
+          if (statuses.length == 1) return Query.equal(key, statuses.first.name);
+          if (statuses.length > 1) return Query.or([for (final t in statuses) Query.equal(key, t.name)]);
+          return null;
+        }
+      case FilterType.roles:
+        {
+          if (roles.length == 1) return Query.equal(key, roles.first.id);
+          if (roles.length > 1) return Query.or([for (final t in roles) Query.equal(key, t.id)]);
           return null;
         }
     }

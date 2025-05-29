@@ -37,7 +37,6 @@ class ProductsView extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ProductFilterFields(productCtrl: productCtrl),
-          const Gap(Insets.sm),
           Expanded(
             child: productList.when(
               loading: () => const Loading(),

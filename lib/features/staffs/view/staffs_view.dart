@@ -1,3 +1,4 @@
+import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/features/staffs/controller/update_staff_ctrl.dart';
 import 'package:pos/features/user_roles/controller/user_roles_ctrl.dart';
@@ -21,8 +22,8 @@ class StaffsView extends HookConsumerWidget {
     final staffList = ref.watch(staffsCtrlProvider);
     final staffCtrl = useCallback(() => ref.read(staffsCtrlProvider.notifier));
 
-    final warehouseList = ref.watch(warehouseCtrlProvider);
-    final roleList = ref.watch(userRolesCtrlProvider);
+    final warehouseList = ref.watch(warehouseCtrlProvider).maybeList();
+    final roleList = ref.watch(userRolesCtrlProvider).maybeList();
 
     return BaseBody(
       title: 'Staffs',
@@ -37,53 +38,13 @@ class StaffsView extends HookConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 350,
-                child: ShadTextField(
-                  hintText: 'Search',
-                  onChanged: (v) => staffCtrl().search(v ?? ''),
-                  showClearButton: true,
-                ),
-              ),
-              SizedBox(
-                width: 250,
-                child: warehouseList.maybeWhen(
-                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                  data: (warehouses) {
-                    return ShadSelectField<WareHouse>(
-                      hintText: 'Warehouse',
-                      options: warehouses,
-                      selectedBuilder: (context, value) => Text(value.name),
-                      optionBuilder: (_, value, _) {
-                        return ShadOption(value: value, child: Text(value.name));
-                      },
-                      onChanged: (v) => staffCtrl().filter(wh: v),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(
-                width: 250,
-                child: roleList.maybeWhen(
-                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                  data: (accounts) {
-                    return ShadSelectField<UserRole>(
-                      hintText: 'Account',
-                      options: accounts,
-                      selectedBuilder: (context, value) => Text(value.name),
-                      optionBuilder: (_, value, _) {
-                        return ShadOption(value: value, child: Text(value.name));
-                      },
-                      onChanged: (v) => staffCtrl().filter(role: v),
-                    );
-                  },
-                ),
-              ),
-            ],
+          FilterBar(
+            hintText: 'Search by name, email or phone',
+            houses: warehouseList,
+            roles: roleList,
+            onSearch: (q) => staffCtrl().search(q),
+            onReset: () => staffCtrl().refresh(),
           ),
-          const Gap(Insets.med),
           Expanded(
             child: staffList.when(
               loading: () => const Loading(),

@@ -43,8 +43,16 @@ class StaffRepo with AwHandler {
     return doc;
   }
 
-  FutureReport<List<AppUser>> getStaffs() async {
-    return await db.getList(AWConst.collections.users).convert((docs) => docs.convertDoc(AppUser.fromDoc));
+  FutureReport<List<AppUser>> getStaffs([FilterState? fl]) async {
+    final query = <String?>[];
+
+    if (fl != null) {
+      query.add(fl.queryBuilder(FilterType.house, 'warehouse'));
+      query.add(fl.queryBuilder(FilterType.roles, 'role'));
+    }
+    return await db
+        .getList(AWConst.collections.users, queries: query.nonNulls.toList())
+        .convert((docs) => docs.convertDoc(AppUser.fromDoc));
   }
 
   FutureReport<AppUser> getStaffById(String id) async {

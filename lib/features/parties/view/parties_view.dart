@@ -6,10 +6,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 const _headings = [
   TableHeading(name: 'Name'),
   TableHeading(name: 'Phone', max: 500.0, alignment: Alignment.center),
-  TableHeading(
-    name: 'Due/Balance',
-    max: 400.0,
-  ),
+  TableHeading(name: 'Due/Balance', max: 400.0),
   TableHeading(name: 'Action', max: 200.0, alignment: Alignment.centerRight),
 ];
 

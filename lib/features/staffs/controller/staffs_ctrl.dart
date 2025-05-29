@@ -1,3 +1,4 @@
+import 'package:pos/features/filter/controller/filter_ctrl.dart';
 import 'package:pos/features/staffs/repository/staffs_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -12,7 +13,9 @@ class StaffsCtrl extends _$StaffsCtrl {
 
   @override
   Future<List<AppUser>> build() async {
-    final staffs = await _repo.getStaffs();
+    final fState = ref.watch(filterCtrlProvider);
+
+    final staffs = await _repo.getStaffs(fState);
     return staffs.fold(
       (l) {
         Toast.showErr(Ctx.context, l);
@@ -31,24 +34,15 @@ class StaffsCtrl extends _$StaffsCtrl {
       state = AsyncValue.data(_searchFrom);
     }
     query = query.low;
-    final list =
-        _searchFrom
-            .where((e) => e.name.low.contains(query) || e.phone.low.contains(query) || e.email.low.contains(query))
-            .toList();
+    final list = _searchFrom
+        .where((e) => e.name.low.contains(query) || e.phone.low.contains(query) || e.email.low.contains(query))
+        .toList();
     state = AsyncData(list);
   }
 
-  void filter({WareHouse? wh, UserRole? role}) async {
-    if (wh != null) {
-      state = AsyncData(_searchFrom.where((e) => e.warehouse?.id == wh.id).toList());
-    }
-    if (role != null) {
-      state = AsyncData(_searchFrom.where((e) => e.role?.id == role.id).toList());
-    }
-
-    if (wh == null && role == null) {
-      state = AsyncValue.data(_searchFrom);
-    }
+  void refresh() async {
+    state = AsyncValue.data(_searchFrom);
+    ref.invalidateSelf();
   }
 
   Future<Result> createStaff(String password, QMap formData, [PFile? file]) async {

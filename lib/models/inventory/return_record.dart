@@ -12,6 +12,7 @@ class ReturnRecord {
     required this.adjustFromParty,
     required this.isSale,
     this.detailsQtyPair = const [],
+    this.account,
   });
 
   final String id;
@@ -22,6 +23,7 @@ class ReturnRecord {
   final num adjustFromParty;
   final String? note;
   final bool isSale;
+  final PaymentAccount? account;
 
   /// this stores the [InventoryDetails.id] and ReturnQty in pair
   /// example: [InventoryDetails.id]::[ReturnQty]
@@ -37,6 +39,7 @@ class ReturnRecord {
     adjustFromParty: doc.data['deductedFromParty'],
     isSale: doc.data['isSale'],
     detailsQtyPair: List<String>.from(doc.data['stock_qty_pair']),
+    account: PaymentAccount.tryParse(doc.data['paymentAccount']),
   );
 
   factory ReturnRecord.fromMap(Map<String, dynamic> map) => ReturnRecord(
@@ -49,6 +52,7 @@ class ReturnRecord {
     adjustFromParty: map.parseNum('deductedFromParty'),
     isSale: map.parseBool('isSale'),
     detailsQtyPair: List<String>.from(map['stock_qty_pair']),
+    account: PaymentAccount.tryParse(map['paymentAccount']),
   );
 
   static ReturnRecord? tryParse(dynamic value) {
@@ -72,6 +76,7 @@ class ReturnRecord {
     'deductedFromParty': adjustFromParty,
     'isSale': isSale,
     'stock_qty_pair': detailsQtyPair,
+    'paymentAccount': account?.toMap(),
   };
 
   QMap toAwPost() => {
@@ -82,6 +87,7 @@ class ReturnRecord {
     'deductedFromParty': adjustFromParty,
     'isSale': isSale,
     'stock_qty_pair': detailsQtyPair,
+    'paymentAccount': account?.id,
   };
 
   num get totalReturn => adjustAccount + adjustFromParty;

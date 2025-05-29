@@ -14,6 +14,8 @@ class FilterBar extends HookConsumerWidget {
     this.houses = const [],
     this.types = const [],
     this.units = const [],
+    this.statuses = const [],
+    this.roles = const [],
     this.showDateRange = false,
     this.onSearch,
     this.onReset,
@@ -24,6 +26,9 @@ class FilterBar extends HookConsumerWidget {
   final List<WareHouse> houses;
   final List<TransactionType> types;
   final List<ProductUnit> units;
+  final List<InventoryStatus> statuses;
+  final List<UserRole> roles;
+
   final bool showDateRange;
   final Function(String q)? onSearch;
   final VoidCallback? onReset;
@@ -81,6 +86,27 @@ class FilterBar extends HookConsumerWidget {
                             );
                           },
                         ),
+
+                      if (statuses.isNotEmpty)
+                        FilterTile(
+                          leading: FilterType.status.icon,
+                          text: 'Status',
+                          onPressed: () {
+                            _push(
+                              context,
+                              _ListItemBuilder<InventoryStatus>(
+                                title: 'Status',
+                                values: statuses,
+                                nameBuilder: (value) => value.name,
+                                isSelected: (fState, type) => fState.statuses.contains(type),
+                                onSelect: (value) => ctrl().copyWith(statuses: (s) => {...s, value}.toList()),
+                                onRemove: (value) =>
+                                    ctrl().copyWith(statuses: (s) => s.whereNot((e) => e == value).toList()),
+                              ),
+                            );
+                          },
+                        ),
+
                       if (accounts.isNotEmpty)
                         FilterTile(
                           leading: FilterType.account.icon,
@@ -100,6 +126,7 @@ class FilterBar extends HookConsumerWidget {
                             );
                           },
                         ),
+
                       if (houses.isNotEmpty)
                         FilterTile(
                           leading: FilterType.house.icon,
@@ -119,6 +146,27 @@ class FilterBar extends HookConsumerWidget {
                             );
                           },
                         ),
+
+                      if (roles.isNotEmpty)
+                        FilterTile(
+                          leading: FilterType.roles.icon,
+                          text: 'Roles',
+                          onPressed: () {
+                            _push(
+                              context,
+                              _ListItemBuilder<UserRole>(
+                                title: 'Roles',
+                                values: roles,
+                                nameBuilder: (value) => value.name,
+                                isSelected: (fState, type) => fState.roles.contains(type),
+                                onSelect: (value) => ctrl().copyWith(roles: (s) => {...s, value}.toList()),
+                                onRemove: (value) =>
+                                    ctrl().copyWith(roles: (s) => s.whereNot((e) => e == value).toList()),
+                              ),
+                            );
+                          },
+                        ),
+
                       if (units.isNotEmpty)
                         FilterTile(
                           leading: FilterType.unit.icon,
@@ -138,6 +186,7 @@ class FilterBar extends HookConsumerWidget {
                             );
                           },
                         ),
+
                       if (showDateRange)
                         FilterTile(
                           leading: FilterType.dateFrom.icon,
@@ -214,6 +263,7 @@ class FilterBar extends HookConsumerWidget {
               ),
           ],
         ),
+        const Gap(Insets.xs),
       ],
     );
   }

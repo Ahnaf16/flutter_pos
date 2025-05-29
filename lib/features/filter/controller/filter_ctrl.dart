@@ -22,6 +22,8 @@ class FilterCtrl extends _$FilterCtrl {
       accounts: !type.isAccount ? null : (v) => [],
       trxTypes: !type.isType ? null : (v) => [],
       units: !type.isUnit ? null : (v) => [],
+      statuses: !type.isStatus ? null : (v) => [],
+      roles: !type.isRole ? null : (v) => [],
     );
   }
 
@@ -33,6 +35,8 @@ class FilterCtrl extends _$FilterCtrl {
     ListValueGetter<PaymentAccount>? accounts,
     ListValueGetter<TransactionType>? trxTypes,
     ListValueGetter<ProductUnit>? units,
+    ListValueGetter<InventoryStatus>? statuses,
+    ListValueGetter<UserRole>? roles,
   }) {
     state = FilterState(
       query: query != null ? query() : state.query,
@@ -42,6 +46,8 @@ class FilterCtrl extends _$FilterCtrl {
       accounts: accounts != null ? accounts(state.accounts) : state.accounts,
       trxTypes: trxTypes != null ? trxTypes(state.trxTypes) : state.trxTypes,
       units: units != null ? units(state.units) : state.units,
+      statuses: statuses != null ? statuses(state.statuses) : state.statuses,
+      roles: roles != null ? roles(state.roles) : state.roles,
     );
     if (state.from != null && state.to != null && state.from!.isAfterOrEqualTo(state.to!)) {
       state = state.copyWith(to: () => null);

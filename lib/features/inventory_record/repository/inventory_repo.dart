@@ -248,12 +248,17 @@ class InventoryRepo with AwHandler {
     return await updateRecord(rec.copyWith(status: status));
   }
 
-  FutureReport<List<InventoryRecord>> getRecords(RecordType? type) async {
+  FutureReport<List<InventoryRecord>> getRecords(RecordType? type, [FilterState? fl]) async {
+    final query = <String?>[if (type != null) Query.equal('record_type', type.name)];
+
+    if (fl != null) {
+      query.add(fl.queryBuilder(FilterType.account, 'payment_account'));
+      query.add(fl.queryBuilder(FilterType.status, 'status'));
+      query.add(fl.queryBuilder(FilterType.dateFrom, 'date'));
+      query.add(fl.queryBuilder(FilterType.dateTo, 'date'));
+    }
     return await db
-        .getList(
-          AWConst.collections.inventoryRecord,
-          queries: [if (type != null) Query.equal('record_type', type.name)],
-        )
+        .getList(AWConst.collections.inventoryRecord, queries: query.nonNulls.toList())
         .convert((docs) => docs.convertDoc(InventoryRecord.fromDoc));
   }
 

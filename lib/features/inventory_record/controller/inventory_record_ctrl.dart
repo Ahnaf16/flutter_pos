@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:pos/features/filter/controller/filter_ctrl.dart';
 import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
 import 'package:pos/features/inventory_record/repository/return_repo.dart';
 import 'package:pos/main.export.dart';
@@ -15,7 +16,8 @@ class InventoryCtrl extends _$InventoryCtrl {
 
   @override
   Future<List<InventoryRecord>> build(RecordType? type) async {
-    final staffs = await _repo.getRecords(type);
+    final fState = ref.watch(filterCtrlProvider);
+    final staffs = await _repo.getRecords(type, fState);
     return staffs.fold(
       (l) {
         Toast.showErr(Ctx.context, l);
@@ -33,43 +35,17 @@ class InventoryCtrl extends _$InventoryCtrl {
     if (query.isEmpty) {
       state = AsyncValue.data(_searchFrom);
     }
-    final list =
-        _searchFrom.where((e) {
-          return e.details.any((d) => d.product.name.low.contains(query.low)) ||
-              (e.party?.name.low.contains(query.low) ?? false);
-        }).toList();
+    final list = _searchFrom.where((e) {
+      return e.details.any((d) => d.product.name.low.contains(query)) ||
+          (e.party?.name.low.contains(query) ?? false) ||
+          e.invoiceNo.low.contains(query);
+    }).toList();
     state = AsyncData(list);
   }
 
-  void filter({PaymentAccount? account, InventoryStatus? status, ShadDateTimeRange? range}) async {
-    if (account != null) {
-      state = AsyncData(_searchFrom.where((e) => e.account?.id == account.id).toList());
-    }
-
-    if (status != null) {
-      state = AsyncData(_searchFrom.where((e) => e.status == status).toList());
-    }
-
-    if (range case ShadDateTimeRange(:final start, :final end)) {
-      final filteredList =
-          _searchFrom.where((entry) {
-            final date = entry.date.justDate;
-            if (start != null && end != null) {
-              return date.isAfter(start.justDate) && date.isBefore(end.nextDay.justDate);
-            } else if (start != null) {
-              return date.isAfter(start.justDate);
-            } else if (end != null) {
-              return date.isBefore(end.nextDay.justDate);
-            }
-            return true;
-          }).toList();
-
-      state = AsyncData(filteredList);
-    }
-
-    if (account == null && status == null && range == null) {
-      state = AsyncValue.data(_searchFrom);
-    }
+  void refresh() async {
+    state = AsyncValue.data(_searchFrom);
+    ref.invalidateSelf();
   }
 }
 
@@ -81,7 +57,8 @@ class InventoryReturnCtrl extends _$InventoryReturnCtrl {
 
   @override
   Future<List<ReturnRecord>> build(bool? isSale) async {
-    final staffs = await _repo.getRecords(isSale);
+    final fState = ref.watch(filterCtrlProvider);
+    final staffs = await _repo.getRecords(isSale, fState);
     return staffs.fold(
       (l) {
         Toast.showErr(Ctx.context, l);
@@ -99,35 +76,13 @@ class InventoryReturnCtrl extends _$InventoryReturnCtrl {
     if (query.isEmpty) {
       state = AsyncValue.data(_searchFrom);
     }
-    final list = _searchFrom.where((e) => (e.returnedRec?.party?.name.low.contains(query.low) ?? false)).toList();
+    final list = _searchFrom.where((e) => (e.returnedRec?.party?.name.low.contains(query) ?? false)).toList();
     state = AsyncData(list);
   }
 
-  void filter({PaymentAccount? account, ShadDateTimeRange? range}) async {
-    if (account != null) {
-      state = AsyncData(_searchFrom.where((e) => e.returnedRec?.account?.id == account.id).toList());
-    }
-
-    if (range case ShadDateTimeRange(:final start, :final end)) {
-      final filteredList =
-          _searchFrom.where((entry) {
-            final date = entry.returnDate.justDate;
-            if (start != null && end != null) {
-              return date.isAfter(start.justDate) && date.isBefore(end.nextDay.justDate);
-            } else if (start != null) {
-              return date.isAfter(start.justDate);
-            } else if (end != null) {
-              return date.isBefore(end.nextDay.justDate);
-            }
-            return true;
-          }).toList();
-
-      state = AsyncData(filteredList);
-    }
-
-    if (account == null && range == null) {
-      state = AsyncValue.data(_searchFrom);
-    }
+  void refresh() async {
+    state = AsyncValue.data(_searchFrom);
+    ref.invalidateSelf();
   }
 }
 

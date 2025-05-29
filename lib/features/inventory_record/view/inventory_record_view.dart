@@ -1,5 +1,6 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/features/inventory_record/view/local/inv_invoice_widget.dart';
@@ -29,9 +30,7 @@ class InventoryRecordView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final inventoryList = ref.watch(inventoryCtrlProvider(type));
     final invCtrl = useCallback(() => ref.read(inventoryCtrlProvider(type).notifier), [type]);
-    final accountList = ref.watch(paymentAccountsCtrlProvider());
-    final calKeyResetter = useState(false);
-    final calKey = useMemoized(() => UniqueKey(), [type, calKeyResetter.value]);
+    final accountList = ref.watch(paymentAccountsCtrlProvider()).maybeList();
 
     return BaseBody(
       title: 'All ${type.name}',
@@ -49,59 +48,15 @@ class InventoryRecordView extends HookConsumerWidget {
       ],
       body: Column(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: ShadTextField(
-                  hintText: 'Search',
-                  onChanged: (v) => invCtrl().search(v ?? ''),
-                  showClearButton: true,
-                ),
-              ),
-
-              Expanded(
-                child: accountList.maybeWhen(
-                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                  data: (accounts) {
-                    return ShadSelectField<PaymentAccount>(
-                      hintText: 'Account',
-                      options: accounts,
-                      selectedBuilder: (context, value) => Text(value.name),
-                      optionBuilder: (_, value, _) {
-                        return ShadOption(value: value, child: Text(value.name));
-                      },
-                      onChanged: (v) => invCtrl().filter(account: v),
-                    );
-                  },
-                ),
-              ),
-              Expanded(
-                child: ShadSelectField<InventoryStatus>(
-                  hintText: 'Status',
-                  options: InventoryStatus.values,
-                  selectedBuilder: (context, value) => Text(value.name),
-                  optionBuilder: (_, value, _) {
-                    return ShadOption(value: value, child: Text(value.name));
-                  },
-                  onChanged: (v) => invCtrl().filter(status: v),
-                ),
-              ),
-              const Gap(Insets.xs),
-              ShadDatePicker.range(
-                key: calKey,
-                onRangeChanged: (v) => invCtrl().filter(range: v),
-              ),
-              ShadIconButton.raw(
-                icon: const Icon(LuIcons.x),
-                onPressed: () {
-                  calKeyResetter.toggle();
-                  invCtrl().filter();
-                },
-                variant: ShadButtonVariant.destructive,
-              ),
-            ],
+          FilterBar(
+            hintText: 'Search by product or ${type.isSale ? 'customer' : 'supplier'} name',
+            statuses: InventoryStatus.values,
+            accounts: accountList,
+            onSearch: (q) => invCtrl().search(q),
+            onReset: () => invCtrl().refresh(),
+            showDateRange: true,
           ),
-          const Gap(Insets.med),
+
           Expanded(
             child: inventoryList.when(
               loading: () => const Loading(),

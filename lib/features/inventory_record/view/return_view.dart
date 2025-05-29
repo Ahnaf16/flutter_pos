@@ -1,3 +1,4 @@
+import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/transactions/view/transactions_view.dart';
@@ -22,53 +23,20 @@ class ReturnView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final inventoryList = ref.watch(inventoryReturnCtrlProvider(isSale));
     final invCtrl = useCallback(() => ref.read(inventoryReturnCtrlProvider(isSale).notifier), [isSale]);
-    final accountList = ref.watch(paymentAccountsCtrlProvider());
+    final accountList = ref.watch(paymentAccountsCtrlProvider()).maybeList();
 
     return BaseBody(
       title: '${isSale ? 'Sale' : 'Purchase'} Returns',
 
       body: Column(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: ShadTextField(
-                  hintText: 'Search',
-                  onChanged: (v) => invCtrl().search(v ?? ''),
-                  showClearButton: true,
-                ),
-              ),
-
-              Expanded(
-                child: accountList.maybeWhen(
-                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                  data: (accounts) {
-                    return ShadSelectField<PaymentAccount>(
-                      hintText: 'Account',
-                      options: accounts,
-                      selectedBuilder: (context, value) => Text(value.name),
-                      optionBuilder: (_, value, _) {
-                        return ShadOption(value: value, child: Text(value.name));
-                      },
-                      onChanged: (v) => invCtrl().filter(account: v),
-                    );
-                  },
-                ),
-              ),
-
-              const Gap(Insets.xs),
-              ShadDatePicker.range(
-                key: ValueKey(isSale),
-                onRangeChanged: (v) => invCtrl().filter(range: v),
-              ),
-              ShadIconButton.raw(
-                icon: const Icon(LuIcons.x),
-                onPressed: () => invCtrl().filter(),
-                variant: ShadButtonVariant.destructive,
-              ),
-            ],
+          FilterBar(
+            hintText: 'Search by ${isSale ? 'customer' : 'supplier'} name',
+            accounts: accountList,
+            onSearch: (q) => invCtrl().search(q),
+            onReset: () => invCtrl().refresh(),
+            showDateRange: true,
           ),
-          const Gap(Insets.med),
           Expanded(
             child: inventoryList.when(
               loading: () => const Loading(),
@@ -122,7 +90,7 @@ class ReturnView extends HookConsumerWidget {
                       ),
                       'Account' => DataGridCell(
                         columnName: head.name,
-                        value: ShadBadge.secondary(child: Text(data.returnedRec?.account?.name.up ?? '--')),
+                        value: ShadBadge.secondary(child: Text(data.account?.name.up ?? '--')),
                       ),
 
                       'Date' => DataGridCell(
