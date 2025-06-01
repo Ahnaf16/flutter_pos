@@ -50,6 +50,7 @@ class ConfigCtrlAsync extends _$ConfigCtrlAsync {
     final res = await _repo.updateConfig(data, image);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
+      ref.invalidate(configCtrlProvider);
       return rightResult('Settings updated successfully');
     });
   }

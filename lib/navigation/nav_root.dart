@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
 
@@ -85,6 +86,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
     final popCtrl = useMemoized(ShadPopoverController.new);
     final user = this.user;
     final viewingWh = ref.watch(viewingWHProvider);
+    final config = ref.watch(configCtrlProvider);
     final houseList = useState(<WareHouse>[]);
 
     void fetchHouses() async {
@@ -102,7 +104,13 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
     }, [user?.id, user?.warehouse?.isDefault]);
 
     return AppBar(
-      title: const Text(kAppName),
+      title: Row(
+        spacing: Insets.lg,
+        children: [
+          if (config.shop.shopLogo != null) CircleImage(Img.aw(config.shop.shopLogo!), radius: 20),
+          Text(config.shop.shopName ?? kAppName),
+        ],
+      ),
 
       leading: UnconstrainedBox(
         child: ShadButton.ghost(
@@ -357,7 +365,8 @@ class NavButton extends HookWidget {
 
 List<(String text, IconData? icon, RPath? path)> _items(List<RolePermissions> p) {
   return [
-    ('Home', LuIcons.house, RPaths.home),
+    ('Home', null, null),
+    ('Dashboard', LuIcons.house, RPaths.home),
     if (RolePermissions.isInGroup(p, RolePermissions.inventoryGroup)) ...[
       if (p.contains(RolePermissions.makeSale)) ('New Sale', LuIcons.shoppingCart, RPaths.createSales),
       ('Inventory', null, null),

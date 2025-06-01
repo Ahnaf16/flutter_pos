@@ -11,46 +11,60 @@ class PieWidget extends HookConsumerWidget {
     final touchedIndex = useState<int?>(null);
 
     return ShadCard(
-      height: 500,
-      width: 500,
+      height: 600,
+      width: context.layout.isMobile ? null : 400,
       title: const Text('Transaction types'),
       childPadding: Pads.lg('t'),
-      footer: _footer(),
-      child: PieChart(
-        PieChartData(
-          pieTouchData: PieTouchData(
-            touchCallback: (event, res) {
-              if (!event.isInterestedForInteractions || res?.touchedSection == null) {
-                touchedIndex.value = null;
-                return;
-              }
-              final i = res?.touchedSection?.touchedSectionIndex ?? -1;
-              touchedIndex.value = i == -1 ? null : i;
-            },
-          ),
-          sectionsSpace: 0,
-          centerSpaceRadius: 60,
-
-          sections: [
-            for (final MapEntry(:key, :value) in pieData.entries)
-              PieChartSectionData(
-                color: key.color,
-                value: value.fromTypes([key]).map((e) => e.amount).sum.toDouble(),
-                title: value.fromTypes([key]).map((e) => e.amount).sum.currency(),
-                titleStyle: context.text.small.textColor(
-                  key.color.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+      child: Column(
+        spacing: Insets.med,
+        children: [
+          Expanded(
+            child: PieChart(
+              PieChartData(
+                pieTouchData: PieTouchData(
+                  touchCallback: (event, res) {
+                    if (!event.isInterestedForInteractions || res?.touchedSection == null) {
+                      touchedIndex.value = null;
+                      return;
+                    }
+                    final i = res?.touchedSection?.touchedSectionIndex ?? -1;
+                    touchedIndex.value = i == -1 ? null : i;
+                  },
                 ),
-                radius: touchedIndex.value == null
-                    ? 50
-                    : TransactionType.values[touchedIndex.value!] == key
-                    ? 60
-                    : 50,
+                sectionsSpace: 0,
+                centerSpaceRadius: 60,
+                sections: [
+                  for (final MapEntry(:key, :value) in pieData.entries)
+                    PieChartSectionData(
+                      color: key.color,
+                      value: value.fromTypes([key]).map((e) => e.amount).sum.toDouble(),
+                      title: value.fromTypes([key]).map((e) => e.amount).sum.currency(),
+                      titleStyle: context.text.small.textColor(
+                        key.color.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+                      ),
+                      radius: touchedIndex.value == null
+                          ? 50
+                          : TransactionType.values[touchedIndex.value!] == key
+                          ? 60
+                          : 50,
+                    ),
+                ],
               ),
-          ],
-        ),
+            ),
+          ),
+
+          _footer(),
+        ],
       ),
     );
   }
+
+  // ShadCard(
+  //         padding: Pads.med(),
+  //         childPadding: Pads.med('t'),
+  //         title: Text('Total', style: context.text.list.op(.5)),
+  //         child: Text('0', style: context.text.h4),
+  //       ),
 
   Widget _footer() {
     return Wrap(

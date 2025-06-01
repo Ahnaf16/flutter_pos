@@ -3,45 +3,16 @@ import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class BarWidget extends HookConsumerWidget {
-  const BarWidget({super.key});
+  const BarWidget(this.start, this.end, {super.key});
+  final DateTime? start;
+  final DateTime? end;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final now = DateTime.now().justDate;
-
-    final type = useState(TableType.yearly);
-    final month = useState(now.month);
-
-    final barData = ref.watch(barDataCtrlProvider(type.value, month.value));
+    final barData = ref.watch(barDataCtrlProvider(start, end));
 
     return ShadCard(
-      title: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Expanded(child: Text('Transactions summary')),
-          LimitedWidthBox(
-            maxWidth: 200,
-            child: ShadSelectField<TableType>(
-              initialValue: type.value,
-              options: TableType.values,
-              optionBuilder: (_, value, _) => ShadOption(value: value, child: Text(value.name.titleCase)),
-              selectedBuilder: (context, value) => Text(value.name.titleCase),
-              onChanged: (v) => type.set(v ?? TableType.yearly),
-            ),
-          ),
-          if (type.value == TableType.monthly)
-            LimitedWidthBox(
-              maxWidth: 150,
-              child: ShadSelectField<int>(
-                initialValue: month.value,
-                options: List.generate(12, (i) => i + 1),
-                optionBuilder: (_, value, _) => ShadOption(value: value, child: Text(getMonthName(value))),
-                selectedBuilder: (context, value) => Text(getMonthName(value)),
-                onChanged: (v) => month.set(v ?? now.month),
-              ),
-            ),
-        ],
-      ),
+      title: const Text('Transactions summary'),
       footer: _footer(),
       childPadding: Pads.lg('t'),
       child: SizedBox(
@@ -61,9 +32,7 @@ class BarWidget extends HookConsumerWidget {
                   minIncluded: false,
                   reservedSize: 40,
                   getTitlesWidget: (value, meta) {
-                    final text = type.value == TableType.monthly
-                        ? value.toInt().toString()
-                        : getMonthName(value.toInt());
+                    final text = getMonthName(value.toInt());
                     return SideTitleWidget(meta: meta, child: Text(text));
                   },
                 ),

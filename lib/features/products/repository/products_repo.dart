@@ -63,7 +63,10 @@ class ProductRepo with AwHandler {
 
   FutureReport<List<Product>> getProducts({WareHouse? warehouse, FilterState? fl}) async {
     final query = <String?>[];
-    if (fl != null) query.add(fl.queryBuilder(FilterType.unit, 'unit'));
+    if (fl != null) {
+      query.add(fl.queryBuilder(FilterType.unit, 'unit'));
+      query.add(fl.queryBuilder(FilterType.dateFrom, '\$createdAt'));
+    }
 
     return await db
         .getList(AWConst.collections.products, queries: query.nonNulls.toList())

@@ -19,20 +19,19 @@ class AppearanceSettingsView extends ConsumerWidget {
           spacing: Insets.med,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ShadInputDecorator(
-              label: const Text('Language'),
-              child: ShadSelect<AppLocale>(
+            LimitedWidthBox(
+              maxWidth: 400,
+              center: false,
+              child: ShadSelectField<AppLocale>(
                 initialValue: LocaleSettings.currentLocale,
-                minWidth: 250,
-                maxWidth: 300,
-                placeholder: const Text('Select Language'),
-                selectedOptionBuilder: (context, value) => Text(value.name.titleCase),
-                itemCount: AppLocale.values.length,
+                hintText: 'Select Language',
+                label: 'Language',
+                selectedBuilder: (context, value) => Text(value.name.titleCase),
+                options: AppLocale.values,
                 onChanged: (value) {
                   if (value != null) LocaleSettings.setLocale(value);
                 },
-                optionsBuilder:
-                    (_, i) => ShadOption(value: AppLocale.values[i], child: Text(AppLocale.values[i].name.titleCase)),
+                optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name.titleCase)),
               ),
             ),
 
@@ -41,20 +40,17 @@ class AppearanceSettingsView extends ConsumerWidget {
               spacing: Insets.med,
               children: [
                 Flexible(
-                  child: ShadInputDecorator(
-                    label: const Text('Theme mode'),
-                    child: ShadSelect<ThemeMode>(
+                  child: LimitedWidthBox(
+                    maxWidth: 400,
+                    center: false,
+                    child: ShadSelectField<ThemeMode>(
                       initialValue: theme.mode,
-                      minWidth: 250,
-                      maxWidth: 300,
-                      maxHeight: 150,
-                      placeholder: const Text('Select'),
-                      selectedOptionBuilder: (context, value) => Text(value.name.titleCase),
+                      hintText: 'Select',
+                      label: 'Theme Mode',
+                      selectedBuilder: (context, value) => Text(value.name.titleCase),
                       onChanged: (v) => ref.read(themeProvider.notifier).setMode(v),
-                      itemCount: ThemeMode.values.length,
-                      optionsBuilder:
-                          (_, i) =>
-                              ShadOption(value: ThemeMode.values[i], child: Text(ThemeMode.values[i].name.titleCase)),
+                      options: ThemeMode.values,
+                      optionBuilder: (_, v, i) => ShadOption(value: v, child: Text(v.name.titleCase)),
                     ),
                   ),
                 ),
@@ -71,7 +67,10 @@ class AppearanceSettingsView extends ConsumerWidget {
                         return Row(
                           mainAxisSize: MainAxisSize.min,
                           spacing: Insets.sm,
-                          children: [ShadCard(backgroundColor: primary, expanded: false), Text(value.titleCase)],
+                          children: [
+                            ShadCard(backgroundColor: primary, expanded: false),
+                            Text(value.titleCase),
+                          ],
                         );
                       },
                       onChanged: (v) => ref.read(themeProvider.notifier).setTheme(v),
@@ -85,7 +84,10 @@ class AppearanceSettingsView extends ConsumerWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             spacing: Insets.sm,
-                            children: [ShadCard(backgroundColor: primary, expanded: false), Text(name.titleCase)],
+                            children: [
+                              ShadCard(backgroundColor: primary, expanded: false),
+                              Text(name.titleCase),
+                            ],
                           ),
                         );
                       },

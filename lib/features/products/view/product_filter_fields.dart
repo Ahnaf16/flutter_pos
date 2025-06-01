@@ -10,14 +10,13 @@ class ProductFilterFields extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final warehouses = ref.watch(warehouseCtrlProvider).maybeList();
     final units = ref.watch(unitCtrlProvider).maybeList();
     return FilterBar(
-      // houses: warehouses,
       hintText: 'Search by product name',
       units: units,
       onSearch: (q) => productCtrl().search(q),
       onReset: () => productCtrl().refresh(),
+      showDateRange: true,
     );
   }
 }

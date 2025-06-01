@@ -25,7 +25,6 @@ class Stock {
     return Stock(
       id: doc.$id,
       purchasePrice: data.parseNum('purchase_price'),
-      // salesPrice: data.parseNum('sales_price'),
       quantity: data.parseInt('quantity'),
       warehouse: WareHouse.tyrParse(data['warehouse']),
       createdAt: DateTime.parse(doc.$createdAt),
@@ -36,7 +35,6 @@ class Stock {
     return Stock(
       id: map.parseAwField(),
       purchasePrice: map.parseNum('purchase_price'),
-      // salesPrice: map.parseNum('sales_price'),
       quantity: map.parseInt('quantity'),
       warehouse: WareHouse.tyrParse(map['warehouse']),
       createdAt: DateTime.tryParse(map.tryParseAwField('createdAt') ?? '') ?? DateTime.now(),
@@ -62,8 +60,9 @@ class Stock {
       // salesPrice: map['sales_price'] ?? salesPrice,
       quantity: map['quantity'] ?? quantity,
       warehouse: WareHouse.tyrParse(map['warehouse']) ?? warehouse,
-      createdAt:
-          map.tryParseAwField('createdAt') != null ? DateTime.parse(map.tryParseAwField('createdAt')!) : createdAt,
+      createdAt: map.tryParseAwField('createdAt') != null
+          ? DateTime.parse(map.tryParseAwField('createdAt')!)
+          : createdAt,
     );
   }
 

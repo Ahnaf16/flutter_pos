@@ -3,7 +3,7 @@ import 'package:pos/features/unit/view/unit_add_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('Name', double.nan), ('Active', 200.0), ('Action', 200.0)];
+const _headings = [('#', 50.0), ('Name', double.nan), ('Active', 200.0), ('Action', 200.0)];
 
 class UnitView extends HookConsumerWidget {
   const UnitView({super.key});
@@ -25,10 +25,10 @@ class UnitView extends HookConsumerWidget {
       body: unitList.when(
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: unitCtrlProvider),
-        data: (products) {
+        data: (units) {
           return DataTableBuilder<ProductUnit, (String, double)>(
             rowHeight: 60,
-            items: products,
+            items: units,
             headings: _headings,
             headingBuilder: (heading) {
               return GridColumn(
@@ -46,6 +46,10 @@ class UnitView extends HookConsumerWidget {
             cellAlignment: Alignment.centerLeft,
             cellBuilder: (data, head) {
               return switch (head.$1) {
+                '#' => DataGridCell(
+                  columnName: head.$1,
+                  value: Text((units.indexWhere((e) => e.id == data.id) + 1).toString()),
+                ),
                 'Name' => DataGridCell(columnName: head.$1, value: Text(data.name)),
 
                 'Active' => DataGridCell(columnName: head.$1, value: _buildActiveCell(data)),

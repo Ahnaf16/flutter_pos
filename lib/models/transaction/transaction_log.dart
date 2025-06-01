@@ -208,7 +208,7 @@ class TransactionLog {
     final parti = record.party;
     return TransactionLog(
       id: '',
-      trxNo: nanoid(length: 8, alphabet: '0123456789'),
+      trxNo: nanoid(length: 8, alphabet: Alphabet.alphanumeric),
       amount: record.paidAmount,
       account: record.account,
       transactedTo: record.type.isSale ? null : parti,
@@ -233,7 +233,7 @@ class TransactionLog {
   static TransactionLog fromExpense(Expense ex) {
     return TransactionLog(
       id: '',
-      trxNo: nanoid(length: 8, alphabet: '0123456789'),
+      trxNo: nanoid(length: 8, alphabet: Alphabet.alphanumeric),
       amount: ex.amount,
       account: ex.account,
       transactedTo: null,
@@ -256,7 +256,7 @@ class TransactionLog {
     final isSale = rec.returnedRec?.type.isSale ?? false;
     return TransactionLog(
       id: '',
-      trxNo: nanoid(length: 8, alphabet: '0123456789'),
+      trxNo: nanoid(length: 8, alphabet: Alphabet.alphanumeric),
       amount: rec.adjustAccount,
       account: rec.returnedRec?.account,
       transactedTo: rec.isSale ? rec.returnedRec?.party : null,
@@ -278,7 +278,7 @@ class TransactionLog {
   static TransactionLog fromTransferState(AccBalanceTransferState tState) {
     return TransactionLog(
       id: '',
-      trxNo: nanoid(length: 8, alphabet: '0123456789'),
+      trxNo: nanoid(length: 8, alphabet: Alphabet.alphanumeric),
       amount: tState.amount,
       account: tState.from,
       transactedTo: null,

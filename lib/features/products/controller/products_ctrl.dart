@@ -15,10 +15,10 @@ class ProductsCtrl extends _$ProductsCtrl {
 
   @override
   Future<List<Product>> build() async {
-    final units = ref.watch(filterCtrlProvider.select((s) => s.units));
+    final filter = ref.watch(filterCtrlProvider);
     final viewingWh = ref.watch(viewingWHProvider);
 
-    final staffs = await _repo.getProducts(fl: FilterState(units: units));
+    final staffs = await _repo.getProducts(fl: filter);
 
     return staffs.fold(
       (l) {

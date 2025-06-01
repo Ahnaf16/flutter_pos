@@ -41,7 +41,7 @@ class AppUser {
       warehouse: WareHouse.tyrParse(data['warehouse']),
       isAccountCreated: data['is_user_created'],
       password: data['password'],
-      isActive: data['isActive'],
+      isActive: data.parseBool('isActive'),
     );
   }
 

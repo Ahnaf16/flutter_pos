@@ -22,26 +22,7 @@ final viewingWHProvider =
     );
 
 typedef _$ViewingWH = Notifier<({WareHouse? my, WareHouse? viewing})>;
-String _$homeCountersHash() => r'2f2a4743cade0250e5b1ad0995d2636c33def69a';
-
-/// See also [HomeCounters].
-@ProviderFor(HomeCounters)
-final homeCountersProvider =
-    AutoDisposeNotifierProvider<
-      HomeCounters,
-      Map<(String, RPath), dynamic>
-    >.internal(
-      HomeCounters.new,
-      name: r'homeCountersProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$homeCountersHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-typedef _$HomeCounters = AutoDisposeNotifier<Map<(String, RPath), dynamic>>;
-String _$barDataCtrlHash() => r'51b222e4c61b8806902566e5ec3c49daf89f941b';
+String _$homeCountersHash() => r'b7406afafbc25807012ff1dc7409f0e0e42bc1f6';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -64,12 +45,175 @@ class _SystemHash {
   }
 }
 
+abstract class _$HomeCounters
+    extends BuildlessAutoDisposeNotifier<Map<(String, RPath), dynamic>> {
+  late final DateTime? start;
+  late final DateTime? end;
+
+  Map<(String, RPath), dynamic> build(DateTime? start, DateTime? end);
+}
+
+/// See also [HomeCounters].
+@ProviderFor(HomeCounters)
+const homeCountersProvider = HomeCountersFamily();
+
+/// See also [HomeCounters].
+class HomeCountersFamily extends Family<Map<(String, RPath), dynamic>> {
+  /// See also [HomeCounters].
+  const HomeCountersFamily();
+
+  /// See also [HomeCounters].
+  HomeCountersProvider call(DateTime? start, DateTime? end) {
+    return HomeCountersProvider(start, end);
+  }
+
+  @override
+  HomeCountersProvider getProviderOverride(
+    covariant HomeCountersProvider provider,
+  ) {
+    return call(provider.start, provider.end);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'homeCountersProvider';
+}
+
+/// See also [HomeCounters].
+class HomeCountersProvider
+    extends
+        AutoDisposeNotifierProviderImpl<
+          HomeCounters,
+          Map<(String, RPath), dynamic>
+        > {
+  /// See also [HomeCounters].
+  HomeCountersProvider(DateTime? start, DateTime? end)
+    : this._internal(
+        () => HomeCounters()
+          ..start = start
+          ..end = end,
+        from: homeCountersProvider,
+        name: r'homeCountersProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$homeCountersHash,
+        dependencies: HomeCountersFamily._dependencies,
+        allTransitiveDependencies:
+            HomeCountersFamily._allTransitiveDependencies,
+        start: start,
+        end: end,
+      );
+
+  HomeCountersProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.start,
+    required this.end,
+  }) : super.internal();
+
+  final DateTime? start;
+  final DateTime? end;
+
+  @override
+  Map<(String, RPath), dynamic> runNotifierBuild(
+    covariant HomeCounters notifier,
+  ) {
+    return notifier.build(start, end);
+  }
+
+  @override
+  Override overrideWith(HomeCounters Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: HomeCountersProvider._internal(
+        () => create()
+          ..start = start
+          ..end = end,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        start: start,
+        end: end,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeNotifierProviderElement<
+    HomeCounters,
+    Map<(String, RPath), dynamic>
+  >
+  createElement() {
+    return _HomeCountersProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is HomeCountersProvider &&
+        other.start == start &&
+        other.end == end;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, start.hashCode);
+    hash = _SystemHash.combine(hash, end.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin HomeCountersRef
+    on AutoDisposeNotifierProviderRef<Map<(String, RPath), dynamic>> {
+  /// The parameter `start` of this provider.
+  DateTime? get start;
+
+  /// The parameter `end` of this provider.
+  DateTime? get end;
+}
+
+class _HomeCountersProviderElement
+    extends
+        AutoDisposeNotifierProviderElement<
+          HomeCounters,
+          Map<(String, RPath), dynamic>
+        >
+    with HomeCountersRef {
+  _HomeCountersProviderElement(super.provider);
+
+  @override
+  DateTime? get start => (origin as HomeCountersProvider).start;
+  @override
+  DateTime? get end => (origin as HomeCountersProvider).end;
+}
+
+String _$barDataCtrlHash() => r'7a83b4dc66b5d805c8dee5a2ea9519d21506c69f';
+
 abstract class _$BarDataCtrl
     extends BuildlessAutoDisposeNotifier<Map<int, List<TransactionLog>>> {
-  late final TableType type;
-  late final int month;
+  late final DateTime? start;
+  late final DateTime? end;
 
-  Map<int, List<TransactionLog>> build(TableType type, int month);
+  Map<int, List<TransactionLog>> build(DateTime? start, DateTime? end);
 }
 
 /// See also [BarDataCtrl].
@@ -82,15 +226,15 @@ class BarDataCtrlFamily extends Family<Map<int, List<TransactionLog>>> {
   const BarDataCtrlFamily();
 
   /// See also [BarDataCtrl].
-  BarDataCtrlProvider call(TableType type, int month) {
-    return BarDataCtrlProvider(type, month);
+  BarDataCtrlProvider call(DateTime? start, DateTime? end) {
+    return BarDataCtrlProvider(start, end);
   }
 
   @override
   BarDataCtrlProvider getProviderOverride(
     covariant BarDataCtrlProvider provider,
   ) {
-    return call(provider.type, provider.month);
+    return call(provider.start, provider.end);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -116,11 +260,11 @@ class BarDataCtrlProvider
           Map<int, List<TransactionLog>>
         > {
   /// See also [BarDataCtrl].
-  BarDataCtrlProvider(TableType type, int month)
+  BarDataCtrlProvider(DateTime? start, DateTime? end)
     : this._internal(
         () => BarDataCtrl()
-          ..type = type
-          ..month = month,
+          ..start = start
+          ..end = end,
         from: barDataCtrlProvider,
         name: r'barDataCtrlProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -128,8 +272,8 @@ class BarDataCtrlProvider
             : _$barDataCtrlHash,
         dependencies: BarDataCtrlFamily._dependencies,
         allTransitiveDependencies: BarDataCtrlFamily._allTransitiveDependencies,
-        type: type,
-        month: month,
+        start: start,
+        end: end,
       );
 
   BarDataCtrlProvider._internal(
@@ -139,18 +283,18 @@ class BarDataCtrlProvider
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.type,
-    required this.month,
+    required this.start,
+    required this.end,
   }) : super.internal();
 
-  final TableType type;
-  final int month;
+  final DateTime? start;
+  final DateTime? end;
 
   @override
   Map<int, List<TransactionLog>> runNotifierBuild(
     covariant BarDataCtrl notifier,
   ) {
-    return notifier.build(type, month);
+    return notifier.build(start, end);
   }
 
   @override
@@ -159,15 +303,15 @@ class BarDataCtrlProvider
       origin: this,
       override: BarDataCtrlProvider._internal(
         () => create()
-          ..type = type
-          ..month = month,
+          ..start = start
+          ..end = end,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        type: type,
-        month: month,
+        start: start,
+        end: end,
       ),
     );
   }
@@ -184,15 +328,15 @@ class BarDataCtrlProvider
   @override
   bool operator ==(Object other) {
     return other is BarDataCtrlProvider &&
-        other.type == type &&
-        other.month == month;
+        other.start == start &&
+        other.end == end;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, type.hashCode);
-    hash = _SystemHash.combine(hash, month.hashCode);
+    hash = _SystemHash.combine(hash, start.hashCode);
+    hash = _SystemHash.combine(hash, end.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -202,11 +346,11 @@ class BarDataCtrlProvider
 // ignore: unused_element
 mixin BarDataCtrlRef
     on AutoDisposeNotifierProviderRef<Map<int, List<TransactionLog>>> {
-  /// The parameter `type` of this provider.
-  TableType get type;
+  /// The parameter `start` of this provider.
+  DateTime? get start;
 
-  /// The parameter `month` of this provider.
-  int get month;
+  /// The parameter `end` of this provider.
+  DateTime? get end;
 }
 
 class _BarDataCtrlProviderElement
@@ -219,9 +363,9 @@ class _BarDataCtrlProviderElement
   _BarDataCtrlProviderElement(super.provider);
 
   @override
-  TableType get type => (origin as BarDataCtrlProvider).type;
+  DateTime? get start => (origin as BarDataCtrlProvider).start;
   @override
-  int get month => (origin as BarDataCtrlProvider).month;
+  DateTime? get end => (origin as BarDataCtrlProvider).end;
 }
 
 String _$pieDataCtrlHash() => r'b5dbb497fc116de4fa402d3bf8b4b8751f19bf4a';

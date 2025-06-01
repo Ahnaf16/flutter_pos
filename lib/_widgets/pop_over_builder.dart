@@ -51,6 +51,7 @@ class PopOverButton extends StatelessWidget {
   final bool isDestructive;
   final bool enabled;
   final bool dense;
+
   @override
   Widget build(BuildContext context) {
     if (dense) {

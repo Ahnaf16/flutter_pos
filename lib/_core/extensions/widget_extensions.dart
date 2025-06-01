@@ -37,6 +37,8 @@ extension WidgetEx on Widget {
 
 extension ShadButtonEx on ShadButton {
   ShadButton compact() => ShadButton.ghost(padding: Pads.zero, height: 24, gap: 24, child: child);
+
+  Widget toolTip(String text) => ShadTooltip(builder: (context) => Text(text), child: this);
 }
 
 extension ShadBadgeEx on ShadBadge {

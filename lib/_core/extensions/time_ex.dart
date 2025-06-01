@@ -1,4 +1,5 @@
 import 'package:pos/main.export.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 extension TimeOfDayEx on TimeOfDay {
   String formatTime([String pattern = 'hh:mm:ss']) {
@@ -19,6 +20,10 @@ extension DateTimeEx on DateTime {
     return DateFormat(pattern).format(this);
   }
 
+  String get ago {
+    return timeago.format(this);
+  }
+
   DateTime get justDateCheckUtc {
     if (isUtc) return DateTime.utc(year, month, day);
     return DateTime(year, month, day);
@@ -29,14 +34,9 @@ extension DateTimeEx on DateTime {
   /// Returns the date as `MM/dd/yyyy`
   String get postString => formatDate('MM/dd/yyyy');
 
-  DateTime startOfMonth() => DateTime(year, month);
-  DateTime nextMonth() => DateTime(year, month + 1);
-
-  DateTime endOfMonth() => DateTime(year, month + 1).subtract(const Duration(days: 1));
-
   DateTime fromDay(int day) {
-    final last = endOfMonth().day;
-    if (day > last) return endOfMonth();
+    final last = endOfMonth.day;
+    if (day > last) return endOfMonth;
     return DateTime(year, month, day);
   }
 
@@ -72,12 +72,11 @@ extension DateTimeEx on DateTime {
     return toUtc();
   }
 
-  DateTime get startOfWeek {
-    final daysToSubtract = (weekday == DateTime.sunday) ? 0 : weekday;
-    return subtract(Duration(days: daysToSubtract));
+  DateTime get startOfYear {
+    return DateTime(year);
   }
 
-  DateTime get endOfWeek => startOfWeek.add(const Duration(days: 6));
+  DateTime get endOfYear => DateTime(year, 12, 31);
 
   bool isWithinAMonth() {
     final today = DateTime.now().justDate;

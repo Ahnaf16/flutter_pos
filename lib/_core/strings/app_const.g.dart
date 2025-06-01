@@ -58,6 +58,7 @@ const _$pub = (
     flChart: "^1.0.0",
     embedAnnotation: "^1.2.2",
     navigatorResizable: "^1.0.2",
+    timeago: "^3.7.1",
   ),
   devDependencies: (
     flutterTest: (sdk: "flutter"),

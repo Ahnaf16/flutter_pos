@@ -5,7 +5,7 @@ import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
-  TableHeading.positional('#', 60.0),
+  TableHeading.positional('#', 50.0),
   TableHeading.positional('Name'),
   TableHeading.positional('Warehouse', 150.0),
   TableHeading.positional('Stock', 100.0),
@@ -51,7 +51,7 @@ class ProductsView extends HookConsumerWidget {
                       columnName: heading.name,
                       columnWidthMode: ColumnWidthMode.fill,
                       maximumWidth: heading.max,
-                      minimumWidth: 200,
+
                       label: Container(
                         padding: Pads.med(),
                         alignment: heading.alignment,
@@ -85,18 +85,24 @@ class ProductsView extends HookConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             ShadButton.secondary(
+                              backgroundColor: Colors.blue.op2,
+                              foregroundColor: Colors.blue,
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.eye),
                               onPressed: () {
                                 RPaths.productDetails(data.id).pushNamed(context);
                               },
-                            ),
+                            ).toolTip('View'),
                             ShadButton.secondary(
+                              backgroundColor: Colors.green.op2,
+                              foregroundColor: Colors.green,
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.pen),
                               onPressed: () => RPaths.editProduct(data.id).pushNamed(context),
-                            ),
-                            ShadButton.destructive(
+                            ).toolTip('Edit'),
+                            ShadButton.secondary(
+                              backgroundColor: context.colors.destructive.op2,
+                              foregroundColor: context.colors.destructive,
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.trash),
                               onPressed: () {
@@ -122,7 +128,7 @@ class ProductsView extends HookConsumerWidget {
                                   },
                                 );
                               },
-                            ),
+                            ).toolTip('Delete'),
                           ],
                         ),
                       ),
@@ -146,8 +152,8 @@ class ProductsView extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          OverflowMarquee(child: Text('Purchase: ${stock?.purchasePrice.toString() ?? '--'}')),
-          OverflowMarquee(child: Text('Sale: ${product.salePrice.toString()}')),
+          Text('Purchase: ${stock?.purchasePrice.toString() ?? '--'}'),
+          Text('Sale: ${product.salePrice.toString()}'),
         ],
       );
     },
@@ -171,11 +177,9 @@ class ProductsView extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                OverflowMarquee(child: Text(product.name, style: context.text.list)),
-                if (product.sku != null)
-                  OverflowMarquee(child: Text('SKU: ${product.sku ?? '--'}', style: context.text.muted)),
-                if (product.manufacturer != null)
-                  OverflowMarquee(child: Text(product.manufacturer ?? '--', style: context.text.muted)),
+                Text(product.name, style: context.text.list),
+                if (product.sku != null) Text('SKU: ${product.sku ?? '--'}', style: context.text.muted),
+                if (product.manufacturer != null) Text(product.manufacturer ?? '--', style: context.text.muted),
               ],
             ),
           ),

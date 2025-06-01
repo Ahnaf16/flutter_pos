@@ -1,6 +1,50 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:pos/main.export.dart';
 
+enum FilterDateRange {
+  today,
+  yesterday,
+  week,
+  month,
+  year;
+
+  IconData get icon {
+    return switch (this) {
+      today => LuIcons.calendar,
+      yesterday => LuIcons.calendarFold,
+      week => LuIcons.calendar1,
+      month => LuIcons.calendarDays,
+      year => LuIcons.calendarRange,
+    };
+  }
+
+  String get title {
+    return switch (this) {
+      today => 'Today',
+      yesterday => 'Yesterday',
+      week => 'This week',
+      month => 'This month',
+      year => 'This year',
+    };
+  }
+
+  (DateTime start, DateTime end) get effectiveDates {
+    final now = DateTime.now();
+    switch (this) {
+      case FilterDateRange.today:
+        return (now.startOfDay, now.endOfDay);
+      case FilterDateRange.yesterday:
+        return (now.previousDay.startOfDay, now.previousDay.endOfDay);
+      case FilterDateRange.week:
+        return (now.startOfWeek, now.endOfWeek);
+      case FilterDateRange.month:
+        return (now.startOfMonth, now.endOfMonth);
+      case FilterDateRange.year:
+        return (now.startOfYear, now.endOfYear);
+    }
+  }
+}
+
 enum FilterType {
   dateFrom,
   dateTo,
@@ -9,7 +53,8 @@ enum FilterType {
   unit,
   status,
   roles,
-  type;
+  type,
+  numRange;
 
   IconData get icon {
     return switch (this) {
@@ -21,6 +66,7 @@ enum FilterType {
       status => LuIcons.circleDashed,
       roles => LuIcons.shield,
       type => LuIcons.tags,
+      numRange => LuIcons.hash,
     };
   }
 
@@ -34,6 +80,7 @@ enum FilterType {
       status => 'Status',
       roles => 'Role',
       type => 'Type',
+      numRange => 'Range',
     };
   }
 
@@ -46,6 +93,7 @@ enum FilterType {
   bool get isUnit => this == FilterType.unit;
   bool get isStatus => this == FilterType.status;
   bool get isRole => this == FilterType.roles;
+  bool get isNumRange => this == FilterType.numRange;
 }
 
 class FilterState {
@@ -59,6 +107,7 @@ class FilterState {
     this.units = const [],
     this.statuses = const [],
     this.roles = const [],
+    this.numRange = (start: null, end: null),
   });
 
   final String? query;
@@ -70,28 +119,32 @@ class FilterState {
   final List<ProductUnit> units;
   final List<InventoryStatus> statuses;
   final List<UserRole> roles;
+  final ({num? start, num? end}) numRange;
 
   FilterState copyWith({
     ValueGetter<String?>? query,
     ValueGetter<DateTime?>? from,
     ValueGetter<DateTime?>? to,
-    ValueGetter<List<WareHouse>>? houses,
-    ValueGetter<List<PaymentAccount>>? accounts,
-    ValueGetter<List<TransactionType>>? trxTypes,
-    ValueGetter<List<ProductUnit>>? units,
-    ValueGetter<List<InventoryStatus>>? statuses,
-    ValueGetter<List<UserRole>>? roles,
+    ListValueGetter<WareHouse>? houses,
+    ListValueGetter<PaymentAccount>? accounts,
+    ListValueGetter<TransactionType>? trxTypes,
+    ListValueGetter<ProductUnit>? units,
+    ListValueGetter<InventoryStatus>? statuses,
+    ListValueGetter<UserRole>? roles,
+    ValueGetter<num?>? start,
+    ValueGetter<num?>? end,
   }) {
     return FilterState(
       query: query != null ? query() : this.query,
       from: from != null ? from() : this.from,
       to: to != null ? to() : this.to,
-      houses: houses != null ? houses() : this.houses,
-      accounts: accounts != null ? accounts() : this.accounts,
-      trxTypes: trxTypes != null ? trxTypes() : this.trxTypes,
-      units: units != null ? units() : this.units,
-      statuses: statuses != null ? statuses() : this.statuses,
-      roles: roles != null ? roles() : this.roles,
+      houses: houses != null ? houses(this.houses) : this.houses,
+      accounts: accounts != null ? accounts(this.accounts) : this.accounts,
+      trxTypes: trxTypes != null ? trxTypes(this.trxTypes) : this.trxTypes,
+      units: units != null ? units(this.units) : this.units,
+      statuses: statuses != null ? statuses(this.statuses) : this.statuses,
+      roles: roles != null ? roles(this.roles) : this.roles,
+      numRange: (start: start != null ? start() : numRange.start, end: end != null ? end() : numRange.end),
     );
   }
 
@@ -168,6 +221,18 @@ class FilterState {
             return Query.between(key, from!.justDate.toIso8601String(), from!.nextDay.justDate.toIso8601String());
           }
           if (to != null) return Query.lessThanEqual(key, to!.justDate.toIso8601String());
+          return null;
+        }
+
+      case FilterType.numRange:
+        {
+          if (numRange.start != null && numRange.end != null) {
+            return Query.between(key, numRange.start, numRange.end);
+          }
+          if (numRange.start != null) {
+            return Query.greaterThanEqual(key, numRange.start.toString());
+          }
+          if (numRange.end != null) return Query.lessThanEqual(key, numRange.end.toString());
           return null;
         }
 

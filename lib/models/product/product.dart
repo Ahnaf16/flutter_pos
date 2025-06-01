@@ -12,6 +12,7 @@ class Product {
     required this.stock,
     required this.manufacturer,
     required this.salePrice,
+    required this.createdAt,
   });
 
   final String id;
@@ -23,6 +24,7 @@ class Product {
   final List<Stock> stock;
   final String? manufacturer;
   final num salePrice;
+  final DateTime createdAt;
 
   factory Product.fromDoc(Document doc) {
     final data = doc.data;
@@ -39,6 +41,7 @@ class Product {
       },
       manufacturer: data['manufacturer'],
       salePrice: data['sale_price'],
+      createdAt: DateTime.parse(doc.$createdAt),
     );
   }
 
@@ -56,6 +59,7 @@ class Product {
       },
       manufacturer: map['manufacturer'],
       salePrice: map.parseNum('sale_price'),
+      createdAt: DateTime.parse(map.parseAwField('createdAt')),
     );
   }
 
@@ -84,6 +88,7 @@ class Product {
       },
       manufacturer: map['manufacturer'] ?? manufacturer,
       salePrice: map.parseNum('sale_price', fallBack: salePrice),
+      createdAt: createdAt,
     );
   }
 
@@ -99,6 +104,7 @@ class Product {
     'stock': stock.map((e) => e.toMap()).toList(),
     'manufacturer': manufacturer,
     'sale_price': salePrice,
+    'createdAt': createdAt.toIso8601String(),
   };
 
   Map<String, dynamic> toAwPost([List<String>? include]) {
@@ -119,6 +125,8 @@ class Product {
     add(fields.manufacturer, manufacturer);
     add(fields.salePrice, salePrice);
 
+    add(fields.createdAt, createdAt.toIso8601String());
+
     return map;
   }
 
@@ -132,6 +140,7 @@ class Product {
     List<Stock>? stock,
     ValueGetter<String?>? manufacturer,
     num? salePrice,
+    DateTime? createdAt,
   }) {
     return Product(
       id: id ?? this.id,
@@ -143,6 +152,7 @@ class Product {
       stock: stock ?? this.stock,
       manufacturer: manufacturer != null ? manufacturer() : this.manufacturer,
       salePrice: salePrice ?? this.salePrice,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -240,6 +250,7 @@ class _ProductFiled {
   final String manageStock = 'manage_stock';
   final String manufacturer = 'manufacturer';
   final String salePrice = 'sale_price';
+  final String createdAt = 'created_at';
 }
 
 extension ProductEx on List<Product> {

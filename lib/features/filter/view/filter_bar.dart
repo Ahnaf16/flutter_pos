@@ -20,6 +20,7 @@ class FilterBar extends HookConsumerWidget {
     this.onSearch,
     this.onReset,
     this.hintText,
+    this.extraTiles,
   });
 
   final List<PaymentAccount> accounts;
@@ -33,14 +34,18 @@ class FilterBar extends HookConsumerWidget {
   final Function(String q)? onSearch;
   final VoidCallback? onReset;
   final String? hintText;
+  final List<FilterTile> Function(BuildContext context, FilterState filter)? extraTiles;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final popCtrl = useMemoized(ShadPopoverController.new);
+    final popCtrl2nd = useMemoized(ShadPopoverController.new);
     final searchCtrl = useTextEditingController();
 
-    final fState = ref.watch(filterCtrlProvider);
+    final filter = ref.watch(filterCtrlProvider);
     final ctrl = useCallback(() => ref.read(filterCtrlProvider.notifier));
+
+    final state = useState<FilterState>(filter);
 
     return Column(
       spacing: Insets.xs,
@@ -55,10 +60,47 @@ class FilterBar extends HookConsumerWidget {
                   controller: searchCtrl,
                   hintText: hintText ?? 'Search',
                   leading: const Icon(LuIcons.search),
-                  onChanged: (v) => onSearch?.call((v ?? '').low),
+                  // onChanged: (v) => onSearch?.call((v ?? '').low),
                   showClearButton: true,
                 ),
               ),
+            if (showDateRange)
+              ShadPopover(
+                controller: popCtrl2nd,
+                padding: Pads.sm(),
+                anchor: const ShadAnchorAuto(targetAnchor: Alignment.bottomRight, offset: Offset(13, 0)),
+                popover: (context) {
+                  return _PopOverWidget(
+                    builder: (context) => FiltererBody(
+                      children: [
+                        for (final rangeType in FilterDateRange.values)
+                          FilterTile(
+                            leading: rangeType.icon,
+                            text: rangeType.title,
+                            onPressed: () {
+                              final (start, end) = rangeType.effectiveDates;
+                              state.value = state.value.copyWith(from: () => start, to: () => end);
+                              popCtrl2nd.toggle();
+                            },
+                          ),
+                        FilterTile(
+                          leading: LuIcons.calendarCog,
+                          text: 'Custom range',
+                          onPressed: () {
+                            _push(context, _DateSelector(state));
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: ShadButton.outline(
+                  leading: Icon(FilterType.dateFrom.icon),
+                  child: const Text('Date range'),
+                  onPressed: () => popCtrl2nd.toggle(),
+                ),
+              ),
+
             ShadPopover(
               controller: popCtrl,
               padding: Pads.sm(),
@@ -77,11 +119,14 @@ class FilterBar extends HookConsumerWidget {
                               _ListItemBuilder<TransactionType>(
                                 title: 'Transaction types',
                                 values: types,
+                                filter: state,
                                 nameBuilder: (value) => value.name,
                                 isSelected: (fState, type) => fState.trxTypes.contains(type),
-                                onSelect: (value) => ctrl().copyWith(trxTypes: (s) => {...s, value}.toList()),
-                                onRemove: (value) =>
-                                    ctrl().copyWith(trxTypes: (s) => s.whereNot((e) => e == value).toList()),
+                                onSelect: (value) =>
+                                    state.value = state.value.copyWith(trxTypes: (s) => {...s, value}.toList()),
+                                onRemove: (value) => state.value = state.value.copyWith(
+                                  trxTypes: (s) => s.whereNot((e) => e == value).toList(),
+                                ),
                               ),
                             );
                           },
@@ -97,11 +142,14 @@ class FilterBar extends HookConsumerWidget {
                               _ListItemBuilder<InventoryStatus>(
                                 title: 'Status',
                                 values: statuses,
+                                filter: state,
                                 nameBuilder: (value) => value.name,
                                 isSelected: (fState, type) => fState.statuses.contains(type),
-                                onSelect: (value) => ctrl().copyWith(statuses: (s) => {...s, value}.toList()),
-                                onRemove: (value) =>
-                                    ctrl().copyWith(statuses: (s) => s.whereNot((e) => e == value).toList()),
+                                onSelect: (value) =>
+                                    state.value = state.value.copyWith(statuses: (s) => {...s, value}.toList()),
+                                onRemove: (value) => state.value = state.value.copyWith(
+                                  statuses: (s) => s.whereNot((e) => e == value).toList(),
+                                ),
                               ),
                             );
                           },
@@ -117,11 +165,14 @@ class FilterBar extends HookConsumerWidget {
                               _ListItemBuilder<PaymentAccount>(
                                 title: 'Accounts',
                                 values: accounts,
+                                filter: state,
                                 nameBuilder: (value) => value.name,
                                 isSelected: (fState, type) => fState.accounts.contains(type),
-                                onSelect: (value) => ctrl().copyWith(accounts: (s) => {...s, value}.toList()),
-                                onRemove: (value) =>
-                                    ctrl().copyWith(accounts: (s) => s.whereNot((e) => e == value).toList()),
+                                onSelect: (value) =>
+                                    state.value = state.value.copyWith(accounts: (s) => {...s, value}.toList()),
+                                onRemove: (value) => state.value = state.value.copyWith(
+                                  accounts: (s) => s.whereNot((e) => e == value).toList(),
+                                ),
                               ),
                             );
                           },
@@ -137,11 +188,14 @@ class FilterBar extends HookConsumerWidget {
                               _ListItemBuilder<WareHouse>(
                                 title: 'Warehouse',
                                 values: houses,
+                                filter: state,
                                 nameBuilder: (value) => value.name,
                                 isSelected: (fState, type) => fState.houses.contains(type),
-                                onSelect: (value) => ctrl().copyWith(houses: (s) => {...s, value}.toList()),
-                                onRemove: (value) =>
-                                    ctrl().copyWith(houses: (s) => s.whereNot((e) => e == value).toList()),
+                                onSelect: (value) =>
+                                    state.value = state.value.copyWith(houses: (s) => {...s, value}.toList()),
+                                onRemove: (value) => state.value = state.value.copyWith(
+                                  houses: (s) => s.whereNot((e) => e == value).toList(),
+                                ),
                               ),
                             );
                           },
@@ -157,11 +211,14 @@ class FilterBar extends HookConsumerWidget {
                               _ListItemBuilder<UserRole>(
                                 title: 'Roles',
                                 values: roles,
+                                filter: state,
                                 nameBuilder: (value) => value.name,
                                 isSelected: (fState, type) => fState.roles.contains(type),
-                                onSelect: (value) => ctrl().copyWith(roles: (s) => {...s, value}.toList()),
-                                onRemove: (value) =>
-                                    ctrl().copyWith(roles: (s) => s.whereNot((e) => e == value).toList()),
+                                onSelect: (value) =>
+                                    state.value = state.value.copyWith(roles: (s) => {...s, value}.toList()),
+                                onRemove: (value) => state.value = state.value.copyWith(
+                                  roles: (s) => s.whereNot((e) => e == value).toList(),
+                                ),
                               ),
                             );
                           },
@@ -177,38 +234,38 @@ class FilterBar extends HookConsumerWidget {
                               _ListItemBuilder<ProductUnit>(
                                 title: 'Product unit',
                                 values: units,
+                                filter: state,
                                 nameBuilder: (value) => value.name,
                                 isSelected: (fState, type) => fState.units.contains(type),
-                                onSelect: (value) => ctrl().copyWith(units: (s) => {...s, value}.toList()),
-                                onRemove: (value) =>
-                                    ctrl().copyWith(units: (s) => s.whereNot((e) => e == value).toList()),
+                                onSelect: (value) =>
+                                    state.value = state.value.copyWith(units: (s) => {...s, value}.toList()),
+                                onRemove: (value) => state.value = state.value.copyWith(
+                                  units: (s) => s.whereNot((e) => e == value).toList(),
+                                ),
                               ),
                             );
                           },
                         ),
 
-                      if (showDateRange)
-                        FilterTile(
-                          leading: FilterType.dateFrom.icon,
-                          text: 'Date range',
-                          onPressed: () {
-                            _push(
-                              context,
-                              const _DateSelector(),
-                            );
-                          },
-                        ),
+                      // if (extraTiles != null) ...extraTiles!(context, state.value),
                     ],
                   ),
                 );
               },
               child: ShadButton.outline(
                 leading: const Icon(LuIcons.funnel),
-                child: const Text('Filter'),
+                child: const Text('Advanced Filter'),
                 onPressed: () => popCtrl.toggle(),
               ),
             ),
 
+            ShadIconButton(
+              icon: const Icon(LuIcons.search),
+              onPressed: () {
+                onSearch?.call(searchCtrl.text.low);
+                ctrl().setState(state.value);
+              },
+            ),
             ShadIconButton.outline(
               backgroundColor: context.colors.destructive.op1,
               foregroundColor: context.colors.destructive,
@@ -217,7 +274,8 @@ class FilterBar extends HookConsumerWidget {
               pressedBackgroundColor: context.colors.destructive.op3,
               icon: const Icon(LuIcons.refreshCw),
               onPressed: () {
-                ctrl().reset();
+                state.value = state.value = const FilterState();
+                ctrl().setState(state.value);
                 searchCtrl.clear();
                 onReset?.call();
               },
@@ -228,7 +286,7 @@ class FilterBar extends HookConsumerWidget {
           spacing: Insets.sm,
           runSpacing: Insets.xs,
           children: [
-            for (final MapEntry(:key, :value) in fState.buildNames().entries)
+            for (final MapEntry(:key, :value) in state.value.buildNames().entries)
               ShadCard(
                 expanded: false,
                 backgroundColor: context.colors.secondary,
@@ -256,7 +314,7 @@ class FilterBar extends HookConsumerWidget {
                       ),
 
                       icon: const Icon(LucideIcons.x),
-                      onPressed: () => ctrl().clearByType(key),
+                      onPressed: () => state.value = state.value = ctrl().clearByType(key, state.value = state.value),
                     ),
                   ],
                 ),
@@ -276,6 +334,7 @@ class _ListItemBuilder<T> extends HookConsumerWidget {
     required this.isSelected,
     required this.onSelect,
     required this.onRemove,
+    required this.filter,
     this.title,
   });
 
@@ -285,40 +344,46 @@ class _ListItemBuilder<T> extends HookConsumerWidget {
   final bool Function(FilterState state, T value) isSelected;
   final Function(T value) onSelect;
   final Function(T value) onRemove;
+  final ValueNotifier<FilterState> filter;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fState = ref.watch(filterCtrlProvider);
-
-    return FiltererBody(
-      showBack: true,
-      title: title,
-      children: [
-        for (final type in values)
-          FilterTileSelectable<T>(
-            value: type,
-            text: nameBuilder(type).titleCase,
-            selected: isSelected(fState, type),
-            onPressed: () {
-              if (!isSelected(fState, type)) return onSelect(type);
-              onRemove(type);
-            },
-          ),
-      ],
+    return ValueListenableBuilder(
+      valueListenable: filter,
+      builder: (context, fState, child) {
+        return FiltererBody(
+          showBack: true,
+          title: title,
+          children: [
+            for (final type in values)
+              FilterTileSelectable<T>(
+                value: type,
+                text: nameBuilder(type).titleCase,
+                selected: isSelected(fState, type),
+                onPressed: () {
+                  if (!isSelected(fState, type)) return onSelect(type);
+                  onRemove(type);
+                },
+              ),
+          ],
+        );
+      },
     );
   }
 }
 
 class _DateSelector extends HookConsumerWidget {
-  const _DateSelector();
+  const _DateSelector(this.state);
+
+  final ValueNotifier<FilterState> state;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fState = ref.watch(filterCtrlProvider);
-    final ctrl = useCallback(() => ref.read(filterCtrlProvider.notifier));
+    // final fState = ref.watch(filterCtrlProvider);
+    // final ctrl = useCallback(() => ref.read(filterCtrlProvider.notifier));
 
-    final from = useState<DateTime?>(fState.from);
-    final to = useState<DateTime?>(fState.to);
+    final from = useState<DateTime?>(state.value.from);
+    final to = useState<DateTime?>(state.value.to);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -392,10 +457,63 @@ class _DateSelector extends HookConsumerWidget {
               ),
               child: const Text('Submit'),
               onPressed: () {
-                ctrl().copyWith(
+                state.value = state.value = state.value = state.value.copyWith(
                   from: from.value == null ? null : () => from.value,
                   to: to.value == null ? null : () => to.value,
                 );
+                context.nPop();
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ignore: unused_element
+class _NumRangeSelector extends HookConsumerWidget {
+  const _NumRangeSelector();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final fState = ref.watch(filterCtrlProvider);
+    // final ctrl = useCallback(() => ref.read(filterCtrlProvider.notifier));
+
+    // final start = useState<num?>(fState.numRange.start);
+    // final end = useState<num?>(fState.numRange.end);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      spacing: Insets.med,
+      children: [
+        const Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: Insets.sm,
+        ),
+
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: Insets.sm,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ShadButton.outline(
+              height: 35,
+              decoration: const ShadDecoration(
+                secondaryFocusedBorder: ShadBorder.none,
+                secondaryBorder: ShadBorder.none,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () => context.nPop(),
+            ),
+            ShadButton(
+              height: 35,
+              decoration: const ShadDecoration(
+                secondaryFocusedBorder: ShadBorder.none,
+                secondaryBorder: ShadBorder.none,
+              ),
+              child: const Text('Submit'),
+              onPressed: () {
                 context.nPop();
               },
             ),

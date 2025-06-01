@@ -10,8 +10,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_ctrl.g.dart';
 
-enum TableType { yearly, monthly }
-
 @Riverpod(keepAlive: true)
 class ViewingWH extends _$ViewingWH {
   Future<void> updateHouse(WareHouse? house) async {
@@ -29,10 +27,13 @@ class ViewingWH extends _$ViewingWH {
 @Riverpod()
 class HomeCounters extends _$HomeCounters {
   @override
-  Map<(String, RPath), dynamic> build() {
-    final products = ref.watch(productsCtrlProvider).maybeList();
-    final inventory = ref.watch(inventoryCtrlProvider(null)).maybeList();
-    final returns = ref.watch(inventoryReturnCtrlProvider(null)).maybeList();
+  Map<(String, RPath), dynamic> build(DateTime? start, DateTime? end) {
+    final products = ref.watch(productsCtrlProvider).maybeList().filterByDateRange(start, end, (e) => e.createdAt);
+    final inventory = ref.watch(inventoryCtrlProvider(null)).maybeList().filterByDateRange(start, end, (e) => e.date);
+    final returns = ref
+        .watch(inventoryReturnCtrlProvider(null))
+        .maybeList()
+        .filterByDateRange(start, end, (e) => e.returnDate);
     final peoples = ref.watch(partiesCtrlProvider(null)).maybeList();
     final accounts = ref.watch(paymentAccountsCtrlProvider()).maybeList();
 
@@ -41,15 +42,10 @@ class HomeCounters extends _$HomeCounters {
     final returnSales = returns.where((e) => e.returnedRec?.type == RecordType.sale);
     final returnPurchases = returns.where((e) => e.returnedRec?.type == RecordType.purchase);
 
-    final todaysSales = sales.where((e) => !e.status.isReturned && e.date.isSameDay(DateTime.now()));
-    final todaysPurchases = purchases.where((e) => !e.status.isReturned && e.date.isSameDay(DateTime.now()));
-
     return {
       ('Products', RPaths.products): products.length,
       ('Sales', RPaths.sales): sales.where((e) => !e.status.isReturned).map((e) => e.payable).sum.currency(),
       ('Purchase', RPaths.purchases): purchases.where((e) => !e.status.isReturned).map((e) => e.payable).sum.currency(),
-      ('Today\'s Sales', RPaths.sales): todaysSales.map((e) => e.payable).sum.currency(),
-      ('Today\'s Purchase', RPaths.purchases): todaysPurchases.map((e) => e.payable).sum.currency(),
       ('Sales Return', RPaths.salesReturn): returnSales.map((e) => e.adjustAccount).sum.currency(),
       ('Purchase Return', RPaths.purchasesReturn): returnPurchases.map((e) => e.adjustAccount).sum.currency(),
       ('Customer due', RPaths.customer): peoples
@@ -70,24 +66,14 @@ class HomeCounters extends _$HomeCounters {
 @riverpod
 class BarDataCtrl extends _$BarDataCtrl {
   @override
-  Map<int, List<TransactionLog>> build(TableType type, int month) {
-    final now = DateTime.now();
-
-    final trx = ref.watch(transactionLogCtrlProvider).maybeList().where((e) => e.date.year == now.year);
+  Map<int, List<TransactionLog>> build(DateTime? start, DateTime? end) {
+    final trx = ref.watch(transactionLogCtrlProvider).maybeList().filterByDateRange(start, end, (e) => e.date);
 
     final data = <int, List<TransactionLog>>{};
 
-    if (type == TableType.yearly) {
-      final trxGroup = trx.groupListsBy((e) => e.date.month);
-      for (var month = 1; month <= 12; month++) {
-        data[month] = trxGroup[month] ?? [];
-      }
-    } else {
-      final trxGroup = trx.where((e) => e.date.month == month).groupListsBy((e) => e.date.day);
-      final length = getMonth(month).daysInMonth;
-      for (var day = 1; day <= length; day++) {
-        data[day] = trxGroup[day] ?? [];
-      }
+    final trxGroup = trx.groupListsBy((e) => e.date.month);
+    for (var month = 1; month <= 12; month++) {
+      data[month] = trxGroup[month] ?? [];
     }
 
     return data;
