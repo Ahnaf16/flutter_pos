@@ -8,6 +8,8 @@ class InventoryDetails {
     required this.stock,
     required this.quantity,
     required this.price,
+    this.record,
+    required this.createdDate,
   });
   final String id;
 
@@ -15,6 +17,8 @@ class InventoryDetails {
   final Stock stock;
   final int quantity;
   final num price;
+  final InventoryRecord? record;
+  final DateTime createdDate;
 
   factory InventoryDetails.fromDoc(Document doc) {
     final data = doc.data;
@@ -24,6 +28,8 @@ class InventoryDetails {
       stock: Stock.fromMap(data['stock']),
       quantity: data['quantity'],
       price: data['price'],
+      record: InventoryRecord.tryParse(data['record']),
+      createdDate: DateTime.parse(doc.$createdAt),
     );
   }
 
@@ -34,6 +40,8 @@ class InventoryDetails {
       stock: Stock.fromMap(map['stock']),
       quantity: map.parseInt('quantity'),
       price: map.parseNum('price'),
+      record: InventoryRecord.tryParse(map['record']),
+      createdDate: DateTime.parse(map.parseAwField('createdAt')),
     );
   }
 
@@ -54,6 +62,8 @@ class InventoryDetails {
       stock: map['stock'] == null ? stock : Stock.fromMap(map['stock']),
       quantity: map.parseInt('quantity', quantity),
       price: map.parseNum('price', fallBack: price),
+      record: map['record'] == null ? record : InventoryRecord.tryParse(map['record']),
+      createdDate: createdDate,
     );
   }
 
@@ -63,17 +73,29 @@ class InventoryDetails {
     'stock': stock.toMap(),
     'quantity': quantity,
     'price': price,
+    'record': record?.toMap(),
+    'createdAt': createdDate.toIso8601String(),
   };
 
   Map<String, dynamic> toAwPost() => {'products': product.id, 'stock': stock.id, 'quantity': quantity, 'price': price};
 
-  InventoryDetails copyWith({String? id, Product? product, Stock? stock, int? quantity, num? price}) {
+  InventoryDetails copyWith({
+    String? id,
+    Product? product,
+    Stock? stock,
+    int? quantity,
+    num? price,
+    ValueGetter<InventoryRecord?>? record,
+    DateTime? createdDate,
+  }) {
     return InventoryDetails(
       id: id ?? this.id,
       product: product ?? this.product,
       stock: stock ?? this.stock,
       quantity: quantity ?? this.quantity,
       price: price ?? this.price,
+      record: record != null ? record() : this.record,
+      createdDate: createdDate ?? this.createdDate,
     );
   }
 

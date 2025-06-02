@@ -191,7 +191,7 @@ class _ProductHeader extends StatelessWidget {
             ShadCard(
               expanded: false,
               padding: Pads.xs(),
-              child: HostedImage.square(product.getPhoto, radius: Corners.sm, dimension: 40),
+              child: HostedImage.square(product.getPhoto(), radius: Corners.sm, dimension: 40),
             ),
 
             Flexible(

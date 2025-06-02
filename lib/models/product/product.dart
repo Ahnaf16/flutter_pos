@@ -92,7 +92,7 @@ class Product {
     );
   }
 
-  Img get getPhoto => photo == null ? Img.icon(LucideIcons.package, 25) : Img.aw(photo!);
+  Img getPhoto([double size = 25]) => photo == null ? Img.icon(LucideIcons.package, size) : Img.aw(photo!);
 
   QMap toMap() => {
     'id': id,

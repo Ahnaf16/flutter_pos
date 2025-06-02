@@ -7,6 +7,7 @@ import 'package:pos/features/auth/repository/auth_repo.dart';
 import 'package:pos/features/parties/repository/parties_repo.dart';
 import 'package:pos/features/payment_accounts/repository/payment_accounts_repo.dart';
 import 'package:pos/features/products/repository/products_repo.dart';
+import 'package:pos/features/settings/repository/config_repo.dart';
 import 'package:pos/features/stock/repository/stock_repo.dart';
 import 'package:pos/features/transactions/repository/transactions_repo.dart';
 import 'package:pos/main.export.dart';
@@ -19,10 +20,13 @@ class InventoryRepo with AwHandler {
     final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
     if (err != null || user == null) return left(err ?? const Failure('Unable to get current user'));
 
+    final (cErr, config) = await locate<ConfigRepo>().getConfig().toRecord();
+    if (err != null || config == null) return left(err ?? const Failure('Unable to get config'));
+
     //! add details
     final (detailErr, detailsData) = await _createRecordDetails(inventory.details, true).toRecord();
     if (detailErr != null || detailsData == null) return left(detailErr ?? Failure(_generalFailure));
-    final record = inventory.copyWith(details: detailsData).toInventoryRecord(user);
+    final record = inventory.copyWith(details: detailsData).toInventoryRecord(user, config);
 
     //! update account amount
     final acc = record.account;
@@ -61,8 +65,11 @@ class InventoryRepo with AwHandler {
     final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
     if (err != null || user == null) return left(err ?? const Failure('Unable to get current user'));
 
+    final (cErr, config) = await locate<ConfigRepo>().getConfig().toRecord();
+    if (err != null || config == null) return left(err ?? const Failure('Unable to get config'));
+
     //! add details
-    InventoryRecord record = inventory.toInventoryRecord(user);
+    InventoryRecord record = inventory.toInventoryRecord(user, config);
     Party? parti = record.party;
     if (parti == null && !ignoreParty) return left(const Failure('Parti is required when purchasing'));
 
@@ -266,6 +273,12 @@ class InventoryRepo with AwHandler {
     return await db
         .getList(AWConst.collections.inventoryRecord, queries: queries)
         .convert((docs) => docs.convertDoc(InventoryRecord.fromDoc));
+  }
+
+  FutureReport<List<InventoryDetails>> getInvDetails(List<String> queries) async {
+    return await db
+        .getList(AWConst.collections.inventoryDetails, queries: queries)
+        .convert((docs) => docs.convertDoc(InventoryDetails.fromDoc));
   }
 
   FutureReport<InventoryRecord> getRecordById(String id) async {

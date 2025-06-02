@@ -265,7 +265,7 @@ class FilterBar extends HookConsumerWidget {
                 onSearch?.call(searchCtrl.text.low);
                 ctrl().setState(state.value);
               },
-            ),
+            ).toolTip('Search & Filter'),
             ShadIconButton.outline(
               backgroundColor: context.colors.destructive.op1,
               foregroundColor: context.colors.destructive,
@@ -279,7 +279,7 @@ class FilterBar extends HookConsumerWidget {
                 searchCtrl.clear();
                 onReset?.call();
               },
-            ),
+            ).toolTip('Reset'),
           ],
         ),
         Wrap(
@@ -315,7 +315,7 @@ class FilterBar extends HookConsumerWidget {
 
                       icon: const Icon(LucideIcons.x),
                       onPressed: () => state.value = state.value = ctrl().clearByType(key, state.value = state.value),
-                    ),
+                    ).toolTip('Remove ${key.title} filter'),
                   ],
                 ),
               ),

@@ -41,7 +41,7 @@ class BaseBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget child = AnimatedPadding(
-      padding: padding ?? context.layout.pagePadding.copyWith(top: Insets.sm),
+      padding: padding ?? Pads.med(),
       duration: 250.ms,
       child: body,
     );

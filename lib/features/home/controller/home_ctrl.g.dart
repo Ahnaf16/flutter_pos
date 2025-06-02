@@ -206,7 +206,7 @@ class _HomeCountersProviderElement
   DateTime? get end => (origin as HomeCountersProvider).end;
 }
 
-String _$barDataCtrlHash() => r'7a83b4dc66b5d805c8dee5a2ea9519d21506c69f';
+String _$barDataCtrlHash() => r'a6408f979cfb296477dd796860da8214fe45c0ae';
 
 abstract class _$BarDataCtrl
     extends BuildlessAutoDisposeNotifier<Map<int, List<TransactionLog>>> {

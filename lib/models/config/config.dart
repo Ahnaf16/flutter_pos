@@ -6,6 +6,8 @@ enum StockDistPolicy { newerFirst, olderFirst }
 class Config {
   const Config({
     required this.currencySymbol,
+    required this.invoicePrefix,
+    required this.skuPrefix,
     required this.symbolLeft,
     required this.stockDistPolicy,
     required this.minimumVersion,
@@ -14,6 +16,8 @@ class Config {
   });
 
   final String currencySymbol;
+  final String invoicePrefix;
+  final String skuPrefix;
   final bool symbolLeft;
   final StockDistPolicy stockDistPolicy;
   final String? minimumVersion;
@@ -24,6 +28,8 @@ class Config {
 
   static Config get _def => const Config(
     currencySymbol: '\$',
+    invoicePrefix: 'INV',
+    skuPrefix: 'SKU',
     symbolLeft: true,
     stockDistPolicy: StockDistPolicy.newerFirst,
     minimumVersion: null,
@@ -43,6 +49,8 @@ class Config {
       minimumVersion: map['minimum_version'] ?? _def.minimumVersion,
       defAccount: PaymentAccount.tryParse(map['default_account']),
       shop: ShopConfig.fromMap(map),
+      invoicePrefix: map['invoice_prefix'] ?? _def.invoicePrefix,
+      skuPrefix: map['sku_prefix'] ?? _def.skuPrefix,
     );
   }
 
@@ -69,6 +77,8 @@ class Config {
       minimumVersion: map['minimum_version'] ?? minimumVersion,
       defAccount: PaymentAccount.tryParse(map['default_account']) ?? defAccount,
       shop: shop.marge(map),
+      invoicePrefix: map['invoice_prefix'] ?? invoicePrefix,
+      skuPrefix: map['sku_prefix'] ?? skuPrefix,
     );
   }
 
@@ -80,6 +90,8 @@ class Config {
       'minimum_version': minimumVersion,
       'default_account': defAccount?.toMap(),
       ...shop.toMap(),
+      'invoice_prefix': invoicePrefix,
+      'sku_prefix': skuPrefix,
     };
   }
 
@@ -90,10 +102,14 @@ class Config {
     'minimum_version': minimumVersion,
     'default_account': defAccount?.id,
     ...shop.toMap(),
+    'invoice_prefix': invoicePrefix,
+    'sku_prefix': skuPrefix,
   };
 
   Config copyWith({
     String? currencySymbol,
+    String? invoicePrefix,
+    String? skuPrefix,
     bool? symbolLeft,
     StockDistPolicy? stockDistPolicy,
     ValueGetter<String?>? minimumVersion,
@@ -102,6 +118,8 @@ class Config {
   }) {
     return Config(
       currencySymbol: currencySymbol ?? this.currencySymbol,
+      invoicePrefix: invoicePrefix ?? this.invoicePrefix,
+      skuPrefix: skuPrefix ?? this.skuPrefix,
       symbolLeft: symbolLeft ?? this.symbolLeft,
       stockDistPolicy: stockDistPolicy ?? this.stockDistPolicy,
       minimumVersion: minimumVersion != null ? minimumVersion() : this.minimumVersion,

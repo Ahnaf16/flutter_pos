@@ -23,7 +23,6 @@ class PartyDetailsView extends HookConsumerWidget {
 
     return BaseBody(
       title: '${isCustomer ? 'Customer' : 'Supplier'} Details',
-      // scrollable: true,
       body: party.when(
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: partyDetailsProvider),
@@ -83,7 +82,10 @@ class PartyDetailsView extends HookConsumerWidget {
                       showDue: true,
                       direction: Axis.vertical,
                       onEdit: () {
-                        showShadDialog(context: context, builder: (context) => PartyBalanceDialog(party: party));
+                        showShadDialog(
+                          context: context,
+                          builder: (context) => PartyBalanceDialog(party: party),
+                        );
                       },
                     ),
                   ],
@@ -121,7 +123,10 @@ class PartyBalanceDialog extends HookConsumerWidget {
       title: const Text('Update Due'),
       description: Row(
         spacing: Insets.sm,
-        children: [Text('Update ${party.name}\'s Due'), ShadBadge.outline(child: Text(party.type.name))],
+        children: [
+          Text('Update ${party.name}\'s Due'),
+          ShadBadge.outline(child: Text(party.type.name)),
+        ],
       ),
 
       actions: [

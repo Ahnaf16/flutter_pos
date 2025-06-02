@@ -121,7 +121,7 @@ class ShadTextField extends ShadFormDecoration<String> {
   final bool isRequired;
   final TextInputType? keyboardType;
   final String? label;
-  final Icon? leading;
+  final Widget? leading;
   final ValueChanged<String>? onSubmitted;
   final GestureTapCallback? onTap;
   final TapRegionCallback? onTapOutside;

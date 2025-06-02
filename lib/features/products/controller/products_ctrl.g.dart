@@ -147,7 +147,7 @@ class _ProductDetailsProviderElement
   String? get id => (origin as ProductDetailsProvider).id;
 }
 
-String _$productsCtrlHash() => r'561a162477a692aacecd3240de236e92202fa424';
+String _$productsCtrlHash() => r'6b6ab46ac37a2ab4888a0fb282fb227944d08c18';
 
 /// See also [ProductsCtrl].
 @ProviderFor(ProductsCtrl)

@@ -94,12 +94,22 @@ class ErrorDisplay extends HookConsumerWidget {
 }
 
 class EmptyWidget extends HookConsumerWidget {
-  const EmptyWidget(this.title, {super.key, this.description, this.dense = false, this.bordered = true});
+  const EmptyWidget(
+    this.title, {
+    super.key,
+    this.description,
+    this.dense = false,
+    this.bordered = true,
+    this.height,
+    this.width,
+  });
 
   final String? title;
   final String? description;
   final bool dense;
   final bool bordered;
+  final double? height;
+  final double? width;
 
   Widget withSF() => Scaffold(appBar: AppBar(), body: this);
 
@@ -109,6 +119,8 @@ class EmptyWidget extends HookConsumerWidget {
       childPadding: Pads.med(),
       border: bordered ? null : const Border(),
       shadows: bordered ? null : [],
+      height: height,
+      width: width,
       child: Center(
         child: Flex(
           direction: dense ? Axis.horizontal : Axis.vertical,

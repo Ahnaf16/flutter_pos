@@ -69,7 +69,7 @@ class ProductsPanel extends HookConsumerWidget {
                               color: context.colors.border,
                               borderRadius: Corners.sm,
                               alignment: Alignment.center,
-                              child: HostedImage.square(product.getPhoto, radius: Corners.sm),
+                              child: HostedImage.square(product.getPhoto(), radius: Corners.sm),
                             ),
                             Positioned(
                               bottom: 0,

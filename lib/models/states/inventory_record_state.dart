@@ -79,14 +79,16 @@ class InventoryRecordState {
 
   bool get isWalkIn => parti?.isWalkIn ?? true;
 
-  InventoryRecord toInventoryRecord(AppUser user) {
+  InventoryRecord toInventoryRecord(AppUser user, Config config) {
     InventoryStatus status = InventoryStatus.paid;
     if (paidAmount == 0) status = InventoryStatus.unpaid;
     if (paidAmount > 0 && paidAmount < totalPrice()) status = InventoryStatus.partial;
 
+    final inv = config.invoicePrefix + nanoid(length: 6, alphabet: Alphabet.numbers);
+
     return InventoryRecord(
       id: '',
-      invoiceNo: 'pos${nanoid(length: 8, alphabet: '0123456789')}',
+      invoiceNo: inv,
       party: parti,
       details: details,
       account: account,

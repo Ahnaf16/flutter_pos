@@ -95,6 +95,14 @@ Future<List<InventoryRecord>> recordsByParti(Ref ref, String? parti) async {
 }
 
 @riverpod
+Future<List<InventoryDetails>> recordDetailsByProduct(Ref ref, String? product) async {
+  if (product == null) return [];
+  final repo = locate<InventoryRepo>();
+  final result = await repo.getInvDetails([Query.equal('products', product)]);
+  return result.fold((l) => [], (r) => r);
+}
+
+@riverpod
 Future<InventoryRecord?> recordDetails(Ref ref, String? id) async {
   if (id == null) return null;
 

@@ -33,12 +33,65 @@ extension WidgetEx on Widget {
 
   Widget conditionalExpanded(bool condition, [int flex = 1]) => condition ? Expanded(flex: flex, child: this) : this;
   Widget conditionalFlexible(bool condition, [int flex = 1]) => condition ? Flexible(flex: flex, child: this) : this;
+
+  Widget toolTip(String text) => ShadTooltip(builder: (context) => Text(text), child: this);
 }
 
 extension ShadButtonEx on ShadButton {
   ShadButton compact() => ShadButton.ghost(padding: Pads.zero, height: 24, gap: 24, child: child);
 
-  Widget toolTip(String text) => ShadTooltip(builder: (context) => Text(text), child: this);
+  ShadButton colored(Color color, {bool filled = false}) => ShadButton.raw(
+    key: key,
+    variant: variant,
+    backgroundColor: filled ? color : color.op2,
+    foregroundColor: filled ? (color.computeLuminance() > 0.5 ? Colors.black : Colors.white) : color,
+    hoverBackgroundColor: filled ? color.op9 : color.op3,
+    hoverForegroundColor: filled ? (color.computeLuminance() > 0.5 ? Colors.black : Colors.white) : color,
+    pressedBackgroundColor: pressedBackgroundColor,
+    pressedForegroundColor: pressedForegroundColor,
+    shadows: shadows,
+    textDecoration: textDecoration,
+    textDirection: textDirection,
+    padding: padding,
+    height: height,
+    width: width,
+    decoration: decoration,
+    size: size,
+    gap: gap,
+    expands: expands,
+    cursor: cursor,
+    crossAxisAlignment: crossAxisAlignment,
+    autofocus: autofocus,
+    focusNode: focusNode,
+    gradient: gradient,
+    hoverStrategies: hoverStrategies,
+    hoverTextDecoration: hoverTextDecoration,
+    longPressDuration: longPressDuration,
+    mainAxisAlignment: mainAxisAlignment,
+    onDoubleTap: onDoubleTap,
+    onDoubleTapCancel: onDoubleTapCancel,
+    onLongPress: onLongPress,
+    onLongPressCancel: onLongPressCancel,
+    onLongPressEnd: onLongPressEnd,
+    onDoubleTapDown: onDoubleTapDown,
+    onLongPressDown: onLongPressDown,
+    onLongPressStart: onLongPressStart,
+    onSecondaryTapCancel: onSecondaryTapCancel,
+    onSecondaryTapDown: onSecondaryTapDown,
+    onSecondaryTapUp: onSecondaryTapUp,
+    onFocusChange: onFocusChange,
+    onHoverChange: onHoverChange,
+    onLongPressUp: onLongPressUp,
+    onTapCancel: onTapCancel,
+    onTapDown: onTapDown,
+    onTapUp: onTapUp,
+    statesController: statesController,
+    enabled: enabled,
+    leading: leading,
+    trailing: trailing,
+    onPressed: onPressed,
+    child: child,
+  );
 }
 
 extension ShadBadgeEx on ShadBadge {

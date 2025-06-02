@@ -50,6 +50,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       stock: stock,
       price: type.isSale ? product.salePrice : stock.purchasePrice,
       quantity: qty,
+      createdDate: DateTime.now(),
     );
 
     state = state.copyWith(details: [if (!replaceExisting) ...state.details, details]);

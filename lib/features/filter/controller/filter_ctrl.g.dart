@@ -6,7 +6,7 @@ part of 'filter_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$filterCtrlHash() => r'f4c605a9712bc6f72d64c4fd82d9c77900669e9e';
+String _$filterCtrlHash() => r'9a3cc379d35a00e4e13bf78290e55bff91b49113';
 
 /// See also [FilterCtrl].
 @ProviderFor(FilterCtrl)

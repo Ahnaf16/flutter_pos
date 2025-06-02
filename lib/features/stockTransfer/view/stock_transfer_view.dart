@@ -82,7 +82,7 @@ class StockTransferView extends HookConsumerWidget {
                                     spacing: Insets.med,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      HostedImage.square(product.getPhoto, dimension: 80, radius: Corners.med),
+                                      HostedImage.square(product.getPhoto(), dimension: 80, radius: Corners.med),
                                       Flexible(
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,

@@ -55,10 +55,10 @@ const _$pub = (
     printing: "^5.14.2",
     pathProvider: "^2.1.5",
     universalHtml: "^2.2.4",
-    flChart: "^1.0.0",
     embedAnnotation: "^1.2.2",
     navigatorResizable: "^1.0.2",
     timeago: "^3.7.1",
+    syncfusionFlutterCharts: "^29.2.7",
   ),
   devDependencies: (
     flutterTest: (sdk: "flutter"),

@@ -10,6 +10,7 @@ import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/view/account_add_dialog.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/features/products/controller/update_product_ctrl.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/staffs/controller/update_staff_ctrl.dart';
 import 'package:pos/features/unit/controller/unit_ctrl.dart';
 import 'package:pos/features/unit/view/unit_add_dialog.dart';
@@ -23,6 +24,8 @@ class CreateProductView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final updatingId = context.param('id');
+
+    final config = ref.watch(configCtrlProvider);
 
     final updatingStaff = ref.watch(updateProductCtrlProvider(updatingId));
     final updateCtrl = useCallback(() => ref.read(updateProductCtrlProvider(updatingId).notifier));
@@ -107,7 +110,7 @@ class CreateProductView extends HookConsumerWidget {
 
           return FormBuilder(
             key: formKey,
-            initialValue: updateProduct?.toMap().transformValues((_, v) => '$v') ?? {},
+            initialValue: updateProduct?.toMap().removeNullAndEmpty().transformValues((_, v) => '$v') ?? {},
             child: Column(
               spacing: Insets.lg,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,6 +172,7 @@ class CreateProductView extends HookConsumerWidget {
                           hintText: 'Enter sale price',
                           isRequired: true,
                           numeric: true,
+                          leading: Text(config.currencySymbol),
                         ),
                         ShadInputDecorator(
                           label: const Text('Product image'),
@@ -219,7 +223,7 @@ class CreateProductView extends HookConsumerWidget {
                                         )
                                       else ...[
                                         const Icon(LuIcons.cloudUpload, size: 40),
-                                        Text('Drag and drop your image here', style: context.text.muted),
+                                        Text('Select image', style: context.text.muted),
                                       ],
                                     ],
                                   ),
@@ -242,13 +246,13 @@ class CreateProductView extends HookConsumerWidget {
                               child: ShadTextField(
                                 name: 'sku',
                                 label: 'SKU',
-                                initialValue: nanoid(length: 8, alphabet: '0123456789'),
+                                initialValue: config.skuPrefix + nanoid(length: 6, alphabet: Alphabet.numbers),
                                 hintText: 'Enter product SKU',
                                 outsideTrailing: SmallButton(
                                   icon: LuIcons.refreshCcw,
                                   onPressed: () {
                                     final field = formKey.currentState!.fields['sku']!;
-                                    field.didChange(nanoid(length: 12));
+                                    field.didChange(config.skuPrefix + nanoid(length: 6, alphabet: Alphabet.numbers));
                                   },
                                 ),
                               ),
@@ -290,7 +294,8 @@ class _InitialStock extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final user = ref.watch(authStateSyncProvider).toNullable();
+    final config = ref.watch(configCtrlProvider);
+
     final viewingWh = ref.watch(viewingWHProvider);
 
     final warehouseList = ref.watch(warehouseCtrlProvider);
@@ -325,6 +330,7 @@ class _InitialStock extends HookConsumerWidget {
                     hintText: 'Enter purchase price',
                     isRequired: true,
                     numeric: true,
+                    leading: Text(config.currencySymbol),
                   ),
                 ),
 
@@ -349,6 +355,7 @@ class _InitialStock extends HookConsumerWidget {
                     hintText: 'Vat',
                     keyboardType: TextInputType.number,
                     numeric: true,
+                    leading: Text(config.currencySymbol),
                   ),
                 ),
                 Expanded(
@@ -358,6 +365,7 @@ class _InitialStock extends HookConsumerWidget {
                     hintText: 'Shipping charge',
                     keyboardType: TextInputType.number,
                     numeric: true,
+                    leading: Text(config.currencySymbol),
                   ),
                 ),
                 Expanded(
@@ -368,6 +376,7 @@ class _InitialStock extends HookConsumerWidget {
                     padding: kDefInputPadding.copyWith(bottom: 0, top: 0, right: 5),
                     keyboardType: TextInputType.number,
                     numeric: true,
+                    leading: Text(record.discountType == DiscountType.flat ? config.currencySymbol : '%'),
 
                     trailing: DiscountTypePopOver(
                       onTypeChange: recordCtrl().changeDiscountType,
@@ -388,7 +397,6 @@ class _InitialStock extends HookConsumerWidget {
                         name: 'record.supplier',
                         label: 'Supplier',
                         hintText: 'Select supplier',
-                        // isRequired: true,
                         options: parties,
                         selectedBuilder: (context, value) => Text(value.name),
                         optionBuilder: (_, value, _) {
@@ -454,7 +462,7 @@ class _InitialStock extends HookConsumerWidget {
                     label: 'Paid amount',
                     keyboardType: TextInputType.number,
                     numeric: true,
-                    // isRequired: true,
+                    leading: Text(config.currencySymbol),
                   ),
                 ),
               ],

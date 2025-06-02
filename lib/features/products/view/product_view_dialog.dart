@@ -19,7 +19,7 @@ class ProductViewDialog extends HookConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (product.photo != null) HostedImage.square(product.getPhoto, dimension: 80, radius: Corners.med),
+            if (product.photo != null) HostedImage.square(product.getPhoto(), dimension: 80, radius: Corners.med),
 
             SpacedText(left: 'Name', right: product.name, styleBuilder: (l, r) => (l, r.bold)),
             SpacedText(left: 'Manufacturer', right: product.manufacturer ?? '--', styleBuilder: (l, r) => (l, r.bold)),

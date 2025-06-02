@@ -148,6 +148,134 @@ class _RecordsByPartiProviderElement
   String? get parti => (origin as RecordsByPartiProvider).parti;
 }
 
+String _$recordDetailsByProductHash() =>
+    r'27907f748b02cc786209ddecdd3fd1ceddaffd07';
+
+/// See also [recordDetailsByProduct].
+@ProviderFor(recordDetailsByProduct)
+const recordDetailsByProductProvider = RecordDetailsByProductFamily();
+
+/// See also [recordDetailsByProduct].
+class RecordDetailsByProductFamily
+    extends Family<AsyncValue<List<InventoryDetails>>> {
+  /// See also [recordDetailsByProduct].
+  const RecordDetailsByProductFamily();
+
+  /// See also [recordDetailsByProduct].
+  RecordDetailsByProductProvider call(String? product) {
+    return RecordDetailsByProductProvider(product);
+  }
+
+  @override
+  RecordDetailsByProductProvider getProviderOverride(
+    covariant RecordDetailsByProductProvider provider,
+  ) {
+    return call(provider.product);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'recordDetailsByProductProvider';
+}
+
+/// See also [recordDetailsByProduct].
+class RecordDetailsByProductProvider
+    extends AutoDisposeFutureProvider<List<InventoryDetails>> {
+  /// See also [recordDetailsByProduct].
+  RecordDetailsByProductProvider(String? product)
+    : this._internal(
+        (ref) =>
+            recordDetailsByProduct(ref as RecordDetailsByProductRef, product),
+        from: recordDetailsByProductProvider,
+        name: r'recordDetailsByProductProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$recordDetailsByProductHash,
+        dependencies: RecordDetailsByProductFamily._dependencies,
+        allTransitiveDependencies:
+            RecordDetailsByProductFamily._allTransitiveDependencies,
+        product: product,
+      );
+
+  RecordDetailsByProductProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.product,
+  }) : super.internal();
+
+  final String? product;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<InventoryDetails>> Function(
+      RecordDetailsByProductRef provider,
+    )
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: RecordDetailsByProductProvider._internal(
+        (ref) => create(ref as RecordDetailsByProductRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        product: product,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<InventoryDetails>> createElement() {
+    return _RecordDetailsByProductProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RecordDetailsByProductProvider && other.product == product;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, product.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin RecordDetailsByProductRef
+    on AutoDisposeFutureProviderRef<List<InventoryDetails>> {
+  /// The parameter `product` of this provider.
+  String? get product;
+}
+
+class _RecordDetailsByProductProviderElement
+    extends AutoDisposeFutureProviderElement<List<InventoryDetails>>
+    with RecordDetailsByProductRef {
+  _RecordDetailsByProductProviderElement(super.provider);
+
+  @override
+  String? get product => (origin as RecordDetailsByProductProvider).product;
+}
+
 String _$recordDetailsHash() => r'6a509e5055f7c0b2498b229290bb0e4751afe428';
 
 /// See also [recordDetails].

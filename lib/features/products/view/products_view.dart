@@ -85,24 +85,18 @@ class ProductsView extends HookConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             ShadButton.secondary(
-                              backgroundColor: Colors.blue.op2,
-                              foregroundColor: Colors.blue,
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.eye),
                               onPressed: () {
                                 RPaths.productDetails(data.id).pushNamed(context);
                               },
-                            ).toolTip('View'),
+                            ).colored(Colors.blue).toolTip('View'),
                             ShadButton.secondary(
-                              backgroundColor: Colors.green.op2,
-                              foregroundColor: Colors.green,
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.pen),
                               onPressed: () => RPaths.editProduct(data.id).pushNamed(context),
-                            ).toolTip('Edit'),
+                            ).colored(Colors.green).toolTip('Edit'),
                             ShadButton.secondary(
-                              backgroundColor: context.colors.destructive.op2,
-                              foregroundColor: context.colors.destructive,
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.trash),
                               onPressed: () {
@@ -128,7 +122,7 @@ class ProductsView extends HookConsumerWidget {
                                   },
                                 );
                               },
-                            ).toolTip('Delete'),
+                            ).colored(context.colors.destructive).toolTip('Delete'),
                           ],
                         ),
                       ),
@@ -168,7 +162,7 @@ class ProductsView extends HookConsumerWidget {
         children: [
           ShadCard(
             expanded: false,
-            child: HostedImage.square(product.getPhoto, radius: Corners.sm, dimension: imgSize),
+            child: HostedImage.square(product.getPhoto(), radius: Corners.sm, dimension: imgSize),
           ),
 
           Flexible(

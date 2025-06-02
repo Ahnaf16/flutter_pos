@@ -330,7 +330,7 @@ class _ProductTile extends StatelessWidget {
           child: Row(
             spacing: Insets.sm,
             children: [
-              HostedImage.square(product.getPhoto, radius: Corners.sm, dimension: 60),
+              HostedImage.square(product.getPhoto(), radius: Corners.sm, dimension: 60),
               Flexible(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -448,9 +448,6 @@ class _PartiSection extends HookConsumerWidget {
     final type = record.type;
     final partiList = ref.watch(partiesCtrlProvider(type.isSale));
 
-    final search = useState('');
-    final selectCtrl = useMemoized(ShadSelectController<Party>.new);
-
     final parti = record.getParti;
 
     return partiList.when(
@@ -460,41 +457,37 @@ class _PartiSection extends HookConsumerWidget {
       ),
       error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
       data: (parties) {
-        final filtered = parties.where((e) => e.name.low.contains(search.value.low)).toList();
         return Padding(
           padding: Pads.sm('lrt'),
           child: ShadInputDecorator(
-            label: Text(type.isSale ? 'Customer' : 'Supplier').required(),
             child: Wrap(
               spacing: Insets.sm,
               runSpacing: Insets.sm,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                ShadSelect<Party>.withSearch(
-                  controller: selectCtrl,
+                LimitedWidthBox(
                   maxWidth: 400,
-                  minWidth: 300,
-                  placeholder: Text(type.isSale ? 'Customer' : 'Supplier'),
-                  itemCount: filtered.length,
-                  initialValue: parti,
-                  options: [
-                    if (type.isSale) ShadOption(value: Party.fromWalkIn(), child: const Text('Walk-in customer')),
-                    if (filtered.isEmpty) Padding(padding: Pads.med('tb'), child: const Text('No Parties found')),
-                    ...filtered.map((house) {
-                      return ShadOption(value: house, child: Text(house.name));
-                    }),
-                  ],
-                  onChanged: (v) => onSelect(v),
-                  selectedOptionBuilder: (_, v) => Text(v.name),
-                  onSearchChanged: search.set,
+                  center: false,
+                  child: ShadSelectField<Party>(
+                    isRequired: true,
+                    label: type.isSale ? 'Customer' : 'Supplier',
+                    hintText: type.isSale ? 'Customer' : 'Supplier',
+                    initialValue: parti,
+                    options: parties,
+                    optionBuilder: (_, value, _) => ShadOption(value: value, child: Text(value.name)),
+                    onChanged: (v) => onSelect(v),
+                    selectedBuilder: (_, v) => Text(v.name),
+                    searchBuilder: (v) => v.name,
+                    outsideTrailing: ShadIconButton.outline(
+                      height: 38,
+                      icon: const Icon(LuIcons.plus),
+                      onPressed: () async {
+                        await PartiesView.showAddDialog(context, type.isSale);
+                      },
+                    ),
+                  ),
                 ),
-                ShadIconButton.outline(
-                  height: 38,
-                  icon: const Icon(LuIcons.plus),
-                  onPressed: () async {
-                    await PartiesView.showAddDialog(context, type.isSale);
-                  },
-                ),
+
                 if (parti != null)
                   Padding(
                     padding: Pads.sm(),

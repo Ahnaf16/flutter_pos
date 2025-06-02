@@ -92,7 +92,7 @@ class InventoryRecord {
       id: doc.$id,
       invoiceNo: data['invoice_no'],
       party: Party.tryParse(data['parties']),
-      details: switch (data['inventory_details']) {
+      details: switch (data['details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
       },
@@ -122,7 +122,7 @@ class InventoryRecord {
       id: map.parseAwField(),
       invoiceNo: map['invoice_no'],
       party: Party.tryParse(map['parties']),
-      details: switch (map['inventory_details']) {
+      details: switch (map['details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => [],
       },
@@ -162,7 +162,7 @@ class InventoryRecord {
       id: map.tryParseAwField() ?? id,
       invoiceNo: map['invoice_no'] ?? invoiceNo,
       party: Party.tryParse(map['parties']) ?? party,
-      details: switch (map['inventory_details']) {
+      details: switch (map['details']) {
         final List l => l.map((e) => InventoryDetails.tryParse(e)).nonNulls.toList(),
         _ => details,
       },
@@ -191,7 +191,7 @@ class InventoryRecord {
     'id': id,
     'invoice_no': invoiceNo,
     'parties': party?.toMap(),
-    'inventory_details': details.map((e) => e.toMap()).toList(),
+    'details': details.map((e) => e.toMap()).toList(),
     'amount': paidAmount,
     'initial_pay_amount': initialPayAmount,
     'payment_account': account?.toMap(),
@@ -212,7 +212,7 @@ class InventoryRecord {
   Map<String, dynamic> toAwPost() => {
     'parties': party?.id,
     'invoice_no': invoiceNo,
-    'inventory_details': details.map((e) => e.id).toList(),
+    'details': details.map((e) => e.id).toList(),
     'amount': paidAmount,
     'initial_pay_amount': initialPayAmount,
     'payment_account': account?.id,
