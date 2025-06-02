@@ -59,7 +59,7 @@ class Product {
       },
       manufacturer: map['manufacturer'],
       salePrice: map.parseNum('sale_price'),
-      createdAt: DateTime.parse(map.parseAwField('createdAt')),
+      createdAt: map.containsKey('createdAt') ? DateTime.parse(map.parseAwField('createdAt')) : DateTime.now(),
     );
   }
 
@@ -124,8 +124,6 @@ class Product {
     add(fields.stock, stock.map((e) => e.id).toList());
     add(fields.manufacturer, manufacturer);
     add(fields.salePrice, salePrice);
-
-    add(fields.createdAt, createdAt.toIso8601String());
 
     return map;
   }

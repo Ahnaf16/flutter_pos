@@ -176,6 +176,7 @@ class TableHeading {
   final double max;
   final double min;
   final Alignment alignment;
+  double? get minWidth => name == 'Action' ? 150 : (name == '#' ? max : null);
 }
 
 extension TableHeadingEx on List<TableHeading> {

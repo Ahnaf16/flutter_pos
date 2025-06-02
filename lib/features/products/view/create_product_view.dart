@@ -246,7 +246,9 @@ class CreateProductView extends HookConsumerWidget {
                               child: ShadTextField(
                                 name: 'sku',
                                 label: 'SKU',
-                                initialValue: config.skuPrefix + nanoid(length: 6, alphabet: Alphabet.numbers),
+                                initialValue:
+                                    updateProduct?.sku ??
+                                    config.skuPrefix + nanoid(length: 6, alphabet: Alphabet.numbers),
                                 hintText: 'Enter product SKU',
                                 outsideTrailing: SmallButton(
                                   icon: LuIcons.refreshCcw,

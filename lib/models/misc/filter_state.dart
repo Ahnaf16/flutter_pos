@@ -58,7 +58,7 @@ enum FilterType {
 
   IconData get icon {
     return switch (this) {
-      dateFrom => LuIcons.calendarArrowDown,
+      dateFrom => LuIcons.calendarRange,
       dateTo => LuIcons.calendarArrowUp,
       house => LuIcons.warehouse,
       account => LuIcons.creditCard,

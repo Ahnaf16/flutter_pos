@@ -48,7 +48,7 @@ class ThemeCtrl extends Notifier<ThemeConfig> {
       brightness: brightness,
       // radius: Corners.xsBorder,
       textTheme: ShadTextTheme.fromGoogleFont(GoogleFonts.poppins),
-      cardTheme: ShadCardTheme(padding: Pads.sm(), rowMainAxisAlignment: MainAxisAlignment.start),
+      cardTheme: ShadCardTheme(padding: Pads.med(), rowMainAxisAlignment: MainAxisAlignment.start),
       inputTheme: ShadInputTheme(
         padding: kDefInputPadding,
       ).copyWith(decoration: ShadDecoration(border: ShadBorder.all(width: 1))),

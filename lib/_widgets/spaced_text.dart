@@ -19,6 +19,7 @@ class SpacedText extends StatelessWidget {
     this.enableSelection = true,
     this.mainAxisAlignment,
     this.useFlexible = true,
+    this.maxLines,
   });
 
   static (TextStyle?, TextStyle?) buildStye(left, right) => (left, right);
@@ -43,6 +44,7 @@ class SpacedText extends StatelessWidget {
   final Widget Function(String right)? builder;
   final bool enableSelection;
   final bool useFlexible;
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +66,7 @@ class SpacedText extends StatelessWidget {
             DefaultTextStyle(
               style: rSty,
               textAlign: spaced ? TextAlign.end : TextAlign.start,
-              child: builder?.call(right) ?? Text(right),
+              child: builder?.call(right) ?? Text(right, maxLines: maxLines, overflow: TextOverflow.ellipsis),
             ).conditionalFlexible(useFlexible),
             if (trailing != null) ...[const Gap(Insets.sm), trailing!],
           ],

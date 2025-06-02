@@ -43,6 +43,7 @@ class PopOverButton extends StatelessWidget {
     this.isDestructive = false,
     this.enabled = true,
     this.dense = false,
+    this.color,
   });
 
   final Widget? child;
@@ -51,6 +52,7 @@ class PopOverButton extends StatelessWidget {
   final bool isDestructive;
   final bool enabled;
   final bool dense;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +64,7 @@ class PopOverButton extends StatelessWidget {
         enabled: enabled,
         icon: icon ?? const SizedBox(),
         onPressed: onPressed,
-      );
+      ).colored(color ?? (isDestructive ? context.colors.destructive : null));
     }
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 150),
@@ -70,13 +72,12 @@ class PopOverButton extends StatelessWidget {
         foregroundColor: isDestructive ? context.colors.destructive : context.colors.foreground,
         hoverBackgroundColor: isDestructive ? context.colors.destructive.op1 : null,
         size: ShadButtonSize.sm,
-
         mainAxisAlignment: MainAxisAlignment.start,
         enabled: enabled,
         leading: icon,
         onPressed: onPressed,
         child: child,
-      ),
+      ).colored(color ?? (isDestructive ? context.colors.destructive : null)),
     );
   }
 }

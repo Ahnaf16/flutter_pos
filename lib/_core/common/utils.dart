@@ -18,7 +18,13 @@ class Copier {
   static copy(String? text) {
     if (text == null) return;
     Clipboard.setData(ClipboardData(text: text));
-    HapticFeedback.mediumImpact();
+    // HapticFeedback.mediumImpact();
+    ShadToaster.of(Ctx.context).show(
+      ShadToast(
+        alignment: Alignment.bottomCenter,
+        description: Text('Copied to clipboard', style: Ctx.context.text.small),
+      ),
+    );
   }
 }
 

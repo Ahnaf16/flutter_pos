@@ -110,13 +110,6 @@ class _ShadFileFieldState<T> extends ShadFormDecorationState<ShadFileField<T>, T
 }
 
 class ShadDottedBorder extends StatelessWidget {
-  final Widget child;
-  final double strokeWidth;
-  final BorderRadius? borderRadius;
-  final Color? color;
-  final double dashWidth;
-  final double dashSpace;
-
   const ShadDottedBorder({
     super.key,
     required this.child,
@@ -125,7 +118,16 @@ class ShadDottedBorder extends StatelessWidget {
     this.color,
     this.dashWidth = 5,
     this.dashSpace = 3,
+    this.padding,
   });
+
+  final Widget child;
+  final double strokeWidth;
+  final BorderRadius? borderRadius;
+  final Color? color;
+  final double dashWidth;
+  final double dashSpace;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +142,10 @@ class ShadDottedBorder extends StatelessWidget {
         dashWidth: dashWidth,
         dashSpace: dashSpace,
       ),
-      child: ClipRRect(borderRadius: borderRadius, child: Padding(padding: const EdgeInsets.all(16), child: child)),
+      child: ClipRRect(
+        borderRadius: borderRadius,
+        child: Padding(padding: padding ?? Pads.med(), child: child),
+      ),
     );
   }
 }
@@ -162,11 +167,10 @@ class _DottedBorderPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = color
-          ..strokeWidth = strokeWidth
-          ..style = PaintingStyle.stroke;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
 
     final rrect = borderRadius.toRRect(Offset.zero & size);
     final path = Path()..addRRect(rrect);

@@ -28,8 +28,8 @@ enum InventoryStatus {
   Color get color => switch (this) {
     paid => const Color(0xFF28A745),
     partial => const Color(0xFF6EC5BB),
-    unpaid => const Color(0xFFDC3545),
-    returned => const Color(0xFF6C757D),
+    unpaid => const Color(0xFFFF8800),
+    returned => const Color(0xFFDC3545),
   };
 }
 

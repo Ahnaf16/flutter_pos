@@ -279,7 +279,8 @@ class _InvDetails extends StatelessWidget {
                                   spacing: Insets.med,
                                   runSpacing: Insets.sm,
                                   children: [
-                                    ShadBadge(child: Text(data.record?.account?.name ?? '--')),
+                                    if (data.record?.account != null)
+                                      ShadBadge(child: Text(data.record?.account?.name ?? '--')),
                                     ShadBadge.secondary(
                                       child: Text(data.record?.status.name ?? '--'),
                                     ).colored(data.record?.status.color ?? context.colors.destructive),

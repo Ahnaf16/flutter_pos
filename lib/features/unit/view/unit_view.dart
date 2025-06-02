@@ -3,7 +3,7 @@ import 'package:pos/features/unit/view/unit_add_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('#', 50.0), ('Name', double.nan), ('Active', 200.0), ('Action', 200.0)];
+const _headings = [('#', 60.0), ('Name', double.nan), ('Active', 200.0), ('Action', 200.0)];
 
 class UnitView extends HookConsumerWidget {
   const UnitView({super.key});
@@ -27,7 +27,7 @@ class UnitView extends HookConsumerWidget {
         error: (e, s) => ErrorView(e, s, prov: unitCtrlProvider),
         data: (units) {
           return DataTableBuilder<ProductUnit, (String, double)>(
-            rowHeight: 60,
+            rowHeight: 80,
             items: units,
             headings: _headings,
             headingBuilder: (heading) {
@@ -35,7 +35,6 @@ class UnitView extends HookConsumerWidget {
                 columnName: heading.$1,
                 columnWidthMode: ColumnWidthMode.fill,
                 maximumWidth: heading.$2,
-                minimumWidth: 200,
                 label: Container(
                   padding: Pads.med(),
                   alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
@@ -60,6 +59,7 @@ class UnitView extends HookConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       PopOverButton(
+                        color: Colors.blue,
                         icon: const Icon(LuIcons.pen),
                         dense: true,
                         onPressed: () => showShadDialog(

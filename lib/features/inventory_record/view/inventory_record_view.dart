@@ -13,6 +13,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
   TableHeading.positional('#', 60.0),
+  TableHeading.positional('Invoice'),
   TableHeading.positional('Parti'),
   TableHeading.positional('Product', 400.0),
   TableHeading.positional('Amount', 300.0),
@@ -49,7 +50,7 @@ class InventoryRecordView extends HookConsumerWidget {
       body: Column(
         children: [
           FilterBar(
-            hintText: 'Search by product or ${type.isSale ? 'customer' : 'supplier'} name',
+            hintText: 'Search by invoice, product or ${type.isSale ? 'customer' : 'supplier'} name',
             statuses: InventoryStatus.values,
             accounts: accountList,
             onSearch: (q) => invCtrl().search(q),
@@ -93,7 +94,7 @@ class RecordTable extends ConsumerWidget {
           columnName: heading.name,
           columnWidthMode: ColumnWidthMode.fill,
           maximumWidth: heading.max,
-          minimumWidth: heading.name == 'Status' ? 100 : 150,
+          minimumWidth: heading.minWidth ?? 150,
           label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
         );
       },
@@ -101,8 +102,25 @@ class RecordTable extends ConsumerWidget {
       cellBuilder: (data, head) {
         return switch (head.name) {
           '#' => DataGridCell(columnName: head.name, value: Text((inventories.indexOf(data) + 1).toString())),
+          'Invoice' => DataGridCell(
+            columnName: head.name,
+            value: Text.rich(
+              TextSpan(
+                text: data.invoiceNo,
+                children: [
+                  WidgetSpan(
+                    child: SmallButton(
+                      icon: LuIcons.copy,
+                      onPressed: () => Copier.copy(data.invoiceNo),
+                    ),
+                  ),
+                ],
+              ),
+              style: context.text.list,
+            ),
+          ),
           'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
-          'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data.details)),
+          'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data)),
           'Amount' => DataGridCell(columnName: head.name, value: _amountBuilder(data)),
           'Account' => DataGridCell(columnName: head.name, value: Text(data.account?.name ?? '--')),
           'Status' => DataGridCell(
@@ -115,6 +133,7 @@ class RecordTable extends ConsumerWidget {
               actionSpread: actionSpread,
               children: (context, hide) => [
                 PopOverButton(
+                  color: Colors.blue,
                   dense: actionSpread,
                   icon: const Icon(LuIcons.eye),
                   onPressed: () async {
@@ -124,6 +143,7 @@ class RecordTable extends ConsumerWidget {
                   child: const Text('View'),
                 ),
                 PopOverButton(
+                  color: Colors.green,
                   dense: actionSpread,
                   icon: const Icon(LuIcons.download),
                   onPressed: () async {
@@ -188,7 +208,8 @@ class RecordTable extends ConsumerWidget {
     );
   }
 
-  Widget _productCellBuilder(List<InventoryDetails> details) {
+  Widget _productCellBuilder(InventoryRecord rec) {
+    final details = rec.details;
     return Builder(
       builder: (context) {
         return Column(
@@ -223,7 +244,13 @@ class RecordTable extends ConsumerWidget {
                 ),
               ),
 
-            if (details.length > 2) Text('+ ${details.length - 2} more', style: context.text.muted.size(12)),
+            if (details.length > 2)
+              Text('+ ${details.length - 2} more', style: context.text.muted.size(12)).clickable(
+                onTap: () {
+                  if (rec.type.isSale) RPaths.saleDetails(rec.id).pushNamed(context);
+                  if (rec.type.isPurchase) RPaths.purchaseDetails(rec.id).pushNamed(context);
+                },
+              ),
           ],
         );
       },
@@ -239,10 +266,11 @@ class RecordTable extends ConsumerWidget {
           spacing: Insets.xs,
           children: [
             SpacedText(
-              left: data.type == RecordType.purchase ? 'Paid' : 'Received',
+              left: data.type == RecordType.purchase ? 'Paid' : 'Paid',
               right: data.paidAmount.currency(),
               crossAxisAlignment: CrossAxisAlignment.center,
               styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+              maxLines: 1,
             ),
 
             if (data.vat != 0)
@@ -251,6 +279,7 @@ class RecordTable extends ConsumerWidget {
                 right: data.vat.currency(),
                 crossAxisAlignment: CrossAxisAlignment.center,
                 styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+                maxLines: 1,
               ),
             if (data.shipping != 0)
               SpacedText(
@@ -258,6 +287,7 @@ class RecordTable extends ConsumerWidget {
                 right: data.shipping.currency(),
                 crossAxisAlignment: CrossAxisAlignment.center,
                 styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+                maxLines: 1,
               ),
             if (data.discount != 0)
               SpacedText(
@@ -265,6 +295,7 @@ class RecordTable extends ConsumerWidget {
                 right: data.discountString(),
                 crossAxisAlignment: CrossAxisAlignment.center,
                 styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+                maxLines: 1,
               ),
             if (data.due != 0)
               SpacedText(
@@ -273,12 +304,14 @@ class RecordTable extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 styleBuilder: (l, r) =>
                     (context.text.muted.textHeight(1.1), r.textColor(data.hasDue ? Colors.red : Colors.green)),
+                maxLines: 1,
               ),
             SpacedText(
               left: 'Total',
               right: data.total.currency(),
               crossAxisAlignment: CrossAxisAlignment.center,
               styleBuilder: (l, r) => (context.text.small.textHeight(1.1), context.text.p.bold),
+              maxLines: 1,
             ),
           ],
         );
