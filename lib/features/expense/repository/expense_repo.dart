@@ -1,20 +1,27 @@
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/payment_accounts/repository/payment_accounts_repo.dart';
+import 'package:pos/features/settings/repository/config_repo.dart';
 import 'package:pos/features/transactions/repository/transactions_repo.dart';
 import 'package:pos/main.export.dart';
 
 class ExpenseRepo with AwHandler {
-  FutureReport<Document> createExpenses(QMap form) async {
+  FutureReport<Document> createExpenses(QMap form, PFile? file) async {
     final data = QMap.from(form);
     data.addAll({'date': DateTime.now().toIso8601String()});
 
-    final expense = Expense.fromMap(data);
+    Expense expense = Expense.fromMap(data);
 
     //! update account amount
     final acc = expense.account;
     final (accErr, accData) = await _updateAccountAmount(acc, expense.amount).toRecord();
     if (accErr != null || accData == null) return left(accErr ?? const Failure('Unable to update account amount'));
+
+    if (file != null) {
+      final (fileErr, fileData) = await _createFile(file).toRecord();
+      if (fileErr != null || fileData == null) return left(fileErr ?? const Failure('Unable to upload file'));
+      expense = expense.copyWith(file: () => fileData);
+    }
 
     //! add transaction log
     await _addTransactionLog(expense);
@@ -26,6 +33,11 @@ class ExpenseRepo with AwHandler {
   FutureReport<Document> _updateAccountAmount(PaymentAccount account, num amount) async {
     final repo = locate<PaymentAccountsRepo>();
     return await repo.updateAccount(account.copyWith(amount: account.amount - amount));
+  }
+
+  FutureReport<AwFile> _createFile(PFile file) async {
+    final repo = locate<FileRepo>();
+    return await repo.createNew(file);
   }
 
   FutureReport<Document> _addTransactionLog(Expense ex) async {

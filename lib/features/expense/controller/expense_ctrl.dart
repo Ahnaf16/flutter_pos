@@ -52,8 +52,8 @@ class ExpenseCtrl extends _$ExpenseCtrl {
     }
   }
 
-  Future<Result> createExpense(QMap form) async {
-    final res = await _repo.createExpenses(form);
+  Future<Result> createExpense(QMap form, PFile? file) async {
+    final res = await _repo.createExpenses(form, file);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       return rightResult('Expense created successfully');

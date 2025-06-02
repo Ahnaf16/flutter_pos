@@ -11,6 +11,7 @@ class Expense {
     required this.date,
     required this.note,
     required this.category,
+    this.file,
   });
   final String id;
   final num amount;
@@ -20,6 +21,7 @@ class Expense {
   final DateTime date;
   final String? note;
   final ExpenseCategory category;
+  final AwFile? file;
 
   factory Expense.fromDoc(Document doc) => Expense.fromMap(doc.data);
 
@@ -33,6 +35,7 @@ class Expense {
       date: DateTime.parse(map['date']),
       note: map['note'],
       category: ExpenseCategory.fromMap(map['expanseCategory']),
+      file: AwFile.tryParse(map['file']),
     );
   }
 
@@ -46,6 +49,7 @@ class Expense {
       date: map['date'] == null ? date : DateTime.parse(map['date']),
       note: map['note'] ?? note,
       category: map['expanseCategory'] == null ? category : ExpenseCategory.fromMap(map['expanseCategory']),
+      file: AwFile.tryParse(map['file']) ?? file,
     );
   }
 
@@ -58,6 +62,7 @@ class Expense {
     'date': date.toIso8601String(),
     'note': note,
     'expanseCategory': category.toMap(),
+    'file': file?.toMap(),
   };
   QMap toAwPost() => {
     'amount': amount,
@@ -67,6 +72,7 @@ class Expense {
     'date': date.toIso8601String(),
     'note': note,
     'expanseCategory': category.id,
+    'file': file?.id,
   };
 
   Expense copyWith({
@@ -76,8 +82,9 @@ class Expense {
     PaymentAccount? account,
     AppUser? expenseBy,
     DateTime? date,
-    String? note,
+    ValueGetter<String?>? note,
     ExpenseCategory? category,
+    ValueGetter<AwFile?>? file,
   }) {
     return Expense(
       id: id ?? this.id,
@@ -86,8 +93,9 @@ class Expense {
       account: account ?? this.account,
       expenseBy: expenseBy ?? this.expenseBy,
       date: date ?? this.date,
-      note: note ?? this.note,
+      note: note != null ? note() : this.note,
       category: category ?? this.category,
+      file: file != null ? file() : this.file,
     );
   }
 }

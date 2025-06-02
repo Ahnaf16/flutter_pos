@@ -1,3 +1,4 @@
+export 'config/aw_file.dart';
 export 'config/config.dart';
 export 'config/shop_config.dart';
 export 'inventory/inventory_details.dart';

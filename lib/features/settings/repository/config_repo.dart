@@ -23,3 +23,19 @@ class ConfigRepo with AwHandler {
     return doc;
   }
 }
+
+class FileRepo with AwHandler {
+  FutureReport<AwFile> createNew(PFile file) async {
+    final (err, sFile) = await storage.createFile(file).toRecord();
+    if (err != null || sFile == null) return left(err ?? const Failure('Error uploading file'));
+
+    final data = AwFile.fromFile(sFile.$id, file);
+
+    final doc = await db.create(AWConst.collections.files, docId: sFile.$id, data: data.toAwPost());
+
+    if (doc.isLeft()) {
+      await storage.deleteFile(sFile.$id);
+    }
+    return doc.convert(AwFile.fromDoc);
+  }
+}

@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/expense/controller/expense_ctrl.dart';
 import 'package:pos/features/expense/view/expense_category_view.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
@@ -142,11 +143,10 @@ class ExpenseView extends HookConsumerWidget {
                             ShadButton.secondary(
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.eye),
-                              onPressed:
-                                  () => showShadDialog(
-                                    context: context,
-                                    builder: (context) => _ExpenseViewDialog(ex: data),
-                                  ),
+                              onPressed: () => showShadDialog(
+                                context: context,
+                                builder: (context) => _ExpenseViewDialog(ex: data),
+                              ),
                             ),
                           ],
                         ),
@@ -251,6 +251,8 @@ class _ExpenseAddDialog extends HookConsumerWidget {
     final categoryList = ref.watch(expenseCategoryCtrlProvider);
 
     final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
+    final selectedFile = useState<PFile?>(null);
+
     final actionTxt = ex == null ? 'Add' : 'Update';
     return ShadDialog(
       title: Text('$actionTxt Expense'),
@@ -268,7 +270,7 @@ class _ExpenseAddDialog extends HookConsumerWidget {
 
             if (ex == null) {
               l.truthy();
-              result = await ctrl.createExpense(data);
+              result = await ctrl.createExpense(data, selectedFile.value);
               l.falsey();
             } else {
               final updated = ex?.marge(data);
@@ -305,7 +307,9 @@ class _ExpenseAddDialog extends HookConsumerWidget {
               ),
               Row(
                 children: [
-                  Flexible(child: ShadTextField(name: 'expanse_for', label: 'Expanse For', isRequired: true)),
+                  Flexible(
+                    child: ShadTextField(name: 'expanse_for', label: 'Expanse For', isRequired: true),
+                  ),
                   Flexible(
                     child: categoryList.maybeWhen(
                       orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
@@ -379,6 +383,62 @@ class _ExpenseAddDialog extends HookConsumerWidget {
                 ],
               ),
               ShadTextAreaField(name: 'note', label: 'Expanse For'),
+
+              ShadCard(
+                border: const Border(),
+                shadows: const [],
+
+                title: Text('Upload File', style: context.text.p),
+                description: Text('Select a file to upload', style: context.text.muted),
+                padding: Pads.zero,
+                childPadding: Pads.med('t'),
+
+                child: ShadDottedBorder(
+                  color: context.colors.foreground.op3,
+                  child: Center(
+                    child: Column(
+                      children: [
+                        if (selectedFile.value == null) ...[
+                          const ShadAvatar(LuIcons.upload),
+                          const Gap(Insets.med),
+                          const Text('Drag and drop files here'),
+                          Text('Or click browse (max 3MB)', style: context.text.muted.size(12)),
+                          const Gap(Insets.med),
+                          ShadButton.outline(
+                            size: ShadButtonSize.sm,
+                            child: const Text('Browse Files'),
+                            onPressed: () async {
+                              if (selectedFile.value != null) return;
+                              final files = await fileUtil.pickSingleFile();
+                              final file = files.fold(identityNull, identity);
+                              selectedFile.set(file);
+                            },
+                          ),
+                        ] else
+                          Row(
+                            spacing: Insets.med,
+                            children: [
+                              const ShadAvatar(LuIcons.file),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(selectedFile.value!.name, style: context.text.list),
+                                    Text(selectedFile.value!.size.readableByte(), style: context.text.muted),
+                                  ],
+                                ),
+                              ),
+                              ShadIconButton(
+                                icon: const Icon(LuIcons.x),
+                                onPressed: () => selectedFile.set(null),
+                              ).colored(context.colors.destructive),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

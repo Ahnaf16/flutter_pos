@@ -23,7 +23,7 @@ enum TransactionType {
     payment => Colors.green,
     returned => Colors.red,
     expanse => Colors.orange,
-    transfer => Colors.pink,
+    transfer => Colors.indigo,
     dueAdjustment => Colors.purple,
   };
 
@@ -50,6 +50,7 @@ class TransactionLog {
     required this.transferredToAccount,
     required this.isBetweenAccount,
     required this.isIncome,
+    this.file,
   });
 
   final String id;
@@ -81,6 +82,7 @@ class TransactionLog {
 
   /// null when transfer between account or return
   final bool? isIncome;
+  final AwFile? file;
 
   factory TransactionLog.fromDoc(Document doc) => TransactionLog.fromMap(doc.data);
 
@@ -103,6 +105,7 @@ class TransactionLog {
     transactedToShop: map.parseBool('transacted_to_shop'),
     isBetweenAccount: map.parseBool('betweenAccount'),
     isIncome: map.parseBool('is_income'),
+    file: AwFile.tryParse(map['file']),
   );
 
   static TransactionLog? tyrParse(dynamic value) {
@@ -136,6 +139,7 @@ class TransactionLog {
     'betweenAccount': isBetweenAccount,
     'transferredToAccount': transferredToAccount?.toMap(),
     'is_income': isIncome,
+    'file': file?.toMap(),
   };
 
   QMap toAwPost() => {
@@ -155,6 +159,7 @@ class TransactionLog {
     'transferredToAccount': transferredToAccount?.id,
     'betweenAccount': isBetweenAccount,
     'is_income': isIncome,
+    'file': file?.id,
   };
 
   String? validate() {
@@ -249,6 +254,7 @@ class TransactionLog {
       isBetweenAccount: false,
       transferredToAccount: null,
       isIncome: false,
+      file: ex.file,
     );
   }
 
@@ -357,6 +363,7 @@ class TransactionLog {
     bool? transactedToShop,
     bool? isBetweenAccount,
     ValueGetter<bool?>? isIncome,
+    ValueGetter<AwFile?>? file,
   }) {
     return TransactionLog(
       id: id ?? this.id,
@@ -377,6 +384,7 @@ class TransactionLog {
       transactedToShop: transactedToShop ?? this.transactedToShop,
       isBetweenAccount: isBetweenAccount ?? this.isBetweenAccount,
       isIncome: isIncome != null ? isIncome() : this.isIncome,
+      file: file != null ? file() : this.file,
     );
   }
 }

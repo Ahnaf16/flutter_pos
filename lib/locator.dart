@@ -66,4 +66,5 @@ Future<void> initDependencies() async {
   locate.registerLazyIfAbsent<TransactionsRepo>(TransactionsRepo.new);
   locate.registerLazyIfAbsent<ExpenseRepo>(ExpenseRepo.new);
   locate.registerLazyIfAbsent<ReturnRepo>(ReturnRepo.new);
+  locate.registerLazyIfAbsent<FileRepo>(FileRepo.new);
 }
