@@ -133,7 +133,7 @@ class PaymentAccountsView extends HookConsumerWidget {
                                 hide();
                                 showShadDialog(
                                   context: context,
-                                  builder: (context) => _AccountViewDialog(acc: data),
+                                  builder: (context) => AccountViewDialog(acc: data),
                                 );
                               },
                             ),
@@ -405,8 +405,8 @@ class _AccountDeleteDialog extends HookConsumerWidget {
   }
 }
 
-class _AccountViewDialog extends HookConsumerWidget {
-  const _AccountViewDialog({required this.acc});
+class AccountViewDialog extends HookConsumerWidget {
+  const AccountViewDialog({super.key, required this.acc});
 
   final PaymentAccount acc;
 

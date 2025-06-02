@@ -7,6 +7,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
   TableHeading.positional('#', 80.0),
+  TableHeading.positional('Invoice'),
   TableHeading.positional('From'),
   TableHeading.positional('By'),
   TableHeading.positional('Amount', 300.0),
@@ -63,6 +64,24 @@ class ReturnView extends HookConsumerWidget {
                         columnName: head.name,
                         value: Text((inventories.indexOf(data) + 1).toString()),
                       ),
+                      'Invoice' => DataGridCell(
+                        columnName: head.name,
+                        value: Text.rich(
+                          TextSpan(
+                            text: data.returnedRec?.invoiceNo ?? '--',
+                            children: [
+                              if (data.returnedRec != null)
+                                WidgetSpan(
+                                  child: SmallButton(
+                                    icon: LuIcons.copy,
+                                    onPressed: () => Copier.copy(data.returnedRec?.invoiceNo),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          style: context.text.list,
+                        ),
+                      ),
                       'From' => DataGridCell(
                         columnName: head.name,
                         value: NameCellBuilder(data.returnedRec?.getParti.name, data.returnedRec?.getParti.phone),
@@ -73,19 +92,9 @@ class ReturnView extends HookConsumerWidget {
                       ),
                       'Amount' => DataGridCell(
                         columnName: head.name,
-                        value: Column(
-                          spacing: Insets.xs,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SpacedText(
-                              left: 'Account',
-                              right: '${data.isSale ? '-' : '+'}${data.adjustAccount.currency()}',
-                            ),
-                            SpacedText(
-                              left: 'Total',
-                              right: '${data.isSale ? '-' : '+'}${data.totalReturn.currency()}',
-                            ),
-                          ],
+                        value: SpacedText(
+                          left: 'Return amount',
+                          right: data.totalReturn.currency(),
                         ),
                       ),
                       'Account' => DataGridCell(
@@ -95,7 +104,13 @@ class ReturnView extends HookConsumerWidget {
 
                       'Date' => DataGridCell(
                         columnName: head.name,
-                        value: Center(child: Text(data.returnDate.formatDate())),
+                        value: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(data.returnDate.formatDate()),
+                            Text(data.returnDate.ago),
+                          ],
+                        ),
                       ),
 
                       _ => DataGridCell(columnName: head.name, value: Text(data.toString())),

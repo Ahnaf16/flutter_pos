@@ -1,4 +1,3 @@
-import 'package:pos/features/auth/view/user_card.dart';
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/inventory_record/view/inventory_record_view.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
@@ -21,76 +20,89 @@ class PartyDetailsView extends HookConsumerWidget {
 
     final tabValue = useState(true);
 
+    final typeName = isCustomer ? 'Customer' : 'Supplier';
+
     return BaseBody(
-      title: '${isCustomer ? 'Customer' : 'Supplier'} Details',
+      title: '$typeName Details',
       body: party.when(
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: partyDetailsProvider),
         data: (party) {
-          if (party == null) return ErrorDisplay('No ${isCustomer ? 'Customer' : 'Supplier'} found');
-          return Row(
-            spacing: Insets.med,
-            mainAxisSize: MainAxisSize.min,
+          if (party == null) return ErrorDisplay('No $typeName found');
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+
             children: [
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              ShadCard(
+                title: Text('$typeName details'),
+                childPadding: Pads.med('t'),
+                child: Row(
                   children: [
-                    ShadTabs<bool>(
-                      value: tabValue.value,
-                      onChanged: (value) => tabValue.set(value),
-                      scrollable: true,
-                      tabs: const [
-                        ShadTab(value: true, child: Text('Orders')),
-                        ShadTab(value: false, child: Text('Transactions')),
-                      ],
-                    ),
-                    if (tabValue.value)
-                      Expanded(
-                        child: orderList.when(
-                          loading: () => const Loading(),
-                          error: (e, s) => ErrorView(e, s, prov: transactionLogCtrlProvider),
-                          data: (rec) {
-                            return RecordTable(inventories: rec, excludes: const ['Parti']);
-                          },
-                        ),
-                      )
-                    else
-                      Expanded(
-                        child: trxLogsList.when(
-                          loading: () => const Loading(),
-                          error: (e, s) => ErrorView(e, s, prov: transactionLogCtrlProvider),
-                          data: (logs) {
-                            return TrxTable(logs: logs, excludes: const ['To', 'From']);
-                          },
-                        ),
+                    if (party.photo != null) HostedImage.square(party.getPhoto, dimension: 80, radius: Corners.med),
+                    Flexible(
+                      child: Column(
+                        spacing: Insets.xs,
+                        children: [
+                          SpacedText(left: 'Name', right: party.name, style: context.text.list),
+                          SpacedText(left: 'Phone', right: party.phone, style: context.text.list),
+                          if (party.email != null)
+                            SpacedText(left: 'Email', right: party.email!, style: context.text.list),
+                          if (party.address != null)
+                            SpacedText(left: 'Address', right: party.address!, style: context.text.list),
+
+                          SpacedText(
+                            left: party.hasDue() ? 'Due' : 'Balance',
+                            right: party.due.currency(),
+                            trailing: SmallButton(
+                              icon: LuIcons.pen,
+                              onPressed: () {
+                                showShadDialog(
+                                  context: context,
+                                  builder: (context) => PartyBalanceDialog(party: party),
+                                );
+                              },
+                            ),
+                            style: context.text.lead,
+                            styleBuilder: (l, r) {
+                              return (l, r.bold.textColor(party.hasDue() ? Colors.red : Colors.green));
+                            },
+                          ),
+                        ],
                       ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  spacing: Insets.med,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Customer details', style: context.text.list),
-                    UserCard.parti(
-                      parti: party,
-                      imgSize: 100,
-                      showDue: true,
-                      direction: Axis.vertical,
-                      onEdit: () {
-                        showShadDialog(
-                          context: context,
-                          builder: (context) => PartyBalanceDialog(party: party),
-                        );
-                      },
                     ),
                   ],
                 ),
               ),
+              const Gap(Insets.med),
+              ShadTabs<bool>(
+                value: tabValue.value,
+                onChanged: (value) => tabValue.set(value),
+                scrollable: true,
+                tabs: const [
+                  ShadTab(value: true, child: Text('Invoices')),
+                  ShadTab(value: false, child: Text('Transactions')),
+                ],
+              ),
+              if (tabValue.value)
+                Expanded(
+                  child: orderList.when(
+                    loading: () => const Loading(),
+                    error: (e, s) => ErrorView(e, s, prov: transactionLogCtrlProvider),
+                    data: (rec) {
+                      return RecordTable(inventories: rec, excludes: const ['Parti']);
+                    },
+                  ),
+                )
+              else
+                Expanded(
+                  child: trxLogsList.when(
+                    loading: () => const Loading(),
+                    error: (e, s) => ErrorView(e, s, prov: transactionLogCtrlProvider),
+                    data: (logs) {
+                      return TrxTable(logs: logs, excludes: const ['To', 'From']);
+                    },
+                  ),
+                ),
             ],
           );
         },

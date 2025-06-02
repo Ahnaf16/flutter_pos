@@ -6,6 +6,7 @@ import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dar
 import 'package:pos/features/inventory_record/view/local/inv_invoice_widget.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
+import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
 import 'package:pos/features/products/view/product_view_dialog.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/main.export.dart';
@@ -63,7 +64,7 @@ class InventoryRecordView extends HookConsumerWidget {
               loading: () => const Loading(),
               error: (e, s) => ErrorView(e, s, prov: inventoryCtrlProvider),
               data: (inventories) {
-                return RecordTable(inventories: inventories, actionSpread: true);
+                return RecordTable(inventories: inventories, actionSpread: true, showFooter: true);
               },
             ),
           ),
@@ -74,11 +75,18 @@ class InventoryRecordView extends HookConsumerWidget {
 }
 
 class RecordTable extends ConsumerWidget {
-  const RecordTable({super.key, required this.inventories, this.excludes = const [], this.actionSpread = false});
+  const RecordTable({
+    super.key,
+    required this.inventories,
+    this.excludes = const [],
+    this.actionSpread = false,
+    this.showFooter = false,
+  });
 
   final List<InventoryRecord> inventories;
   final List<String> excludes;
   final bool actionSpread;
+  final bool showFooter;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -122,7 +130,25 @@ class RecordTable extends ConsumerWidget {
           'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
           'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data)),
           'Amount' => DataGridCell(columnName: head.name, value: _amountBuilder(data)),
-          'Account' => DataGridCell(columnName: head.name, value: Text(data.account?.name ?? '--')),
+          'Account' => DataGridCell(
+            columnName: head.name,
+            value: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(data.account?.name ?? '--', style: context.text.list),
+                if (data.account != null)
+                  SmallButton(
+                    icon: LuIcons.arrowUpRight,
+                    onPressed: () {
+                      showShadDialog(
+                        context: context,
+                        builder: (context) => AccountViewDialog(acc: data.account!),
+                      );
+                    },
+                  ),
+              ],
+            ),
+          ),
           'Status' => DataGridCell(
             columnName: head.name,
             value: ShadBadge.secondary(child: Text(data.status.name.titleCase)).colored(data.status.color),
@@ -176,6 +202,26 @@ class RecordTable extends ConsumerWidget {
           _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
         };
       },
+      footer: !showFooter
+          ? null
+          : DecoContainer(
+              color: context.colors.border,
+              padding: Pads.med(),
+              height: 80,
+              child: Row(
+                spacing: Insets.xl,
+                children: [
+                  SpacedText(
+                    left: 'Total ',
+                    right: inventories.whereNot((e) => e.status.isReturned).map((e) => e.paidAmount).sum.currency(),
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    useFlexible: false,
+                    style: context.text.list.primary(context),
+                    styleBuilder: (l, r) => (l, context.text.large.primary(context)),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 
@@ -197,7 +243,21 @@ class RecordTable extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                OverflowMarquee(child: Text(parti?.name ?? '--', style: context.text.list)),
+                Row(
+                  children: [
+                    Text(parti?.name ?? '--', style: context.text.list),
+                    SmallButton(
+                      icon: LuIcons.arrowUpRight,
+                      onPressed: () {
+                        if (parti == null) return;
+                        showShadDialog(
+                          context: context,
+                          builder: (context) => PartiViewDialog(parti: parti),
+                        );
+                      },
+                    ),
+                  ],
+                ),
                 if (parti != null) OverflowMarquee(child: Text('Phone: ${parti.phone}')),
                 if (parti?.email != null) OverflowMarquee(child: Text('Email: ${parti!.email}')),
               ],
@@ -239,6 +299,15 @@ class RecordTable extends ConsumerWidget {
                         ),
                       ),
                       Text(' (${p.quantity})', style: context.text.muted.size(12)),
+                      SmallButton(
+                        icon: LuIcons.arrowUpRight,
+                        onPressed: () {
+                          showShadDialog(
+                            context: context,
+                            builder: (context) => ProductViewDialog(product: p.product),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
