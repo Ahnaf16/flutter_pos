@@ -1,10 +1,11 @@
-import 'package:pos/features/home/view/bar_widget.dart';
+// import 'package:pos/features/home/view/bar_widget.dart';
+// import 'package:pos/features/home/view/pie_widget.dart';
+// import 'package:pos/features/transactions/view/transactions_view.dart';
+import 'package:pos/features/home/view/charts_widget.dart';
 import 'package:pos/features/home/view/home_counter_widget.dart';
-import 'package:pos/features/home/view/pie_widget.dart';
 import 'package:pos/features/transactions/controller/transactions_ctrl.dart';
 import 'package:pos/features/transactions/view/transactions_view.dart';
 import 'package:pos/main.export.dart';
-import 'package:shadcn_ui/shadcn_ui.dart' as shadcn;
 
 final _list = [
   'All time',
@@ -74,29 +75,29 @@ class HomeView extends HookConsumerWidget {
             ),
           ),
           HomeCounterWidget(start.value, end.value),
+
           const Gap(8),
-          BarWidget(start.value, end.value),
-          const Gap(8),
+
           Flex(
             direction: context.layout.isDesktop ? Axis.horizontal : Axis.vertical,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: Insets.med,
             children: [
-              const PieWidget(),
-              const Gap(8),
-              SizedBox(
+              PieWidget(start.value, end.value),
+              ShadCard(
                 height: 600,
-                width: 1000,
-                child: ShadCard(
-                  title: const Text('Transactions'),
-                  childPadding: Pads.lg('t'),
-                  child: TrxTable(
-                    logs: trxList,
-                    excludes: const ['#'],
-                    accountAmounts: false,
-                  ),
-                ),
+                child: BarWidget(start.value, end.value),
               ).conditionalExpanded(context.layout.isDesktop),
             ],
+          ),
+          const Gap(8),
+          ShadCard(
+            height: 600,
+            title: const Text('Transactions'),
+            childPadding: Pads.lg('t'),
+            child: TrxTable(
+              logs: trxList,
+              accountAmounts: false,
+            ),
           ),
           const Gap(8),
         ],

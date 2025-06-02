@@ -38,16 +38,23 @@ extension ValueTEx<T> on ValueNotifier<T> {
   void set(T value) => this.value = value;
 }
 
+NumberFormat currencyFormate({num? value, bool compact = false}) {
+  final symbol = locate<SP>().currencySymbol.value ?? Config.def().currencySymbol;
+  final onLeft = locate<SP>().symbolOnLeft.value ?? Config.def().symbolLeft;
+
+  if (compact) {
+    return NumberFormat.compactCurrency(symbol: symbol);
+  }
+
+  final String pattern = onLeft ? '$symbol##,##,##,##,##0' : '##,##,##,##,##0$symbol';
+  return NumberFormat.currency(customPattern: pattern, decimalDigits: value is int ? 0 : 2);
+}
+
 extension NumEx on num {
   String readableByte([int? decimals]) => Parser.formatBytes(toInt(), decimals ?? 2);
 
   String currency() {
-    final symbol = locate<SP>().currencySymbol.value ?? Config.def().currencySymbol;
-    final onLeft = locate<SP>().symbolOnLeft.value ?? Config.def().symbolLeft;
-
-    final String pattern = onLeft ? '$symbol##,##,##,##,##0' : '##,##,##,##,##0$symbol';
-
-    return NumberFormat.currency(customPattern: pattern, decimalDigits: clean is int ? 0 : 2).format(this);
+    return currencyFormate(value: this).format(this);
   }
 
   num get clean => this is double && this % 1 == 0 ? toInt() : this;

@@ -1355,7 +1355,7 @@ packages:
     source: hosted
     version: "1.4.1"
   syncfusion_flutter_charts:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: syncfusion_flutter_charts
       sha256: "8c55049105f3939adfd8a913a5421154999f0dde4fd5472ab66f3d0f49d3a9a3"

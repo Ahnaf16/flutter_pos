@@ -63,6 +63,7 @@ dependencies:
   embed_annotation: ^1.2.2
   navigator_resizable: ^1.0.2
   timeago: ^3.7.1
+  syncfusion_flutter_charts: ^29.2.7
 
 dev_dependencies:
   flutter_test:
@@ -74,7 +75,6 @@ dev_dependencies:
   riverpod_generator: ^2.6.5
   build_runner: ^2.4.15
   embed: ^1.4.1
-  syncfusion_flutter_charts: ^29.2.7
   # shared_preferences_gen: ^0.1.1
 
 dependency_overrides:
