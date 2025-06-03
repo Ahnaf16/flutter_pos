@@ -31,7 +31,7 @@ class ReturnRepo with AwHandler {
 
       final qty = effectiveOp(value).toInt();
       detailsQtyPair.add('$key$kSplitPattern$qty');
-      final (stockErr, stockData) = await _updateStockQty(detail.stock, qty).toRecord();
+      final (stockErr, stockData) = await _updateStockQty(detail.stock.id, qty).toRecord();
       if (stockErr != null || stockData == null) return left(stockErr ?? Failure(_generalFailure));
     }
 
@@ -70,7 +70,7 @@ class ReturnRepo with AwHandler {
     );
 
     //! update record
-    await _updateRecordType(record);
+    await _updateRecordType(record.id, InventoryStatus.returned);
 
     //! add transaction log
     await _addTransactionLog(returnRec);
@@ -80,17 +80,70 @@ class ReturnRepo with AwHandler {
     return doc;
   }
 
-  FutureReport<Document> _updateRecordType(InventoryRecord rec) async {
-    final repo = locate<InventoryRepo>();
-    return await repo.updateType(rec.id, InventoryStatus.returned);
+  FutureReport<Unit> delete(ReturnRecord record) async {
+    final isSale = record.isSale;
+
+    num effectiveOp(num value) => isSale ? value : -value;
+
+    final qtyPair = record.toMap().parseCustomInfo('stock_qty_pair').transformValues((_, v) => v.asInt);
+
+    //! update stock qty
+    for (final MapEntry(:key, :value) in qtyPair.entries) {
+      final (err, detail) = await _getDetails(key).toRecord();
+      if (err != null || detail == null) return left(err ?? Failure(_generalFailure));
+
+      final (stockErr, stockData) = await _updateStockQty(detail.stock.id, -value).toRecord();
+      if (stockErr != null || stockData == null) return left(stockErr ?? Failure(_generalFailure));
+    }
+
+    //! update account amount
+    final acc = record.account;
+    if (acc != null) {
+      final effectiveAccBal = record.adjustAccount;
+      final (accErr, accData) = await _updateAccountAmount(acc.id, effectiveOp(effectiveAccBal)).toRecord();
+      if (accErr != null || accData == null) return left(accErr ?? Failure(_updateAccountFailure));
+    }
+
+    //! update Due
+    final Party? parti = record.returnedRec?.party;
+    if (parti != null) {
+      final effectiveAccBal = record.adjustFromParty;
+      final type = record.isSale ? RecordType.sale : RecordType.purchase;
+      final (partiErr, partiData) = await _updateDue(parti.id, effectiveAccBal, type).toRecord();
+      if (partiErr != null || partiData == null) return left(partiErr ?? Failure(_generalFailure));
+    }
+
+    //! update record
+    final rec = record.returnedRec;
+    if (rec != null) {
+      InventoryStatus type = InventoryStatus.paid;
+      if (rec.paidAmount == 0) type = InventoryStatus.unpaid;
+      if (rec.paidAmount > 0 && rec.paidAmount < rec.total) type = InventoryStatus.partial;
+      await _updateRecordType(rec.id, type);
+    }
+
+    return db.delete(AWConst.collections.returnRecord, record.id);
   }
 
-  FutureReport<Document> _updateStockQty(Stock stock, int qty) async {
+  FutureReport<Document> _updateRecordType(String id, InventoryStatus status) async {
+    final repo = locate<InventoryRepo>();
+    return await repo.updateType(id, status);
+  }
+
+  FutureReport<Document> _updateStockQty(String id, int qty) async {
     final repo = locate<StockRepo>();
-    final (err, st) = await repo.getStockById(stock.id).toRecord();
+    final (err, st) = await repo.getStockById(id).toRecord();
 
     if (err != null || st == null) return left(err ?? const Failure('Unable to get stock'));
     return await repo.updateStock(st.copyWith(quantity: st.quantity + qty), [Stock.fields.quantity]);
+  }
+
+  FutureReport<InventoryDetails> _getDetails(String id) async {
+    final repo = locate<InventoryRepo>();
+    final (err, detail) = await repo.getInvDetails([Query.equal(r'$id', id)]).toRecord();
+
+    if (err != null || detail == null || detail.isEmpty) return left(err ?? const Failure('Unable to get record'));
+    return right(detail.first);
   }
 
   FutureReport<Document> _updateAccountAmount(String id, num amount) async {

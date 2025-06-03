@@ -84,6 +84,14 @@ class InventoryReturnCtrl extends _$InventoryReturnCtrl {
     state = AsyncValue.data(_searchFrom);
     ref.invalidateSelf();
   }
+
+  Future<Result> delete(ReturnRecord rec) async {
+    final res = await _repo.delete(rec);
+    return res.fold(leftResult, (_) {
+      ref.invalidateSelf();
+      return rightResult('Deleted successfully');
+    });
+  }
 }
 
 @riverpod

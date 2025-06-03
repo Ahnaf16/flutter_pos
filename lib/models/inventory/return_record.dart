@@ -91,4 +91,6 @@ class ReturnRecord {
   };
 
   num get totalReturn => adjustAccount + adjustFromParty;
+
+  Map<String, int> get detailsQtyMap => toMap().parseCustomInfo('stock_qty_pair').transformValues((_, v) => v.asInt);
 }

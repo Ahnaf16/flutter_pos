@@ -34,7 +34,7 @@ extension WidgetEx on Widget {
   Widget conditionalExpanded(bool condition, [int flex = 1]) => condition ? Expanded(flex: flex, child: this) : this;
   Widget conditionalFlexible(bool condition, [int flex = 1]) => condition ? Flexible(flex: flex, child: this) : this;
 
-  Widget toolTip(String text) => ShadTooltip(builder: (context) => Text(text), child: this);
+  Widget toolTip(String? text) => text == null ? this : ShadTooltip(builder: (context) => Text(text), child: this);
 }
 
 extension ShadIconButtonEx on ShadIconButton {

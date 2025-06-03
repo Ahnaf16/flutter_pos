@@ -22,6 +22,11 @@ class WarehouseRepo with AwHandler {
     return await db.update(AWConst.collections.warehouse, data.id, data: data.toAwPost(include));
   }
 
+  FutureReport<Unit> delete(WareHouse data, [bool checkUser = false]) async {
+    if (data.isDefault) return failure('Cannot delete default warehouse');
+    return await db.delete(AWConst.collections.warehouse, data.id);
+  }
+
   FutureReport<WareHouse> changeDefault(WareHouse newDefault) async {
     final query = [Query.equal('is_default', true)];
     final (err, docs) = await getWareHouses(query).toRecord();

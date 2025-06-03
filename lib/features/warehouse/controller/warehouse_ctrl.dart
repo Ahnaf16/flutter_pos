@@ -33,12 +33,11 @@ class WarehouseCtrl extends _$WarehouseCtrl {
       state = AsyncValue.data(_searchFrom);
     }
     query = query.low;
-    final list =
-        _searchFrom.where((e) {
-          return e.name.low.contains(query) ||
-              e.contactNumber.low.contains(query) ||
-              (e.contactPerson?.low.contains(query) ?? false);
-        }).toList();
+    final list = _searchFrom.where((e) {
+      return e.name.low.contains(query) ||
+          e.contactNumber.low.contains(query) ||
+          (e.contactPerson?.low.contains(query) ?? false);
+    }).toList();
     state = AsyncData(list);
   }
 
@@ -56,6 +55,15 @@ class WarehouseCtrl extends _$WarehouseCtrl {
       ref.invalidateSelf();
       ref.invalidate(currentUserProvider);
       return rightResult('Default warehouse changed');
+    });
+  }
+
+  Future<Result> delete(WareHouse wh) async {
+    final res = await _repo.delete(wh);
+    return res.fold(leftResult, (r) {
+      ref.invalidateSelf();
+      ref.invalidate(currentUserProvider);
+      return rightResult('Deleted successfully');
     });
   }
 }

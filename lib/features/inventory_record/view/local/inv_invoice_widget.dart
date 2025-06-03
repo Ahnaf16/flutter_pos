@@ -183,6 +183,14 @@ class InvInvoiceWidget extends HookConsumerWidget {
               ),
               if (rec.returnRecord != null)
                 SpacedText(
+                  left: 'Return Qty',
+                  right: (rec.returnRecord!.detailsQtyMap.values.sum.abs()).toString(),
+                  style: context.text.list,
+                  spaced: true,
+                  styleBuilder: (l, r) => (l.bold, r.bold),
+                ),
+              if (rec.returnRecord != null)
+                SpacedText(
                   left: 'Return amount',
                   right: (rec.returnRecord!.totalReturn).currency(),
                   style: context.text.large,

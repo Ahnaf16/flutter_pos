@@ -1,6 +1,7 @@
 import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
+import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
 import 'package:pos/features/transactions/view/transactions_view.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -13,6 +14,7 @@ const _headings = [
   TableHeading.positional('Amount', 300.0),
   TableHeading.positional('Account', 200.0, Alignment.center),
   TableHeading.positional('Date', 150.0, Alignment.center),
+  TableHeading.positional('Action', 150.0, Alignment.centerRight),
 ];
 
 class ReturnView extends HookConsumerWidget {
@@ -93,13 +95,28 @@ class ReturnView extends HookConsumerWidget {
                       'Amount' => DataGridCell(
                         columnName: head.name,
                         value: SpacedText(
-                          left: 'Return amount',
+                          left: 'Total return',
                           right: data.totalReturn.currency(),
                         ),
                       ),
                       'Account' => DataGridCell(
                         columnName: head.name,
-                        value: ShadBadge.secondary(child: Text(data.account?.name.up ?? '--')),
+                        value: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(data.account?.name ?? '--', style: context.text.list),
+                            if (data.account != null)
+                              SmallButton(
+                                icon: LuIcons.arrowUpRight,
+                                onPressed: () {
+                                  showShadDialog(
+                                    context: context,
+                                    builder: (context) => AccountViewDialog(acc: data.account!),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
                       ),
 
                       'Date' => DataGridCell(
@@ -109,6 +126,53 @@ class ReturnView extends HookConsumerWidget {
                           children: [
                             Text(data.returnDate.formatDate()),
                             Text(data.returnDate.ago),
+                          ],
+                        ),
+                      ),
+                      'Action' => DataGridCell(
+                        columnName: head.name,
+                        value: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            if (data.returnedRec != null)
+                              ShadIconButton(
+                                icon: const Icon(LuIcons.eye),
+                                onPressed: () {
+                                  if (isSale) {
+                                    RPaths.saleDetails(data.returnedRec!.id).pushNamed(context);
+                                  } else {
+                                    RPaths.purchaseDetails(data.returnedRec!.id).pushNamed(context);
+                                  }
+                                },
+                              ).colored(Colors.blue).toolTip('View'),
+                            ShadIconButton(
+                              icon: const Icon(LuIcons.trash),
+                              onPressed: () async {
+                                await showShadDialog(
+                                  context: context,
+                                  builder: (c) {
+                                    return ShadDialog.alert(
+                                      title: const Text('Delete Return Record'),
+                                      description: Text(
+                                        'Deleting a ${isSale ? 'sale' : 'purchase'} return will adjust the stock and account balance but wont create and Transaction. Are you sure?',
+                                      ),
+                                      actions: [
+                                        ShadButton(onPressed: () => c.nPop(), child: const Text('Cancel')),
+                                        ShadButton.destructive(
+                                          onPressed: () async {
+                                            final result = await invCtrl().delete(data);
+                                            if (!context.mounted) return;
+                                            result.showToast(context);
+                                            c.nPop();
+                                          },
+                                          child: const Text('Delete'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ).colored(context.colors.destructive).toolTip('Delete'),
                           ],
                         ),
                       ),

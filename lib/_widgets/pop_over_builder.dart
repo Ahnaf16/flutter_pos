@@ -44,6 +44,7 @@ class PopOverButton extends StatelessWidget {
     this.enabled = true,
     this.dense = false,
     this.color,
+    this.toolTip,
   });
 
   final Widget? child;
@@ -53,6 +54,7 @@ class PopOverButton extends StatelessWidget {
   final bool enabled;
   final bool dense;
   final Color? color;
+  final String? toolTip;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +66,7 @@ class PopOverButton extends StatelessWidget {
         enabled: enabled,
         icon: icon ?? const SizedBox(),
         onPressed: onPressed,
-      ).colored(color ?? (isDestructive ? context.colors.destructive : null));
+      ).colored(color ?? (isDestructive ? context.colors.destructive : null)).toolTip(toolTip);
     }
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 150),

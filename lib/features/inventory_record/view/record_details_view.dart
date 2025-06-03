@@ -68,7 +68,8 @@ class RecordDetailsView extends HookConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _Summaries(rec: rec, shop: config.shop),
-                            _ProductSummary(details: details),
+                            _ProductSummary(details: details, returns: returned?.detailsQtyMap ?? {}),
+
                             _OrderSummaryTable(rec),
                             _PayTable(rec),
 
@@ -223,10 +224,12 @@ class _OrderSummaryTable extends StatelessWidget {
 }
 
 class _ProductSummary extends StatelessWidget {
-  const _ProductSummary({required this.details});
+  const _ProductSummary({required this.details, required this.returns});
 
   final List<InventoryDetails> details;
+  final Map<String, int> returns;
 
+  int? getReturnQty(String id) => returns[id];
   @override
   Widget build(BuildContext context) {
     return ShadCard(
@@ -249,6 +252,11 @@ class _ProductSummary extends StatelessWidget {
                 flex: 2,
                 child: CenterLeft(child: Text('Quantity', style: context.text.list.bold)),
               ),
+              if (returns.isNotEmpty)
+                Expanded(
+                  flex: 2,
+                  child: CenterLeft(child: Text('Return', style: context.text.list.bold)),
+                ),
               Expanded(
                 child: CenterRight(child: Text('Total Price', style: context.text.list.bold)),
               ),
@@ -301,30 +309,22 @@ class _ProductSummary extends StatelessWidget {
 
                 Expanded(
                   flex: 2,
-                  child: CenterLeft(
-                    child: Text(
-                      d.price.currency(),
-                      style: context.text.list,
-                    ),
-                  ),
+                  child: CenterLeft(child: Text(d.price.currency(), style: context.text.list)),
                 ),
 
                 Expanded(
                   flex: 2,
-                  child: CenterLeft(
-                    child: Text(
-                      '${d.quantity}',
-                      style: context.text.list,
-                    ),
-                  ),
+                  child: CenterLeft(child: Text('${d.quantity}', style: context.text.list)),
                 ),
+                if (returns.isNotEmpty)
+                  Expanded(
+                    flex: 2,
+                    child: CenterLeft(child: Text('${getReturnQty(d.id)?.abs() ?? '--'}', style: context.text.list)),
+                  ),
 
                 Expanded(
                   child: CenterRight(
-                    child: Text(
-                      (d.price * d.quantity).currency(),
-                      style: context.text.list,
-                    ),
+                    child: Text((d.price * d.quantity).currency(), style: context.text.list),
                   ),
                 ),
               ],
@@ -380,6 +380,10 @@ class _Summaries extends StatelessWidget {
             SpacedText(
               left: 'Return date',
               right: returned.returnDate.formatDate('MMM dd, yyyy hh:mm a'),
+            ),
+            SpacedText(
+              left: 'Return Qty',
+              right: returned.detailsQtyMap.values.sum.abs().toString(),
             ),
             SpacedText(
               left: 'Return amount',

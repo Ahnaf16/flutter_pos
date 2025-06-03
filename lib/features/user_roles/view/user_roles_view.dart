@@ -2,7 +2,7 @@ import 'package:pos/features/user_roles/controller/user_roles_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('Name', 200.0), ('Permissions', double.nan), ('Enabled', 200.0), ('Action', 260.0)];
+const _headings = [('#', 50.0), ('Name', 200.0), ('Permissions', double.nan), ('Enabled', 200.0), ('Action', 260.0)];
 
 class UserRolesView extends HookConsumerWidget {
   const UserRolesView({super.key});
@@ -44,6 +44,10 @@ class UserRolesView extends HookConsumerWidget {
             cellAlignment: Alignment.centerLeft,
             cellBuilder: (data, head) {
               return switch (head.$1) {
+                '#' => DataGridCell(
+                  columnName: head.$1,
+                  value: Text((roles.indexWhere((e) => e.id == data.id) + 1).toString()),
+                ),
                 'Name' => DataGridCell(columnName: head.$1, value: Text(data.name)),
                 'Permissions' => DataGridCell(columnName: head.$1, value: _permissionBuilder(data)),
                 'Enabled' => DataGridCell(
@@ -78,6 +82,8 @@ class UserRolesView extends HookConsumerWidget {
                       PopOverButton(
                         dense: true,
                         icon: const Icon(LuIcons.eye),
+                        color: Colors.blue,
+                        toolTip: 'View',
                         onPressed: () {
                           showShadDialog(
                             context: context,
@@ -87,6 +93,8 @@ class UserRolesView extends HookConsumerWidget {
                       ),
                       PopOverButton(
                         dense: true,
+                        color: Colors.green,
+                        toolTip: 'Edit',
                         icon: const Icon(LuIcons.pen),
                         onPressed: () => RPaths.editRole(data.id).pushNamed(context),
                       ),
@@ -94,6 +102,7 @@ class UserRolesView extends HookConsumerWidget {
                         dense: true,
                         icon: const Icon(LuIcons.trash),
                         isDestructive: true,
+                        toolTip: 'Delete',
                         onPressed: () {
                           showShadDialog(
                             context: context,

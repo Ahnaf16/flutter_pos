@@ -238,8 +238,8 @@ class NameCellBuilder extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        OverflowMarquee(child: Text(name ?? '--', style: context.text.list)),
-        if (phone != null) Text(phone ?? '--'),
+        Text(name ?? '--', style: context.text.list, maxLines: 1),
+        if (phone != null) Text(phone ?? '--', maxLines: 1),
       ],
     );
   }

@@ -2,6 +2,7 @@
 
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:pos/_core/_core.dart';
@@ -170,6 +171,14 @@ class _Invoice extends StatelessWidget {
             spaced: true,
             styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
           ),
+          if (rec.returnRecord != null)
+            _SpacedText(
+              left: 'Return Qty',
+              right: (rec.returnRecord!.detailsQtyMap.values.sum.abs()).toString(),
+              style: theme.header5,
+              spaced: true,
+              styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            ),
           if (rec.returnRecord != null)
             _SpacedText(
               left: 'Return amount',

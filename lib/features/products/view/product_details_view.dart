@@ -136,8 +136,9 @@ class ProductDetailsView extends ConsumerWidget {
                             children: [
                               ShadAccordionItem<int>(
                                 value: 1,
+                                underlineTitleOnHover: false,
                                 padding: Pads.sm(),
-                                separator: const ShadSeparator.horizontal(margin: Pads.zero),
+                                separator: const Gap(0),
                                 title: const Text('Stocks'),
                                 child: ListView.separated(
                                   itemCount: product.nonEmptyStocks().length,
@@ -146,7 +147,10 @@ class ProductDetailsView extends ConsumerWidget {
                                   separatorBuilder: (_, __) => const ShadSeparator.horizontal(margin: Pads.zero),
                                   itemBuilder: (BuildContext context, int index) {
                                     final stock = product.nonEmptyStocks()[index];
-                                    return StockTile(stock: stock, unit: product.unitName);
+                                    return ShadDottedBorder(
+                                      color: context.colors.foreground.op3,
+                                      child: StockTile(stock: stock, unit: product.unitName),
+                                    );
                                   },
                                 ),
                               ),

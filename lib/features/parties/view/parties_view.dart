@@ -45,7 +45,7 @@ class PartiesView extends HookConsumerWidget {
           SizedBox(
             width: 300,
             child: ShadTextField(
-              hintText: 'Search',
+              hintText: 'Search by name, phone or email',
               onChanged: (v) => partiCtrl().search(v ?? ''),
               showClearButton: true,
             ),

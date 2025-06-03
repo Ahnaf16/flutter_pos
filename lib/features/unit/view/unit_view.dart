@@ -66,11 +66,13 @@ class UnitView extends HookConsumerWidget {
                           context: context,
                           builder: (context) => UnitAddDialog(unit: data),
                         ),
+                        toolTip: 'Edit',
                       ),
                       PopOverButton(
                         icon: const Icon(LuIcons.trash),
                         isDestructive: true,
                         dense: true,
+                        toolTip: 'Delete',
                         onPressed: () {
                           showShadDialog(
                             context: context,

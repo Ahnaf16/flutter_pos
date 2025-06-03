@@ -166,6 +166,7 @@ class RecordTable extends ConsumerWidget {
                     if (data.type.isSale) RPaths.saleDetails(data.id).pushNamed(context);
                     if (data.type.isPurchase) RPaths.purchaseDetails(data.id).pushNamed(context);
                   },
+                  toolTip: 'View',
                   child: const Text('View'),
                 ),
                 PopOverButton(
@@ -181,6 +182,7 @@ class RecordTable extends ConsumerWidget {
                       builder: (context) => InvInvoiceWidget(rec: data, config: config),
                     );
                   },
+                  toolTip: 'Download invoice',
                   child: const Text('Download invoice'),
                 ),
                 if (data.status != InventoryStatus.returned)
@@ -194,6 +196,7 @@ class RecordTable extends ConsumerWidget {
                         builder: (context) => ReturnRecordDialog(inventory: data),
                       );
                     },
+                    toolTip: 'Return',
                     child: const Text('Return'),
                   ),
               ],

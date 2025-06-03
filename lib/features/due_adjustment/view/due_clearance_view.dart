@@ -35,6 +35,8 @@ class DueClearanceView extends HookConsumerWidget {
           spacing: Insets.med,
           children: [
             ShadCard(
+              title: const Text('Clearance information'),
+              childPadding: Pads.med('t'),
               height: context.layout.isDesktop ? double.maxFinite : null,
               child: FormBuilder(
                 key: formKey,

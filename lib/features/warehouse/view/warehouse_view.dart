@@ -2,7 +2,13 @@ import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('Name', 200.0), ('Address', double.nan), ('Default', 200.0), ('Action', 260.0)];
+const _headings = [
+  TableHeading.positional('#', 50.0),
+  TableHeading.positional('Name', 200.0),
+  TableHeading.positional('Address'),
+  TableHeading.positional('Default', 200.0),
+  TableHeading.positional('Action', 260.0),
+];
 
 class WarehouseView extends HookConsumerWidget {
   const WarehouseView({super.key});
@@ -34,30 +40,34 @@ class WarehouseView extends HookConsumerWidget {
               loading: () => const Loading(),
               error: (e, s) => ErrorView(e, s, prov: warehouseCtrlProvider),
               data: (warehouses) {
-                return DataTableBuilder<WareHouse, (String, double)>(
+                return DataTableBuilder<WareHouse, TableHeading>(
                   rowHeight: 100,
                   items: warehouses,
                   headings: _headings,
                   headingBuilder: (heading) {
                     return GridColumn(
-                      columnName: heading.$1,
+                      columnName: heading.name,
                       columnWidthMode: ColumnWidthMode.fill,
-                      maximumWidth: heading.$2,
-                      minimumWidth: 200,
+                      maximumWidth: heading.max,
+                      minimumWidth: heading.minWidth ?? 200,
                       label: Container(
                         padding: Pads.med(),
-                        alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
-                        child: Text(heading.$1),
+                        alignment: heading.name == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
+                        child: Text(heading.name),
                       ),
                     );
                   },
                   cellAlignment: Alignment.centerLeft,
                   cellBuilder: (data, head) {
-                    return switch (head.$1) {
-                      'Name' => DataGridCell(columnName: head.$1, value: Text(data.name)),
-                      'Address' => DataGridCell(columnName: head.$1, value: _addressCellBuilder(data)),
+                    return switch (head.name) {
+                      '#' => DataGridCell(
+                        columnName: head.name,
+                        value: Text((warehouses.indexWhere((e) => e.id == data.id) + 1).toString()),
+                      ),
+                      'Name' => DataGridCell(columnName: head.name, value: Text(data.name)),
+                      'Address' => DataGridCell(columnName: head.name, value: _addressCellBuilder(data)),
                       'Default' => DataGridCell(
-                        columnName: head.$1,
+                        columnName: head.name,
                         value: ShadBadge.raw(
                           variant: data.isDefault ? ShadBadgeVariant.primary : ShadBadgeVariant.secondary,
                           onPressed: () {
@@ -71,27 +81,54 @@ class WarehouseView extends HookConsumerWidget {
                         ),
                       ),
                       'Action' => DataGridCell(
-                        columnName: head.$1,
+                        columnName: head.name,
                         value: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            ShadButton.secondary(
+                            ShadButton(
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.eye),
                               onPressed: () => showShadDialog(
                                 context: context,
                                 builder: (context) => _WarehouseViewDialog(house: data),
                               ),
-                            ),
-                            ShadButton.secondary(
+                            ).colored(Colors.blue).toolTip('View'),
+                            ShadButton(
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.pen),
                               onPressed: () => RPaths.editWarehouse(data.id).pushNamed(context),
-                            ),
+                            ).colored(Colors.green).toolTip('Edit'),
+                            ShadButton(
+                              size: ShadButtonSize.sm,
+                              leading: const Icon(LuIcons.trash),
+                              onPressed: () {
+                                showShadDialog(
+                                  context: context,
+                                  builder: (c) {
+                                    return ShadDialog.alert(
+                                      title: const Text('Delete Warehouse'),
+                                      description: Text('This will delete "${data.name}" warehouse permanently.'),
+                                      actions: [
+                                        ShadButton(onPressed: () => c.nPop(), child: const Text('Cancel')),
+                                        ShadButton.destructive(
+                                          onPressed: () async {
+                                            final res = await whCtrl().delete(data);
+                                            if (!c.mounted) return;
+                                            res.showToast(c);
+                                            c.nPop();
+                                          },
+                                          child: const Text('Delete'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ).colored(context.colors.destructive).toolTip('Delete'),
                           ],
                         ),
                       ),
-                      _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                      _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
                     };
                   },
                 );

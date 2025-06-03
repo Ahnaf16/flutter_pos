@@ -39,6 +39,8 @@ class DueAdjustmentView extends HookConsumerWidget {
           spacing: Insets.med,
           children: [
             ShadCard(
+              title: const Text('Adjustment Details'),
+              childPadding: Pads.med('t'),
               height: context.layout.isDesktop ? double.maxFinite : null,
               child: FormBuilder(
                 key: formKey,
@@ -192,9 +194,7 @@ class DueAdjustmentView extends HookConsumerWidget {
                         const Gap(Insets.med),
                         ShadCheckbox(
                           value: isTransfer.value,
-                          onChanged: (v) {
-                            isTransfer.value = v;
-                          },
+                          onChanged: (v) => isTransfer.value = v,
                           label: const Text('Transfer balance'),
                         ),
                         if (isTransfer.value) ...[

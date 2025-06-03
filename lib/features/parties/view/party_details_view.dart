@@ -118,10 +118,10 @@ class PartyBalanceDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dueCtrl = useTextEditingController(text: party.due.toString());
+    final dueCtrl = useTextEditingController();
     final noteCtrl = useTextEditingController();
 
-    final due = useState(party.due);
+    final due = useState(0.0);
     void listener() => due.set(double.tryParse(dueCtrl.text) ?? 0);
 
     useEffect(() {
@@ -130,6 +130,8 @@ class PartyBalanceDialog extends HookConsumerWidget {
         dueCtrl.removeListener(listener);
       };
     });
+
+    final totalDue = party.due + due.value;
 
     return ShadDialog(
       title: const Text('Update Due'),
@@ -168,10 +170,22 @@ class PartyBalanceDialog extends HookConsumerWidget {
             Text.rich(
               TextSpan(
                 children: [
-                  TextSpan(text: 'Current ${due.value > 0 ? 'Due' : 'Balance'}: '),
+                  TextSpan(text: 'Current ${party.due > 0 ? 'Due' : 'Balance'}: '),
                   TextSpan(
-                    text: due.value.abs().currency(),
-                    style: context.text.list.textColor(due.value > 0 ? context.colors.destructive : Colors.green),
+                    text: party.due.abs().currency(),
+                    style: context.text.list.textColor(party.due > 0 ? context.colors.destructive : Colors.green),
+                  ),
+                ],
+              ),
+              style: context.text.list,
+            ),
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: 'Updated ${totalDue > 0 ? 'Due' : 'Balance'}:  '),
+                  TextSpan(
+                    text: totalDue.abs().currency(),
+                    style: context.text.list.textColor(totalDue > 0 ? context.colors.destructive : Colors.green),
                   ),
                 ],
               ),
