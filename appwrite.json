@@ -67,6 +67,46 @@
                     "twoWayKey": "6821a1100006ad981f7b",
                     "onDelete": "setNull",
                     "side": "parent"
+                },
+                {
+                    "key": "shop_name",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 100,
+                    "default": null
+                },
+                {
+                    "key": "shop_address",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "shop_logo",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "invoice_prefix",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "sku_prefix",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 40,
+                    "default": null
                 }
             ],
             "indexes": []
@@ -151,6 +191,18 @@
                     "twoWayKey": "6818e43a0013400d0b3f",
                     "onDelete": "setNull",
                     "side": "parent"
+                },
+                {
+                    "key": "file",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "683ddf460030b908f57f",
+                    "relationType": "oneToOne",
+                    "twoWay": false,
+                    "twoWayKey": "683de4b900354dba528c",
+                    "onDelete": "setNull",
+                    "side": "parent"
                 }
             ],
             "indexes": []
@@ -208,6 +260,18 @@
                     "min": -1.7976931348623157e+308,
                     "max": 1.7976931348623157e+308,
                     "default": null
+                },
+                {
+                    "key": "record",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680628f40031fda735e1",
+                    "relationType": "manyToOne",
+                    "twoWay": true,
+                    "twoWayKey": "details",
+                    "onDelete": "setNull",
+                    "side": "parent"
                 }
             ],
             "indexes": []
@@ -233,18 +297,6 @@
                     "relationType": "manyToOne",
                     "twoWay": false,
                     "twoWayKey": "680631a2001b79616702",
-                    "onDelete": "setNull",
-                    "side": "parent"
-                },
-                {
-                    "key": "inventory_details",
-                    "type": "relationship",
-                    "required": false,
-                    "array": false,
-                    "relatedCollection": "68064a58002fe1687f71",
-                    "relationType": "oneToMany",
-                    "twoWay": false,
-                    "twoWayKey": "68064af1003506b201de",
                     "onDelete": "setNull",
                     "side": "parent"
                 },
@@ -316,7 +368,8 @@
                     "elements": [
                         "paid",
                         "unpaid",
-                        "returned"
+                        "returned",
+                        "partial"
                     ],
                     "format": "enum",
                     "default": null
@@ -359,6 +412,68 @@
                     "required": true,
                     "array": false,
                     "default": null
+                },
+                {
+                    "key": "initial_pay_amount",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "created_by",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680536a4003be2a282af",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "683be2a8000064d0a42f",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "calculated_discount",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                },
+                {
+                    "key": "paymentLogs",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "682f0d7700136b44c75b",
+                    "relationType": "manyToOne",
+                    "twoWay": true,
+                    "twoWayKey": "record",
+                    "onDelete": "setNull",
+                    "side": "child"
+                },
+                {
+                    "key": "invoice_no",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "details",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "68064a58002fe1687f71",
+                    "relationType": "manyToOne",
+                    "twoWay": true,
+                    "twoWayKey": "record",
+                    "onDelete": "setNull",
+                    "side": "child"
                 }
             ],
             "indexes": []
@@ -485,6 +600,27 @@
                     "required": false,
                     "array": false,
                     "default": true
+                },
+                {
+                    "key": "type",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "elements": [
+                        "cash",
+                        "bank",
+                        "mobileBank"
+                    ],
+                    "format": "enum",
+                    "default": null
+                },
+                {
+                    "key": "custom_info",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 100,
+                    "default": null
                 }
             ],
             "indexes": []
@@ -618,28 +754,7 @@
                     "type": "string",
                     "required": false,
                     "array": true,
-                    "elements": [
-                        "manageProduct",
-                        "manageStock",
-                        "manageUnit",
-                        "makeSale",
-                        "returnSale",
-                        "makePurchase",
-                        "returnPurchase",
-                        "manageCustomer",
-                        "manageSupplier",
-                        "manageStaff",
-                        "manageRole",
-                        "manageWarehouse",
-                        "transferStock",
-                        "manageAccounts",
-                        "manageExpanse",
-                        "moneyTransfer",
-                        "transferMoney",
-                        "due",
-                        "transactions"
-                    ],
-                    "format": "enum",
+                    "size": 100,
                     "default": null
                 }
             ],
@@ -724,7 +839,7 @@
                     "side": "parent"
                 },
                 {
-                    "key": "parties",
+                    "key": "transaction_to",
                     "type": "relationship",
                     "required": false,
                     "array": false,
@@ -741,11 +856,12 @@
                     "required": true,
                     "array": false,
                     "elements": [
-                        "expanse",
-                        "purchase",
                         "sale",
+                        "payment",
+                        "returned",
+                        "expanse",
                         "transfer",
-                        "returned"
+                        "dueAdjustment"
                     ],
                     "format": "enum",
                     "default": null
@@ -767,14 +883,6 @@
                     "default": null
                 },
                 {
-                    "key": "transact_to",
-                    "type": "string",
-                    "required": false,
-                    "array": false,
-                    "size": 300,
-                    "default": null
-                },
-                {
                     "key": "transaction_by",
                     "type": "relationship",
                     "required": false,
@@ -787,7 +895,47 @@
                     "side": "parent"
                 },
                 {
-                    "key": "used_due_balance",
+                    "key": "transaction_from",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680629bf003151f6f6ad",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "681adfb4002ccc5ff9dd",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "trx_no",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "transferredToAccount",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "68063141003974052255",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "683be8320013c23bc0ba",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "custom_info",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "adjust_balance",
                     "type": "double",
                     "required": false,
                     "array": false,
@@ -796,22 +944,60 @@
                     "default": null
                 },
                 {
-                    "key": "transact_to_phone",
+                    "key": "pay_method",
                     "type": "string",
                     "required": false,
                     "array": false,
-                    "size": 40,
+                    "elements": [
+                        "cash",
+                        "bank",
+                        "mobileBank"
+                    ],
+                    "format": "enum",
                     "default": null
                 },
                 {
-                    "key": "transaction_for",
+                    "key": "inventoryRecord",
                     "type": "relationship",
                     "required": false,
                     "array": false,
-                    "relatedCollection": "680629bf003151f6f6ad",
+                    "relatedCollection": "680628f40031fda735e1",
                     "relationType": "manyToOne",
                     "twoWay": false,
-                    "twoWayKey": "681adfb4002ccc5ff9dd",
+                    "twoWayKey": "683bebdb00104bbd0942",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "transacted_to_shop",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "betweenAccount",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "is_income",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "file",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "683ddf460030b908f57f",
+                    "relationType": "oneToOne",
+                    "twoWay": false,
+                    "twoWayKey": "683de4920006c502b4de",
                     "onDelete": "setNull",
                     "side": "parent"
                 }
@@ -940,6 +1126,13 @@
                     "array": false,
                     "size": 300,
                     "default": null
+                },
+                {
+                    "key": "isActive",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false,
+                    "default": null
                 }
             ],
             "indexes": []
@@ -950,7 +1143,8 @@
                 "read(\"any\")",
                 "create(\"users\")",
                 "read(\"users\")",
-                "update(\"users\")"
+                "update(\"users\")",
+                "delete(\"users\")"
             ],
             "databaseId": "6805362c0032bd189cd2",
             "name": "warehouses",
@@ -1062,6 +1256,15 @@
                     "min": -1.7976931348623157e+308,
                     "max": 1.7976931348623157e+308,
                     "default": null
+                },
+                {
+                    "key": "old_amount",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
                 }
             ],
             "indexes": []
@@ -1100,7 +1303,8 @@
             "$id": "68205e6c0011238344a3",
             "$permissions": [
                 "create(\"users\")",
-                "read(\"users\")"
+                "read(\"users\")",
+                "delete(\"users\")"
             ],
             "databaseId": "6805362c0032bd189cd2",
             "name": "return_record",
@@ -1170,6 +1374,192 @@
                     "required": false,
                     "array": true,
                     "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "paymentAccount",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "68063141003974052255",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "683be438000f6ae2d8ea",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "682f0d7700136b44c75b",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "payment_log",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "record",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680628f40031fda735e1",
+                    "relationType": "manyToOne",
+                    "twoWay": true,
+                    "twoWayKey": "paymentLogs",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "payment_date",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "note",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "paid_amount",
+                    "type": "double",
+                    "required": true,
+                    "array": false,
+                    "min": -1.7976931348623157e+308,
+                    "max": 1.7976931348623157e+308,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "683216330007e2e89e34",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "stock_transfer_log",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "product",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6805c655000722776983",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "683be4a0001f1cfd3a25",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "from",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6805bdcd00107f585ff2",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "683be4ba0027f3a379de",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "to",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6805bdcd00107f585ff2",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "683be4cf000074b2aa05",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "stock",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "6805dbf9001793b1a019",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "683be5e5001d34a7c5fc",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                },
+                {
+                    "key": "date",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "user",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedCollection": "680536a4003be2a282af",
+                    "relationType": "manyToOne",
+                    "twoWay": false,
+                    "twoWayKey": "683be6040000ef6cb064",
+                    "onDelete": "setNull",
+                    "side": "parent"
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "683ddf460030b908f57f",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
+            "databaseId": "6805362c0032bd189cd2",
+            "name": "files",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 100,
+                    "default": null
+                },
+                {
+                    "key": "ext",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "size",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 40,
                     "default": null
                 }
             ],
