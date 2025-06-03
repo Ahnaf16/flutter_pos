@@ -111,10 +111,17 @@ class HomeView extends HookConsumerWidget {
           LineChartWidget(start.value, end.value),
           const Gap(0),
           ShadCard(
-            height: 600,
-            title: const Text('Transactions'),
-            childPadding: Pads.lg('t'),
-            child: TrxTable(logs: trxList, accountAmounts: false),
+            height: 850,
+            title: Row(
+              spacing: Insets.med,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Transactions'),
+                ShadButton.link(child: const Text('View all'), onPressed: () => RPaths.transactions.pushNamed(context)),
+              ],
+            ),
+            // childPadding: Pads.lg('t'),
+            child: TrxTable(logs: trxList.takeFirst(6), accountAmounts: false),
           ),
           const Gap(0),
         ],
