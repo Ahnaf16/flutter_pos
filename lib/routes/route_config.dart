@@ -29,6 +29,7 @@ import 'package:pos/features/unit/view/unit_view.dart';
 import 'package:pos/features/user_roles/view/create_user_role_view.dart';
 import 'package:pos/features/user_roles/view/user_roles_view.dart';
 import 'package:pos/features/warehouse/view/create_warehouse_view.dart';
+import 'package:pos/features/warehouse/view/warehouse_details_view.dart';
 import 'package:pos/features/warehouse/view/warehouse_view.dart';
 import 'package:pos/main.export.dart';
 import 'package:pos/navigation/nav_root.dart';
@@ -181,6 +182,7 @@ class AppRouter extends Notifier<GoRouter> {
             routes: [
               AppRoute(RPaths.createWarehouse, (_) => const CreateWarehouseView(), parentKey: _shell),
               AppRoute(RPaths.editWarehouse(':id'), (_) => const CreateWarehouseView(), parentKey: _shell),
+              AppRoute(RPaths.warehouseDetails(':id'), (_) => const WarehouseDetailsView(), parentKey: _shell),
             ],
           ),
           //! stockTransfer

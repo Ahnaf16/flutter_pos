@@ -1,3 +1,4 @@
+import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/warehouse/repository/warehouse_repo.dart';
 import 'package:pos/main.export.dart';
@@ -66,4 +67,18 @@ class WarehouseCtrl extends _$WarehouseCtrl {
       return rightResult('Deleted successfully');
     });
   }
+}
+
+@riverpod
+FutureOr<WareHouse?> warehouseDetails(Ref ref, String? id) async {
+  if (id == null) return null;
+
+  final repo = locate<WarehouseRepo>();
+
+  final party = await repo.getWareHouseById(id);
+
+  return party.fold((l) {
+    Toast.showErr(Ctx.context, l);
+    return null;
+  }, identity);
 }

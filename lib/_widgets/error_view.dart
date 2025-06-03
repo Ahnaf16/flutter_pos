@@ -75,9 +75,8 @@ class ErrorDisplay extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ShadDialog(
-      title: Text(error),
-      description: description == null ? null : Text(description!, style: context.text.muted),
       closeIconData: LuIcons.arrowLeft,
+      closeIconPosition: const ShadPosition(left: 10, top: 10),
       actions: [
         if (prov != null)
           ShadButton.outline(
@@ -89,6 +88,15 @@ class ErrorDisplay extends HookConsumerWidget {
             child: const Text('Retry'),
           ),
       ],
+      child: Column(
+        children: [
+          Icon(LuIcons.circleOff, size: 40, color: context.colors.foreground.op5),
+          const Gap(Insets.xl),
+          Text(error, style: context.text.h3),
+          const Gap(Insets.med),
+          if (description != null) Text(description!, style: context.text.muted),
+        ],
+      ),
     );
   }
 }

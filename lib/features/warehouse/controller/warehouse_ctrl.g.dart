@@ -6,7 +6,148 @@ part of 'warehouse_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$warehouseCtrlHash() => r'215901fd8e1528b74f763491ab5dd3d4329a258b';
+String _$warehouseDetailsHash() => r'5e93bf1e008107f9dfe01c8432dfc51fc4200f7d';
+
+/// Copied from Dart SDK
+class _SystemHash {
+  _SystemHash._();
+
+  static int combine(int hash, int value) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + value);
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    return hash ^ (hash >> 6);
+  }
+
+  static int finish(int hash) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    // ignore: parameter_assignments
+    hash = hash ^ (hash >> 11);
+    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  }
+}
+
+/// See also [warehouseDetails].
+@ProviderFor(warehouseDetails)
+const warehouseDetailsProvider = WarehouseDetailsFamily();
+
+/// See also [warehouseDetails].
+class WarehouseDetailsFamily extends Family<AsyncValue<WareHouse?>> {
+  /// See also [warehouseDetails].
+  const WarehouseDetailsFamily();
+
+  /// See also [warehouseDetails].
+  WarehouseDetailsProvider call(String? id) {
+    return WarehouseDetailsProvider(id);
+  }
+
+  @override
+  WarehouseDetailsProvider getProviderOverride(
+    covariant WarehouseDetailsProvider provider,
+  ) {
+    return call(provider.id);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'warehouseDetailsProvider';
+}
+
+/// See also [warehouseDetails].
+class WarehouseDetailsProvider extends AutoDisposeFutureProvider<WareHouse?> {
+  /// See also [warehouseDetails].
+  WarehouseDetailsProvider(String? id)
+    : this._internal(
+        (ref) => warehouseDetails(ref as WarehouseDetailsRef, id),
+        from: warehouseDetailsProvider,
+        name: r'warehouseDetailsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$warehouseDetailsHash,
+        dependencies: WarehouseDetailsFamily._dependencies,
+        allTransitiveDependencies:
+            WarehouseDetailsFamily._allTransitiveDependencies,
+        id: id,
+      );
+
+  WarehouseDetailsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.id,
+  }) : super.internal();
+
+  final String? id;
+
+  @override
+  Override overrideWith(
+    FutureOr<WareHouse?> Function(WarehouseDetailsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: WarehouseDetailsProvider._internal(
+        (ref) => create(ref as WarehouseDetailsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        id: id,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<WareHouse?> createElement() {
+    return _WarehouseDetailsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is WarehouseDetailsProvider && other.id == id;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, id.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin WarehouseDetailsRef on AutoDisposeFutureProviderRef<WareHouse?> {
+  /// The parameter `id` of this provider.
+  String? get id;
+}
+
+class _WarehouseDetailsProviderElement
+    extends AutoDisposeFutureProviderElement<WareHouse?>
+    with WarehouseDetailsRef {
+  _WarehouseDetailsProviderElement(super.provider);
+
+  @override
+  String? get id => (origin as WarehouseDetailsProvider).id;
+}
+
+String _$warehouseCtrlHash() => r'bc164f8586d93c208f2a70a394d74a59c1af4f8c';
 
 /// See also [WarehouseCtrl].
 @ProviderFor(WarehouseCtrl)

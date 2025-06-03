@@ -50,7 +50,12 @@ class ProductDetailsView extends ConsumerWidget {
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: productDetailsProvider),
         data: (product) {
-          if (product == null) return const ErrorDisplay('Product not found');
+          if (product == null) {
+            return const ErrorDisplay(
+              'Product not found',
+              description: 'The product you are looking might have been deleted',
+            );
+          }
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: Insets.med,
@@ -144,7 +149,7 @@ class ProductDetailsView extends ConsumerWidget {
                                   itemCount: product.nonEmptyStocks().length,
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
-                                  separatorBuilder: (_, __) => const ShadSeparator.horizontal(margin: Pads.zero),
+                                  separatorBuilder: (_, __) => const Gap(Insets.sm),
                                   itemBuilder: (BuildContext context, int index) {
                                     final stock = product.nonEmptyStocks()[index];
                                     return ShadDottedBorder(

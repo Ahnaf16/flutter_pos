@@ -88,10 +88,7 @@ class WarehouseView extends HookConsumerWidget {
                             ShadButton(
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.eye),
-                              onPressed: () => showShadDialog(
-                                context: context,
-                                builder: (context) => _WarehouseViewDialog(house: data),
-                              ),
+                              onPressed: () => RPaths.warehouseDetails(data.id).pushNamed(context),
                             ).colored(Colors.blue).toolTip('View'),
                             ShadButton(
                               size: ShadButtonSize.sm,
@@ -154,49 +151,6 @@ class WarehouseView extends HookConsumerWidget {
       );
     },
   );
-}
-
-class _WarehouseViewDialog extends HookConsumerWidget {
-  const _WarehouseViewDialog({required this.house});
-
-  final WareHouse house;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ShadDialog(
-      title: const Text('Warehouse'),
-      description: Text('Details of ${house.name}'),
-      actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
-      child: Container(
-        padding: Pads.padding(v: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: Insets.med,
-          children: [
-            SpacedText(left: 'Name', right: house.name, styleBuilder: (l, r) => (l, r.bold)),
-            SpacedText(
-              left: 'Address',
-              right: house.address,
-              styleBuilder: (l, r) => (l, r.bold),
-              trailing: SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(house.address)),
-            ),
-            SpacedText(
-              left: 'Contact Person',
-              right: house.contactPerson ?? 'N/a',
-              styleBuilder: (l, r) => (l, r.bold),
-            ),
-            SpacedText(
-              left: 'Contact Number',
-              right: house.contactNumber,
-              styleBuilder: (l, r) => (l, r.bold),
-              trailing: SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(house.contactNumber)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class _WarehouseDefaultDialog extends HookConsumerWidget {
