@@ -6,7 +6,7 @@ part of 'expense_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$expenseCtrlHash() => r'9da4686ffdaa5e2d182bb9abece07634455a8158';
+String _$expenseCtrlHash() => r'9a039e7f5ef231fd921af45fb08753fd13284fe9';
 
 /// See also [ExpenseCtrl].
 @ProviderFor(ExpenseCtrl)

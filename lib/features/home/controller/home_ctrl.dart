@@ -27,7 +27,7 @@ class ViewingWH extends _$ViewingWH {
 @Riverpod()
 class HomeCounters extends _$HomeCounters {
   @override
-  Map<(String, RPath), dynamic> build(DateTime? start, DateTime? end) {
+  Map<(String, RPath, IconData), dynamic> build(DateTime? start, DateTime? end) {
     final products = ref.watch(productsCtrlProvider).maybeList().filterByDateRange(start, end, (e) => e.createdAt);
     final inventory = ref.watch(inventoryCtrlProvider(null)).maybeList().filterByDateRange(start, end, (e) => e.date);
     final returns = ref
@@ -43,22 +43,36 @@ class HomeCounters extends _$HomeCounters {
     final returnPurchases = returns.where((e) => e.returnedRec?.type == RecordType.purchase);
 
     return {
-      ('Products', RPaths.products): products.length,
-      ('Sales', RPaths.sales): sales.where((e) => !e.status.isReturned).map((e) => e.payable).sum.currency(),
-      ('Purchase', RPaths.purchases): purchases.where((e) => !e.status.isReturned).map((e) => e.payable).sum.currency(),
-      ('Sales Return', RPaths.salesReturn): returnSales.map((e) => e.adjustAccount).sum.currency(),
-      ('Purchase Return', RPaths.purchasesReturn): returnPurchases.map((e) => e.adjustAccount).sum.currency(),
-      ('Customer due', RPaths.customer): peoples
+      ('Products', RPaths.products, LuIcons.box): products.length,
+      ('Sales', RPaths.sales, LuIcons.shoppingCart): sales
+          .where((e) => !e.status.isReturned)
+          .map((e) => e.payable)
+          .sum
+          .currency(),
+      ('Purchase', RPaths.purchases, LuIcons.scrollText): purchases
+          .where((e) => !e.status.isReturned)
+          .map((e) => e.payable)
+          .sum
+          .currency(),
+      ('Sales Return', RPaths.salesReturn, LuIcons.undo): returnSales.map((e) => e.adjustAccount).sum.currency(),
+      ('Purchase Return', RPaths.purchasesReturn, LuIcons.redo): returnPurchases
+          .map((e) => e.adjustAccount)
+          .sum
+          .currency(),
+      ('Customer due', RPaths.customer, LuIcons.handCoins): peoples
           .where((e) => e.isCustomer && e.hasDue())
           .map((e) => e.due)
           .sum
           .currency(),
-      ('Supplier due', RPaths.supplier): peoples
+      ('Supplier due', RPaths.supplier, LuIcons.handCoins): peoples
           .where((e) => !e.isCustomer && e.hasBalance())
           .map((e) => e.due.abs())
           .sum
           .currency(),
-      ('Total account balance', RPaths.paymentAccount): accounts.map((e) => e.amount).sum.currency(),
+      ('Total account balance', RPaths.paymentAccount, LuIcons.creditCard): accounts
+          .map((e) => e.amount)
+          .sum
+          .currency(),
     };
   }
 }

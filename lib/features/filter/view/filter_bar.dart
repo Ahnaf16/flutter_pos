@@ -89,7 +89,20 @@ class FilterBar extends HookConsumerWidget {
                             leading: LuIcons.calendarCog,
                             text: 'Custom range',
                             onPressed: () {
-                              _push(context, _DateSelector(state));
+                              _push(
+                                context,
+                                DateRangeSelector(
+                                  start: state.value.from,
+                                  end: state.value.to,
+                                  onApply: (from, to) {
+                                    state.value = state.value = state.value = state.value.copyWith(
+                                      from: from == null ? null : () => from,
+                                      to: to == null ? null : () => to,
+                                    );
+                                    popCtrl2nd.toggle();
+                                  },
+                                ),
+                              );
                             },
                           ),
                         ],
@@ -266,6 +279,7 @@ class FilterBar extends HookConsumerWidget {
                   ctrl().setState(state.value);
                 },
               ).toolTip('Search & Filter'),
+
               ShadIconButton.outline(
                 backgroundColor: context.colors.destructive.op1,
                 foregroundColor: context.colors.destructive,
@@ -373,18 +387,20 @@ class _ListItemBuilder<T> extends HookConsumerWidget {
   }
 }
 
-class _DateSelector extends HookConsumerWidget {
-  const _DateSelector(this.state);
+class DateRangeSelector extends HookConsumerWidget {
+  const DateRangeSelector({super.key, this.start, this.end, this.onApply});
 
-  final ValueNotifier<FilterState> state;
+  final DateTime? start;
+  final DateTime? end;
+  final Function(DateTime? start, DateTime? end)? onApply;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // final fState = ref.watch(filterCtrlProvider);
     // final ctrl = useCallback(() => ref.read(filterCtrlProvider.notifier));
 
-    final from = useState<DateTime?>(state.value.from);
-    final to = useState<DateTime?>(state.value.to);
+    final from = useState<DateTime?>(start);
+    final to = useState<DateTime?>(end);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -458,11 +474,12 @@ class _DateSelector extends HookConsumerWidget {
               ),
               child: const Text('Submit'),
               onPressed: () {
-                state.value = state.value = state.value = state.value.copyWith(
-                  from: from.value == null ? null : () => from.value,
-                  to: to.value == null ? null : () => to.value,
-                );
-                context.nPop();
+                onApply?.call(from.value, to.value);
+                // state.value = state.value = state.value = state.value.copyWith(
+                //   from: from.value == null ? null : () => from.value,
+                //   to: to.value == null ? null : () => to.value,
+                // );
+                context.nPop(({start: from.value, end: to.value}));
               },
             ),
           ],

@@ -22,7 +22,7 @@ final viewingWHProvider =
     );
 
 typedef _$ViewingWH = Notifier<({WareHouse? my, WareHouse? viewing})>;
-String _$homeCountersHash() => r'b7406afafbc25807012ff1dc7409f0e0e42bc1f6';
+String _$homeCountersHash() => r'89d41a8ba4d3da9075e6a1b98e921aa5681d05d5';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -46,11 +46,12 @@ class _SystemHash {
 }
 
 abstract class _$HomeCounters
-    extends BuildlessAutoDisposeNotifier<Map<(String, RPath), dynamic>> {
+    extends
+        BuildlessAutoDisposeNotifier<Map<(String, RPath, IconData), dynamic>> {
   late final DateTime? start;
   late final DateTime? end;
 
-  Map<(String, RPath), dynamic> build(DateTime? start, DateTime? end);
+  Map<(String, RPath, IconData), dynamic> build(DateTime? start, DateTime? end);
 }
 
 /// See also [HomeCounters].
@@ -58,7 +59,8 @@ abstract class _$HomeCounters
 const homeCountersProvider = HomeCountersFamily();
 
 /// See also [HomeCounters].
-class HomeCountersFamily extends Family<Map<(String, RPath), dynamic>> {
+class HomeCountersFamily
+    extends Family<Map<(String, RPath, IconData), dynamic>> {
   /// See also [HomeCounters].
   const HomeCountersFamily();
 
@@ -94,7 +96,7 @@ class HomeCountersProvider
     extends
         AutoDisposeNotifierProviderImpl<
           HomeCounters,
-          Map<(String, RPath), dynamic>
+          Map<(String, RPath, IconData), dynamic>
         > {
   /// See also [HomeCounters].
   HomeCountersProvider(DateTime? start, DateTime? end)
@@ -129,7 +131,7 @@ class HomeCountersProvider
   final DateTime? end;
 
   @override
-  Map<(String, RPath), dynamic> runNotifierBuild(
+  Map<(String, RPath, IconData), dynamic> runNotifierBuild(
     covariant HomeCounters notifier,
   ) {
     return notifier.build(start, end);
@@ -157,7 +159,7 @@ class HomeCountersProvider
   @override
   AutoDisposeNotifierProviderElement<
     HomeCounters,
-    Map<(String, RPath), dynamic>
+    Map<(String, RPath, IconData), dynamic>
   >
   createElement() {
     return _HomeCountersProviderElement(this);
@@ -183,7 +185,7 @@ class HomeCountersProvider
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin HomeCountersRef
-    on AutoDisposeNotifierProviderRef<Map<(String, RPath), dynamic>> {
+    on AutoDisposeNotifierProviderRef<Map<(String, RPath, IconData), dynamic>> {
   /// The parameter `start` of this provider.
   DateTime? get start;
 
@@ -195,7 +197,7 @@ class _HomeCountersProviderElement
     extends
         AutoDisposeNotifierProviderElement<
           HomeCounters,
-          Map<(String, RPath), dynamic>
+          Map<(String, RPath, IconData), dynamic>
         >
     with HomeCountersRef {
   _HomeCountersProviderElement(super.provider);

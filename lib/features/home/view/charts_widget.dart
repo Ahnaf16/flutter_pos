@@ -1,4 +1,6 @@
+import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
+import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/transactions/controller/transactions_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -10,9 +12,16 @@ class _PieData {
 }
 
 class _BarData {
-  _BarData(this.month, this.y);
+  _BarData(this.x, this.y);
 
-  final int month;
+  final String x;
+  final num? y;
+}
+
+class _LineData {
+  _LineData(this.x, this.y);
+
+  final DateTime x;
   final num? y;
 }
 
@@ -93,7 +102,7 @@ class BarWidget extends HookConsumerWidget {
 
       final trxGroup = trxList.where((e) => e.isIncome == true).groupListsBy((e) => e.date.month);
       for (var month = 1; month <= 12; month++) {
-        data.add(_BarData(month, trxGroup[month]?.map((e) => e.amount).sum));
+        data.add(_BarData(getMonthName(month), trxGroup[month]?.map((e) => e.amount).sum));
       }
 
       return data;
@@ -104,7 +113,7 @@ class BarWidget extends HookConsumerWidget {
 
       final trxGroup = trxList.where((e) => e.isIncome != true).groupListsBy((e) => e.date.month);
       for (var month = 1; month <= 12; month++) {
-        data.add(_BarData(month, trxGroup[month]?.map((e) => e.amount).sum));
+        data.add(_BarData(getMonthName(month), trxGroup[month]?.map((e) => e.amount).sum));
       }
 
       return data;
@@ -115,7 +124,7 @@ class BarWidget extends HookConsumerWidget {
 
       final trxGroup = trxList.fromTypes([TransactionType.returned]).groupListsBy((e) => e.date.month);
       for (var month = 1; month <= 12; month++) {
-        data.add(_BarData(month, trxGroup[month]?.map((e) => e.amount).sum));
+        data.add(_BarData(getMonthName(month), trxGroup[month]?.map((e) => e.amount).sum));
       }
 
       return data;
@@ -133,7 +142,7 @@ class BarWidget extends HookConsumerWidget {
         ColumnSeries<_BarData, String>(
           name: 'In',
           dataSource: inData(),
-          xValueMapper: (data, _) => getMonthName(data.month),
+          xValueMapper: (data, _) => data.x,
           yValueMapper: (data, _) => data.y,
           color: Colors.blue,
           borderRadius: Corners.smBorder.copyWith(bottomLeft: Radius.zero, bottomRight: Radius.zero),
@@ -143,7 +152,7 @@ class BarWidget extends HookConsumerWidget {
         ColumnSeries<_BarData, String>(
           name: 'Out',
           dataSource: outData(),
-          xValueMapper: (data, _) => getMonthName(data.month),
+          xValueMapper: (data, _) => data.x,
           yValueMapper: (data, _) => data.y,
           color: Colors.amber.shade900,
           borderRadius: Corners.smBorder.copyWith(bottomLeft: Radius.zero, bottomRight: Radius.zero),
@@ -153,7 +162,7 @@ class BarWidget extends HookConsumerWidget {
         ColumnSeries<_BarData, String>(
           name: 'Return',
           dataSource: returnData(),
-          xValueMapper: (data, _) => getMonthName(data.month),
+          xValueMapper: (data, _) => data.x,
           yValueMapper: (data, _) => data.y,
           color: Colors.red,
           borderRadius: Corners.smBorder.copyWith(bottomLeft: Radius.zero, bottomRight: Radius.zero),
@@ -161,6 +170,73 @@ class BarWidget extends HookConsumerWidget {
           width: 0.8,
         ),
       ],
+    );
+  }
+}
+
+class LineChartWidget extends ConsumerWidget {
+  const LineChartWidget(this.start, this.end, {super.key});
+  final DateTime? start;
+  final DateTime? end;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final inventory = ref
+        .watch(inventoryCtrlProvider(null))
+        .maybeList()
+        .sortWithDate((e) => e.date)
+        .filterByDateRange(start, end, (e) => e.date);
+
+    List<_LineData> sale() {
+      final data = <_LineData>[];
+
+      final invList = inventory.where((e) => e.type.isSale).groupListsBy((e) => e.date.justDate);
+      for (final inv in invList.entries) {
+        data.add(_LineData(inv.key, inv.value.map((e) => e.total).sum));
+      }
+
+      return data;
+    }
+
+    List<_LineData> purchase() {
+      final data = <_LineData>[];
+
+      final invList = inventory.where((e) => e.type.isPurchase).groupListsBy((e) => e.date.justDate);
+      for (final inv in invList.entries) {
+        data.add(_LineData(inv.key, inv.value.map((e) => e.total).sum));
+      }
+
+      return data;
+    }
+
+    return ShadCard(
+      child: SfCartesianChart(
+        title: const ChartTitle(text: 'Invoice records', alignment: ChartAlignment.near),
+        tooltipBehavior: TooltipBehavior(enable: true),
+        legend: const Legend(isVisible: true, position: LegendPosition.bottom),
+        primaryXAxis: DateTimeAxis(maximum: DateTime.now().addDays(10)),
+        primaryYAxis: NumericAxis(
+          numberFormat: currencyFormate(compact: true),
+        ),
+        series: [
+          SplineSeries<_LineData, DateTime>(
+            name: 'Sale',
+            dataSource: sale(),
+            xValueMapper: (data, _) => data.x.justDate,
+            yValueMapper: (data, _) => data.y,
+            color: RecordType.sale.color,
+            markerSettings: const MarkerSettings(isVisible: true),
+          ),
+          SplineSeries<_LineData, DateTime>(
+            name: 'Purchase',
+            dataSource: purchase(),
+            xValueMapper: (data, _) => data.x,
+            yValueMapper: (data, _) => data.y,
+            color: RecordType.purchase.color,
+            markerSettings: const MarkerSettings(isVisible: true),
+          ),
+        ],
+      ),
     );
   }
 }

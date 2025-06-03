@@ -21,7 +21,7 @@ class HomeCounterWidget extends ConsumerWidget {
       itemCount: counters.length,
       shrinkWrap: true,
       itemBuilder: (BuildContext context, int index) {
-        final MapEntry(key: (title, path), :value) = counters.entries.toList()[index];
+        final MapEntry(key: (title, path, icon), :value) = counters.entries.toList()[index];
         return Stack(
           fit: StackFit.expand,
           children: [
@@ -30,7 +30,14 @@ class HomeCounterWidget extends ConsumerWidget {
                 return ShadCard(
                   padding: Pads.med(),
                   childPadding: Pads.med('t'),
-                  title: OverflowMarquee(child: Text(title, style: context.text.list.op(.5))),
+
+                  title: Row(
+                    spacing: Insets.med,
+                    children: [
+                      Icon(icon),
+                      Text(title, style: context.text.list.op(.5)),
+                    ],
+                  ),
                   child: OverflowMarquee(child: Text(value.toString(), style: context.text.h4)),
                 );
               },

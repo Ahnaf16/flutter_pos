@@ -1,6 +1,7 @@
 // import 'package:pos/features/home/view/bar_widget.dart';
 // import 'package:pos/features/home/view/pie_widget.dart';
 // import 'package:pos/features/transactions/view/transactions_view.dart';
+import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/home/view/charts_widget.dart';
 import 'package:pos/features/home/view/home_counter_widget.dart';
 import 'package:pos/features/transactions/controller/transactions_ctrl.dart';
@@ -14,6 +15,7 @@ final _list = [
   'This week',
   'This month',
   'This year',
+  'Custom date',
 ];
 
 class HomeView extends HookConsumerWidget {
@@ -41,11 +43,13 @@ class HomeView extends HookConsumerWidget {
             child: ShadSelect<int>(
               minWidth: 300,
               initialValue: 0,
+              placeholder: const Text('Select date'),
               selectedOptionBuilder: (_, v) => Text(_list[v]),
               options: [
                 for (int i = 0; i < _list.length; i++) ShadOption(value: i, child: Text(_list[i])),
               ],
-              onChanged: (v) {
+              allowDeselection: true,
+              onChanged: (v) async {
                 final now = DateTime.now();
                 if (v == 0) {
                   start.value = null;
@@ -71,12 +75,26 @@ class HomeView extends HookConsumerWidget {
                   start.value = now.startOfYear;
                   end.value = now.endOfYear;
                 }
+                if (v == 6) {
+                  await showShadDialog(
+                    context: context,
+                    builder: (context) => ShadDialog(
+                      title: const Text('Select date range'),
+                      child: DateRangeSelector(
+                        onApply: (from, to) {
+                          start.value = from;
+                          end.value = to;
+                        },
+                      ),
+                    ),
+                  );
+                }
               },
             ),
           ),
           HomeCounterWidget(start.value, end.value),
 
-          const Gap(8),
+          const Gap(0),
 
           Flex(
             direction: context.layout.isDesktop ? Axis.horizontal : Axis.vertical,
@@ -89,17 +107,16 @@ class HomeView extends HookConsumerWidget {
               ).conditionalExpanded(context.layout.isDesktop),
             ],
           ),
-          const Gap(8),
+          const Gap(0),
+          LineChartWidget(start.value, end.value),
+          const Gap(0),
           ShadCard(
             height: 600,
             title: const Text('Transactions'),
             childPadding: Pads.lg('t'),
-            child: TrxTable(
-              logs: trxList,
-              accountAmounts: false,
-            ),
+            child: TrxTable(logs: trxList, accountAmounts: false),
           ),
-          const Gap(8),
+          const Gap(0),
         ],
       ),
     );
