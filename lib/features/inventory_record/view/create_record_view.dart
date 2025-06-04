@@ -182,7 +182,7 @@ class _Inputs extends HookConsumerWidget {
               child: ShadTextField(
                 name: 'amount',
                 label: type.isSale ? 'Payment amount' : 'Paid amount',
-                hintText: type.isSale ? 'Payment amount' : 'Paid amount',
+                hintText: 'eg: 0.00',
                 keyboardType: TextInputType.number,
                 numeric: true,
               ),
@@ -190,7 +190,7 @@ class _Inputs extends HookConsumerWidget {
             Expanded(
               child: ShadTextField(
                 name: 'vat',
-                hintText: 'Vat',
+                hintText: 'eg: 0.00',
                 label: 'Vat',
                 keyboardType: TextInputType.number,
                 numeric: true,
@@ -205,7 +205,7 @@ class _Inputs extends HookConsumerWidget {
               flex: 4,
               child: ShadTextField(
                 name: 'discount',
-                hintText: 'Discount',
+                hintText: 'eg: 0.00',
                 label: 'Discount',
                 padding: kDefInputPadding.copyWith(bottom: 0, top: 0, right: 5),
                 keyboardType: TextInputType.number,
@@ -217,7 +217,7 @@ class _Inputs extends HookConsumerWidget {
               flex: 3,
               child: ShadTextField(
                 name: 'shipping',
-                hintText: 'Shipping',
+                hintText: 'eg: 0.00',
                 label: 'Shipping',
                 keyboardType: TextInputType.number,
                 numeric: true,
@@ -225,6 +225,7 @@ class _Inputs extends HookConsumerWidget {
             ),
           ],
         ),
+
         PaymentAccountSelect(onAccountSelect: onAccountSelect, type: type),
       ],
     );

@@ -231,8 +231,8 @@ class RecordTable extends ConsumerWidget {
   Widget _nameCellBuilder(Party? parti) {
     return Builder(
       builder: (context) {
-        return MouseRegion(
-          cursor: SystemMouseCursors.click,
+        return DefaultSelectionStyle(
+          mouseCursor: SystemMouseCursors.click,
           child: GestureDetector(
             onTap: () {
               if (parti == null) return;

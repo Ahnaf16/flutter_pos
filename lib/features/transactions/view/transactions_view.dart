@@ -6,9 +6,9 @@ import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/party_name_builder.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/payment_accounts/view/local/account_name_builder.dart';
+import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/transactions/controller/transactions_ctrl.dart';
-import 'package:pos/features/transactions/view/trx_report_view.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -16,7 +16,7 @@ part '_trx_add_dialog.dart';
 
 const _headings = [
   TableHeading.positional('#', 50.0),
-  TableHeading.positional('Trx'),
+  TableHeading.positional('Trx No'),
   TableHeading.positional('To'),
   TableHeading.positional('From'),
   TableHeading.positional('Amount', 300.0),
@@ -38,21 +38,21 @@ class TransactionsView extends HookConsumerWidget {
 
     return BaseBody(
       title: 'Transaction logs',
-      actions: [
-        ShadButton.outline(
-          child: const Text('Generate Report'),
-          onPressed: () {
-            showShadDialog(
-              context: context,
-              builder: (context) => const TrxReportView(),
-            );
-          },
-        ),
-      ],
+      // actions: [
+      //   ShadButton.outline(
+      //     child: const Text('Generate Report'),
+      //     onPressed: () {
+      //       showShadDialog(
+      //         context: context,
+      //         builder: (context) => const TrxReportView(),
+      //       );
+      //     },
+      //   ),
+      // ],
       body: Column(
         children: [
           FilterBar(
-            hintText: 'Search by name, email or phone',
+            hintText: 'Search by trx no, name, email or phone',
             types: TransactionType.values,
             accounts: accountList,
             onSearch: (q) => trxCtrl().search(q),
@@ -101,7 +101,7 @@ class TrxTable extends StatelessWidget {
           columnName: heading.name,
           columnWidthMode: ColumnWidthMode.fill,
           maximumWidth: heading.max,
-          minimumWidth: context.layout.isDesktop ? 100 : 200,
+          minimumWidth: heading.minWidth ?? 150,
           label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
         );
       },
@@ -115,7 +115,7 @@ class TrxTable extends StatelessWidget {
 
         return switch (head.name) {
           '#' => DataGridCell(columnName: head.name, value: Text((i + 1).toString())),
-          'Trx' => DataGridCell(
+          'Trx No' => DataGridCell(
             columnName: head.name,
             value: Wrap(
               spacing: Insets.xs,
@@ -320,6 +320,34 @@ class _TrxViewDialog extends HookConsumerWidget {
                 onPressed: () => Copier.copy(trx.trxNo),
               ),
             ),
+            if (trx.record != null)
+              SpacedText(
+                left: 'Related Invoice',
+                right: trx.record!.invoiceNo,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                style: context.text.list,
+                styleBuilder: (l, r) => (l, r.bold.primary(context)),
+                trailing: Row(
+                  spacing: Insets.med,
+                  children: [
+                    SmallButton(
+                      icon: LuIcons.copy,
+                      onPressed: () => Copier.copy(trx.record!.invoiceNo),
+                    ),
+                    SmallButton(
+                      icon: LuIcons.arrowUpRight,
+                      onPressed: () {
+                        context.nPop();
+                        if (trx.record!.type.isSale) {
+                          RPaths.saleDetails(trx.record!.id).pushNamed(context);
+                        } else {
+                          RPaths.purchaseDetails(trx.record!.id).pushNamed(context);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
             SpacedText(
               left: 'Amount',
               right: trx.amount.currency(),
@@ -330,12 +358,34 @@ class _TrxViewDialog extends HookConsumerWidget {
               SpacedText(left: 'Payment method', right: trx.payMethod!.name, styleBuilder: (l, r) => (l, r.bold)),
 
             if (trx.account != null)
-              SpacedText(left: 'Account', right: trx.account?.name ?? '--', styleBuilder: (l, r) => (l, r.bold)),
+              SpacedText(
+                left: 'Account',
+                right: trx.account?.name ?? '--',
+                style: context.text.list,
+                styleBuilder: (l, r) => (l, r.bold),
+                trailing: SmallButton(
+                  icon: LuIcons.arrowUpRight,
+                  onPressed: () {
+                    context.nPop();
+                    showShadDialog(
+                      context: context,
+                      builder: (context) => AccountViewDialog(acc: trx.account!),
+                    );
+                  },
+                ),
+              ),
 
             SpacedText(left: 'Date', right: trx.date.formatDate(), styleBuilder: (l, r) => (l, r.bold)),
 
+            Row(
+              children: [
+                if (trx.isBetweenAccount) const ShadBadge(child: Text('Account balance transfer')),
+              ],
+            ),
+
             if (trx.note != null)
               SpacedText(left: 'Note', right: trx.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),
+
             if (trx.file != null)
               ShadCard(
                 child: Row(

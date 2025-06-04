@@ -1,4 +1,5 @@
 import 'package:pos/features/due/controller/due_ctrl.dart';
+import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -18,39 +19,20 @@ class DueView extends HookConsumerWidget {
     final dueList = ref.watch(dueLogCtrlProvider);
     final dueCtrl = useCallback(() => ref.read(dueLogCtrlProvider.notifier));
 
-    final calKeyResetter = useState(false);
-    final calKey = useMemoized(() => UniqueKey(), [calKeyResetter.value]);
-
     return BaseBody(
       title: 'Due logs',
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: Insets.med,
+
         children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 350,
-                child: ShadTextField(
-                  hintText: 'Search',
-                  onChanged: (v) => dueCtrl().search(v ?? ''),
-                  showClearButton: true,
-                ),
-              ),
-              ShadDatePicker.range(
-                key: calKey,
-                onRangeChanged: (v) => dueCtrl().filter(range: v),
-              ),
-              ShadIconButton.raw(
-                icon: const Icon(LuIcons.x),
-                onPressed: () {
-                  calKeyResetter.toggle();
-                  dueCtrl().filter();
-                },
-                variant: ShadButtonVariant.destructive,
-              ),
-            ],
+          FilterBar(
+            hintText: 'Search by name, email or phone',
+
+            onSearch: (q) => dueCtrl().search(q),
+            onReset: () => dueCtrl().refresh(),
+            showDateRange: true,
           ),
+
           Expanded(
             child: dueList.when(
               loading: () => const Loading(),
@@ -66,7 +48,7 @@ class DueView extends HookConsumerWidget {
                       columnName: heading.name,
                       columnWidthMode: ColumnWidthMode.fill,
                       maximumWidth: heading.max,
-                      minimumWidth: 200,
+                      minimumWidth: heading.minWidth ?? 150,
                       label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
                     );
                   },
@@ -107,21 +89,28 @@ class DueView extends HookConsumerWidget {
                       ),
                       'Date' => DataGridCell(
                         columnName: head.name,
-                        value: Center(child: Text(data.date.formatDate())),
+                        value: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(data.date.formatDate()),
+                            Text(data.date.ago),
+                          ],
+                        ),
                       ),
                       'Action' => DataGridCell(
                         columnName: head.name,
                         value: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            ShadButton.secondary(
+                            ShadButton(
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.eye),
                               onPressed: () => showShadDialog(
                                 context: context,
                                 builder: (context) => _PartiViewDialog(log: data),
                               ),
-                            ),
+                            ).colored(Colors.blue).toolTip('View'),
                           ],
                         ),
                       ),

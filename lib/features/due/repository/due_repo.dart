@@ -18,8 +18,13 @@ class DueRepo with AwHandler {
     return await db.create(_coll, data: data.toAwPost());
   }
 
-  FutureReport<List<DueLog>> getDueLogs() async {
-    return await db.getList(_coll).convert((docs) => docs.convertDoc(DueLog.fromDoc));
+  FutureReport<List<DueLog>> getDueLogs([FilterState? fl]) async {
+    final query = <String?>[];
+    if (fl != null) {
+      query.add(fl.queryBuilder(FilterType.dateFrom, 'adjustment_date'));
+      query.add(fl.queryBuilder(FilterType.dateTo, 'adjustment_date'));
+    }
+    return await db.getList(_coll, queries: query.nonNulls.toList()).convert((docs) => docs.convertDoc(DueLog.fromDoc));
   }
 
   FutureReport<DueLog> getLogById(String id) async {

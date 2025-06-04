@@ -1,6 +1,7 @@
 import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/inventory_record/view/local/inv_invoice_widget.dart';
+import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
@@ -57,7 +58,7 @@ class ReturnView extends HookConsumerWidget {
                       columnName: heading.name,
                       columnWidthMode: ColumnWidthMode.fill,
                       maximumWidth: heading.max,
-                      minimumWidth: context.layout.isDesktop ? 100 : 200,
+                      minimumWidth: heading.minWidth ?? 200,
                       label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
                     );
                   },
@@ -88,7 +89,23 @@ class ReturnView extends HookConsumerWidget {
                       ),
                       'From' => DataGridCell(
                         columnName: head.name,
-                        value: NameCellBuilder(data.returnedRec?.getParti.name, data.returnedRec?.getParti.phone),
+                        value: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: Insets.sm,
+                          children: [
+                            NameCellBuilder(data.returnedRec?.getParti.name, data.returnedRec?.getParti.phone),
+                            if (data.returnedRec?.getParti != null)
+                              SmallButton(
+                                icon: LuIcons.arrowUpRight,
+                                onPressed: () {
+                                  showShadDialog(
+                                    context: context,
+                                    builder: (context) => PartiViewDialog(parti: data.returnedRec!.getParti),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
                       ),
                       'By' => DataGridCell(
                         columnName: head.name,

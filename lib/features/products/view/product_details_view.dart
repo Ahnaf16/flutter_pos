@@ -32,13 +32,14 @@ class ProductDetailsView extends ConsumerWidget {
                 context: context,
                 side: ShadSheetSide.right,
                 builder: (context) => ShadSheet(
+                  scrollable: false,
                   title: const Text('Records'),
                   closeIconData: LuIcons.x,
                   constraints: const BoxConstraints(maxWidth: 500),
                   padding: Pads.padding(h: Insets.med, v: Insets.lg),
                   child: _InvDetails(
-                    sales: sales,
-                    purchases: purchases,
+                    sales: sales.takeFirst(10),
+                    purchases: purchases.takeFirst(10),
                     noBorder: true,
                   ),
                 ),
@@ -168,7 +169,7 @@ class ProductDetailsView extends ConsumerWidget {
               ),
               if (context.layout.isDesktop)
                 Expanded(
-                  child: _InvDetails(sales: sales, purchases: purchases),
+                  child: _InvDetails(sales: sales.takeFirst(10), purchases: purchases.takeFirst(10)),
                 ),
             ],
           );
@@ -178,7 +179,7 @@ class ProductDetailsView extends ConsumerWidget {
   }
 }
 
-class _InvDetails extends StatelessWidget {
+class _InvDetails extends HookWidget {
   const _InvDetails({
     required this.sales,
     required this.purchases,
@@ -191,135 +192,143 @@ class _InvDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final type = useState<RecordType>(RecordType.sale);
     return ShadCard(
       height: context.layout.isDesktop ? double.infinity : null,
       border: noBorder ? const Border() : null,
       shadows: noBorder ? [] : null,
-      child: ShadTabs<RecordType>(
-        value: RecordType.sale,
-        tabs: [
-          for (final type in RecordType.values)
-            if ((type.isSale ? sales.length : purchases.length) == 0)
-              ShadTab(
-                value: type,
-                content: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    EmptyWidget('No ${type.name.titleCase} found'),
-                  ],
-                ),
-                child: Text(type.name.titleCase),
-              )
-            else
-              ShadTab(
-                value: type,
-                content: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: type.isSale ? sales.length : purchases.length,
-                  separatorBuilder: (_, _) => const Gap(Insets.sm),
-                  itemBuilder: (context, index) {
-                    final data = type.isSale ? sales[index] : purchases[index];
-                    return ShadCard(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              spacing: Insets.med,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text.rich(
-                                        TextSpan(
-                                          text: '${data.record?.invoiceNo ?? '--'} ',
-                                          children: [
+      child: Column(
+        children: [
+          ShadTabs<RecordType>(
+            value: RecordType.sale,
+            tabs: [
+              for (final type in RecordType.values)
+                if ((type.isSale ? sales.length : purchases.length) == 0)
+                  ShadTab(
+                    value: type,
+                    content: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        EmptyWidget('No ${type.name.titleCase} found'),
+                      ],
+                    ),
+                    child: Text(type.name.titleCase),
+                  )
+                else
+                  ShadTab(
+                    value: type,
+                    child: Text('Recent ${type.name.titleCase}'),
+                  ),
+            ],
+          ),
+          if ((type.value.isSale ? sales.length : purchases.length) > 0)
+            Expanded(
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: type.value.isSale ? sales.length : purchases.length,
+                separatorBuilder: (_, _) => const Gap(Insets.sm),
+                itemBuilder: (context, index) {
+                  final data = type.value.isSale ? sales[index] : purchases[index];
+                  return ShadCard(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: Insets.med,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text.rich(
+                                      TextSpan(
+                                        text: '${data.record?.invoiceNo ?? '--'} ',
+                                        children: [
+                                          WidgetSpan(
+                                            child: SmallButton(
+                                              icon: LuIcons.arrowUpRight,
+                                              onPressed: () {
+                                                if (type.value.isSale) {
+                                                  RPaths.saleDetails(data.record!.id).pushNamed(context);
+                                                } else {
+                                                  RPaths.purchaseDetails(
+                                                    data.record!.id,
+                                                  ).pushNamed(context);
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      maxLines: 1,
+                                      style: context.text.p.primary(context),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text.rich(
+                                      TextSpan(
+                                        text: '${data.record?.getParti.name ?? '--'} ',
+                                        children: [
+                                          if (data.record?.getParti.isWalkIn == false)
                                             WidgetSpan(
                                               child: SmallButton(
                                                 icon: LuIcons.arrowUpRight,
                                                 onPressed: () {
-                                                  if (type.isSale) {
-                                                    RPaths.saleDetails(data.record!.id).pushNamed(context);
+                                                  final party = data.record?.getParti;
+                                                  if (party == null) return;
+
+                                                  if (party.isCustomer) {
+                                                    RPaths.customerDetails(party.id).pushNamed(context);
                                                   } else {
-                                                    RPaths.purchaseDetails(
-                                                      data.record!.id,
-                                                    ).pushNamed(context);
+                                                    RPaths.supplierDetails(party.id).pushNamed(context);
                                                   }
                                                 },
                                               ),
                                             ),
-                                          ],
-                                        ),
-
-                                        maxLines: 1,
-                                        style: context.text.p.primary(context),
+                                        ],
                                       ),
+                                      maxLines: 1,
+                                      style: context.text.p,
                                     ),
-                                    Expanded(
-                                      child: Text.rich(
-                                        TextSpan(
-                                          text: '${data.record?.getParti.name ?? '--'} ',
-                                          children: [
-                                            if (data.record?.getParti.isWalkIn == false)
-                                              WidgetSpan(
-                                                child: SmallButton(
-                                                  icon: LuIcons.arrowUpRight,
-                                                  onPressed: () {
-                                                    final party = data.record?.getParti;
-                                                    if (party == null) return;
-
-                                                    if (party.isCustomer) {
-                                                      RPaths.customerDetails(party.id).pushNamed(context);
-                                                    } else {
-                                                      RPaths.supplierDetails(party.id).pushNamed(context);
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                        maxLines: 1,
-                                        style: context.text.p,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Wrap(
-                                  spacing: Insets.med,
-                                  runSpacing: Insets.sm,
-                                  children: [
-                                    if (data.record?.account != null)
-                                      ShadBadge(child: Text(data.record?.account?.name ?? '--')),
-                                    ShadBadge.secondary(
-                                      child: Text(data.record?.status.name ?? '--'),
-                                    ).colored(data.record?.status.color ?? context.colors.destructive),
-                                    ShadBadge.secondary(
-                                      child: Text('${data.quantity} ${data.product.unitName}'),
-                                    ),
-                                    ShadBadge.secondary(
-                                      child: Text(data.stock.warehouse?.name ?? '--'),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            spacing: Insets.med,
-                            children: [
-                              Text(data.record?.paidAmount.currency() ?? '--'),
-                              Text(data.createdDate.formatDate()),
+                                  ),
+                                ],
+                              ),
+                              Wrap(
+                                spacing: Insets.med,
+                                runSpacing: Insets.sm,
+                                children: [
+                                  if (data.record?.account != null)
+                                    ShadBadge(child: Text(data.record?.account?.name ?? '--')),
+                                  ShadBadge.secondary(
+                                    child: Text(data.record?.status.name ?? '--'),
+                                  ).colored(data.record?.status.color ?? context.colors.destructive),
+                                  ShadBadge.secondary(
+                                    child: Text('${data.quantity} ${data.product.unitName}'),
+                                  ),
+                                  ShadBadge.secondary(
+                                    child: Text(data.stock.warehouse?.name ?? '--'),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                child: Text(type.name.titleCase),
+                        ),
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          spacing: Insets.med,
+                          children: [
+                            Text(data.record?.paidAmount.currency() ?? '--'),
+                            Text(data.createdDate.formatDate()),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
+            ),
         ],
       ),
     );
@@ -339,7 +348,7 @@ class StockTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: Pads.med(),
+      padding: Pads.sm(),
       child: Row(
         spacing: Insets.sm,
         children: [

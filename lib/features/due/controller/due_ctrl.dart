@@ -1,4 +1,5 @@
 import 'package:pos/features/due/repository/due_repo.dart';
+import 'package:pos/features/filter/controller/filter_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -12,7 +13,9 @@ class DueLogCtrl extends _$DueLogCtrl {
 
   @override
   FutureOr<List<DueLog>> build() async {
-    final staffs = await _repo.getDueLogs();
+    final fState = ref.watch(filterCtrlProvider);
+
+    final staffs = await _repo.getDueLogs(fState);
     return staffs.fold(
       (l) {
         Toast.showErr(Ctx.context, l);
@@ -30,35 +33,16 @@ class DueLogCtrl extends _$DueLogCtrl {
     if (query.isEmpty) {
       state = AsyncValue.data(_searchFrom);
     }
-    final list =
-        _searchFrom.where((e) {
-          return e.parti.name.low.contains(query) ||
-              e.parti.phone.low.contains(query) ||
-              (e.parti.email?.low.contains(query) ?? false);
-        }).toList();
+    final list = _searchFrom.where((e) {
+      return e.parti.name.low.contains(query) ||
+          e.parti.phone.low.contains(query) ||
+          (e.parti.email?.low.contains(query) ?? false);
+    }).toList();
     state = AsyncData(list);
   }
 
-  void filter({ShadDateTimeRange? range}) async {
-    if (range case ShadDateTimeRange(:final start, :final end)) {
-      final filteredList =
-          _searchFrom.where((entry) {
-            final date = entry.date.justDate;
-            if (start != null && end != null) {
-              return date.isAfter(start.justDate) && date.isBefore(end.nextDay.justDate);
-            } else if (start != null) {
-              return date.isAfter(start.justDate);
-            } else if (end != null) {
-              return date.isBefore(end.nextDay.justDate);
-            }
-            return true;
-          }).toList();
-
-      state = AsyncData(filteredList);
-    }
-
-    if (range == null) {
-      state = AsyncValue.data(_searchFrom);
-    }
+  FVoid refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async => build());
   }
 }

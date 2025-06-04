@@ -15,7 +15,7 @@ class RelatedRecords extends ConsumerWidget {
     final inventoryList = ref.watch(recordsByPartiProvider(party.id));
 
     return ShadCard(
-      title: Text(unpaid ? 'Unpaid/Partial invoices' : 'Invoices', style: context.text.p),
+      title: Text(unpaid ? 'Unpaid/Partial invoices' : 'Recent Invoices', style: context.text.p),
       height: context.layout.isDesktop ? double.maxFinite : null,
       childPadding: Pads.med('t'),
       child: inventoryList.when(
@@ -24,6 +24,8 @@ class RelatedRecords extends ConsumerWidget {
         data: (inventories) {
           if (unpaid) {
             inventories = inventories.where((e) => e.status.isUnpaid || e.status.isPartial).toList();
+          } else {
+            inventories = inventories.takeFirst(10);
           }
           if (inventories.isEmpty) return const EmptyWidget('No Invoice Found');
 

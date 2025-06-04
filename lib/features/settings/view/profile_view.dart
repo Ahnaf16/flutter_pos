@@ -40,7 +40,6 @@ class ProfileView extends HookConsumerWidget {
                     const Gap(Insets.sm),
                     Row(
                       spacing: Insets.med,
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Stack(
                           children: [

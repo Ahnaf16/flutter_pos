@@ -59,7 +59,7 @@ class StaffsView extends HookConsumerWidget {
                       columnName: heading.name,
                       columnWidthMode: ColumnWidthMode.fill,
                       maximumWidth: heading.max,
-                      minimumWidth: 200,
+                      minimumWidth: heading.minWidth ?? 200,
                       label: Container(
                         padding: Pads.med(),
                         alignment: heading.alignment,
@@ -82,8 +82,12 @@ class StaffsView extends HookConsumerWidget {
                       'Action' => DataGridCell(
                         columnName: head.name,
                         value: PopOverBuilder(
+                          actionSpread: true,
                           children: (context, hide) => [
                             PopOverButton(
+                              dense: true,
+                              color: Colors.blue,
+                              toolTip: 'View',
                               icon: const Icon(LuIcons.eye),
                               onPressed: () {
                                 hide();
@@ -95,6 +99,9 @@ class StaffsView extends HookConsumerWidget {
                               child: const Text('View'),
                             ),
                             PopOverButton(
+                              dense: true,
+                              color: Colors.green,
+                              toolTip: 'Edit',
                               icon: const Icon(LuIcons.pen),
                               onPressed: () {
                                 hide();
@@ -104,6 +111,9 @@ class StaffsView extends HookConsumerWidget {
                             ),
 
                             PopOverButton(
+                              dense: true,
+                              color: Colors.red,
+                              toolTip: data.isActive ? 'Deactivate' : 'Activate',
                               icon: Icon(data.isActive ? LuIcons.powerOff : LuIcons.power),
                               isDestructive: true,
                               onPressed: () async {

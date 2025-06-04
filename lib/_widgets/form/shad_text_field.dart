@@ -70,7 +70,7 @@ class ShadTextField extends ShadFormDecoration<String> {
                      decoration: state.decoration,
                      padding: padding,
                      keyboardType: keyboardType,
-                     textInputAction: textInputAction,
+                     textInputAction: textInputAction ?? TextInputAction.next,
                      autofocus: autofocus,
                      readOnly: readOnly,
                      maxLines: maxLines,

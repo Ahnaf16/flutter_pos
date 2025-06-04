@@ -88,7 +88,7 @@ class TransactionLog {
 
   factory TransactionLog.fromMap(Map<String, dynamic> map) => TransactionLog(
     id: map.parseAwField(),
-    trxNo: map['trx_no'] ?? '',
+    trxNo: map['trx_no'] ?? createTrxNo(),
     amount: map.parseNum('amount'),
     account: PaymentAccount.tryParse(map['payment_account']),
     transferredToAccount: PaymentAccount.tryParse(map['transferredToAccount']),
@@ -144,7 +144,7 @@ class TransactionLog {
 
   QMap toAwPost() => {
     'amount': amount,
-    'trx_no': trxNo,
+    'trx_no': trxNo.isEmpty ? createTrxNo() : trxNo,
     'payment_account': account?.id,
     'transaction_to': transactedTo?.id,
     'custom_info': customInfo.toCustomList(),
@@ -209,11 +209,13 @@ class TransactionLog {
     return (name: isWalkIn ? 'Walk In' : fromName, phone: isWalkIn ? null : fromPhone);
   }
 
+  static String createTrxNo() => nanoid(length: 8, alphabet: Alphabet.alphanumeric);
+
   static TransactionLog fromInventoryRecord(InventoryRecord record, AppUser user) {
     final parti = record.party;
     return TransactionLog(
       id: '',
-      trxNo: nanoid(length: 8, alphabet: Alphabet.alphanumeric),
+      trxNo: createTrxNo(),
       amount: record.paidAmount,
       account: record.account,
       transactedTo: record.type.isSale ? null : parti,
@@ -238,7 +240,7 @@ class TransactionLog {
   static TransactionLog fromExpense(Expense ex) {
     return TransactionLog(
       id: '',
-      trxNo: nanoid(length: 8, alphabet: Alphabet.alphanumeric),
+      trxNo: createTrxNo(),
       amount: ex.amount,
       account: ex.account,
       transactedTo: null,
@@ -262,7 +264,7 @@ class TransactionLog {
     final isSale = rec.returnedRec?.type.isSale ?? false;
     return TransactionLog(
       id: '',
-      trxNo: nanoid(length: 8, alphabet: Alphabet.alphanumeric),
+      trxNo: createTrxNo(),
       amount: rec.adjustAccount,
       account: rec.returnedRec?.account,
       transactedTo: rec.isSale ? rec.returnedRec?.party : null,
@@ -284,7 +286,7 @@ class TransactionLog {
   static TransactionLog fromTransferState(AccBalanceTransferState tState) {
     return TransactionLog(
       id: '',
-      trxNo: nanoid(length: 8, alphabet: Alphabet.alphanumeric),
+      trxNo: createTrxNo(),
       amount: tState.amount,
       account: tState.from,
       transactedTo: null,

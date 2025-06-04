@@ -58,11 +58,30 @@ class GeneralSettingsView extends HookConsumerWidget {
                               selectedOptionBuilder: (context, value) => Text(value.toString()),
                               onChanged: (value) => form.didChange(value),
                               itemCount: 2,
-                              optionsBuilder:
-                                  (_, i) => ShadOption(value: i == 0, child: Text(i == 0 ? 'True' : 'False')),
+                              optionsBuilder: (_, i) =>
+                                  ShadOption(value: i == 0, child: Text(i == 0 ? 'True' : 'False')),
                             ),
                           );
                         },
+                      ),
+                    ),
+                  ],
+                ),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: ShadTextField(
+                        name: 'invoice_prefix',
+                        label: 'Invoice prefix',
+                        hintText: 'Enter invoice prefix',
+                      ),
+                    ),
+                    Expanded(
+                      child: ShadTextField(
+                        name: 'sku_prefix',
+                        label: 'SKU prefix',
+                        hintText: 'Enter SKU prefix',
                       ),
                     ),
                   ],
@@ -99,11 +118,10 @@ class GeneralSettingsView extends HookConsumerWidget {
                         selectedOptionBuilder: (context, value) => Text(value.name.titleCase),
                         itemCount: StockDistPolicy.values.length,
                         onChanged: (value) => form.didChange(value?.name),
-                        optionsBuilder:
-                            (_, i) => ShadOption<StockDistPolicy>(
-                              value: StockDistPolicy.values[i],
-                              child: Text(StockDistPolicy.values[i].name.titleCase),
-                            ),
+                        optionsBuilder: (_, i) => ShadOption<StockDistPolicy>(
+                          value: StockDistPolicy.values[i],
+                          child: Text(StockDistPolicy.values[i].name.titleCase),
+                        ),
                       ),
                     );
                   },

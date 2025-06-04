@@ -63,7 +63,7 @@ class PartiesView extends HookConsumerWidget {
                       columnName: heading.name,
                       columnWidthMode: ColumnWidthMode.fill,
                       maximumWidth: heading.max,
-                      minimumWidth: 200,
+                      minimumWidth: heading.minWidth ?? 200,
                       label: Container(padding: Pads.med(), alignment: heading.alignment, child: Text(heading.name)),
                     );
                   },
@@ -450,11 +450,24 @@ class PartiViewDialog extends HookConsumerWidget {
         spacing: Insets.sm,
         children: [
           Text('Details of ${parti.name}'),
-          ShadBadge.outline(child: Text(parti.type.name)),
+          if (!parti.isWalkIn) ShadBadge.outline(child: Text(parti.type.name)),
         ],
       ),
 
-      actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
+      actions: [
+        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton(
+          onPressed: () {
+            context.nPop();
+            if (parti.isCustomer) {
+              RPaths.customerDetails(parti.id).pushNamed(context);
+            } else {
+              RPaths.supplierDetails(parti.id).pushNamed(context);
+            }
+          },
+          child: const Text('Full Details'),
+        ),
+      ],
       child: Container(
         padding: Pads.padding(v: Insets.med),
         child: Column(

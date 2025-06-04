@@ -21,8 +21,18 @@ class PaymentAccountSelect extends HookConsumerWidget {
     final accList = ref.watch(paymentAccountsCtrlProvider());
     final config = ref.watch(configCtrlProvider);
 
+    useEffect(() {
+      if (config.defaultAccount != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => onAccountSelect(config.defaultAccount));
+      }
+      return null;
+    }, const []);
+
     return accList.when(
-      loading: () => Padding(padding: Pads.sm('lrt'), child: const ShadCard(width: 300, child: Loading())),
+      loading: () => Padding(
+        padding: Pads.sm('lrt'),
+        child: const ShadCard(width: 300, child: Loading()),
+      ),
       error: (e, s) => ErrorView(e, s, prov: paymentAccountsCtrlProvider),
       data: (accounts) {
         return ShadSelectField<PaymentAccount>(
@@ -57,7 +67,7 @@ class PaymentAccountSelect extends HookConsumerWidget {
               ],
             );
           },
-          onChanged: onAccountSelect,
+          onChanged: (v) => onAccountSelect(v),
           anchor: const ShadAnchorAuto(targetAnchor: Alignment.topCenter, followerAnchor: Alignment.topCenter),
           outsideTrailing: outsideTrailing,
         );

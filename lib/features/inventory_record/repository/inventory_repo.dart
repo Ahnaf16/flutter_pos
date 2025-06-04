@@ -52,13 +52,14 @@ class InventoryRepo with AwHandler {
       }
     }
 
-    //! add transaction log
-    await _addTransactionLog(record);
-
     //! add record
-    final doc = await db.create(AWConst.collections.inventoryRecord, data: record.toAwPost());
-    return doc;
-    // return left(const Failure('___'));
+    final (invErr, doc) = await db.create(AWConst.collections.inventoryRecord, data: record.toAwPost()).toRecord();
+
+    //! add transaction log
+    if (doc != null) await _addTransactionLog(InventoryRecord.fromDoc(doc));
+
+    if (invErr != null || doc == null) return left(invErr ?? Failure(_generalFailure));
+    return right(doc);
   }
 
   FutureReport<Document> createPurchase(InventoryRecordState inventory, {bool ignoreParty = false}) async {
@@ -101,12 +102,14 @@ class InventoryRepo with AwHandler {
       }
     }
 
-    // //! add transaction log
-    await _addTransactionLog(record);
+    //! add record
+    final (invErr, doc) = await db.create(AWConst.collections.inventoryRecord, data: record.toAwPost()).toRecord();
 
-    // //! add record
-    final doc = await db.create(AWConst.collections.inventoryRecord, data: record.toAwPost());
-    return doc;
+    //! add transaction log
+    if (doc != null) await _addTransactionLog(InventoryRecord.fromDoc(doc));
+
+    if (invErr != null || doc == null) return left(invErr ?? Failure(_generalFailure));
+    return right(doc);
   }
 
   /// For sale: stock exist, so just create details and update stock qty

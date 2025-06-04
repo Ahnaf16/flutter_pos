@@ -15,8 +15,8 @@ class PartyDetailsView extends HookConsumerWidget {
     final id = context.param('id');
 
     final party = ref.watch(partyDetailsProvider(id));
-    final trxLogsList = ref.watch(transactionsByPartiProvider(id));
-    final orderList = ref.watch(recordsByPartiProvider(id));
+    final trxLogsList = ref.watch(transactionsByPartiProvider(id)).maybeList();
+    final invList = ref.watch(recordsByPartiProvider(id)).maybeList();
 
     final tabValue = useState(true);
 
@@ -33,41 +33,78 @@ class PartyDetailsView extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
-              ShadCard(
-                title: Text('$typeName details'),
-                childPadding: Pads.med('t'),
+              IntrinsicHeight(
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  spacing: Insets.med,
                   children: [
-                    if (party.photo != null) HostedImage.square(party.getPhoto, dimension: 80, radius: Corners.med),
-                    Flexible(
-                      child: Column(
-                        spacing: Insets.xs,
-                        children: [
-                          SpacedText(left: 'Name', right: party.name, style: context.text.list),
-                          SpacedText(left: 'Phone', right: party.phone, style: context.text.list),
-                          if (party.email != null)
-                            SpacedText(left: 'Email', right: party.email!, style: context.text.list),
-                          if (party.address != null)
-                            SpacedText(left: 'Address', right: party.address!, style: context.text.list),
+                    Expanded(
+                      child: ShadCard(
+                        title: Text('$typeName details'),
+                        childPadding: Pads.med('t'),
+                        child: Row(
+                          children: [
+                            if (party.photo != null)
+                              HostedImage.square(party.getPhoto, dimension: 80, radius: Corners.med),
+                            Flexible(
+                              child: Column(
+                                spacing: Insets.xs,
+                                children: [
+                                  SpacedText(left: 'Name', right: party.name, style: context.text.list),
+                                  SpacedText(left: 'Phone', right: party.phone, style: context.text.list),
+                                  if (party.email != null)
+                                    SpacedText(left: 'Email', right: party.email!, style: context.text.list),
+                                  if (party.address != null)
+                                    SpacedText(left: 'Address', right: party.address!, style: context.text.list),
 
-                          SpacedText(
-                            left: party.hasDue() ? 'Due' : 'Balance',
-                            right: party.due.currency(),
-                            trailing: SmallButton(
-                              icon: LuIcons.pen,
-                              onPressed: () {
-                                showShadDialog(
-                                  context: context,
-                                  builder: (context) => PartyBalanceDialog(party: party),
-                                );
-                              },
+                                  SpacedText(
+                                    left: party.hasDue() ? 'Due' : 'Balance',
+                                    right: party.due.abs().currency(),
+                                    trailing: SmallButton(
+                                      icon: LuIcons.pen,
+                                      onPressed: () {
+                                        showShadDialog(
+                                          context: context,
+                                          builder: (context) => PartyBalanceDialog(party: party),
+                                        );
+                                      },
+                                    ),
+                                    style: context.text.lead,
+                                    styleBuilder: (l, r) {
+                                      return (l, r.bold.textColor(party.hasDue() ? Colors.red : Colors.green));
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
-                            style: context.text.lead,
-                            styleBuilder: (l, r) {
-                              return (l, r.bold.textColor(party.hasDue() ? Colors.red : Colors.green));
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: ShadCard(
+                        title: const Text('Invoice summary'),
+                        childPadding: Pads.med('t'),
+                        child: Column(
+                          children: [
+                            SpacedText(left: 'Total Orders', right: '${invList.length}', style: context.text.list),
+                            SpacedText(
+                              left: 'Total Returns',
+                              right: '${invList.where((e) => e.status.isReturned).length}',
+                              style: context.text.list,
+                            ),
+                            SpacedText(
+                              left: party.isCustomer ? 'Total bought' : 'Total sold',
+                              right: invList
+                                  .whereNot((e) => e.status.isReturned)
+                                  .map((e) => e.paidAmount)
+                                  .sum
+                                  .currency(),
+                              style: context.text.list,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -79,29 +116,17 @@ class PartyDetailsView extends HookConsumerWidget {
                 onChanged: (value) => tabValue.set(value),
                 scrollable: true,
                 tabs: const [
-                  ShadTab(value: true, child: Text('Invoices')),
-                  ShadTab(value: false, child: Text('Transactions')),
+                  ShadTab(value: true, child: Text('Recent Invoices')),
+                  ShadTab(value: false, child: Text('Recent Transactions')),
                 ],
               ),
               if (tabValue.value)
                 Expanded(
-                  child: orderList.when(
-                    loading: () => const Loading(),
-                    error: (e, s) => ErrorView(e, s, prov: transactionLogCtrlProvider),
-                    data: (rec) {
-                      return RecordTable(inventories: rec, excludes: const ['Parti']);
-                    },
-                  ),
+                  child: RecordTable(inventories: invList.takeFirst(10), excludes: const ['Parti'], actionSpread: true),
                 )
               else
                 Expanded(
-                  child: trxLogsList.when(
-                    loading: () => const Loading(),
-                    error: (e, s) => ErrorView(e, s, prov: transactionLogCtrlProvider),
-                    data: (logs) {
-                      return TrxTable(logs: logs, excludes: const ['To', 'From']);
-                    },
-                  ),
+                  child: TrxTable(logs: trxLogsList.takeFirst(10), excludes: const ['To', 'From']),
                 ),
             ],
           );

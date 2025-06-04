@@ -1,4 +1,3 @@
-import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
@@ -173,11 +172,7 @@ class _Summary extends StatelessWidget {
                   ),
                   SpacedText(
                     left: 'Total value',
-                    right: products
-                        .map((e) => e.stocksByHouse(id).map((s) => s.purchasePrice * s.quantity))
-                        .expand(identity)
-                        .sum
-                        .currency(),
+                    right: products.map((e) => e.salePrice).sum.currency(),
                     style: context.text.list,
                   ),
                 ],

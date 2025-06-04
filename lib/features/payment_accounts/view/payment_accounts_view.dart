@@ -55,7 +55,7 @@ class PaymentAccountsView extends HookConsumerWidget {
                     columnName: heading.name,
                     columnWidthMode: ColumnWidthMode.fill,
                     maximumWidth: heading.max,
-                    minimumWidth: 200,
+                    minimumWidth: heading.minWidth ?? 200,
                     label: Container(padding: Pads.med(), alignment: heading.alignment, child: Text(heading.name)),
                   ),
                   cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
