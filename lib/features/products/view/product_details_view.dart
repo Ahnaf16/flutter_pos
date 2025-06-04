@@ -200,24 +200,26 @@ class _InvDetails extends HookWidget {
       child: Column(
         children: [
           ShadTabs<RecordType>(
-            value: RecordType.sale,
+            value: type.value,
+            onChanged: (value) => type.value = value,
             tabs: [
-              for (final type in RecordType.values)
-                if ((type.isSale ? sales.length : purchases.length) == 0)
+              for (final ty in RecordType.values)
+                if ((ty.isSale ? sales.length : purchases.length) == 0)
                   ShadTab(
-                    value: type,
+                    value: ty,
                     content: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        EmptyWidget('No ${type.name.titleCase} found'),
+                        EmptyWidget('No ${ty.name.titleCase} found'),
                       ],
                     ),
-                    child: Text(type.name.titleCase),
+
+                    child: Text(ty.name.titleCase),
                   )
                 else
                   ShadTab(
-                    value: type,
-                    child: Text('Recent ${type.name.titleCase}'),
+                    value: ty,
+                    child: Text('Recent ${ty.name.titleCase}'),
                   ),
             ],
           ),

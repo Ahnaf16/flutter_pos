@@ -34,6 +34,6 @@ assets_gen: ## generates assets using flutter-gen and adds inline html preview f
  
 build_web: ## build for web
 	@echo "╠ building web release"
-	# @fvm flutter build web --no-tree-shake-icons
+	@fvm flutter build web --no-tree-shake-icons
 
  

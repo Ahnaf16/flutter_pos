@@ -249,16 +249,17 @@ class RecordTable extends ConsumerWidget {
                 Row(
                   children: [
                     Text(parti?.name ?? '--', style: context.text.list),
-                    SmallButton(
-                      icon: LuIcons.arrowUpRight,
-                      onPressed: () {
-                        if (parti == null) return;
-                        showShadDialog(
-                          context: context,
-                          builder: (context) => PartiViewDialog(parti: parti),
-                        );
-                      },
-                    ),
+                    if (parti?.isWalkIn != true)
+                      SmallButton(
+                        icon: LuIcons.arrowUpRight,
+                        onPressed: () {
+                          if (parti == null) return;
+                          showShadDialog(
+                            context: context,
+                            builder: (context) => PartiViewDialog(parti: parti),
+                          );
+                        },
+                      ),
                   ],
                 ),
                 if (parti != null) OverflowMarquee(child: Text('Phone: ${parti.phone}')),

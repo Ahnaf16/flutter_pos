@@ -260,6 +260,7 @@ class _TrxViewDialog extends HookConsumerWidget {
         children: [
           Text('Details of a ${trx.type.name}'),
           ShadBadge(child: Text(trx.type.name.titleCase)).colored(trx.type.color),
+          if (trx.isBetweenAccount) const ShadBadge(child: Text('Account balance transfer')),
         ],
       ),
 
@@ -376,12 +377,6 @@ class _TrxViewDialog extends HookConsumerWidget {
               ),
 
             SpacedText(left: 'Date', right: trx.date.formatDate(), styleBuilder: (l, r) => (l, r.bold)),
-
-            Row(
-              children: [
-                if (trx.isBetweenAccount) const ShadBadge(child: Text('Account balance transfer')),
-              ],
-            ),
 
             if (trx.note != null)
               SpacedText(left: 'Note', right: trx.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),

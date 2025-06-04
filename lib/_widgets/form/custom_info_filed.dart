@@ -69,6 +69,7 @@ class CustomInfoFiled extends HookWidget {
                       initialValue: v.key,
                       isRequired: showXButton,
                       readOnly: !showXButton,
+                      focusNode: showXButton ? null : FocusNode(skipTraversal: true, canRequestFocus: false),
                       onChanged: (key) {
                         key ??= '';
                         final values = field.value?.toList();
@@ -98,18 +99,16 @@ class CustomInfoFiled extends HookWidget {
                         values[i] = entry;
                         field.didChange(values);
                       },
-                      outsideTrailing:
-                          !showXButton
-                              ? null
-                              : ShadButton.outline(
-                                size: ShadButtonSize.sm,
-                                leading: const Icon(LuIcons.x),
-                                onPressed: () {
-                                  final list =
-                                      field.value?.where((e) => e != v).toList() ?? <MapEntry<String, String>>[];
-                                  field.didChange(list);
-                                },
-                              ),
+                      outsideTrailing: !showXButton
+                          ? null
+                          : ShadButton.outline(
+                              size: ShadButtonSize.sm,
+                              leading: const Icon(LuIcons.x),
+                              onPressed: () {
+                                final list = field.value?.where((e) => e != v).toList() ?? <MapEntry<String, String>>[];
+                                field.didChange(list);
+                              },
+                            ),
                     ),
                   ),
                 ],
