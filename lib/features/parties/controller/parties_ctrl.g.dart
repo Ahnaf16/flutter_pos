@@ -147,7 +147,7 @@ class _PartyDetailsProviderElement
   String? get id => (origin as PartyDetailsProvider).id;
 }
 
-String _$partiesCtrlHash() => r'2f377d32e8f571c7829acbcf63b81d0446ef857a';
+String _$partiesCtrlHash() => r'76ceae320f07b81f2d1482370168f702ec99a44e';
 
 abstract class _$PartiesCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<Party>> {

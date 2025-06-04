@@ -153,7 +153,7 @@ class _TransactionsByPartiProviderElement
 }
 
 String _$transactionLogCtrlHash() =>
-    r'c5ee4b4bfe81265ba7c6273ba326c7618942fbc3';
+    r'535d71bf00ae1bb05cc8d91dd2e3b258e6da8bd0';
 
 /// See also [TransactionLogCtrl].
 @ProviderFor(TransactionLogCtrl)

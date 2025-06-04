@@ -12,15 +12,19 @@ help: ## This help dialog.
 		printf "%-30s %s\n" $$help_command $$help_info ; \
 	done
 
-clean: ## Cleans the environment
+clean: builder_clean## Cleans the environment
 	@echo "╠ Cleaning the project..."
 	@rm -rf pubspec.lock
-	@flutter clean
-	@flutter pub get
+	@fvm flutter clean
+	@fvm flutter pub get
  
-builder_run:
+builder_run:  
 	@echo "╠ Running build runner..."
-	@fvm flutter pub run build_runner build --delete-conflicting-outputs
+	@fvm dart run build_runner build --delete-conflicting-outputs
+
+builder_clean:
+	@echo "╠ Running build runner..."
+	@fvm dart run build_runner clean
 
 assets_gen: ## generates assets using flutter-gen and adds inline html preview for assets
 	@echo "╠ Generating assets"
@@ -30,6 +34,6 @@ assets_gen: ## generates assets using flutter-gen and adds inline html preview f
  
 build_web: ## build for web
 	@echo "╠ building web release"
-	@fvm flutter build web --no-tree-shake-icons
+	# @fvm flutter build web --no-tree-shake-icons
 
  

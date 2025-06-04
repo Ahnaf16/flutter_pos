@@ -147,7 +147,7 @@ class _WarehouseDetailsProviderElement
   String? get id => (origin as WarehouseDetailsProvider).id;
 }
 
-String _$warehouseCtrlHash() => r'bc164f8586d93c208f2a70a394d74a59c1af4f8c';
+String _$warehouseCtrlHash() => r'4ac69f100cfe3e6c18fe18fbc57cbc17b5a6c6c4';
 
 /// See also [WarehouseCtrl].
 @ProviderFor(WarehouseCtrl)

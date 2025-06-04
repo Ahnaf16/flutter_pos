@@ -541,7 +541,7 @@ class _InventoryCtrlProviderElement
 }
 
 String _$inventoryReturnCtrlHash() =>
-    r'c620b0503eb70ffb024d7828f788627722c4baae';
+    r'1aeb8cf05ff5cc72646d37d25538f56e82e808f4';
 
 abstract class _$InventoryReturnCtrl
     extends BuildlessAutoDisposeAsyncNotifier<List<ReturnRecord>> {

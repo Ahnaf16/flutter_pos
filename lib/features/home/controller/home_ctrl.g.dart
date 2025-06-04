@@ -6,7 +6,7 @@ part of 'home_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$viewingWHHash() => r'09b47aee08ae6e4d1f3521f5a498f7636fef83e3';
+String _$viewingWHHash() => r'0e67e68687e3e44d943058737eeb3a6b503f81b6';
 
 /// See also [ViewingWH].
 @ProviderFor(ViewingWH)
@@ -22,7 +22,7 @@ final viewingWHProvider =
     );
 
 typedef _$ViewingWH = Notifier<({WareHouse? my, WareHouse? viewing})>;
-String _$homeCountersHash() => r'89d41a8ba4d3da9075e6a1b98e921aa5681d05d5';
+String _$homeCountersHash() => r'd15de8307cbbbcfd0da3daee87b4939ecb212da5';
 
 /// Copied from Dart SDK
 class _SystemHash {

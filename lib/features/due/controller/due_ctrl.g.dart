@@ -6,7 +6,7 @@ part of 'due_ctrl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dueLogCtrlHash() => r'1f82eae58c3d4dccdf416e1713ced5dfd09ac1c5';
+String _$dueLogCtrlHash() => r'8173b942559010b1fd56eefd20ac425e3ceb86a6';
 
 /// See also [DueLogCtrl].
 @ProviderFor(DueLogCtrl)

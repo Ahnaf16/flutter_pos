@@ -7,7 +7,7 @@ part of 'stock_transfer_list_ctrl.dart';
 // **************************************************************************
 
 String _$stockTransferListCtrlHash() =>
-    r'1ba71719cea584b57ebdca104da0577de9c13737';
+    r'a8c925a2aa4454cc472c51d40edac50acb5e57ca';
 
 /// See also [StockTransferListCtrl].
 @ProviderFor(StockTransferListCtrl)
