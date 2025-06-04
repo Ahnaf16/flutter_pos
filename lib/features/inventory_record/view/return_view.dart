@@ -1,7 +1,9 @@
 import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
+import 'package:pos/features/inventory_record/view/local/inv_invoice_widget.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/transactions/view/transactions_view.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -14,7 +16,7 @@ const _headings = [
   TableHeading.positional('Amount', 300.0),
   TableHeading.positional('Account', 200.0, Alignment.center),
   TableHeading.positional('Date', 150.0, Alignment.center),
-  TableHeading.positional('Action', 150.0, Alignment.centerRight),
+  TableHeading.positional('Action', 200.0, Alignment.centerRight),
 ];
 
 class ReturnView extends HookConsumerWidget {
@@ -145,6 +147,25 @@ class ReturnView extends HookConsumerWidget {
                                   }
                                 },
                               ).colored(Colors.blue).toolTip('View'),
+                            if (data.returnedRec != null)
+                              PopOverButton(
+                                color: Colors.green,
+                                dense: true,
+                                icon: const Icon(LuIcons.download),
+                                onPressed: () async {
+                                  final rec = await ref.read(recordDetailsProvider(data.returnedRec!.id).future);
+                                  if (rec == null) return;
+                                  final config = await ref.read(configCtrlAsyncProvider.future);
+
+                                  if (!context.mounted) return;
+                                  await showShadDialog(
+                                    context: context,
+                                    builder: (context) => InvInvoiceWidget(rec: rec, config: config),
+                                  );
+                                },
+                                toolTip: 'Download invoice',
+                                child: const Text('Download invoice'),
+                              ),
                             ShadIconButton(
                               icon: const Icon(LuIcons.trash),
                               onPressed: () async {

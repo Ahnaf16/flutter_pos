@@ -7,6 +7,7 @@ export 'error_view.dart';
 export 'flex/flex.dart';
 export 'flex/separated_flex.dart';
 export 'form/custom_info_filed.dart';
+export 'form/file_picker_field.dart';
 export 'form/shad_file_field.dart';
 export 'form/shad_form_decoration.dart';
 export 'form/shad_select_field.dart';

@@ -51,8 +51,17 @@ class ExpenseRepo with AwHandler {
     return doc;
   }
 
-  FutureReport<List<Expense>> getExpenses() async {
-    return await db.getList(AWConst.collections.expense).convert((docs) => docs.convertDoc(Expense.fromDoc));
+  FutureReport<List<Expense>> getExpenses([FilterState? fl]) async {
+    final query = <String?>[];
+
+    if (fl != null) {
+      query.add(fl.queryBuilder(FilterType.account, 'payment_account'));
+      query.add(fl.queryBuilder(FilterType.dateFrom, 'date'));
+      query.add(fl.queryBuilder(FilterType.dateTo, 'date'));
+    }
+    return await db
+        .getList(AWConst.collections.expense, queries: query.nonNulls.toList())
+        .convert((docs) => docs.convertDoc(Expense.fromDoc));
   }
 
   FutureReport<Document> createExpenseCategory(QMap form) async {

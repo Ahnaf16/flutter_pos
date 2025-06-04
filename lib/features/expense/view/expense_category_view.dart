@@ -3,7 +3,12 @@ import 'package:pos/features/expense/controller/expense_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('Name', double.nan), ('Enabled', 300.0), ('Action', 400.0)];
+const _headings = [
+  TableHeading.positional('#', 50.0),
+  TableHeading.positional('Name'),
+  TableHeading.positional('Enabled', 300.0),
+  TableHeading.positional('Action', 400.0, Alignment.centerRight),
+];
 
 class ExpenseCategoryView extends HookConsumerWidget {
   const ExpenseCategoryView({super.key});
@@ -25,37 +30,41 @@ class ExpenseCategoryView extends HookConsumerWidget {
       body: productList.when(
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: expenseCategoryCtrlProvider),
-        data: (products) {
-          return DataTableBuilder<ExpenseCategory, (String, double)>(
-            rowHeight: 60,
-            items: products,
+        data: (category) {
+          return DataTableBuilder<ExpenseCategory, TableHeading>(
+            rowHeight: 80,
+            items: category,
             headings: _headings,
             headingBuilder: (heading) {
               return GridColumn(
-                columnName: heading.$1,
+                columnName: heading.name,
                 columnWidthMode: ColumnWidthMode.fill,
-                maximumWidth: heading.$2,
-                minimumWidth: 200,
+                maximumWidth: heading.max,
+                minimumWidth: heading.minWidth ?? 150,
                 label: Container(
                   padding: Pads.med(),
-                  alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Text(heading.$1),
+                  alignment: heading.alignment,
+                  child: Text(heading.name),
                 ),
               );
             },
             cellAlignment: Alignment.centerLeft,
-            cellBuilder: (data, head) {
-              return switch (head.$1) {
-                'Name' => DataGridCell(columnName: head.$1, value: Text(data.name)),
-
-                'Enabled' => DataGridCell(columnName: head.$1, value: _buildActiveCell(data)),
-
+            cellBuilderIndexed: (data, head, i) {
+              return switch (head.name) {
+                '#' => DataGridCell(columnName: head.name, value: Text((i + 1).toString())),
+                'Name' => DataGridCell(
+                  columnName: head.name,
+                  value: Text(data.name, style: context.text.list),
+                ),
+                'Enabled' => DataGridCell(columnName: head.name, value: _buildActiveCell(data)),
                 'Action' => DataGridCell(
-                  columnName: head.$1,
+                  columnName: head.name,
                   value: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       PopOverButton(
+                        color: Colors.green,
+                        toolTip: 'Edit',
                         icon: const Icon(LuIcons.pen),
                         dense: true,
                         onPressed: () => showShadDialog(
@@ -64,6 +73,7 @@ class ExpenseCategoryView extends HookConsumerWidget {
                         ),
                       ),
                       PopOverButton(
+                        toolTip: 'Delete',
                         icon: const Icon(LuIcons.trash),
                         isDestructive: true,
                         dense: true,
@@ -92,7 +102,7 @@ class ExpenseCategoryView extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
               };
             },
           );

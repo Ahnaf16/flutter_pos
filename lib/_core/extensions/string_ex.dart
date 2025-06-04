@@ -42,8 +42,9 @@ NumberFormat currencyFormate({num? value, bool compact = false}) {
   final symbol = locate<SP>().currencySymbol.value ?? Config.def().currencySymbol;
   final onLeft = locate<SP>().symbolOnLeft.value ?? Config.def().symbolLeft;
 
-  if (compact) {
-    return NumberFormat.compactCurrency(symbol: symbol);
+  final useCompact = compact || (value != null && value >= 1000000);
+  if (useCompact) {
+    return NumberFormat.compactCurrency(symbol: symbol, decimalDigits: value is int ? 0 : 2);
   }
 
   final String pattern = onLeft ? '$symbol##,##,##,##,##0' : '##,##,##,##,##0$symbol';
@@ -54,7 +55,7 @@ extension NumEx on num {
   String readableByte([int? decimals]) => Parser.formatBytes(toInt(), decimals ?? 2);
 
   String currency() {
-    return currencyFormate(value: this).format(this);
+    return currencyFormate(value: this).format(clean);
   }
 
   num get clean => this is double && this % 1 == 0 ? toInt() : this;

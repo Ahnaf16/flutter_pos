@@ -46,298 +46,307 @@ class FilterBar extends HookConsumerWidget {
     final ctrl = useCallback(() => ref.read(filterCtrlProvider.notifier));
 
     final state = useState<FilterState>(filter);
+    final node = useFocusNode();
 
-    return Column(
-      spacing: Insets.xs,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CenterLeft(
-          child: Wrap(
-            children: [
-              if (onSearch != null)
-                LimitedWidthBox(
-                  maxWidth: 400,
-                  center: false,
-                  child: ShadTextField(
-                    controller: searchCtrl,
-                    hintText: hintText ?? 'Search',
-                    leading: const Icon(LuIcons.search),
-                    // onChanged: (v) => onSearch?.call((v ?? '').low),
-                    showClearButton: true,
+    final showFilter = [accounts, houses, types, units, statuses, roles].any((l) => l.isNotEmpty);
+
+    return Focus(
+      autofocus: true,
+
+      child: Column(
+        spacing: Insets.xs,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CenterLeft(
+            child: Wrap(
+              children: [
+                if (onSearch != null)
+                  LimitedWidthBox(
+                    maxWidth: 400,
+                    center: false,
+                    child: ShadTextField(
+                      controller: searchCtrl,
+                      focusNode: node,
+                      hintText: hintText ?? 'Search',
+                      leading: const Icon(LuIcons.search),
+                      onSubmitted: (value) => onSearch?.call((value).low),
+                      onClear: () => onReset?.call(),
+                      showClearButton: true,
+                    ),
                   ),
-                ),
-              if (showDateRange)
-                ShadPopover(
-                  controller: popCtrl2nd,
-                  padding: Pads.sm(),
-                  anchor: const ShadAnchorAuto(targetAnchor: Alignment.bottomRight, offset: Offset(13, 0)),
-                  popover: (context) {
-                    return _PopOverWidget(
-                      builder: (context) => FiltererBody(
-                        children: [
-                          for (final rangeType in FilterDateRange.values)
+                if (showDateRange)
+                  ShadPopover(
+                    controller: popCtrl2nd,
+                    padding: Pads.sm(),
+                    anchor: const ShadAnchorAuto(targetAnchor: Alignment.bottomRight, offset: Offset(13, 0)),
+                    popover: (context) {
+                      return _PopOverWidget(
+                        builder: (context) => FiltererBody(
+                          children: [
+                            for (final rangeType in FilterDateRange.values)
+                              FilterTile(
+                                leading: rangeType.icon,
+                                text: rangeType.title,
+                                onPressed: () {
+                                  final (start, end) = rangeType.effectiveDates;
+                                  state.value = state.value.copyWith(from: () => start, to: () => end);
+                                  popCtrl2nd.toggle();
+                                },
+                              ),
                             FilterTile(
-                              leading: rangeType.icon,
-                              text: rangeType.title,
+                              leading: LuIcons.calendarCog,
+                              text: 'Custom range',
                               onPressed: () {
-                                final (start, end) = rangeType.effectiveDates;
-                                state.value = state.value.copyWith(from: () => start, to: () => end);
-                                popCtrl2nd.toggle();
+                                _push(
+                                  context,
+                                  DateRangeSelector(
+                                    start: state.value.from,
+                                    end: state.value.to,
+                                    onApply: (from, to) {
+                                      state.value = state.value = state.value = state.value.copyWith(
+                                        from: from == null ? null : () => from,
+                                        to: to == null ? null : () => to,
+                                      );
+                                      popCtrl2nd.toggle();
+                                    },
+                                  ),
+                                );
                               },
                             ),
-                          FilterTile(
-                            leading: LuIcons.calendarCog,
-                            text: 'Custom range',
-                            onPressed: () {
-                              _push(
-                                context,
-                                DateRangeSelector(
-                                  start: state.value.from,
-                                  end: state.value.to,
-                                  onApply: (from, to) {
-                                    state.value = state.value = state.value = state.value.copyWith(
-                                      from: from == null ? null : () => from,
-                                      to: to == null ? null : () => to,
-                                    );
-                                    popCtrl2nd.toggle();
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    );
+                          ],
+                        ),
+                      );
+                    },
+                    child: ShadButton.outline(
+                      leading: Icon(FilterType.dateFrom.icon),
+                      // child: const Text('Date range'),
+                      onPressed: () => popCtrl2nd.toggle(),
+                    ),
+                  ),
+                if (showFilter)
+                  ShadPopover(
+                    controller: popCtrl,
+                    padding: Pads.sm(),
+                    anchor: const ShadAnchorAuto(targetAnchor: Alignment.bottomRight, offset: Offset(13, 0)),
+                    popover: (context) {
+                      return _PopOverWidget(
+                        builder: (context) => FiltererBody(
+                          children: [
+                            if (types.isNotEmpty)
+                              FilterTile(
+                                leading: FilterType.type.icon,
+                                text: 'Types',
+                                onPressed: () {
+                                  _push(
+                                    context,
+                                    _ListItemBuilder<TransactionType>(
+                                      title: 'Transaction types',
+                                      values: types,
+                                      filter: state,
+                                      nameBuilder: (value) => value.name,
+                                      isSelected: (fState, type) => fState.trxTypes.contains(type),
+                                      onSelect: (value) =>
+                                          state.value = state.value.copyWith(trxTypes: (s) => {...s, value}.toList()),
+                                      onRemove: (value) => state.value = state.value.copyWith(
+                                        trxTypes: (s) => s.whereNot((e) => e == value).toList(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                            if (statuses.isNotEmpty)
+                              FilterTile(
+                                leading: FilterType.status.icon,
+                                text: 'Status',
+                                onPressed: () {
+                                  _push(
+                                    context,
+                                    _ListItemBuilder<InventoryStatus>(
+                                      title: 'Status',
+                                      values: statuses,
+                                      filter: state,
+                                      nameBuilder: (value) => value.name,
+                                      isSelected: (fState, type) => fState.statuses.contains(type),
+                                      onSelect: (value) =>
+                                          state.value = state.value.copyWith(statuses: (s) => {...s, value}.toList()),
+                                      onRemove: (value) => state.value = state.value.copyWith(
+                                        statuses: (s) => s.whereNot((e) => e == value).toList(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                            if (accounts.isNotEmpty)
+                              FilterTile(
+                                leading: FilterType.account.icon,
+                                text: 'Accounts',
+                                onPressed: () {
+                                  _push(
+                                    context,
+                                    _ListItemBuilder<PaymentAccount>(
+                                      title: 'Accounts',
+                                      values: accounts,
+                                      filter: state,
+                                      nameBuilder: (value) => value.name,
+                                      isSelected: (fState, type) => fState.accounts.contains(type),
+                                      onSelect: (value) =>
+                                          state.value = state.value.copyWith(accounts: (s) => {...s, value}.toList()),
+                                      onRemove: (value) => state.value = state.value.copyWith(
+                                        accounts: (s) => s.whereNot((e) => e == value).toList(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                            if (houses.isNotEmpty)
+                              FilterTile(
+                                leading: FilterType.house.icon,
+                                text: 'Warehouse',
+                                onPressed: () {
+                                  _push(
+                                    context,
+                                    _ListItemBuilder<WareHouse>(
+                                      title: 'Warehouse',
+                                      values: houses,
+                                      filter: state,
+                                      nameBuilder: (value) => value.name,
+                                      isSelected: (fState, type) => fState.houses.contains(type),
+                                      onSelect: (value) =>
+                                          state.value = state.value.copyWith(houses: (s) => {...s, value}.toList()),
+                                      onRemove: (value) => state.value = state.value.copyWith(
+                                        houses: (s) => s.whereNot((e) => e == value).toList(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                            if (roles.isNotEmpty)
+                              FilterTile(
+                                leading: FilterType.roles.icon,
+                                text: 'Roles',
+                                onPressed: () {
+                                  _push(
+                                    context,
+                                    _ListItemBuilder<UserRole>(
+                                      title: 'Roles',
+                                      values: roles,
+                                      filter: state,
+                                      nameBuilder: (value) => value.name,
+                                      isSelected: (fState, type) => fState.roles.contains(type),
+                                      onSelect: (value) =>
+                                          state.value = state.value.copyWith(roles: (s) => {...s, value}.toList()),
+                                      onRemove: (value) => state.value = state.value.copyWith(
+                                        roles: (s) => s.whereNot((e) => e == value).toList(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                            if (units.isNotEmpty)
+                              FilterTile(
+                                leading: FilterType.unit.icon,
+                                text: 'Product unit',
+                                onPressed: () {
+                                  _push(
+                                    context,
+                                    _ListItemBuilder<ProductUnit>(
+                                      title: 'Product unit',
+                                      values: units,
+                                      filter: state,
+                                      nameBuilder: (value) => value.name,
+                                      isSelected: (fState, type) => fState.units.contains(type),
+                                      onSelect: (value) =>
+                                          state.value = state.value.copyWith(units: (s) => {...s, value}.toList()),
+                                      onRemove: (value) => state.value = state.value.copyWith(
+                                        units: (s) => s.whereNot((e) => e == value).toList(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
+                      );
+                    },
+                    child: ShadButton.outline(
+                      leading: const Icon(LuIcons.funnel),
+                      // child: const Text('Advanced Filter'),
+                      onPressed: () => popCtrl.toggle(),
+                    ),
+                  ),
+
+                ShadIconButton(
+                  icon: const Icon(LuIcons.search),
+                  onPressed: () {
+                    onSearch?.call(searchCtrl.text.low);
+                    ctrl().setState(state.value);
                   },
-                  child: ShadButton.outline(
-                    leading: Icon(FilterType.dateFrom.icon),
-                    // child: const Text('Date range'),
-                    onPressed: () => popCtrl2nd.toggle(),
+                ).toolTip('Search & Filter'),
+
+                ShadIconButton.outline(
+                  backgroundColor: context.colors.destructive.op1,
+                  foregroundColor: context.colors.destructive,
+                  hoverBackgroundColor: context.colors.destructive.op2,
+                  hoverForegroundColor: context.colors.destructive,
+                  pressedBackgroundColor: context.colors.destructive.op3,
+                  icon: const Icon(LuIcons.refreshCw),
+                  onPressed: () {
+                    state.value = state.value = const FilterState();
+                    ctrl().setState(state.value);
+                    searchCtrl.clear();
+                    onReset?.call();
+                  },
+                ).toolTip('Reset'),
+              ],
+            ),
+          ),
+          Wrap(
+            spacing: Insets.sm,
+            runSpacing: Insets.xs,
+            children: [
+              for (final MapEntry(:key, :value) in state.value.buildNames().entries)
+                ShadCard(
+                  expanded: false,
+                  backgroundColor: context.colors.secondary,
+                  radius: Corners.circleBorder,
+                  height: 36,
+                  padding: Pads.padding(h: 12, v: 3),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: Insets.sm,
+                    children: [
+                      Icon(key.icon, color: context.colors.foreground.op5),
+                      Text(key.title, style: context.text.muted),
+                      ShadSeparator.vertical(color: context.colors.foreground.op5, margin: Pads.xs('tb')),
+                      Text(value, style: context.text.p.primary(context)),
+                      ShadIconButton.destructive(
+                        width: 25,
+                        height: 25,
+                        backgroundColor: context.colors.secondary,
+                        foregroundColor: context.colors.destructive,
+                        hoverForegroundColor: context.colors.destructive,
+                        hoverBackgroundColor: context.colors.destructive.op1,
+                        decoration: const ShadDecoration(
+                          secondaryBorder: ShadBorder.none,
+                          secondaryFocusedBorder: ShadBorder.none,
+                        ),
+
+                        icon: const Icon(LucideIcons.x),
+                        onPressed: () => state.value = state.value = ctrl().clearByType(key, state.value = state.value),
+                      ).toolTip('Remove ${key.title} filter'),
+                    ],
                   ),
                 ),
-
-              ShadPopover(
-                controller: popCtrl,
-                padding: Pads.sm(),
-                anchor: const ShadAnchorAuto(targetAnchor: Alignment.bottomRight, offset: Offset(13, 0)),
-                popover: (context) {
-                  return _PopOverWidget(
-                    builder: (context) => FiltererBody(
-                      children: [
-                        if (types.isNotEmpty)
-                          FilterTile(
-                            leading: FilterType.type.icon,
-                            text: 'Types',
-                            onPressed: () {
-                              _push(
-                                context,
-                                _ListItemBuilder<TransactionType>(
-                                  title: 'Transaction types',
-                                  values: types,
-                                  filter: state,
-                                  nameBuilder: (value) => value.name,
-                                  isSelected: (fState, type) => fState.trxTypes.contains(type),
-                                  onSelect: (value) =>
-                                      state.value = state.value.copyWith(trxTypes: (s) => {...s, value}.toList()),
-                                  onRemove: (value) => state.value = state.value.copyWith(
-                                    trxTypes: (s) => s.whereNot((e) => e == value).toList(),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-
-                        if (statuses.isNotEmpty)
-                          FilterTile(
-                            leading: FilterType.status.icon,
-                            text: 'Status',
-                            onPressed: () {
-                              _push(
-                                context,
-                                _ListItemBuilder<InventoryStatus>(
-                                  title: 'Status',
-                                  values: statuses,
-                                  filter: state,
-                                  nameBuilder: (value) => value.name,
-                                  isSelected: (fState, type) => fState.statuses.contains(type),
-                                  onSelect: (value) =>
-                                      state.value = state.value.copyWith(statuses: (s) => {...s, value}.toList()),
-                                  onRemove: (value) => state.value = state.value.copyWith(
-                                    statuses: (s) => s.whereNot((e) => e == value).toList(),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-
-                        if (accounts.isNotEmpty)
-                          FilterTile(
-                            leading: FilterType.account.icon,
-                            text: 'Accounts',
-                            onPressed: () {
-                              _push(
-                                context,
-                                _ListItemBuilder<PaymentAccount>(
-                                  title: 'Accounts',
-                                  values: accounts,
-                                  filter: state,
-                                  nameBuilder: (value) => value.name,
-                                  isSelected: (fState, type) => fState.accounts.contains(type),
-                                  onSelect: (value) =>
-                                      state.value = state.value.copyWith(accounts: (s) => {...s, value}.toList()),
-                                  onRemove: (value) => state.value = state.value.copyWith(
-                                    accounts: (s) => s.whereNot((e) => e == value).toList(),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-
-                        if (houses.isNotEmpty)
-                          FilterTile(
-                            leading: FilterType.house.icon,
-                            text: 'Warehouse',
-                            onPressed: () {
-                              _push(
-                                context,
-                                _ListItemBuilder<WareHouse>(
-                                  title: 'Warehouse',
-                                  values: houses,
-                                  filter: state,
-                                  nameBuilder: (value) => value.name,
-                                  isSelected: (fState, type) => fState.houses.contains(type),
-                                  onSelect: (value) =>
-                                      state.value = state.value.copyWith(houses: (s) => {...s, value}.toList()),
-                                  onRemove: (value) => state.value = state.value.copyWith(
-                                    houses: (s) => s.whereNot((e) => e == value).toList(),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-
-                        if (roles.isNotEmpty)
-                          FilterTile(
-                            leading: FilterType.roles.icon,
-                            text: 'Roles',
-                            onPressed: () {
-                              _push(
-                                context,
-                                _ListItemBuilder<UserRole>(
-                                  title: 'Roles',
-                                  values: roles,
-                                  filter: state,
-                                  nameBuilder: (value) => value.name,
-                                  isSelected: (fState, type) => fState.roles.contains(type),
-                                  onSelect: (value) =>
-                                      state.value = state.value.copyWith(roles: (s) => {...s, value}.toList()),
-                                  onRemove: (value) => state.value = state.value.copyWith(
-                                    roles: (s) => s.whereNot((e) => e == value).toList(),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-
-                        if (units.isNotEmpty)
-                          FilterTile(
-                            leading: FilterType.unit.icon,
-                            text: 'Product unit',
-                            onPressed: () {
-                              _push(
-                                context,
-                                _ListItemBuilder<ProductUnit>(
-                                  title: 'Product unit',
-                                  values: units,
-                                  filter: state,
-                                  nameBuilder: (value) => value.name,
-                                  isSelected: (fState, type) => fState.units.contains(type),
-                                  onSelect: (value) =>
-                                      state.value = state.value.copyWith(units: (s) => {...s, value}.toList()),
-                                  onRemove: (value) => state.value = state.value.copyWith(
-                                    units: (s) => s.whereNot((e) => e == value).toList(),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                      ],
-                    ),
-                  );
-                },
-                child: ShadButton.outline(
-                  leading: const Icon(LuIcons.funnel),
-                  // child: const Text('Advanced Filter'),
-                  onPressed: () => popCtrl.toggle(),
-                ),
-              ),
-
-              ShadIconButton(
-                icon: const Icon(LuIcons.search),
-                onPressed: () {
-                  onSearch?.call(searchCtrl.text.low);
-                  ctrl().setState(state.value);
-                },
-              ).toolTip('Search & Filter'),
-
-              ShadIconButton.outline(
-                backgroundColor: context.colors.destructive.op1,
-                foregroundColor: context.colors.destructive,
-                hoverBackgroundColor: context.colors.destructive.op2,
-                hoverForegroundColor: context.colors.destructive,
-                pressedBackgroundColor: context.colors.destructive.op3,
-                icon: const Icon(LuIcons.refreshCw),
-                onPressed: () {
-                  state.value = state.value = const FilterState();
-                  ctrl().setState(state.value);
-                  searchCtrl.clear();
-                  onReset?.call();
-                },
-              ).toolTip('Reset'),
             ],
           ),
-        ),
-        Wrap(
-          spacing: Insets.sm,
-          runSpacing: Insets.xs,
-          children: [
-            for (final MapEntry(:key, :value) in state.value.buildNames().entries)
-              ShadCard(
-                expanded: false,
-                backgroundColor: context.colors.secondary,
-                radius: Corners.circleBorder,
-                height: 36,
-                padding: Pads.padding(h: 12, v: 3),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: Insets.sm,
-                  children: [
-                    Icon(key.icon, color: context.colors.foreground.op5),
-                    Text(key.title, style: context.text.muted),
-                    ShadSeparator.vertical(color: context.colors.foreground.op5, margin: Pads.xs('tb')),
-                    Text(value, style: context.text.p.primary(context)),
-                    ShadIconButton.destructive(
-                      width: 25,
-                      height: 25,
-                      backgroundColor: context.colors.secondary,
-                      foregroundColor: context.colors.destructive,
-                      hoverForegroundColor: context.colors.destructive,
-                      hoverBackgroundColor: context.colors.destructive.op1,
-                      decoration: const ShadDecoration(
-                        secondaryBorder: ShadBorder.none,
-                        secondaryFocusedBorder: ShadBorder.none,
-                      ),
-
-                      icon: const Icon(LucideIcons.x),
-                      onPressed: () => state.value = state.value = ctrl().clearByType(key, state.value = state.value),
-                    ).toolTip('Remove ${key.title} filter'),
-                  ],
-                ),
-              ),
-          ],
-        ),
-        const Gap(Insets.xs),
-      ],
+          const Gap(Insets.xs),
+        ],
+      ),
     );
   }
 }

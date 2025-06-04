@@ -31,18 +31,13 @@ class PaymentAccountsCtrl extends _$PaymentAccountsCtrl {
       state = AsyncValue.data(_searchFrom);
     }
     query = query.low;
-    final list = _searchFrom.where((e) => e.name.low.contains(query)).toList();
+    final list = _searchFrom.where((e) => e.type.name.low.contains(query) || e.name.low.contains(query)).toList();
     state = AsyncData(list);
   }
 
-  void filter({AccountType? type}) async {
-    if (type != null) {
-      state = AsyncData(_searchFrom.where((e) => e.type == type).toList());
-    }
-
-    if (type == null) {
-      state = AsyncValue.data(_searchFrom);
-    }
+  FVoid refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async => build(onlyActive));
   }
 
   Future<Result> createAccount(QMap form) async {

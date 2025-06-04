@@ -1,4 +1,5 @@
 import 'package:appwrite/models.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 
@@ -37,5 +38,13 @@ class FileRepo with AwHandler {
       await storage.deleteFile(sFile.$id);
     }
     return doc.convert(AwFile.fromDoc);
+  }
+
+  Future<String> download(AwFile file) async {
+    final bytes = await storage.download(file.id);
+
+    final fs = FileSaver.instance;
+
+    return fs.saveFile(name: file.name, ext: file.ext, bytes: bytes);
   }
 }

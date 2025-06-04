@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/products/repository/products_repo.dart';
@@ -79,9 +80,23 @@ class StockRepo with AwHandler {
     return doc;
   }
 
-  FutureReport<List<StockTransferLog>> getStockLogs() async {
+  FutureReport<List<StockTransferLog>> getStockLogs([FilterState? fl]) async {
+    final query = <String?>[];
+
+    if (fl != null) {
+      if (fl.houses.isNotEmpty) {
+        query.add(
+          Query.or([
+            ?fl.queryBuilder(FilterType.house, 'from'),
+            ?fl.queryBuilder(FilterType.house, 'to'),
+          ]),
+        );
+      }
+      query.add(fl.queryBuilder(FilterType.dateFrom, 'date'));
+      query.add(fl.queryBuilder(FilterType.dateTo, 'date'));
+    }
     return await db
-        .getList(AWConst.collections.stockTransferLog)
+        .getList(AWConst.collections.stockTransferLog, queries: query.nonNulls.toList())
         .convert((docs) => docs.convertDoc(StockTransferLog.fromDoc));
   }
 }

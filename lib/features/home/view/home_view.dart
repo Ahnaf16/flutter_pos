@@ -94,8 +94,6 @@ class HomeView extends HookConsumerWidget {
           ),
           HomeCounterWidget(start.value, end.value),
 
-          const Gap(0),
-
           Flex(
             direction: context.layout.isDesktop ? Axis.horizontal : Axis.vertical,
             spacing: Insets.med,
@@ -107,9 +105,9 @@ class HomeView extends HookConsumerWidget {
               ).conditionalExpanded(context.layout.isDesktop),
             ],
           ),
-          const Gap(0),
+
           LineChartWidget(start.value, end.value),
-          const Gap(0),
+
           ShadCard(
             height: 850,
             title: Row(

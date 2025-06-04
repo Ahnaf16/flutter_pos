@@ -158,6 +158,10 @@ class AwStorage {
   Future<Uint8List> imgPreview(String id) async {
     return await _storage.getFileView(bucketId: AWConst.storageId.id, fileId: id);
   }
+
+  Future<Uint8List> download(String id) async {
+    return await _storage.getFileDownload(bucketId: AWConst.storageId.id, fileId: id);
+  }
 }
 
 class AwAccount {

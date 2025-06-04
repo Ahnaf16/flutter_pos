@@ -68,10 +68,28 @@ class RecordDetailsView extends HookConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _Summaries(rec: rec, shop: config.shop),
-                            _ProductSummary(details: details, returns: returned?.detailsQtyMap ?? {}),
-
-                            _OrderSummaryTable(rec),
-                            _PayTable(rec),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: Insets.med,
+                              children: [
+                                Expanded(
+                                  child: _ProductSummary(details: details, returns: returned?.detailsQtyMap ?? {}),
+                                ),
+                                if (rec.paymentLogs.isEmpty || !context.layout.isDesktop)
+                                  Column(
+                                    spacing: Insets.med,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      _OrderSummaryTable(rec),
+                                      _PayTable(rec),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                            if (rec.paymentLogs.isNotEmpty && context.layout.isDesktop) ...[
+                              _OrderSummaryTable(rec),
+                              _PayTable(rec),
+                            ],
 
                             const Gap(Insets.xl),
                           ],

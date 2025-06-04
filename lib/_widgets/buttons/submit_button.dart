@@ -35,16 +35,17 @@ class SubmitButton extends HookWidget {
   Widget build(BuildContext context) {
     final isLoading = useState(false);
 
-    return Padding(
-      padding: margin ?? EdgeInsets.zero,
-      child: ShadButton.raw(
-        size: size,
-        width: width,
-        height: height,
-        variant: variant,
-        onPressed:
-            (onPressed != null && !isLoading.value)
-                ? () async {
+    return DefaultSelectionStyle(
+      mouseCursor: SystemMouseCursors.click,
+      child: Padding(
+        padding: margin ?? EdgeInsets.zero,
+        child: ShadButton.raw(
+          size: size,
+          width: width,
+          height: height,
+          variant: variant,
+          onPressed: (onPressed != null && !isLoading.value)
+              ? () async {
                   try {
                     await onPressed!(isLoading);
                   } catch (e) {
@@ -53,11 +54,12 @@ class SubmitButton extends HookWidget {
                     isLoading.value = false;
                   }
                 }
-                : null,
-        enabled: enabled,
-        trailing: loadingPosition == LoadingPosition.trailing ? _buildLoading(trailing, isLoading.value) : null,
-        leading: loadingPosition == LoadingPosition.leading ? _buildLoading(leading, isLoading.value) : null,
-        child: loadingPosition == LoadingPosition.center ? (_buildLoading(child, isLoading.value)) ?? child : child,
+              : null,
+          enabled: enabled,
+          trailing: loadingPosition == LoadingPosition.trailing ? _buildLoading(trailing, isLoading.value) : null,
+          leading: loadingPosition == LoadingPosition.leading ? _buildLoading(leading, isLoading.value) : null,
+          child: loadingPosition == LoadingPosition.center ? (_buildLoading(child, isLoading.value)) ?? child : child,
+        ),
       ),
     );
   }

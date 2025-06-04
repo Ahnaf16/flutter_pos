@@ -1,4 +1,5 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
@@ -49,7 +50,6 @@ class TransactionsView extends HookConsumerWidget {
         ),
       ],
       body: Column(
-        spacing: Insets.med,
         children: [
           FilterBar(
             hintText: 'Search by name, email or phone',
@@ -168,7 +168,7 @@ class TrxTable extends StatelessWidget {
             value: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                ShadButton.secondary(
+                ShadButton(
                   size: ShadButtonSize.sm,
                   leading: const Icon(LuIcons.eye),
                   onPressed: () {
@@ -177,7 +177,7 @@ class TrxTable extends StatelessWidget {
                       builder: (context) => _TrxViewDialog(trx: data),
                     );
                   },
-                ),
+                ).colored(Colors.blue),
               ],
             ),
           ),
@@ -192,6 +192,7 @@ class TrxTable extends StatelessWidget {
               padding: Pads.med(),
               height: 80,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 spacing: Insets.xl,
                 children: [
                   SpacedText(
@@ -308,8 +309,23 @@ class _TrxViewDialog extends HookConsumerWidget {
             ),
 
             //! trx info
-            const Gap(Insets.sm),
-            SpacedText(left: 'Amount', right: trx.amount.currency(), styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(
+              left: 'Trx no',
+              right: trx.trxNo,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              style: context.text.list,
+              styleBuilder: (l, r) => (l, r.bold.primary(context)),
+              trailing: SmallButton(
+                icon: LuIcons.copy,
+                onPressed: () => Copier.copy(trx.trxNo),
+              ),
+            ),
+            SpacedText(
+              left: 'Amount',
+              right: trx.amount.currency(),
+              style: context.text.list,
+              styleBuilder: (l, r) => (l, r.bold),
+            ),
             if (trx.payMethod != null)
               SpacedText(left: 'Payment method', right: trx.payMethod!.name, styleBuilder: (l, r) => (l, r.bold)),
 
@@ -320,8 +336,41 @@ class _TrxViewDialog extends HookConsumerWidget {
 
             if (trx.note != null)
               SpacedText(left: 'Note', right: trx.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),
+            if (trx.file != null)
+              ShadCard(
+                child: Row(
+                  spacing: Insets.sm,
+                  children: [
+                    const ShadAvatar(LuIcons.file),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(trx.file!.name, style: context.text.p),
+                          Text(trx.file!.ext),
+                        ],
+                      ),
+                    ),
+                    ShadIconButton(
+                      icon: const Icon(LuIcons.download),
+                      onPressed: () async {
+                        final path = await trx.file!.download();
+                        if (!context.mounted) return;
+                        Toast.show(
+                          context,
+                          'Downloaded',
+                          action: (id) => SmallButton(
+                            icon: LuIcons.externalLink,
+                            onPressed: () => OpenFilex.open(path),
+                          ),
+                        );
+                      },
+                    ).toolTip('Download'),
+                  ],
+                ),
+              ),
 
-            Text('Custom info:', style: context.theme.decoration.labelStyle),
+            if (trx.customInfo.isNotEmpty) Text('Custom info:', style: context.theme.decoration.labelStyle),
             for (final MapEntry(:key, :value) in trx.customInfo.entries)
               SpacedText(left: key, right: value, styleBuilder: (l, r) => (l, r.bold)),
           ],

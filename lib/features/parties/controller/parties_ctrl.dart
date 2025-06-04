@@ -32,6 +32,11 @@ class PartiesCtrl extends _$PartiesCtrl {
     );
   }
 
+  void refresh() async {
+    state = AsyncValue.data(_searchFrom);
+    ref.invalidateSelf();
+  }
+
   void search(String query) async {
     if (query.isEmpty) {
       state = AsyncValue.data(_searchFrom);

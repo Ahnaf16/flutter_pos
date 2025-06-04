@@ -1,16 +1,27 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:fpdart/fpdart.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:pos/features/expense/controller/expense_ctrl.dart';
 import 'package:pos/features/expense/view/expense_category_view.dart';
+import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/payment_accounts/view/account_add_dialog.dart';
+import 'package:pos/features/payment_accounts/view/payment_accounts_view.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/staffs/controller/staffs_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('For', double.nan), ('By', 300.0), ('Account', 200.0), ('date', 130.0), ('Action', 200.0)];
+const _headings = [
+  TableHeading.positional('#', 50.0),
+  TableHeading.positional('Amount'),
+  TableHeading.positional('By', 250.0),
+  TableHeading.positional('For', 200),
+  TableHeading.positional('Category', 150.0),
+  TableHeading.positional('Account', 150.0),
+  TableHeading.positional('date', 130.0),
+  TableHeading.positional('Action', 100.0, Alignment.centerRight),
+];
 
 class ExpenseView extends HookConsumerWidget {
   const ExpenseView({super.key});
@@ -19,8 +30,8 @@ class ExpenseView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final expenseList = ref.watch(expenseCtrlProvider);
     final exCtrl = useCallback(() => ref.read(expenseCtrlProvider.notifier));
-    final accountList = ref.watch(paymentAccountsCtrlProvider(false));
-    final categoryList = ref.watch(expenseCategoryCtrlProvider);
+    final accountList = ref.watch(paymentAccountsCtrlProvider(false)).maybeList();
+    // final categoryList = ref.watch(expenseCategoryCtrlProvider);
 
     return BaseBody(
       title: 'Expense',
@@ -34,92 +45,57 @@ class ExpenseView extends HookConsumerWidget {
       ],
       body: Column(
         children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 350,
-                child: ShadTextField(
-                  hintText: 'Search',
-                  onChanged: (v) => exCtrl().search(v ?? ''),
-                  showClearButton: true,
-                ),
-              ),
-              SizedBox(
-                width: 250,
-                child: categoryList.maybeWhen(
-                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                  data: (categories) {
-                    return ShadSelectField<ExpenseCategory>(
-                      hintText: 'Category',
-                      options: categories,
-                      selectedBuilder: (context, value) => Text(value.name),
-                      optionBuilder: (_, value, _) {
-                        return ShadOption(value: value, child: Text(value.name));
-                      },
-                      onChanged: (v) => exCtrl().filter(category: v),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(
-                width: 250,
-                child: accountList.maybeWhen(
-                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                  data: (accounts) {
-                    return ShadSelectField<PaymentAccount>(
-                      hintText: 'Accounts',
-                      options: accounts,
-                      selectedBuilder: (context, value) => Text(value.name),
-                      optionBuilder: (_, value, _) {
-                        return ShadOption(value: value, child: Text(value.name));
-                      },
-                      onChanged: (v) => exCtrl().filter(acc: v),
-                    );
-                  },
-                ),
-              ),
-            ],
+          FilterBar(
+            hintText: 'Search by name, email or phone',
+            accounts: accountList,
+            onSearch: (q) => exCtrl().search(q),
+            onReset: () => exCtrl().refresh(),
+            showDateRange: true,
           ),
-          const Gap(Insets.med),
           Expanded(
             child: expenseList.when(
               loading: () => const Loading(),
               error: (e, s) => ErrorView(e, s, prov: expenseCtrlProvider),
               data: (expenses) {
-                return DataTableBuilder<Expense, (String, double)>(
+                return DataTableBuilder<Expense, TableHeading>(
                   rowHeight: 110,
                   items: expenses,
                   headings: _headings,
                   headingBuilder: (heading) {
                     return GridColumn(
-                      columnName: heading.$1,
+                      columnName: heading.name,
                       columnWidthMode: ColumnWidthMode.fill,
-                      maximumWidth: heading.$2,
-                      minimumWidth: 200,
+                      maximumWidth: heading.max,
+                      minimumWidth: heading.minWidth ?? 100,
                       label: Container(
                         padding: Pads.med(),
-                        alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
-                        child: Text(heading.$1),
+                        alignment: heading.alignment,
+                        child: Text(heading.name),
                       ),
                     );
                   },
-                  cellAlignment: Alignment.centerLeft,
+                  cellAlignmentBuilder: (head) => _headings.fromName(head).alignment,
                   cellBuilder: (data, head) {
-                    return switch (head.$1) {
+                    return switch (head.name) {
+                      '#' => DataGridCell(
+                        columnName: head.name,
+                        value: Text((expenses.indexWhere((e) => e.id == data.id) + 1).toString()),
+                      ),
+                      'Amount' => DataGridCell(
+                        columnName: head.name,
+                        value: Text(data.amount.currency(), style: context.text.lead),
+                      ),
                       'For' => DataGridCell(
-                        columnName: head.$1,
-                        value: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(data.amount.currency(), style: context.text.lead),
-                            Text(data.expanseFor, style: context.text.small, maxLines: 2),
-                          ],
-                        ),
+                        columnName: head.name,
+                        value: Text(data.expanseFor, style: context.text.p, maxLines: 2),
+                      ),
+                      'Category' => DataGridCell(
+                        columnName: head.name,
+                        value: ShadBadge.secondary(child: Text(data.category.name.titleCase, style: context.text.p)),
                       ),
 
                       'By' => DataGridCell(
-                        columnName: head.$1,
+                        columnName: head.name,
                         value: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,28 +106,54 @@ class ExpenseView extends HookConsumerWidget {
                         ),
                       ),
                       'Account' => DataGridCell(
-                        columnName: head.$1,
-                        value: Text(data.account.name, style: context.text.list),
+                        columnName: head.name,
+                        value: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(data.account.name, style: context.text.list),
+                            SmallButton(
+                              icon: LuIcons.arrowUpRight,
+                              onPressed: () {
+                                showShadDialog(
+                                  context: context,
+                                  builder: (context) => AccountViewDialog(acc: data.account),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                      'date' => DataGridCell(columnName: head.$1, value: Text(data.date.formatDate())),
+                      'date' => DataGridCell(
+                        columnName: head.name,
+                        value: Column(
+                          mainAxisSize: MainAxisSize.min,
+
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(data.date.formatDate()),
+                            Text(data.date.ago),
+                          ],
+                        ),
+                      ),
 
                       'Action' => DataGridCell(
-                        columnName: head.$1,
+                        columnName: head.name,
                         value: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            ShadButton.secondary(
+                            ShadButton(
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.eye),
                               onPressed: () => showShadDialog(
                                 context: context,
                                 builder: (context) => _ExpenseViewDialog(ex: data),
                               ),
-                            ),
+                            ).colored(Colors.blue).toolTip('View'),
                           ],
                         ),
                       ),
-                      _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                      _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
                     };
                   },
                 );
@@ -222,10 +224,43 @@ class _ExpenseViewDialog extends HookConsumerWidget {
                 ],
               ),
             ),
-            //! trx info
-            const Gap(Insets.sm),
-            SpacedText(left: 'Amount', right: ex.amount.currency(), styleBuilder: (l, r) => (l, r.bold)),
+            if (ex.file != null)
+              ShadCard(
+                child: Row(
+                  spacing: Insets.sm,
+                  children: [
+                    const ShadAvatar(LuIcons.file),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(ex.file!.name, style: context.text.p),
+                          Text(ex.file!.ext),
+                        ],
+                      ),
+                    ),
+                    ShadIconButton(
+                      icon: const Icon(LuIcons.download),
+                      onPressed: () async {
+                        final path = await ex.file!.download();
+                        if (!context.mounted) return;
+                        Toast.show(
+                          context,
+                          'Downloaded',
+                          action: (id) => SmallButton(
+                            icon: LuIcons.externalLink,
+                            onPressed: () => OpenFilex.open(path),
+                          ),
+                        );
+                      },
+                    ).toolTip('Download'),
+                  ],
+                ),
+              ),
 
+            //! trx info
+            SpacedText(left: 'Amount', right: ex.amount.currency(), styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(left: 'Category', right: ex.category.name, styleBuilder: (l, r) => (l, r.bold)),
             SpacedText(left: 'Account', right: ex.account.name, styleBuilder: (l, r) => (l, r.bold)),
             SpacedText(left: 'Date', right: ex.date.formatDate(), styleBuilder: (l, r) => (l, r.bold)),
             SpacedText(left: 'Note', right: ex.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),
@@ -384,61 +419,7 @@ class _ExpenseAddDialog extends HookConsumerWidget {
               ),
               ShadTextAreaField(name: 'note', label: 'Expanse For'),
 
-              ShadCard(
-                border: const Border(),
-                shadows: const [],
-
-                title: Text('Upload File', style: context.text.p),
-                description: Text('Select a file to upload', style: context.text.muted),
-                padding: Pads.zero,
-                childPadding: Pads.med('t'),
-
-                child: ShadDottedBorder(
-                  color: context.colors.foreground.op3,
-                  child: Center(
-                    child: Column(
-                      children: [
-                        if (selectedFile.value == null) ...[
-                          const ShadAvatar(LuIcons.upload),
-                          const Gap(Insets.med),
-                          const Text('Drag and drop files here'),
-                          Text('Or click browse (max 3MB)', style: context.text.muted.size(12)),
-                          const Gap(Insets.med),
-                          ShadButton.outline(
-                            size: ShadButtonSize.sm,
-                            child: const Text('Browse Files'),
-                            onPressed: () async {
-                              if (selectedFile.value != null) return;
-                              final files = await fileUtil.pickSingleFile();
-                              final file = files.fold(identityNull, identity);
-                              selectedFile.set(file);
-                            },
-                          ),
-                        ] else
-                          Row(
-                            spacing: Insets.med,
-                            children: [
-                              const ShadAvatar(LuIcons.file),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(selectedFile.value!.name, style: context.text.list),
-                                    Text(selectedFile.value!.size.readableByte(), style: context.text.muted),
-                                  ],
-                                ),
-                              ),
-                              ShadIconButton(
-                                icon: const Icon(LuIcons.x),
-                                onPressed: () => selectedFile.set(null),
-                              ).colored(context.colors.destructive),
-                            ],
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              FilePickerField(selectedFile: selectedFile.value, onSelect: selectedFile.set),
             ],
           ),
         ),

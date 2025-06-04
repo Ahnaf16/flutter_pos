@@ -4,6 +4,7 @@ import 'package:pos/features/auth/repository/auth_repo.dart';
 import 'package:pos/features/inventory_record/repository/inventory_repo.dart';
 import 'package:pos/features/parties/repository/parties_repo.dart';
 import 'package:pos/features/payment_accounts/repository/payment_accounts_repo.dart';
+import 'package:pos/features/settings/repository/config_repo.dart';
 import 'package:pos/main.export.dart';
 
 class TransactionsRepo with AwHandler {
@@ -13,7 +14,7 @@ class TransactionsRepo with AwHandler {
     return await db.create(_coll, data: log.toAwPost());
   }
 
-  FutureReport<Document> adjustCustomerDue(QMap form, [bool isPayment = false]) async {
+  FutureReport<Document> adjustCustomerDue(QMap form, [bool isPayment = false, PFile? file]) async {
     final data = QMap.from(form);
     data.addAll({'date': DateTime.now().toIso8601String()});
     TransactionLog log = TransactionLog.fromMap(data);
@@ -21,6 +22,12 @@ class TransactionsRepo with AwHandler {
     if (log.validate() != null) return left(Failure(log.validate()!));
 
     log = log.copyWith(isIncome: () => !isPayment);
+
+    if (file != null) {
+      final (fileErr, fileData) = await _createFile(file).toRecord();
+      if (fileErr != null || fileData == null) return left(fileErr ?? const Failure('Unable to upload file'));
+      log = log.copyWith(file: () => fileData);
+    }
 
     if (log.transactionBy == null) {
       final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
@@ -53,7 +60,7 @@ class TransactionsRepo with AwHandler {
     // return left(const Failure('___WIP___'));
   }
 
-  FutureReport<Document> supplierDuePayment(QMap form, [bool isPayment = true]) async {
+  FutureReport<Document> supplierDuePayment(QMap form, [bool isPayment = true, PFile? file]) async {
     final data = QMap.from(form);
     data.addAll({'date': DateTime.now().toIso8601String()});
     TransactionLog log = TransactionLog.fromMap(data);
@@ -61,6 +68,12 @@ class TransactionsRepo with AwHandler {
     if (log.validate() != null) return left(Failure(log.validate()!));
 
     log = log.copyWith(isIncome: () => !isPayment);
+
+    if (file != null) {
+      final (fileErr, fileData) = await _createFile(file).toRecord();
+      if (fileErr != null || fileData == null) return left(fileErr ?? const Failure('Unable to upload file'));
+      log = log.copyWith(file: () => fileData);
+    }
 
     if (log.transactionBy == null) {
       final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
@@ -91,13 +104,19 @@ class TransactionsRepo with AwHandler {
     return await db.create(_coll, data: log.toAwPost());
   }
 
-  FutureReport<Document> transferBalance(QMap form) async {
+  FutureReport<Document> transferBalance(QMap form, PFile? file) async {
     final data = QMap.from(form);
     data.addAll({'date': DateTime.now().toIso8601String()});
     TransactionLog log = TransactionLog.fromMap(data);
     if (log.validate() != null) return left(Failure(log.validate()!));
 
     log = log.copyWith(isIncome: () => false);
+
+    if (file != null) {
+      final (fileErr, fileData) = await _createFile(file).toRecord();
+      if (fileErr != null || fileData == null) return left(fileErr ?? const Failure('Unable to upload file'));
+      log = log.copyWith(file: () => fileData);
+    }
 
     if (log.transactionBy == null) {
       final (err, user) = await locate<AuthRepo>().currentUser().toRecord();
@@ -138,6 +157,11 @@ class TransactionsRepo with AwHandler {
 
     if (err != null || parti == null) return left(err ?? const Failure('Unable to get account'));
     return await repo.updateDue(parti, due, !due.isNegative, '');
+  }
+
+  FutureReport<AwFile> _createFile(PFile file) async {
+    final repo = locate<FileRepo>();
+    return await repo.createNew(file);
   }
 
   FutureReport<List<TransactionLog>> getTransactionLogs([FilterState? fl, List<String>? queries]) async {

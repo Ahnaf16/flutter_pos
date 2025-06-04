@@ -18,6 +18,7 @@ class ShadTextField extends ShadFormDecoration<String> {
     super.restorationId,
     String? name,
     String? initialValue,
+    this.onClear,
     this.readOnly = false,
     this.autofocus = false,
     this.keyboardType,
@@ -83,13 +84,19 @@ class ShadTextField extends ShadFormDecoration<String> {
                      enabled: state.enabled,
                      obscureText: isPassField ? state.isObscure : false,
                      placeholder: hintText == null ? null : Text(hintText),
-
                      leading: leading,
                      trailing: Row(
                        mainAxisSize: MainAxisSize.min,
                        children: [
                          if (showClearButton && state.hasValue)
-                           SmallButton(variant: buttonVariant, icon: LucideIcons.x, onPressed: () => state.clear()),
+                           SmallButton(
+                             variant: buttonVariant,
+                             icon: LucideIcons.x,
+                             onPressed: () {
+                               onClear?.call();
+                               state.clear();
+                             },
+                           ),
                          if (trailing != null) trailing,
                          if (isPassField)
                            SmallButton(
@@ -135,6 +142,7 @@ class ShadTextField extends ShadFormDecoration<String> {
   final int? maxLength;
   final int? maxLines;
   final ShadButtonVariant buttonVariant;
+  final VoidCallback? onClear;
 
   @override
   ShadFormDecorationState<ShadTextField, String> createState() => _ShadTextFieldState();

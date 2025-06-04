@@ -1,3 +1,4 @@
+import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -30,11 +31,11 @@ class WarehouseView extends HookConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 350,
-            child: ShadTextField(hintText: 'Search', onChanged: (v) => whCtrl().search(v ?? ''), showClearButton: true),
+          FilterBar(
+            hintText: 'Search by name or contact number',
+            onSearch: (q) => whCtrl().search(q),
+            onReset: () => whCtrl().refresh(),
           ),
-          const Gap(Insets.med),
           Expanded(
             child: warehouseList.when(
               loading: () => const Loading(),

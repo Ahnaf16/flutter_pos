@@ -67,7 +67,7 @@ FutureOr<AppUser?> currentUser(Ref ref) async {
   final user = await repo.currentUser();
   return user.fold(identityNull, (r) {
     if (!r.isActive) return null;
-    ref.read(viewingWHProvider.notifier).updateHouse(r.warehouse);
+    ref.read(viewingWHProvider.notifier).updateHouse(r.warehouse, r.warehouse);
     return r;
   });
 }

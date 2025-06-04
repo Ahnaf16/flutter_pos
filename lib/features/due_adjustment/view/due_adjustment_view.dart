@@ -28,6 +28,8 @@ class DueAdjustmentView extends HookConsumerWidget {
 
     final isTransfer = useState(transfer);
 
+    final selectedFile = useState<PFile?>(null);
+
     return BaseBody(
       title: 'Customer due adjustment',
       alignment: Alignment.topLeft,
@@ -71,6 +73,7 @@ class DueAdjustmentView extends HookConsumerWidget {
                           },
                         ),
                       ),
+
                       const Gap(Insets.med),
                       if (selectedParty.value != null)
                         Row(
@@ -189,6 +192,9 @@ class DueAdjustmentView extends HookConsumerWidget {
                       const Gap(Insets.med),
                       ShadTextAreaField(name: 'note', label: 'Note'),
 
+                      const Gap(Insets.med),
+                      FilePickerField(selectedFile: selectedFile.value, onSelect: selectedFile.set, compact: true),
+
                       //! transfer balance
                       if (selectedParty.value?.hasBalance() == true) ...[
                         const Gap(Insets.med),
@@ -246,10 +252,11 @@ class DueAdjustmentView extends HookConsumerWidget {
 
                             final ok = await showShadDialog<bool>(
                               context: context,
-                              builder: (context) => _DuePayDialog(log),
+                              builder: (context) => _DuePayDialog(log, selectedFile.value),
                             );
                             if (ok == true) {
                               selectedParty.value = null;
+                              selectedFile.value = null;
                               state.reset();
                             }
                           },
@@ -283,15 +290,16 @@ class DueAdjustmentView extends HookConsumerWidget {
                             if (transfer) {
                               ok = await showShadDialog<bool>(
                                 context: context,
-                                builder: (context) => _TransferDialog(log),
+                                builder: (context) => _TransferDialog(log, selectedFile.value),
                               );
                             } else {
                               ok = await showShadDialog<bool>(
                                 context: context,
-                                builder: (context) => _DueClearDialog(log),
+                                builder: (context) => _DueClearDialog(log, selectedFile.value),
                               );
                             }
                             if (ok == true) {
+                              selectedFile.value = null;
                               selectedParty.value = null;
                               state.reset();
                             }
@@ -317,10 +325,10 @@ class DueAdjustmentView extends HookConsumerWidget {
 }
 
 class _DueClearDialog extends ConsumerWidget {
-  const _DueClearDialog(this.log);
+  const _DueClearDialog(this.log, this.file);
 
   final TransactionLog log;
-
+  final PFile? file;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ShadDialog(
@@ -333,7 +341,7 @@ class _DueClearDialog extends ConsumerWidget {
             final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
-            final result = await ctrl.adjustCustomerDue(log.toMap(), true);
+            final result = await ctrl.adjustCustomerDue(log.toMap(), true, file);
             l.falsey();
 
             if (result case final Result r) {
@@ -369,9 +377,10 @@ class _DueClearDialog extends ConsumerWidget {
 }
 
 class _DuePayDialog extends ConsumerWidget {
-  const _DuePayDialog(this.log);
+  const _DuePayDialog(this.log, this.file);
 
   final TransactionLog log;
+  final PFile? file;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -385,7 +394,7 @@ class _DuePayDialog extends ConsumerWidget {
             final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
-            final result = await ctrl.adjustCustomerDue(log.toMap());
+            final result = await ctrl.adjustCustomerDue(log.toMap(), false, file);
             l.falsey();
 
             if (result case final Result r) {
@@ -420,9 +429,10 @@ class _DuePayDialog extends ConsumerWidget {
 }
 
 class _TransferDialog extends ConsumerWidget {
-  const _TransferDialog(this.log);
+  const _TransferDialog(this.log, this.file);
 
   final TransactionLog log;
+  final PFile? file;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -436,7 +446,7 @@ class _TransferDialog extends ConsumerWidget {
             final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
-            final result = await ctrl.transferBalance(log.toMap());
+            final result = await ctrl.transferBalance(log.toMap(), file);
             l.falsey();
 
             if (result case final Result r) {

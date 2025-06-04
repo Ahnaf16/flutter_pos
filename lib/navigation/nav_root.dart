@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
+import 'package:pos/features/filter/controller/filter_ctrl.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
@@ -150,7 +151,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
               ),
             ],
             onChanged: (v) {
-              ref.read(viewingWHProvider.notifier).updateHouse(v);
+              ref.read(viewingWHProvider.notifier).updateHouse(v, null);
             },
             allowDeselection: true,
           ),
@@ -210,7 +211,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _BODY extends HookWidget {
+class _BODY extends HookConsumerWidget {
   const _BODY({
     required this.expanded,
     required this.showLabel,
@@ -228,7 +229,7 @@ class _BODY extends HookWidget {
   final List<RolePermissions> permissions;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final items = _items(permissions);
     final navItems = SingleChildScrollView(
       padding: Pads.med(),
@@ -252,6 +253,7 @@ class _BODY extends HookWidget {
                     expanded: expanded.value,
                     selected: index.value == items.indexOf((text, icon, path)),
                     onPressed: () {
+                      ref.invalidate(filterCtrlProvider);
                       index.value = items.indexOf((text, icon, path));
                       if (path != null) path.go(context);
                     },

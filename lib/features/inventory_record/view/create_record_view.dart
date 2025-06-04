@@ -27,7 +27,6 @@ class CreateRecordView extends HookConsumerWidget {
 
     return BaseBody(
       title: type.name.titleCase,
-      padding: context.layout.pagePadding.copyWith(top: 5, bottom: 15),
       body: FormBuilder(
         key: formKey,
         onChanged: () {

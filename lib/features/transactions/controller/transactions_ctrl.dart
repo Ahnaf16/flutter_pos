@@ -38,7 +38,9 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
     final list = _searchFrom.where((e) {
       final name = e.transactionForm?.name ?? e.transactedTo?.name ?? e.transactionBy?.name;
       final phn = e.transactionForm?.phone ?? e.transactedTo?.phone ?? e.transactionBy?.phone;
-      return (name?.low.contains(query.low) ?? false) || (phn?.low.contains(query.low) ?? false);
+      return e.trxNo.low.contains(query.low) ||
+          (name?.low.contains(query.low) ?? false) ||
+          (phn?.low.contains(query.low) ?? false);
     }).toList();
     state = AsyncData(list);
   }
@@ -48,8 +50,8 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
     ref.invalidateSelf();
   }
 
-  Future<Result> adjustCustomerDue(QMap form, [bool isPayment = false]) async {
-    final res = await _repo.adjustCustomerDue(form, isPayment);
+  Future<Result> adjustCustomerDue(QMap form, [bool isPayment = false, PFile? file]) async {
+    final res = await _repo.adjustCustomerDue(form, isPayment, file);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       ref.invalidate(partiesCtrlProvider);
@@ -58,8 +60,8 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
     });
   }
 
-  Future<Result> supplierDuePayment(QMap form, [bool isPayment = true]) async {
-    final res = await _repo.supplierDuePayment(form, isPayment);
+  Future<Result> supplierDuePayment(QMap form, [bool isPayment = true, PFile? file]) async {
+    final res = await _repo.supplierDuePayment(form, isPayment, file);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       ref.invalidate(partiesCtrlProvider);
@@ -68,8 +70,8 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
     });
   }
 
-  Future<Result> transferBalance(QMap form) async {
-    final res = await _repo.transferBalance(form);
+  Future<Result> transferBalance(QMap form, [PFile? file]) async {
+    final res = await _repo.transferBalance(form, file);
     return res.fold(leftResult, (r) {
       ref.invalidateSelf();
       ref.invalidate(partiesCtrlProvider);

@@ -1,4 +1,5 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/payment_accounts/view/account_add_dialog.dart';
 import 'package:pos/main.export.dart';
@@ -7,11 +8,12 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'local/account_name_builder.dart';
 
 const _headings = [
+  TableHeading.positional('#', 50.0),
   TableHeading.positional('Name'),
   TableHeading.positional('Amount', 300.0),
   TableHeading.positional('Type', 200.0),
   TableHeading.positional('Active', 200.0),
-  TableHeading.positional('Action', 200.0, Alignment.centerRight),
+  TableHeading.positional('Action', 250.0, Alignment.centerRight),
 ];
 
 class PaymentAccountsView extends HookConsumerWidget {
@@ -34,31 +36,11 @@ class PaymentAccountsView extends HookConsumerWidget {
       ],
       body: Column(
         children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 350,
-                child: ShadTextField(
-                  hintText: 'Search',
-                  onChanged: (v) => accCtrl().search(v ?? ''),
-                  showClearButton: true,
-                ),
-              ),
-              SizedBox(
-                width: 250,
-                child: ShadSelectField<AccountType>(
-                  hintText: 'Type',
-                  options: AccountType.values,
-                  selectedBuilder: (context, value) => Text(value.name),
-                  optionBuilder: (_, value, _) {
-                    return ShadOption(value: value, child: Text(value.name));
-                  },
-                  onChanged: (v) => accCtrl().filter(type: v),
-                ),
-              ),
-            ],
+          FilterBar(
+            hintText: 'Search by name or type',
+            onSearch: (q) => accCtrl().search(q),
+            onReset: () => accCtrl().refresh(),
           ),
-          const Gap(Insets.med),
 
           Expanded(
             child: accountList.when(
@@ -79,6 +61,10 @@ class PaymentAccountsView extends HookConsumerWidget {
                   cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
                   cellBuilder: (data, head) {
                     return switch (head.name) {
+                      '#' => DataGridCell(
+                        columnName: head.name,
+                        value: Text((accounts.indexWhere((e) => e.id == data.id) + 1).toString()),
+                      ),
                       'Name' => DataGridCell(
                         columnName: head.name,
                         value: Column(
@@ -102,33 +88,13 @@ class PaymentAccountsView extends HookConsumerWidget {
                       'Action' => DataGridCell(
                         columnName: head.name,
                         value: PopOverBuilder(
+                          actionSpread: true,
                           children: (context, hide) => [
-                            if (data.amount > 0)
-                              PopOverButton(
-                                icon: const Icon(LuIcons.arrowLeftRight),
-                                child: const Text('Transfer'),
-                                onPressed: () {
-                                  hide();
-                                  showShadDialog(
-                                    context: context,
-                                    builder: (context) => _AccountBalanceTransfer(acc: data),
-                                  );
-                                },
-                              ),
                             PopOverButton(
-                              icon: const Icon(LuIcons.pen),
-                              child: const Text('Edit'),
-                              onPressed: () {
-                                hide();
-                                showShadDialog(
-                                  context: context,
-                                  builder: (context) => AccountAddDialog(acc: data),
-                                );
-                              },
-                            ),
-                            PopOverButton(
+                              dense: true,
+                              color: Colors.blue,
                               icon: const Icon(LuIcons.eye),
-                              child: const Text('View'),
+                              toolTip: 'View',
                               onPressed: () {
                                 hide();
                                 showShadDialog(
@@ -136,11 +102,45 @@ class PaymentAccountsView extends HookConsumerWidget {
                                   builder: (context) => AccountViewDialog(acc: data),
                                 );
                               },
+                              child: const Text('View'),
+                            ),
+                            PopOverButton(
+                              dense: true,
+                              color: Colors.green,
+                              icon: const Icon(LuIcons.pen),
+                              toolTip: 'Edit',
+                              onPressed: () {
+                                hide();
+                                showShadDialog(
+                                  context: context,
+                                  builder: (context) => AccountAddDialog(acc: data),
+                                );
+                              },
+                              child: const Text('Edit'),
                             ),
 
+                            if (data.amount > 0 && accounts.length > 1)
+                              PopOverButton(
+                                dense: true,
+                                color: Colors.purple,
+                                icon: const Icon(LuIcons.arrowLeftRight),
+                                toolTip: 'Transfer',
+                                onPressed: () {
+                                  hide();
+                                  showShadDialog(
+                                    context: context,
+                                    builder: (context) => _AccountBalanceTransfer(acc: data),
+                                  );
+                                },
+                                child: const Text('Transfer'),
+                              ),
+
                             PopOverButton(
+                              dense: true,
+
                               isDestructive: true,
                               icon: const Icon(LuIcons.trash),
+                              toolTip: 'Delete',
                               child: const Text('Delete'),
                               onPressed: () {
                                 hide();

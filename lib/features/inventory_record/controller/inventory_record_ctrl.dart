@@ -76,7 +76,13 @@ class InventoryReturnCtrl extends _$InventoryReturnCtrl {
     if (query.isEmpty) {
       state = AsyncValue.data(_searchFrom);
     }
-    final list = _searchFrom.where((e) => (e.returnedRec?.party?.name.low.contains(query) ?? false)).toList();
+    final list = _searchFrom
+        .where(
+          (e) =>
+              (e.returnedRec?.invoiceNo.low.contains(query) ?? false) ||
+              (e.returnedRec?.party?.name.low.contains(query) ?? false),
+        )
+        .toList();
     state = AsyncData(list);
   }
 

@@ -1,13 +1,15 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
+  TableHeading(name: '#', max: 50.0),
   TableHeading(name: 'Name'),
-  TableHeading(name: 'Phone', max: 500.0, alignment: Alignment.center),
+  TableHeading(name: 'Phone', max: 500.0),
   TableHeading(name: 'Due/Balance', max: 400.0),
-  TableHeading(name: 'Action', max: 200.0, alignment: Alignment.centerRight),
+  TableHeading(name: 'Action', max: 250.0, alignment: Alignment.centerRight),
 ];
 
 class PartiesView extends HookConsumerWidget {
@@ -42,15 +44,11 @@ class PartiesView extends HookConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 300,
-            child: ShadTextField(
-              hintText: 'Search by name, phone or email',
-              onChanged: (v) => partiCtrl().search(v ?? ''),
-              showClearButton: true,
-            ),
+          FilterBar(
+            hintText: 'Search by name, email or phone',
+            onSearch: (q) => partiCtrl().search(q),
+            onReset: () => partiCtrl().refresh(),
           ),
-          const Gap(Insets.med),
           Expanded(
             child: partiList.when(
               loading: () => const Loading(),
@@ -72,12 +70,15 @@ class PartiesView extends HookConsumerWidget {
                   cellAlignmentBuilder: (h) => _headings.fromName(h).alignment,
                   cellBuilder: (data, head) {
                     return switch (head.name) {
+                      '#' => DataGridCell(
+                        columnName: head.name,
+                        value: Text((parties.indexOf(data) + 1).toString()),
+                      ),
                       'Name' => DataGridCell(columnName: head.name, value: _PartyNameBuilder(data)),
                       'Phone' => DataGridCell(
                         columnName: head.name,
                         value: Row(
                           spacing: Insets.xs,
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(data.phone),
                             SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(data.phone)),
@@ -110,8 +111,11 @@ class PartiesView extends HookConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             PopOverBuilder(
+                              actionSpread: true,
                               children: (context, hide) => [
                                 PopOverButton(
+                                  dense: true,
+                                  color: Colors.blue,
                                   icon: const Icon(LuIcons.eye),
                                   onPressed: () {
                                     if (isCustomer) RPaths.customerDetails(data.id).pushNamed(context);
@@ -121,6 +125,8 @@ class PartiesView extends HookConsumerWidget {
                                 ),
                                 PopOverButton(
                                   icon: const Icon(LuIcons.pen),
+                                  dense: true,
+                                  color: Colors.green,
                                   onPressed: () async {
                                     hide();
                                     await showShadDialog(
@@ -132,6 +138,8 @@ class PartiesView extends HookConsumerWidget {
                                 ),
                                 if (data.isCustomer && data.due != 0)
                                   PopOverButton(
+                                    dense: true,
+                                    color: Colors.purple,
                                     icon: Icon(data.hasDue() ? LuIcons.handCoins : LuIcons.arrowLeftRight),
                                     onPressed: () {
                                       hide();
@@ -149,6 +157,7 @@ class PartiesView extends HookConsumerWidget {
 
                                 if (data.hasBalance() && !data.isCustomer)
                                   PopOverButton(
+                                    dense: true,
                                     icon: const Icon(LuIcons.handCoins),
                                     onPressed: () {
                                       hide();
@@ -158,6 +167,7 @@ class PartiesView extends HookConsumerWidget {
                                   ),
 
                                 PopOverButton(
+                                  dense: true,
                                   icon: const Icon(LuIcons.trash),
                                   onPressed: () async {
                                     hide();

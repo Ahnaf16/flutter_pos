@@ -24,6 +24,8 @@ class DueClearanceView extends HookConsumerWidget {
     final partiList = ref.watch(partiesCtrlProvider(false));
     final accountList = ref.watch(paymentAccountsCtrlProvider());
 
+    final selectedFile = useState<PFile?>(null);
+
     return BaseBody(
       title: 'Supplier due clearance',
       alignment: Alignment.topLeft,
@@ -66,6 +68,7 @@ class DueClearanceView extends HookConsumerWidget {
                         },
                       ),
                     ),
+
                     const Gap(Insets.med),
                     if (selectedParty.value != null) ...[
                       Row(
@@ -184,8 +187,11 @@ class DueClearanceView extends HookConsumerWidget {
                     ),
                     const Gap(Insets.med),
                     ShadTextAreaField(name: 'note', label: 'Note'),
-                    const Gap(Insets.xl),
 
+                    const Gap(Insets.med),
+                    FilePickerField(selectedFile: selectedFile.value, onSelect: selectedFile.set, compact: true),
+
+                    const Gap(Insets.xl),
                     if (selectedParty.value?.hasBalance() == true)
                       SubmitButton(
                         onPressed: (l) async {
@@ -206,15 +212,17 @@ class DueClearanceView extends HookConsumerWidget {
 
                           final ok = await showShadDialog<bool>(
                             context: context,
-                            builder: (context) => _DuePayDialog(log),
+                            builder: (context) => _DuePayDialog(log, selectedFile.value),
                           );
                           if (ok == true) {
+                            selectedFile.value = null;
                             selectedParty.value = null;
                             state.reset();
                           }
                         },
                         child: const Text('Make due payment'),
                       ),
+
                     if (selectedParty.value?.hasDue() == true)
                       SubmitButton(
                         onPressed: (l) async {
@@ -236,9 +244,10 @@ class DueClearanceView extends HookConsumerWidget {
 
                           final ok = await showShadDialog<bool>(
                             context: context,
-                            builder: (context) => _DueClearDialog(log),
+                            builder: (context) => _DueClearDialog(log, selectedFile.value),
                           );
                           if (ok == true) {
+                            selectedFile.value = null;
                             selectedParty.value = null;
                             state.reset();
                           }
@@ -263,9 +272,10 @@ class DueClearanceView extends HookConsumerWidget {
 }
 
 class _DuePayDialog extends ConsumerWidget {
-  const _DuePayDialog(this.log);
+  const _DuePayDialog(this.log, this.file);
 
   final TransactionLog log;
+  final PFile? file;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -279,7 +289,7 @@ class _DuePayDialog extends ConsumerWidget {
             final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
-            final result = await ctrl.supplierDuePayment(log.toMap());
+            final result = await ctrl.supplierDuePayment(log.toMap(), true, file);
             l.falsey();
 
             if (result case final Result r) {
@@ -315,10 +325,10 @@ class _DuePayDialog extends ConsumerWidget {
 }
 
 class _DueClearDialog extends ConsumerWidget {
-  const _DueClearDialog(this.log);
+  const _DueClearDialog(this.log, this.file);
 
   final TransactionLog log;
-
+  final PFile? file;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ShadDialog(
@@ -331,7 +341,7 @@ class _DueClearDialog extends ConsumerWidget {
             final ctrl = ref.read(transactionLogCtrlProvider.notifier);
 
             l.truthy();
-            final result = await ctrl.supplierDuePayment(log.toMap(), false);
+            final result = await ctrl.supplierDuePayment(log.toMap(), false, file);
             l.falsey();
 
             if (result case final Result r) {

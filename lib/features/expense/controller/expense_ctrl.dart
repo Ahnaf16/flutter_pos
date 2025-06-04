@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/features/expense/repository/expense_repo.dart';
+import 'package:pos/features/filter/controller/filter_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -13,7 +14,9 @@ class ExpenseCtrl extends _$ExpenseCtrl {
 
   @override
   Future<List<Expense>> build() async {
-    final staffs = await _repo.getExpenses();
+    final fState = ref.watch(filterCtrlProvider);
+
+    final staffs = await _repo.getExpenses(fState);
     return staffs.fold(
       (l) {
         Toast.showErr(Ctx.context, l);
@@ -35,21 +38,16 @@ class ExpenseCtrl extends _$ExpenseCtrl {
     final list = _searchFrom.where((e) {
       return e.expenseBy.name.low.contains(query) ||
           e.expenseBy.phone.low.contains(query) ||
-          e.expenseBy.email.low.contains(query);
+          e.expenseBy.email.low.contains(query) ||
+          e.expanseFor.low.contains(query) ||
+          e.category.name.low.contains(query);
     }).toList();
     state = AsyncData(list);
   }
 
-  void filter({PaymentAccount? acc, ExpenseCategory? category}) async {
-    if (acc != null) {
-      state = AsyncData(_searchFrom.where((e) => e.account.id == acc.id).toList());
-    }
-    if (category != null) {
-      state = AsyncData(_searchFrom.where((e) => e.category.id == category.id).toList());
-    }
-    if (acc == null && category == null) {
-      state = AsyncValue.data(_searchFrom);
-    }
+  void refresh() async {
+    state = AsyncValue.data(_searchFrom);
+    ref.invalidateSelf();
   }
 
   Future<Result> createExpense(QMap form, PFile? file) async {

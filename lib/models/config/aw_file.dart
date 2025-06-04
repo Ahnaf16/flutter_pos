@@ -1,4 +1,5 @@
 import 'package:appwrite/models.dart';
+import 'package:pos/features/settings/repository/config_repo.dart';
 import 'package:pos/main.export.dart';
 
 class AwFile {
@@ -44,4 +45,9 @@ class AwFile {
 
   QMap toMap() => {'id': id, 'name': name, 'ext': ext, 'size': size, 'createdAt': createdAt};
   QMap toAwPost() => {'name': name, 'ext': ext, 'size': size};
+
+  Future<String> download() async {
+    final repo = locate<FileRepo>();
+    return repo.download(this);
+  }
 }

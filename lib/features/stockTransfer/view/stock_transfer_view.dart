@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/inventory_record/view/local/products_panel.dart';
+import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/stockTransfer/controller/stock_transfer_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
@@ -23,16 +24,22 @@ class StockTransferView extends HookConsumerWidget {
     final StockTransferState(:product, :from, :to, :quantity) = transferState;
     final tCtrl = useCallback(() => ref.read(stockTransferCtrlProvider.notifier));
 
-    final selectedFrom = useState<WareHouse?>(null);
+    final selectedFrom = useState<WareHouse?>(viewingWh.my);
+
+    useValueChanged(viewingWh, (_, _) async {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        formKey.currentState?.reset();
+        tCtrl().reset();
+      });
+    });
 
     return BaseBody(
       title: 'Stock Transfer',
-      padding: context.layout.pagePadding.copyWith(top: 5, bottom: 15),
       body: FormBuilder(
         key: formKey,
         onChanged: () {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            final state = formKey.currentState!..saveAndValidate();
+            final state = formKey.currentState!;
             tCtrl().setStockData(state.instantValue);
           });
         },
@@ -279,18 +286,21 @@ class StockTransferView extends HookConsumerWidget {
 
                             Padding(
                               padding: Pads.med('lr'),
-
                               child: SubmitButton(
                                 width: 200,
                                 height: 50,
                                 onPressed: (l) async {
+                                  final state = formKey.currentState!;
+                                  if (!state.saveAndValidate()) return;
                                   l.truthy();
                                   final res = await tCtrl().submit();
                                   l.falsey();
 
                                   if (context.mounted) res.showToast(context);
-
-                                  if (res.success) formKey.currentState?.reset();
+                                  if (res.success) {
+                                    ref.invalidate(productsCtrlProvider);
+                                    formKey.currentState?.reset();
+                                  }
                                 },
                                 child: const Text('Submit'),
                               ),
@@ -378,15 +388,6 @@ class StockEditSection extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                // Expanded(
-                //   child: ShadTextField(
-                //     name: 'sales_price',
-                //     label: 'Sales Price',
-                //     hintText: 'Enter sale price',
-                //     isRequired: true,
-                //     numeric: true,
-                //   ),
-                // ),
               ],
             ),
           ],
