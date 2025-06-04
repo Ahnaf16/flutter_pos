@@ -15,14 +15,16 @@ Null identityNull<T>(T a) => null;
 
 class Copier {
   const Copier._();
-  static copy(String? text) {
+  static void copy(String? text) {
     if (text == null) return;
     Clipboard.setData(ClipboardData(text: text));
     // HapticFeedback.mediumImpact();
     ShadToaster.of(Ctx.context).show(
       ShadToast(
+        backgroundColor: Colors.green.shade500,
+        shadows: const [],
         alignment: Alignment.bottomCenter,
-        description: Text('Copied to clipboard', style: Ctx.context.text.small),
+        title: Text('Copied to clipboard', style: Ctx.context.text.small.white()),
       ),
     );
   }
