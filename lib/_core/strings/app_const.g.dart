@@ -10,7 +10,7 @@ const _$pub = (
   name: "pos",
   description: "A new Flutter project.",
   publishTo: "none",
-  version: "1.0.7+7",
+  version: "1.0.8+8",
   environment: (sdk: "^3.8.0"),
   dependencies: (
     flutter: (sdk: "flutter"),

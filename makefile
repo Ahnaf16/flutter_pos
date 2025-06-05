@@ -23,7 +23,7 @@ builder_run:
 	@fvm dart run build_runner build --delete-conflicting-outputs
 
 builder_clean:
-	@echo "╠ Running build runner..."
+	@echo "╠ Running build clean..."
 	@fvm dart run build_runner clean
 
 assets_gen: ## generates assets using flutter-gen and adds inline html preview for assets
