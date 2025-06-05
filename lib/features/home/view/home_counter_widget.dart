@@ -30,7 +30,6 @@ class HomeCounterWidget extends ConsumerWidget {
                 return ShadCard(
                   padding: Pads.med(),
                   childPadding: Pads.med('t'),
-
                   title: Row(
                     spacing: Insets.med,
                     children: [
