@@ -24,119 +24,116 @@ class ProductsPanel extends HookConsumerWidget {
       error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
       data: (products) {
         final hId = (viewingWh.viewing == null) ? null : viewingWh.viewing!.id;
-        return IntrinsicWidth(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: Pads.sm('lrt'),
-                child: ShadTextField(
-                  controller: search,
-                  hintText: 'Search',
-                  onChanged: (v) => productCtrl().search(v ?? ''),
-                  showClearButton: true,
-                  outsideTrailing: type.isSale
-                      ? null
-                      : ShadButton.outline(
-                          leading: const Icon(LuIcons.plus),
-                          onPressed: () => showShadDialog(
-                            context: context,
-                            builder: (context) => const CreateProductDialog(),
-                          ),
+        return Column(
+          children: [
+            Padding(
+              padding: Pads.sm('lrt'),
+              child: ShadTextField(
+                controller: search,
+                hintText: 'Search',
+                onChanged: (v) => productCtrl().search(v ?? ''),
+                showClearButton: true,
+                outsideTrailing: type.isSale
+                    ? null
+                    : ShadButton.outline(
+                        leading: const Icon(LuIcons.plus),
+                        onPressed: () => showShadDialog(
+                          context: context,
+                          builder: (context) => const CreateProductDialog(),
                         ),
-                ),
+                      ),
               ),
+            ),
 
-              const ShadSeparator.horizontal(),
-              Expanded(
-                child: GridView.builder(
-                  padding: Pads.med('blr'),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 150,
-                    mainAxisSpacing: Insets.sm,
-                    crossAxisSpacing: Insets.sm,
-                  ),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    final qty = product.quantityByHouse(hId);
-                    return HoverBuilder(
-                      child: ShadCard(
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            DecoContainer(
-                              color: context.colors.border,
-                              borderRadius: Corners.sm,
+            const ShadSeparator.horizontal(),
+            Expanded(
+              child: GridView.builder(
+                padding: Pads.med('blr'),
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 150,
+                  mainAxisSpacing: Insets.sm,
+                  crossAxisSpacing: Insets.sm,
+                ),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  final qty = product.quantityByHouse(hId);
+                  return HoverBuilder(
+                    child: ShadCard(
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          DecoContainer(
+                            color: context.colors.border,
+                            borderRadius: Corners.sm,
+                            alignment: Alignment.center,
+                            child: HostedImage.square(product.getPhoto(), radius: Corners.sm),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: -1,
+                            right: -1,
+                            child: DecoContainer(
+                              color: context.colors.border.op8,
                               alignment: Alignment.center,
-                              child: HostedImage.square(product.getPhoto(), radius: Corners.sm),
+                              child: Text(product.name, maxLines: 2),
                             ),
-                            Positioned(
-                              bottom: 0,
-                              left: -1,
-                              right: -1,
-                              child: DecoContainer(
-                                color: context.colors.border.op8,
+                          ),
+                          Positioned(
+                            top: 3,
+                            right: 3,
+                            child: ShadBadge.raw(
+                              variant: product.quantity <= 0
+                                  ? ShadBadgeVariant.destructive
+                                  : ShadBadgeVariant.secondary,
+                              child: Text('$qty${product.unitName}'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    builder: (hovering, child) {
+                      return GestureDetector(
+                        onTap: () async {
+                          if (type.isSale) {
+                            onProductSelect(product, null, viewingWh.viewing);
+                          } else {
+                            final res = await showShadDialog<Stock>(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) => const _AddStockDialog(),
+                            );
+                            onProductSelect(product, res, null);
+                          }
+                        },
+                        child: Stack(
+                          children: [
+                            child,
+                            Positioned.fill(
+                              child: DecoContainer.animated(
+                                duration: 250.ms,
+                                color: hovering ? context.colors.border.op7 : Colors.transparent,
                                 alignment: Alignment.center,
-                                child: Text(product.name, maxLines: 2),
-                              ),
-                            ),
-                            Positioned(
-                              top: 3,
-                              right: 3,
-                              child: ShadBadge.raw(
-                                variant: product.quantity <= 0
-                                    ? ShadBadgeVariant.destructive
-                                    : ShadBadgeVariant.secondary,
-                                child: Text('$qty${product.unitName}'),
+                                borderRadius: Corners.med,
+                                child: hovering
+                                    ? DecoContainer(
+                                        color: context.colors.primary.op9,
+                                        borderRadius: Corners.circle,
+                                        padding: Pads.sm(),
+                                        child: Icon(LuIcons.plus, color: context.colors.primaryForeground),
+                                      )
+                                    : null,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      builder: (hovering, child) {
-                        return GestureDetector(
-                          onTap: () async {
-                            if (type.isSale) {
-                              onProductSelect(product, null, viewingWh.viewing);
-                            } else {
-                              final res = await showShadDialog<Stock>(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (context) => const _AddStockDialog(),
-                              );
-                              onProductSelect(product, res, null);
-                            }
-                          },
-                          child: Stack(
-                            children: [
-                              child,
-                              Positioned.fill(
-                                child: DecoContainer.animated(
-                                  duration: 250.ms,
-                                  color: hovering ? context.colors.border.op7 : Colors.transparent,
-                                  alignment: Alignment.center,
-                                  borderRadius: Corners.med,
-                                  child: hovering
-                                      ? DecoContainer(
-                                          color: context.colors.primary.op9,
-                                          borderRadius: Corners.circle,
-                                          padding: Pads.sm(),
-                                          child: Icon(LuIcons.plus, color: context.colors.primaryForeground),
-                                        )
-                                      : null,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                      );
+                    },
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );

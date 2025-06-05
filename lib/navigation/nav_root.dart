@@ -23,10 +23,13 @@ class NavigationRoot extends HookConsumerWidget {
     final expanded = useState(true);
     final showLabel = useState(true);
     final drawerOpen = useState(false);
+    final isMobile = context.layout.isMobile;
 
     useEffect(() {
-      final items = _items(authUser.valueOrNull?.role?.getPermissions ?? []);
-      index.value = items.indexWhere((item) => item.$3?.path.contains(rootPath) ?? false);
+      if (!isMobile) {
+        final items = navItems(authUser.valueOrNull?.role?.getPermissions ?? []);
+        index.value = items.indexWhere((item) => item.$3?.path.contains(rootPath) ?? false);
+      }
       return null;
     }, [rootPath, authUser.value]);
 
@@ -49,17 +52,62 @@ class NavigationRoot extends HookConsumerWidget {
       error: (e, s) => ErrorView(e, s, prov: authCtrlProvider),
       loading: () => const SplashPage(),
       data: (user) {
+        final p = user?.role?.getPermissions ?? [];
         return Scaffold(
-          appBar: _AppBar(
-            user: user,
-            onLeadingPressed: () {
-              if (context.layout.isMobile) drawerOpen.toggle();
-              if (!context.layout.isMobile) expanded.toggle();
-              Future.delayed(expanded.value ? 250.ms : 0.ms, () {
-                showLabel.toggle();
-              });
-            },
-          ),
+          bottomNavigationBar: !context.layout.isMobile
+              ? null
+              : ShadCard(
+                  height: 78,
+                  padding: Pads.padding(padding: Insets.sm),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    spacing: Insets.sm,
+                    children: [
+                      for (final (text, icon, path) in _mobileItems(p))
+                        Expanded(
+                          child: Builder(
+                            builder: (context) {
+                              final i = _mobileItems(p).map((e) => e.$1).toList().indexOf(text);
+
+                              final selected = index.value == i;
+                              return GestureDetector(
+                                onTap: () {
+                                  index.value = i;
+                                  path?.go(context);
+                                },
+                                child: DecoContainer.animated(
+                                  duration: 250.ms,
+                                  borderRadius: Corners.sm,
+                                  color: selected ? context.colors.primary.op2 : Colors.transparent,
+                                  padding: Pads.xs(),
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    spacing: Insets.xs,
+                                    children: [
+                                      Icon(icon, size: 22),
+                                      Text(text, style: context.text.muted, textAlign: TextAlign.center, maxLines: 1),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+          appBar: context.layout.isMobile
+              ? null
+              : _AppBar(
+                  user: user,
+                  onLeadingPressed: () {
+                    if (!context.layout.isMobile) expanded.toggle();
+                    Future.delayed(expanded.value ? 250.ms : 0.ms, () {
+                      showLabel.toggle();
+                    });
+                  },
+                ),
           body: _BODY(
             expanded: expanded,
             showLabel: showLabel,
@@ -230,8 +278,8 @@ class _BODY extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final items = _items(permissions);
-    final navItems = SingleChildScrollView(
+    final items = navItems(permissions);
+    final nav = SingleChildScrollView(
       padding: Pads.med(),
       child: LimitedWidthBox(
         maxWidth: expanded.value ? NavigationRoot.expandedPaneSize : NavigationRoot.collapsedPaneSize,
@@ -273,7 +321,7 @@ class _BODY extends HookConsumerWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (!context.layout.isMobile) navItems,
+                  if (!context.layout.isMobile) nav,
                   if (!context.layout.isMobile) const ShadSeparator.vertical(margin: Pads.zero),
                   Expanded(child: child),
                 ],
@@ -281,7 +329,7 @@ class _BODY extends HookConsumerWidget {
             ),
           ],
         ),
-        if (context.layout.isMobile && drawerOpen.value) ShadCard(width: 300, child: navItems),
+        if (context.layout.isMobile && drawerOpen.value) ShadCard(width: 300, child: nav),
       ],
     );
   }
@@ -365,7 +413,7 @@ class NavButton extends HookWidget {
   }
 }
 
-List<(String text, IconData? icon, RPath? path)> _items(List<RolePermissions> p) {
+List<(String text, IconData? icon, RPath? path)> navItems(List<RolePermissions> p) {
   return [
     ('Home', null, null),
     ('Dashboard', LuIcons.house, RPaths.home),
@@ -414,5 +462,21 @@ List<(String text, IconData? icon, RPath? path)> _items(List<RolePermissions> p)
 
     ('Configuration', null, null),
     ('Settings', LuIcons.settings2, RPaths.settings),
+  ];
+}
+
+List<(String text, IconData icon, RPath? path)> _mobileItems(List<RolePermissions> p) {
+  return [
+    ('Dash', LuIcons.house, RPaths.home),
+    if (RolePermissions.isInGroup(p, RolePermissions.inventoryGroup)) ...[
+      if (p.contains(RolePermissions.makeSale)) ('POS', LuIcons.shoppingCart, RPaths.createSales),
+
+      if (p.contains(RolePermissions.manageProduct)) ('Products', LuIcons.box, RPaths.products),
+    ],
+
+    if (RolePermissions.isInGroup(p, RolePermissions.purchasesGroup)) ...[
+      if (p.contains(RolePermissions.makePurchase)) ('Purchase', LuIcons.scrollText, RPaths.purchases),
+    ],
+    ('More', LuIcons.layoutDashboard, RPaths.moreTools),
   ];
 }

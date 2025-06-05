@@ -51,6 +51,7 @@ class ProductsView extends HookConsumerWidget {
                       columnName: heading.name,
                       columnWidthMode: ColumnWidthMode.fill,
                       maximumWidth: heading.max,
+                      minimumWidth: heading.minWidth ?? 150,
 
                       label: Container(
                         padding: Pads.med(),
@@ -155,13 +156,15 @@ class ProductsView extends HookConsumerWidget {
   static Widget nameCellBuilder(Product? product, [double gap = Insets.xs, double imgSize = 40]) => Builder(
     builder: (context) {
       if (product == null) return const Text('Unknown product');
-      return Row(
+      return Wrap(
         spacing: Insets.med,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+        runSpacing: Insets.xs,
+        // crossAxisAlignment: CrossAxisAlignment.start,
+        // mainAxisSize: MainAxisSize.min,
         children: [
           ShadCard(
             expanded: false,
+            padding: Pads.zero,
             child: HostedImage.square(product.getPhoto(), radius: Corners.sm, dimension: imgSize),
           ),
 
@@ -171,9 +174,11 @@ class ProductsView extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(product.name, style: context.text.list),
-                if (product.sku != null) Text('SKU: ${product.sku ?? '--'}', style: context.text.muted),
-                if (product.manufacturer != null) Text(product.manufacturer ?? '--', style: context.text.muted),
+                Text(product.name, style: context.text.list, overflow: TextOverflow.ellipsis),
+                if (product.sku != null)
+                  Text('SKU: ${product.sku ?? '--'}', style: context.text.muted, overflow: TextOverflow.ellipsis),
+                if (product.manufacturer != null)
+                  Text(product.manufacturer ?? '--', style: context.text.muted, overflow: TextOverflow.ellipsis),
               ],
             ),
           ),

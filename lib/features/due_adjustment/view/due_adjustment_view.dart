@@ -33,6 +33,7 @@ class DueAdjustmentView extends HookConsumerWidget {
     return BaseBody(
       title: 'Customer due adjustment',
       alignment: Alignment.topLeft,
+      scrollable: !context.layout.isDesktop,
       body: LimitedWidthBox(
         maxWidth: Layouts.maxContentWidth,
         child: Flex(
@@ -314,6 +315,7 @@ class DueAdjustmentView extends HookConsumerWidget {
 
             if (selectedParty.value != null)
               RelatedRecords(
+                scroll: context.layout.isDesktop,
                 party: selectedParty.value!,
                 unpaid: selectedParty.value?.hasDue() == true,
               ).conditionalExpanded(context.layout.isDesktop),

@@ -33,8 +33,11 @@ class StockTransferView extends HookConsumerWidget {
       });
     });
 
+    final isMobile = context.layout.isMobile;
+
     return BaseBody(
       title: 'Stock Transfer',
+      scrollable: isMobile,
       body: FormBuilder(
         key: formKey,
         onChanged: () {
@@ -53,6 +56,7 @@ class StockTransferView extends HookConsumerWidget {
                 id: 0,
                 defaultSize: .7,
                 child: SingleChildScrollView(
+                  physics: isMobile ? const NeverScrollableScrollPhysics() : null,
                   child: Column(
                     mainAxisAlignment: product == null ? MainAxisAlignment.center : MainAxisAlignment.start,
                     children: [
@@ -66,9 +70,23 @@ class StockTransferView extends HookConsumerWidget {
                             rowGap: Insets.lg,
                             expanded: false,
                             rowCrossAxisAlignment: CrossAxisAlignment.center,
-                            leading: const Icon(LuIcons.circleOff, size: 30),
-                            title: const Text('No Product Selected'),
-                            description: const Text('Select a product to see other options'),
+
+                            child: Column(
+                              spacing: Insets.med,
+                              children: [
+                                const Icon(LuIcons.circleOff, size: 30),
+                                Text('No Product Selected', style: context.text.lead),
+                                const Text('Select a product to see other options'),
+                                if (isMobile)
+                                  ShadButton(
+                                    leading: const Icon(LuIcons.plus),
+                                    child: const Text('Select a product'),
+                                    onPressed: () {
+                                      _showSheet(context, viewingWh.viewing, tCtrl, formKey);
+                                    },
+                                  ),
+                              ],
+                            ),
                           ),
                         )
                       else
@@ -80,7 +98,20 @@ class StockTransferView extends HookConsumerWidget {
                               shadows: const [],
                               padding: Pads.med(),
                               childPadding: Pads.med('tb'),
-                              title: const Text('Product info'),
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Product info'),
+                                  if (isMobile)
+                                    ShadButton.link(
+                                      leading: const Icon(LuIcons.pen),
+                                      child: const Text('Change Product'),
+                                      onPressed: () {
+                                        _showSheet(context, viewingWh.viewing, tCtrl, formKey);
+                                      },
+                                    ),
+                                ],
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 spacing: Insets.med,
@@ -145,7 +176,7 @@ class StockTransferView extends HookConsumerWidget {
                                             itemCount: transferState.sortedStocks(policy).length,
                                             shrinkWrap: true,
                                             physics: const NeverScrollableScrollPhysics(),
-                                            separatorBuilder: (_, __) {
+                                            separatorBuilder: (_, _) {
                                               return const ShadSeparator.horizontal(margin: Pads.zero);
                                             },
                                             itemBuilder: (BuildContext context, int index) {
@@ -170,10 +201,8 @@ class StockTransferView extends HookConsumerWidget {
                                                       ),
                                                     ),
 
-                                                    Expanded(
-                                                      child: CenterRight(
-                                                        child: Text('${stock.quantity} ${product.unitName}'),
-                                                      ),
+                                                    CenterRight(
+                                                      child: Text('${stock.quantity} ${product.unitName}'),
                                                     ),
                                                   ],
                                                 ),
@@ -236,7 +265,7 @@ class StockTransferView extends HookConsumerWidget {
                                             child: ShadSelectField<WareHouse>(
                                               name: 'from',
                                               label: 'From',
-                                              hintText: 'Select to transfer from',
+                                              hintText: 'Transfer from',
                                               initialValue: transferState.from,
                                               enabled: viewingWh.my?.isDefault == true,
                                               options: warehouses,
@@ -255,7 +284,7 @@ class StockTransferView extends HookConsumerWidget {
                                           Flexible(
                                             child: ShadSelectField<WareHouse>(
                                               label: 'To',
-                                              hintText: 'Select transfer destination',
+                                              hintText: 'Transfer destination',
                                               selectedBuilder: (context, value) => Text(value.name),
                                               options: warehouses.where((e) => e.id != selectedFrom.value?.id).toList(),
                                               optionBuilder: (_, value, _) {
@@ -312,29 +341,74 @@ class StockTransferView extends HookConsumerWidget {
                   ),
                 ),
               ),
-              ShadResizablePanel(
-                id: 1,
-                defaultSize: .3,
-                minSize: .2,
-                maxSize: .4,
-                child: ProductsPanel(
-                  type: RecordType.sale,
-                  userHouse: viewingWh.viewing,
-                  onProductSelect: (p, _, w) {
-                    if (p.quantity <= 0) return;
-                    tCtrl().setProduct(p);
-                    final changedStock = tCtrl().setFrom(w);
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      final state = formKey.currentState!;
-                      final value = changedStock.transformValues<dynamic>((_, v) => '$v');
-                      value.addAll({'from': w});
-                      state.patchValue(value);
-                    });
-                  },
+              if (!isMobile)
+                ShadResizablePanel(
+                  id: 1,
+                  defaultSize: .3,
+                  minSize: .2,
+                  maxSize: .4,
+                  child: ProductsPanel(
+                    type: RecordType.sale,
+                    userHouse: viewingWh.viewing,
+                    onProductSelect: (p, _, w) {
+                      if (p.quantity <= 0) return;
+                      tCtrl().setProduct(p);
+                      final changedStock = tCtrl().setFrom(w);
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        final state = formKey.currentState!;
+                        final value = changedStock.transformValues<dynamic>((_, v) => '$v');
+                        value.addAll({'from': w});
+                        state.patchValue(value);
+                      });
+                    },
+                  ),
                 ),
-              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Future<dynamic> _showSheet(
+    BuildContext context,
+    WareHouse? viewingWh,
+    StockTransferCtrl Function() tCtrl,
+    GlobalKey<FormBuilderState> formKey,
+  ) {
+    return showShadSheet(
+      context: context,
+      side: ShadSheetSide.right,
+      useRootNavigator: true,
+      builder: (context) => ShadSheet(
+        constraints: BoxConstraints(maxWidth: context.width * .8),
+        padding: Pads.xl('tb'),
+        title: Row(
+          spacing: Insets.med,
+          children: [
+            ShadIconButton.ghost(
+              icon: const Icon(LuIcons.x),
+              onPressed: () => context.nPop(),
+            ),
+            const Text('Add Product'),
+          ],
+        ),
+        scrollable: false,
+        child: ProductsPanel(
+          type: RecordType.sale,
+          userHouse: viewingWh,
+          onProductSelect: (p, _, w) {
+            if (p.quantity <= 0) return;
+            tCtrl().setProduct(p);
+            final changedStock = tCtrl().setFrom(w);
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final state = formKey.currentState!;
+              final value = changedStock.transformValues<dynamic>((_, v) => '$v');
+              value.addAll({'from': w});
+              state.patchValue(value);
+            });
+            context.nPop();
+          },
         ),
       ),
     );

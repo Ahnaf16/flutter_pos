@@ -12,6 +12,8 @@ class RPaths {
   static const welcome = RPath('/welcome');
   static final login = welcome + const RPath('/login');
 
+  static const moreTools = RPath('/more_tools');
+
   // home
   static RPath home = const RPath('/home');
 

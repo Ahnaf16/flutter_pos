@@ -35,7 +35,7 @@ class HomeCounterWidget extends ConsumerWidget {
                     spacing: Insets.med,
                     children: [
                       Icon(icon),
-                      Text(title, style: context.text.list.op(.5)),
+                      Flexible(child: Text(title, style: context.text.list.op(.5))),
                     ],
                   ),
                   child: OverflowMarquee(child: Text(value.toString(), style: context.text.h4)),

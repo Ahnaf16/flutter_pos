@@ -185,7 +185,7 @@ class TrxTable extends StatelessWidget {
         };
       },
 
-      footer: !showFooter
+      footer: (!showFooter || context.layout.isMobile)
           ? null
           : DecoContainer(
               color: context.colors.border,

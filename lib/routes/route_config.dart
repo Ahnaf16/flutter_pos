@@ -32,6 +32,7 @@ import 'package:pos/features/warehouse/view/create_warehouse_view.dart';
 import 'package:pos/features/warehouse/view/warehouse_details_view.dart';
 import 'package:pos/features/warehouse/view/warehouse_view.dart';
 import 'package:pos/main.export.dart';
+import 'package:pos/navigation/more_tools_view.dart';
 import 'package:pos/navigation/nav_root.dart';
 import 'package:pos/routes/page/maintenance_page.dart';
 import 'package:pos/routes/page/protected_page.dart';
@@ -64,6 +65,7 @@ class AppRouter extends Notifier<GoRouter> {
         routes: [
           //! home
           AppRoute(RPaths.home, (_) => const HomeView()),
+          AppRoute(RPaths.moreTools, (_) => const MoreToolsView()),
           //! products
           AppRoute(
             RPaths.products,

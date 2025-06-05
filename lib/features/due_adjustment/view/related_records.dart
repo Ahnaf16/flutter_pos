@@ -6,9 +6,11 @@ class RelatedRecords extends ConsumerWidget {
     super.key,
     required this.party,
     this.unpaid = false,
+    this.scroll = true,
   });
   final Party party;
   final bool unpaid;
+  final bool scroll;
 
   @override
   Widget build(BuildContext context, ref) {
@@ -31,6 +33,7 @@ class RelatedRecords extends ConsumerWidget {
 
           return ListView.separated(
             shrinkWrap: true,
+            physics: scroll ? null : const NeverScrollableScrollPhysics(),
             itemCount: inventories.length,
             separatorBuilder: (_, _) => const Gap(Insets.med),
             itemBuilder: (BuildContext context, int index) {

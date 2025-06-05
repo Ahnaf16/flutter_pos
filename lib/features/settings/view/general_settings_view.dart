@@ -48,18 +48,18 @@ class GeneralSettingsView extends HookConsumerWidget {
                         name: 'currency_symbol_on_left',
                         builder: (form) {
                           return ShadInputDecorator(
-                            label: const Text('Show currency on left side'),
+                            label: const Text('currency symbol side'),
                             child: ShadSelect<bool>(
                               initialValue: form.value,
                               minWidth: 250,
                               maxWidth: 300,
                               maxHeight: 80,
                               placeholder: const Text('Select'),
-                              selectedOptionBuilder: (context, value) => Text(value.toString()),
+                              selectedOptionBuilder: (context, value) => Text(value ? 'Left' : 'Right'),
                               onChanged: (value) => form.didChange(value),
                               itemCount: 2,
                               optionsBuilder: (_, i) =>
-                                  ShadOption(value: i == 0, child: Text(i == 0 ? 'True' : 'False')),
+                                  ShadOption(value: i == 0, child: Text(i == 0 ? 'Left' : 'Right')),
                             ),
                           );
                         },

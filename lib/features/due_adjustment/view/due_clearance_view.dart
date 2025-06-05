@@ -29,6 +29,7 @@ class DueClearanceView extends HookConsumerWidget {
     return BaseBody(
       title: 'Supplier due clearance',
       alignment: Alignment.topLeft,
+      scrollable: !context.layout.isDesktop,
       body: LimitedWidthBox(
         maxWidth: Layouts.maxContentWidth,
         child: Flex(
@@ -261,6 +262,7 @@ class DueClearanceView extends HookConsumerWidget {
 
             if (selectedParty.value != null)
               RelatedRecords(
+                scroll: context.layout.isDesktop,
                 party: selectedParty.value!,
                 unpaid: selectedParty.value?.hasBalance() == true,
               ).conditionalExpanded(context.layout.isDesktop),

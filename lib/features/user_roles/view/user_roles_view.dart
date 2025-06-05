@@ -2,7 +2,13 @@ import 'package:pos/features/user_roles/controller/user_roles_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('#', 50.0), ('Name', 200.0), ('Permissions', double.nan), ('Enabled', 200.0), ('Action', 260.0)];
+const _headings = [
+  TableHeading.positional('#', 50.0),
+  TableHeading.positional('Name', 200.0),
+  TableHeading.positional('Permissions'),
+  TableHeading.positional('Enabled', 200.0),
+  TableHeading.positional('Action', 260.0, Alignment.centerRight),
+];
 
 class UserRolesView extends HookConsumerWidget {
   const UserRolesView({super.key});
@@ -24,34 +30,34 @@ class UserRolesView extends HookConsumerWidget {
         loading: () => const Loading(),
         error: (e, s) => ErrorView(e, s, prov: userRolesCtrlProvider),
         data: (roles) {
-          return DataTableBuilder<UserRole, (String, double)>(
+          return DataTableBuilder<UserRole, TableHeading>(
             rowHeight: 100,
             items: roles,
             headings: _headings,
             headingBuilder: (heading) {
               return GridColumn(
-                columnName: heading.$1,
+                columnName: heading.name,
                 columnWidthMode: ColumnWidthMode.fill,
-                maximumWidth: heading.$2,
-                minimumWidth: 200,
+                maximumWidth: heading.max,
+                minimumWidth: heading.minWidth ?? 200,
                 label: Container(
                   padding: Pads.med(),
-                  alignment: heading.$1 == 'Action' ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Text(heading.$1),
+                  alignment: heading.alignment,
+                  child: Text(heading.name),
                 ),
               );
             },
-            cellAlignment: Alignment.centerLeft,
+            cellAlignmentBuilder: (head) => _headings.fromName(head).alignment,
             cellBuilder: (data, head) {
-              return switch (head.$1) {
+              return switch (head.name) {
                 '#' => DataGridCell(
-                  columnName: head.$1,
+                  columnName: head.name,
                   value: Text((roles.indexWhere((e) => e.id == data.id) + 1).toString()),
                 ),
-                'Name' => DataGridCell(columnName: head.$1, value: Text(data.name)),
-                'Permissions' => DataGridCell(columnName: head.$1, value: _permissionBuilder(data)),
+                'Name' => DataGridCell(columnName: head.name, value: Text(data.name)),
+                'Permissions' => DataGridCell(columnName: head.name, value: _permissionBuilder(data)),
                 'Enabled' => DataGridCell(
-                  columnName: head.$1,
+                  columnName: head.name,
                   value: HookBuilder(
                     builder: (context) {
                       final loading = useState(false);
@@ -75,7 +81,7 @@ class UserRolesView extends HookConsumerWidget {
                   ),
                 ),
                 'Action' => DataGridCell(
-                  columnName: head.$1,
+                  columnName: head.name,
                   value: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -131,7 +137,7 @@ class UserRolesView extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                _ => DataGridCell(columnName: head.$1, value: Text(data.toString())),
+                _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
               };
             },
           );
