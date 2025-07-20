@@ -225,7 +225,10 @@ class ShadCard extends StatelessWidget {
 
               if (description != null) DefaultTextStyle(style: theme.textTheme.muted, child: description!),
               if (child != null && childSeparator != null) childSeparator!,
-              if (child != null) Flexible(child: Padding(padding: childPadding ?? Pads.zero, child: child)),
+              if (child != null)
+                Flexible(
+                  child: Padding(padding: childPadding ?? Pads.zero, child: child),
+                ),
               if (footer != null) footer!,
             ],
           ).conditionalExpanded(expanded),
