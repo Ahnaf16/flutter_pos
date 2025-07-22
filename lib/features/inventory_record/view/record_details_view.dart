@@ -462,11 +462,23 @@ class _Header extends ConsumerWidget {
             Row(
               spacing: Insets.med,
               children: [
-                Text('Invoice: #${rec.invoiceNo}', style: context.text.lead),
+                Text(
+                  'INVOICE: #${rec.invoiceNo}',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
                 SmallButton(icon: LuIcons.copy, onPressed: () => Copier.copy(rec.invoiceNo)),
               ],
             ),
-            Text(rec.date.formatDate('MMM dd, yyyy hh:mm a'), style: context.text.muted),
+            Text(
+              rec.date.formatDate('MMM dd, yyyy hh:mm a'),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
           ],
         ),
         const Spacer(),
@@ -518,7 +530,12 @@ class _PayLogs extends StatelessWidget {
         children: [
           ShadAccordionItem<int>(
             value: 0,
-            title: Text('Payment Logs', style: context.text.large),
+            title: const Text(
+              'Payment Logs',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             separator: const Gap(0),
             underlineTitleOnHover: false,
             child: Column(

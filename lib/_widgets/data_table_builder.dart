@@ -30,7 +30,6 @@ class DataTableBuilder<T, R> extends StatefulWidget {
   final DataGridCell Function(T data, R head)? cellBuilder;
   final DataGridCell Function(T data, R head, int index)? cellBuilderIndexed;
 
-  /// will be ignored if headingBuilderIndexed is provided
   final GridColumn Function(R heading)? headingBuilder;
   final GridColumn Function(R heading, int index)? headingBuilderIndexed;
   final double? rowHeight;
@@ -49,31 +48,42 @@ class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
   Widget build(BuildContext context) {
     final sfDataGrid = ClipRRect(
       borderRadius: Corners.medBorder,
-      child: SfDataGridTheme(
-        data: SfDataGridThemeData(headerColor: context.colors.border, gridLineColor: context.colors.border),
-        child: SfDataGrid(
-          source: _DataSource<T, R>(
-            items: widget.items,
-            headings: widget.headings,
-            cellBuilder: (data, head, index) {
-              return widget.cellBuilderIndexed?.call(data, head, index) ?? widget.cellBuilder!(data, head);
-            },
-            padding: widget.cellPadding,
-            alignment: widget.cellAlignment,
-            alignmentBuilder: widget.cellAlignmentBuilder,
+      child: DefaultTextStyle(
+        style: context.text.small,
+        child: SfDataGridTheme(
+          data: SfDataGridThemeData(
+            headerColor: context.colors.border,
+            gridLineColor: context.colors.border,
+            frozenPaneElevation: 0,
+            frozenPaneLineColor: Colors.transparent,
           ),
+          child: SfDataGrid(
+            source: _DataSource<T, R>(
+              items: widget.items,
+              headings: widget.headings,
 
-          allowExpandCollapseGroup: true,
-          headerGridLinesVisibility: GridLinesVisibility.both,
-          highlightRowOnHover: false,
-          isScrollbarAlwaysShown: true,
-          rowHeight: widget.rowHeight ?? double.nan,
-          columns: [
-            for (int i = 0; i < widget.headings.length; i++)
-              widget.headingBuilderIndexed?.call(widget.headings[i], i) ?? widget.headingBuilder!(widget.headings[i]),
-          ],
-          footer: widget.footer,
-          footerFrozenRowsCount: widget.footer != null ? 1 : 0,
+              cellBuilder: (data, head, index) {
+                return widget.cellBuilderIndexed?.call(data, head, index) ?? widget.cellBuilder!(data, head);
+              },
+              padding: widget.cellPadding,
+              alignment: widget.cellAlignment,
+              alignmentBuilder: widget.cellAlignmentBuilder,
+            ),
+
+            allowExpandCollapseGroup: true,
+            headerGridLinesVisibility: GridLinesVisibility.both,
+            highlightRowOnHover: false,
+            isScrollbarAlwaysShown: true,
+            rowHeight: widget.rowHeight ?? double.nan,
+            columns: [
+              for (int i = 0; i < widget.headings.length; i++)
+                widget.headingBuilderIndexed?.call(widget.headings[i], i) ?? widget.headingBuilder!(widget.headings[i]),
+            ],
+            footer: widget.footer,
+
+            footerFrozenRowsCount: widget.footer != null ? 1 : 0,
+            footerHeight: 50,
+          ),
         ),
       ),
     );

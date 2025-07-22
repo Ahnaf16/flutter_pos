@@ -1,8 +1,16 @@
+import 'package:scaled_app/scaled_app.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+
 import 'package:pos/main.export.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  ScaledWidgetsFlutterBinding.ensureInitialized(
+    scaleFactor: (size) {
+      const baseWidth = 1440;
+      final factor = size.width / baseWidth;
+      return factor.clamp(0.9, 1.0);
+    },
+  );
   usePathUrlStrategy();
   GoRouter.optionURLReflectsImperativeAPIs = true;
 
