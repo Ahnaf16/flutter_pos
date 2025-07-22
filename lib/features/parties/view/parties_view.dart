@@ -7,6 +7,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 const _headings = [
   TableHeading(name: '#', max: 50.0),
   TableHeading(name: 'Name'),
+  TableHeading(name: 'Address'),
   TableHeading(name: 'Phone', max: 500.0),
   TableHeading(name: 'Due/Balance', max: 400.0),
   TableHeading(name: 'Action', max: 250.0, alignment: Alignment.centerRight),
@@ -55,7 +56,7 @@ class PartiesView extends HookConsumerWidget {
               error: (e, s) => ErrorView(e, s, prov: partiesCtrlProvider),
               data: (parties) {
                 return DataTableBuilder<Party, TableHeading>(
-                  rowHeight: 100,
+                  rowHeight: 80,
                   items: parties,
                   headings: _headings,
                   headingBuilder: (heading) {
@@ -75,6 +76,7 @@ class PartiesView extends HookConsumerWidget {
                         value: Text((parties.indexOf(data) + 1).toString()),
                       ),
                       'Name' => DataGridCell(columnName: head.name, value: _PartyNameBuilder(data)),
+                      'Address' => DataGridCell(columnName: head.name, value: _PartyAddressBuilder(data)),
                       'Phone' => DataGridCell(
                         columnName: head.name,
                         value: Row(
@@ -276,12 +278,20 @@ class _PartyNameBuilder extends StatelessWidget {
                   if (!parti.isCustomer) ShadBadge.outline(child: Text(parti.type.name)),
                 ],
               ),
-              Text(parti.address ?? '--', maxLines: 2, overflow: TextOverflow.ellipsis),
             ],
           ),
         ),
       ],
     );
+  }
+}
+
+class _PartyAddressBuilder extends StatelessWidget {
+  const _PartyAddressBuilder(this.parti);
+  final Party parti;
+  @override
+  Widget build(BuildContext context) {
+    return Text(parti.address ?? '--', maxLines: 2, overflow: TextOverflow.ellipsis);
   }
 }
 
@@ -366,7 +376,6 @@ class _PartiAddDialog extends HookConsumerWidget {
             children: [
               ShadTextField(name: 'name', label: 'Name', isRequired: true),
               ShadTextField(name: 'phone', label: 'Phone', isRequired: true),
-
               ShadTextField(name: 'email', label: 'Email'),
               ShadTextField(name: 'address', label: 'Address'),
 

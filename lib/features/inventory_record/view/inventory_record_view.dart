@@ -96,7 +96,7 @@ class RecordTable extends ConsumerWidget {
     final heads = _headings.where((e) => !excludes.contains(e.name)).toList();
 
     return DataTableBuilder<InventoryRecord, TableHeading>(
-      rowHeight: 80,
+      rowHeight: 100,
       items: inventories,
       headings: heads,
       headingBuilderIndexed: (heading, i) {

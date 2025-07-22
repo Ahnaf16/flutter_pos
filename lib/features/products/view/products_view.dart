@@ -7,10 +7,12 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 const _headings = [
   TableHeading.positional('#', 50.0),
   TableHeading.positional('Name'),
-  TableHeading.positional('Warehouse', 150.0),
-  TableHeading.positional('Stock', 100.0),
-  TableHeading.positional('Pricing', 200.0),
-  TableHeading.positional('Action', 200.0),
+  TableHeading.positional('SKU'),
+  TableHeading.positional('Warehouse'),
+  TableHeading.positional('Stock'),
+  TableHeading.positional('Purchase'),
+  TableHeading.positional('Sale'),
+  TableHeading.positional('Action', 200.0, Alignment.center),
 ];
 
 class ProductsView extends HookConsumerWidget {
@@ -45,6 +47,7 @@ class ProductsView extends HookConsumerWidget {
                 return DataTableBuilder<Product, TableHeading>(
                   rowHeight: 120,
                   items: products,
+
                   headings: _headings,
                   headingBuilder: (heading) {
                     return GridColumn(
@@ -69,6 +72,7 @@ class ProductsView extends HookConsumerWidget {
                         value: Text((products.indexWhere((e) => e.id == data.id) + 1).toString()),
                       ),
                       'Name' => DataGridCell(columnName: head.name, value: nameCellBuilder(data)),
+                      'SKU' => DataGridCell(columnName: head.name, value: skuCellBuilder(data)),
                       'Warehouse' => DataGridCell(
                         columnName: head.name,
                         value: Text(
@@ -79,7 +83,8 @@ class ProductsView extends HookConsumerWidget {
                         columnName: head.name,
                         value: Text('${data.quantityByHouse(hId)}${data.unitName}'),
                       ),
-                      'Pricing' => DataGridCell(columnName: head.name, value: _priceCellBuilder(data)),
+                      'Purchase' => DataGridCell(columnName: head.name, value: _purchaseCellBuilder(data)),
+                      'Sale' => DataGridCell(columnName: head.name, value: _saleCellBuilder(data)),
                       'Action' => DataGridCell(
                         columnName: head.name,
                         value: Row(
@@ -139,20 +144,18 @@ class ProductsView extends HookConsumerWidget {
     );
   }
 
-  Widget _priceCellBuilder(Product product) => Builder(
+  Widget _purchaseCellBuilder(Product product) => Builder(
     builder: (context) {
       final stock = product.stock.firstOrNull;
-      return Column(
-        spacing: Insets.xs,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('Purchase: ${stock?.purchasePrice.toString() ?? '--'}'),
-          Text('Sale: ${product.salePrice.toString()}'),
-        ],
-      );
+      return Text('Purchase: ${stock?.purchasePrice.currency() ?? '--'}');
     },
   );
+  Widget _saleCellBuilder(Product product) => Builder(
+    builder: (context) {
+      return Text('Sale: ${product.salePrice.currency()}');
+    },
+  );
+
   static Widget nameCellBuilder(Product? product, [double gap = Insets.xs, double imgSize = 40]) => Builder(
     builder: (context) {
       if (product == null) return const Text('Unknown product');
@@ -175,10 +178,32 @@ class ProductsView extends HookConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(product.name, style: context.text.list, overflow: TextOverflow.ellipsis),
-                if (product.sku != null)
-                  Text('SKU: ${product.sku ?? '--'}', style: context.text.muted, overflow: TextOverflow.ellipsis),
+
                 if (product.manufacturer != null)
                   Text(product.manufacturer ?? '--', style: context.text.muted, overflow: TextOverflow.ellipsis),
+              ],
+            ),
+          ),
+        ],
+      );
+    },
+  );
+  static Widget skuCellBuilder(Product? product, [double gap = Insets.xs, double imgSize = 40]) => Builder(
+    builder: (context) {
+      if (product == null) return const Text('Unknown product');
+      return Wrap(
+        spacing: Insets.med,
+        runSpacing: Insets.xs,
+
+        children: [
+          Flexible(
+            child: Column(
+              spacing: gap,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (product.sku != null)
+                  Text('SKU: ${product.sku ?? '--'}', style: context.text.muted, overflow: TextOverflow.ellipsis),
               ],
             ),
           ),
