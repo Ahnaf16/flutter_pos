@@ -95,81 +95,139 @@ class BarWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final trxList = ref.watch(transactionLogCtrlProvider).maybeList().filterByDateRange(start, end, (e) => e.date);
 
+    // Your existing data functions remain unchanged
     List<_BarData> inData() {
       final data = <_BarData>[];
-
       final trxGroup = trxList.where((e) => e.isIncome == true).groupListsBy((e) => e.date.month);
       for (var month = 1; month <= 12; month++) {
         data.add(_BarData(getMonthName(month), trxGroup[month]?.map((e) => e.amount).sum));
       }
-
       return data;
     }
 
     List<_BarData> outData() {
       final data = <_BarData>[];
-
       final trxGroup = trxList.where((e) => e.isIncome != true).groupListsBy((e) => e.date.month);
       for (var month = 1; month <= 12; month++) {
         data.add(_BarData(getMonthName(month), trxGroup[month]?.map((e) => e.amount).sum));
       }
-
       return data;
     }
 
     List<_BarData> returnData() {
       final data = <_BarData>[];
-
       final trxGroup = trxList.fromTypes([TransactionType.returned]).groupListsBy((e) => e.date.month);
       for (var month = 1; month <= 12; month++) {
         data.add(_BarData(getMonthName(month), trxGroup[month]?.map((e) => e.amount).sum));
       }
-
       return data;
     }
 
-    return SfCartesianChart(
-      title: const ChartTitle(text: 'Transactions', alignment: ChartAlignment.near),
-      tooltipBehavior: TooltipBehavior(enable: true, duration: 1000),
-      legend: const Legend(isVisible: true, position: LegendPosition.bottom),
-      primaryXAxis: const CategoryAxis(),
-      primaryYAxis: NumericAxis(
-        numberFormat: currencyFormate(compact: true),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: theme.cardColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      series: [
-        ColumnSeries<_BarData, String>(
-          name: 'In',
-          dataSource: inData(),
-          xValueMapper: (data, _) => data.x,
-          yValueMapper: (data, _) => data.y,
-          color: Colors.blue,
-          borderRadius: Corners.smBorder.copyWith(bottomLeft: Radius.zero, bottomRight: Radius.zero),
-          spacing: .3,
-          width: 0.8,
-        ),
-        ColumnSeries<_BarData, String>(
-          name: 'Out',
-          dataSource: outData(),
-          xValueMapper: (data, _) => data.x,
-          yValueMapper: (data, _) => data.y,
-          color: Colors.amber.shade900,
-          borderRadius: Corners.smBorder.copyWith(bottomLeft: Radius.zero, bottomRight: Radius.zero),
-          spacing: .3,
-          width: 0.8,
-        ),
-        ColumnSeries<_BarData, String>(
-          name: 'Return',
-          dataSource: returnData(),
-          xValueMapper: (data, _) => data.x,
-          yValueMapper: (data, _) => data.y,
-          color: Colors.red,
-          borderRadius: Corners.smBorder.copyWith(bottomLeft: Radius.zero, bottomRight: Radius.zero),
-          spacing: .3,
-          width: 0.8,
-        ),
-      ],
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Transactions',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: Icon(Icons.more_vert, color: theme.iconTheme.color),
+                onPressed: () {},
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: SfCartesianChart(
+              title: ChartTitle(
+                alignment: ChartAlignment.near,
+                textStyle: theme.textTheme.titleMedium,
+              ),
+              tooltipBehavior: TooltipBehavior(
+                enable: true,
+                duration: 1000,
+                color: isDark ? Colors.grey[900] : Colors.white,
+                borderColor: theme.dividerColor,
+                textStyle: theme.textTheme.bodySmall,
+              ),
+              legend: Legend(
+                isVisible: true,
+                position: LegendPosition.bottom,
+                textStyle: theme.textTheme.bodyMedium,
+                overflowMode: LegendItemOverflowMode.wrap,
+                orientation: LegendItemOrientation.horizontal,
+              ),
+              plotAreaBorderWidth: 0,
+              primaryXAxis: CategoryAxis(
+                axisLine: const AxisLine(width: 0),
+                majorTickLines: const MajorTickLines(size: 0),
+                labelStyle: theme.textTheme.bodySmall,
+              ),
+              primaryYAxis: NumericAxis(
+                numberFormat: currencyFormate(compact: true),
+                axisLine: const AxisLine(width: 0),
+                majorTickLines: const MajorTickLines(size: 0),
+                labelStyle: theme.textTheme.bodySmall,
+              ),
+              series: [
+                ColumnSeries<_BarData, String>(
+                  name: 'In',
+                  dataSource: inData(),
+                  xValueMapper: (data, _) => data.x,
+                  yValueMapper: (data, _) => data.y,
+                  color: Colors.blueAccent,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                  spacing: 0.3,
+                  width: 0.8,
+                ),
+                ColumnSeries<_BarData, String>(
+                  name: 'Out',
+                  dataSource: outData(),
+                  xValueMapper: (data, _) => data.x,
+                  yValueMapper: (data, _) => data.y,
+                  color: Colors.amber.shade700,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                  spacing: 0.3,
+                  width: 0.8,
+                ),
+                ColumnSeries<_BarData, String>(
+                  name: 'Return',
+                  dataSource: returnData(),
+                  xValueMapper: (data, _) => data.x,
+                  yValueMapper: (data, _) => data.y,
+                  color: Colors.redAccent,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                  spacing: 0.3,
+                  width: 0.8,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
