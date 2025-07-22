@@ -1,11 +1,13 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
+import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/features/inventory_record/view/local/discount_type_pop_over.dart';
 import 'package:pos/features/inventory_record/view/local/inv_invoice_widget.dart';
 import 'package:pos/features/inventory_record/view/local/products_panel.dart';
 import 'package:pos/features/inventory_record/view/payment_account_select.dart';
+import 'package:pos/features/inventory_record/view/stock_selection_dialog.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/parties/view/parties_view.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
@@ -22,7 +24,7 @@ class CreateRecordView extends HookConsumerWidget {
     final record = ref.watch(recordEditingCtrlProvider(type));
     final recordCtrl = useCallback(() => ref.read(recordEditingCtrlProvider(type).notifier));
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
-
+    final vWh = ref.watch(viewingWHProvider);
     // final isSale = type == RecordType.sale;
 
     return BaseBody(
@@ -103,8 +105,9 @@ class CreateRecordView extends HookConsumerWidget {
                                                 child: ProductsPanel(
                                                   type: type,
                                                   userHouse: user?.warehouse,
-                                                  onProductSelect: (p, s, w) =>
-                                                      recordCtrl().addProduct(p, newStock: s, warehouse: w),
+                                                  onProductSelect: (p, s, w) {
+                                                    recordCtrl().addProduct(p, stock: s, warehouse: w);
+                                                  },
                                                 ),
                                               ),
                                             );
@@ -119,6 +122,31 @@ class CreateRecordView extends HookConsumerWidget {
                                         onChange: (p, q) {
                                           recordCtrl().changeQuantity(detail, (_) => q);
                                           recordCtrl().updatePrice(detail, p);
+                                        },
+                                        onQtyEnd: () async {
+                                          final allStockIds = record.details.map((e) => e.stock.id).toList();
+
+                                          final stocks = detail.product
+                                              .sortByNewest(vWh.viewing?.id)
+                                              .where((e) => e.quantity > 0 && !allStockIds.contains(e.id))
+                                              .toList();
+
+                                          if (stocks.isEmpty) {
+                                            return Toast.showErr(context, 'No stock available');
+                                          }
+                                          final selected = await showShadDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return StockSelectionDialog(
+                                                product: detail.product,
+                                                stocks: stocks,
+                                                detailIds: allStockIds,
+                                              );
+                                            },
+                                          );
+                                          if (selected case final Stock s) {
+                                            recordCtrl().addInvDetails(detail.product, s);
+                                          }
                                         },
                                         onProductRemove: (pId) => recordCtrl().removeProduct(pId, detail.stock.id),
                                       );
@@ -181,7 +209,13 @@ class CreateRecordView extends HookConsumerWidget {
                       child: ProductsPanel(
                         type: type,
                         userHouse: user?.warehouse,
-                        onProductSelect: (p, s, w) => recordCtrl().addProduct(p, newStock: s, warehouse: w),
+                        onProductSelect: (p, s, w) async {
+                          // final selected = await showShadDialog(
+                          //   context: context,
+                          //   builder: (context) => StockSelectionDialog(product: p, wh: w),
+                          // );
+                          recordCtrl().addProduct(p, stock: s, warehouse: w);
+                        },
                       ),
                     ),
                 ],
@@ -370,11 +404,13 @@ class _ProductTile extends StatelessWidget {
     required this.onChange,
     required this.onProductRemove,
     required this.type,
+    required this.onQtyEnd,
   });
 
   final InventoryDetails detail;
   final int index;
   final Function(num price, int qty) onChange;
+  final void Function() onQtyEnd;
 
   final Function(String pId) onProductRemove;
   final RecordType type;
@@ -583,7 +619,7 @@ class _ProductTile extends StatelessWidget {
                 height: 30,
                 width: 30,
                 onPressed: () {
-                  if (availableQty == 0 && isSale) return;
+                  if (availableQty == 0 && isSale) return onQtyEnd();
                   onChange(price, qty + 1);
                 },
               ),

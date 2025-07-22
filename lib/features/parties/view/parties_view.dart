@@ -160,6 +160,7 @@ class PartiesView extends HookConsumerWidget {
                                 if (data.hasBalance() && !data.isCustomer)
                                   PopOverButton(
                                     dense: true,
+                                    color: Colors.purple,
                                     icon: const Icon(LuIcons.handCoins),
                                     onPressed: () {
                                       hide();

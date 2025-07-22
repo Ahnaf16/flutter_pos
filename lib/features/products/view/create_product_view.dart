@@ -78,7 +78,7 @@ class CreateProductView extends HookConsumerWidget {
                 final stock = Stock.tryParse(data['stock'])?.copyWith(id: ID.unique());
 
                 recordCtrl().setInputsFromMap(data['record'] ?? {});
-                recordCtrl().addProduct(product.copyWith(id: createdId.value), newStock: stock, replaceExisting: true);
+                recordCtrl().addProduct(product.copyWith(id: createdId.value), stock: stock, replaceExisting: true);
 
                 final ((ok, msg), inv) = await recordCtrl().submit(ignoreParty: true);
                 l.falsey();
