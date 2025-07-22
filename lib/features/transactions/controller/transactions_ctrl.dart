@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:pos/features/filter/controller/filter_ctrl.dart';
+import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
 import 'package:pos/features/transactions/repository/transactions_repo.dart';
@@ -66,6 +67,7 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
       ref.invalidateSelf();
       ref.invalidate(partiesCtrlProvider);
       ref.invalidate(paymentAccountsCtrlProvider);
+      ref.invalidate(recordsByPartiProvider);
       return rightResult('Due paid successfully');
     });
   }

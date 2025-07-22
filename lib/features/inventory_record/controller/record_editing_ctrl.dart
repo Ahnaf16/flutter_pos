@@ -27,22 +27,37 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       stock = product.getEffectiveStock(_config.stockDistPolicy, warehouse?.id);
     }
 
+    if (state.details.map((e) => e.product.id).contains(product.id) && type.isSale) {
+      final existing = state.details.where((e) => e.product.id == product.id);
+      final List<Stock> existingStock = existing.map((e) => e.stock).toList();
+
+      stock = product.getEffectiveStock(_config.stockDistPolicy, warehouse?.id, existingStock);
+
+      if (stock == null) {
+        cat('NO STOCK');
+        return;
+      }
+
+      cat(existingStock.map((e) => e.id).join(', '), stock.id);
+
+      // existingStock = state.details.where((e) => e.stock.id == stock?.id)?.stock;
+
+      // cat('${existingStock?.id}, ${stock?.id}');
+
+      if (existingStock.map((e) => e.id).contains(stock.id)) {
+        return changeProductQuantity(stock.id, (q) {
+          if (q >= (stock?.quantity ?? 0)) return q;
+          return q + 1;
+        });
+      }
+    }
+
     if (stock == null) {
       final msg = type.isSale ? 'Product out of stock' : 'Add a stock first';
       Toast.showErr(Ctx.context, msg);
       return;
     }
 
-    if (state.details.map((e) => e.product.id).contains(product.id) && type.isSale) {
-      final existing = state.details.firstWhere((e) => e.product.id == product.id).stock;
-      if (existing.id != stock.id) return;
-      // if (stock.quantity <= 0) return;
-
-      return changeProductQuantity(product.id, (q) {
-        if (q >= existing.quantity) return q;
-        return q + 1;
-      });
-    }
     final qty = type.isSale ? 1 : stock.quantity;
     final details = InventoryDetails(
       id: '',
@@ -61,12 +76,12 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     if (state.details.isEmpty) {}
   }
 
-  void changeProductQuantity(String pId, int Function(int oldQty) update) {
+  void changeProductQuantity(String stockId, int Function(int oldQty) update) {
     if (type == RecordType.purchase) return;
 
     final updatedDetails = [
       for (final item in state.details)
-        if (item.product.id == pId) item.copyWith(quantity: update(item.quantity)) else item,
+        if (item.stock.id == stockId) item.copyWith(quantity: update(item.quantity)) else item,
     ];
 
     state = state.copyWith(details: updatedDetails);
@@ -105,7 +120,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     if (type.isPurchase) {
       updateStockQuantity(detail.product.id, detail.stock.id, qty);
     } else {
-      changeProductQuantity(detail.product.id, qty);
+      changeProductQuantity(detail.stock.id, qty);
     }
   }
 
