@@ -46,12 +46,33 @@ class ThemeCtrl extends Notifier<ThemeConfig> {
     return ShadThemeData(
       colorScheme: colors,
       brightness: brightness,
-      // radius: Corners.xsBorder,
-      textTheme: ShadTextTheme.fromGoogleFont(GoogleFonts.inter),
+
+      textTheme:
+          ShadTextTheme.fromGoogleFont(
+            GoogleFonts.dmSans,
+          ).copyWith(
+            list: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w300,
+            ),
+            small: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w300,
+            ),
+            large: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
       cardTheme: ShadCardTheme(padding: Pads.med(), rowMainAxisAlignment: MainAxisAlignment.start),
-      inputTheme: ShadInputTheme(
-        padding: kDefInputPadding,
-      ).copyWith(decoration: ShadDecoration(border: ShadBorder.all(width: 1))),
+      inputTheme:
+          ShadInputTheme(
+            padding: kDefInputPadding,
+          ).copyWith(
+            decoration: ShadDecoration(
+              border: ShadBorder.all(width: 1),
+            ),
+          ),
       selectTheme: ShadSelectTheme(padding: kDefInputPadding),
       decoration: ShadDecoration(
         labelPadding: Pads.padding(bottom: 0, left: 5),

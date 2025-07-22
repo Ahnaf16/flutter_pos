@@ -22,6 +22,7 @@ const _user = {
   'role': _adminRoleId,
   'is_user_created': true,
   'warehouse': _whDocId,
+  'isActive': true,
 };
 const _config = {'currency_symbol': '\$'};
 const _wh = {'name': 'HQ', 'address': '--', 'is_default': true, 'contact_number': '--'};

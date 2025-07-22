@@ -17,10 +17,13 @@ const _headings = [
   TableHeading.positional('Invoice'),
   TableHeading.positional('Parti'),
   TableHeading.positional('Product', 400.0),
-  TableHeading.positional('Amount', 300.0),
-  TableHeading.positional('Account', 200.0, Alignment.center),
-  TableHeading.positional('Status', 130.0, Alignment.center),
-  TableHeading.positional('Action', double.nan, Alignment.centerRight),
+  TableHeading.positional('Vat & Shipping', 300.0),
+  TableHeading.positional('Due', double.nan, Alignment.center, 300.0),
+  TableHeading.positional('Discount', double.nan, Alignment.center, 250),
+  TableHeading.positional('Amount', 350),
+  TableHeading.positional('Account', 150, Alignment.center),
+  TableHeading.positional('Status', 100, Alignment.center),
+  TableHeading.positional('Action', double.nan, Alignment.centerRight, 500.0),
 ];
 
 class InventoryRecordView extends HookConsumerWidget {
@@ -93,7 +96,7 @@ class RecordTable extends ConsumerWidget {
     final heads = _headings.where((e) => !excludes.contains(e.name)).toList();
 
     return DataTableBuilder<InventoryRecord, TableHeading>(
-      rowHeight: 150,
+      rowHeight: 80,
       items: inventories,
       headings: heads,
       headingBuilderIndexed: (heading, i) {
@@ -103,7 +106,17 @@ class RecordTable extends ConsumerWidget {
           columnWidthMode: ColumnWidthMode.fill,
           maximumWidth: heading.max,
           minimumWidth: heading.minWidth ?? 150,
-          label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
+          label: Container(
+            padding: Pads.med(),
+            alignment: alignment,
+            child: Text(
+              heading.name,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
         );
       },
       cellAlignmentBuilder: (h) => heads.fromName(h).alignment,
@@ -115,10 +128,15 @@ class RecordTable extends ConsumerWidget {
             value: Text.rich(
               TextSpan(
                 text: data.invoiceNo,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                ),
                 children: [
                   WidgetSpan(
                     child: SmallButton(
                       icon: LuIcons.copy,
+                      iconSize: 15,
                       onPressed: () => Copier.copy(data.invoiceNo),
                     ),
                   ),
@@ -129,13 +147,21 @@ class RecordTable extends ConsumerWidget {
           ),
           'Parti' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data.getParti)),
           'Product' => DataGridCell(columnName: head.name, value: _productCellBuilder(data)),
+          'Vat & Shipping' => DataGridCell(columnName: head.name, value: _vatAndShippingBuilder(data)),
+          'Due' => DataGridCell(columnName: head.name, value: _dueBuilder(data)),
+          'Discount' => DataGridCell(columnName: head.name, value: _discountBuilder(data)),
           'Amount' => DataGridCell(columnName: head.name, value: _amountBuilder(data)),
           'Account' => DataGridCell(
             columnName: head.name,
             value: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(data.account?.name ?? '--', style: context.text.list),
+                Text(
+                  data.account?.name ?? '--',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
                 if (data.account != null)
                   SmallButton(
                     icon: LuIcons.arrowUpRight,
@@ -151,7 +177,11 @@ class RecordTable extends ConsumerWidget {
           ),
           'Status' => DataGridCell(
             columnName: head.name,
-            value: ShadBadge.secondary(child: Text(data.status.name.titleCase)).colored(data.status.color),
+            value: ShadBadge.secondary(
+              child: Text(
+                data.status.name.titleCase,
+              ),
+            ).colored(data.status.color),
           ),
           'Action' => DataGridCell(
             columnName: head.name,
@@ -205,10 +235,11 @@ class RecordTable extends ConsumerWidget {
           _ => DataGridCell(columnName: head.name, value: Text(data.toString())),
         };
       },
+
       footer: !showFooter
           ? null
           : DecoContainer(
-              color: context.colors.border,
+              color: context.colors.primary.op(.05),
               padding: Pads.med(),
               height: 80,
               child: Row(
@@ -219,8 +250,8 @@ class RecordTable extends ConsumerWidget {
                     right: inventories.whereNot((e) => e.status.isReturned).map((e) => e.paidAmount).sum.currency(),
                     crossAxisAlignment: CrossAxisAlignment.center,
                     useFlexible: false,
-                    style: context.text.list.primary(context),
-                    styleBuilder: (l, r) => (l, context.text.large.primary(context)),
+                    style: context.text.list.success(),
+                    styleBuilder: (l, r) => (l, context.text.large.success()),
                   ),
                 ],
               ),
@@ -248,7 +279,12 @@ class RecordTable extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Text(parti?.name ?? '--', style: context.text.list),
+                    Text(
+                      parti?.name ?? '--',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                     if (parti?.isWalkIn != true)
                       SmallButton(
                         icon: LuIcons.arrowUpRight,
@@ -262,8 +298,25 @@ class RecordTable extends ConsumerWidget {
                       ),
                   ],
                 ),
-                if (parti != null) OverflowMarquee(child: Text('Phone: ${parti.phone}')),
-                if (parti?.email != null) OverflowMarquee(child: Text('Email: ${parti!.email}')),
+                if (parti?.isWalkIn != true && parti != null)
+                  OverflowMarquee(
+                    child: Text(
+                      'Phone: ${parti.phone}',
+
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ),
+                if (parti?.email != null)
+                  OverflowMarquee(
+                    child: Text(
+                      'Email: ${parti!.email}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -297,7 +350,9 @@ class RecordTable extends ConsumerWidget {
                       Flexible(
                         child: Text(
                           p.product.name,
-                          style: context.text.small,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w400,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -340,50 +395,81 @@ class RecordTable extends ConsumerWidget {
           children: [
             SpacedText(
               left: data.type == RecordType.purchase ? 'Paid' : 'Paid',
+
+              style: TextStyle(fontWeight: FontWeight.w300, color: context.colors.secondaryForeground),
               right: data.paidAmount.currency(),
               crossAxisAlignment: CrossAxisAlignment.center,
-              styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
+              styleBuilder: (l, r) => (l, r),
               maxLines: 1,
             ),
 
-            if (data.vat != 0)
-              SpacedText(
-                left: 'Vat',
-                right: data.vat.currency(),
-                crossAxisAlignment: CrossAxisAlignment.center,
-                styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
-                maxLines: 1,
-              ),
-            if (data.shipping != 0)
-              SpacedText(
-                left: 'Shipping',
-                right: data.shipping.currency(),
-                crossAxisAlignment: CrossAxisAlignment.center,
-                styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
-                maxLines: 1,
-              ),
-            if (data.discount != 0)
-              SpacedText(
-                left: 'Discount',
-                right: data.discountString(),
-                crossAxisAlignment: CrossAxisAlignment.center,
-                styleBuilder: (l, r) => (context.text.muted.textHeight(1.1), r.bold),
-                maxLines: 1,
-              ),
-            if (data.due != 0)
-              SpacedText(
-                left: data.hasDue ? 'Due' : 'Extra',
-                right: data.due.abs().currency(),
-                crossAxisAlignment: CrossAxisAlignment.center,
-                styleBuilder: (l, r) =>
-                    (context.text.muted.textHeight(1.1), r.textColor(data.hasDue ? Colors.red : Colors.green)),
-                maxLines: 1,
-              ),
             SpacedText(
               left: 'Total',
+              style: TextStyle(fontWeight: FontWeight.w300, color: context.colors.secondaryForeground),
               right: data.total.currency(),
               crossAxisAlignment: CrossAxisAlignment.center,
-              styleBuilder: (l, r) => (context.text.small.textHeight(1.1), context.text.p.bold),
+              styleBuilder: (l, r) => (l, r.medium),
+              maxLines: 1,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _discountBuilder(InventoryRecord data) {
+    return Builder(
+      builder: (context) {
+        return Text(
+          data.discountString(),
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Colors.green,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _dueBuilder(InventoryRecord data) {
+    return Builder(
+      builder: (context) {
+        return Text(
+          data.hasDue ? '- ${data.due.abs().currency()}' : data.due.abs().currency(),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: data.hasDue ? Colors.red : Colors.green,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _vatAndShippingBuilder(InventoryRecord data) {
+    return Builder(
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          spacing: Insets.xs,
+          children: [
+            SpacedText(
+              left: 'Vat',
+              right: data.vat.currency(),
+              style: TextStyle(fontWeight: FontWeight.w300, color: context.colors.secondaryForeground),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              styleBuilder: (l, r) => (l, r.medium),
+              maxLines: 1,
+            ),
+
+            SpacedText(
+              left: 'Shipping',
+              right: data.shipping.currency(),
+              style: TextStyle(fontWeight: FontWeight.w300, color: context.colors.secondaryForeground),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              styleBuilder: (l, r) => (l, r.medium),
               maxLines: 1,
             ),
           ],

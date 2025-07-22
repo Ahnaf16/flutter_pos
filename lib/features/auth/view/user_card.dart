@@ -94,14 +94,14 @@ class UserCard extends StatelessWidget {
                 SpacedText(
                   left: 'Name',
                   right: name ?? '--',
-                  styleBuilder: (l, r) => (l, r.bold),
+                  styleBuilder: (l, r) => (l, r),
                   crossAxisAlignment: CrossAxisAlignment.center,
                 ),
                 if (phone != null)
                   SpacedText(
                     left: 'Phone',
                     right: phone,
-                    styleBuilder: (l, r) => (l, r.bold),
+                    styleBuilder: (l, r) => (l, r),
                     crossAxisAlignment: CrossAxisAlignment.center,
                     onTap: (left, right) => Copier.copy(right),
                   ),
@@ -110,7 +110,7 @@ class UserCard extends StatelessWidget {
                   SpacedText(
                     left: 'Email',
                     right: email,
-                    styleBuilder: (l, r) => (l, r.bold),
+                    styleBuilder: (l, r) => (l, r),
                     crossAxisAlignment: CrossAxisAlignment.center,
                     onTap: (left, right) => Copier.copy(right),
                   ),
@@ -118,7 +118,7 @@ class UserCard extends StatelessWidget {
                   SpacedText(
                     left: 'Address',
                     right: address,
-                    styleBuilder: (l, r) => (l, r.bold),
+                    styleBuilder: (l, r) => (l, r),
                     crossAxisAlignment: CrossAxisAlignment.center,
                     onTap: (left, right) => Copier.copy(right),
                   ),
@@ -129,7 +129,7 @@ class UserCard extends StatelessWidget {
                     right: due.abs().currency(),
                     style: context.text.list,
                     styleBuilder: (l, r) {
-                      return (l, r.bold.textColor((hasDue || forceDue == true) ? Colors.red : Colors.green));
+                      return (l, r.textColor((hasDue || forceDue == true) ? Colors.red : Colors.green));
                     },
                     crossAxisAlignment: CrossAxisAlignment.center,
                     trailing: onEdit == null ? null : SmallButton(icon: LuIcons.pen, onPressed: onEdit),
@@ -139,7 +139,7 @@ class UserCard extends StatelessWidget {
                     left: key,
                     right: value,
                     style: context.text.list,
-                    styleBuilder: (l, r) => (l, r.bold),
+                    styleBuilder: (l, r) => (l, r),
                     crossAxisAlignment: CrossAxisAlignment.center,
                   ),
               ],

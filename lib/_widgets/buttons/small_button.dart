@@ -7,12 +7,14 @@ class SmallButton extends StatelessWidget {
     this.icon,
     this.onPressed,
     this.size,
+    this.iconSize,
     this.variant = ShadButtonVariant.ghost,
   });
 
   final Widget? child;
   final IconData? icon;
   final double? size;
+  final double? iconSize;
   final VoidCallback? onPressed;
   final ShadButtonVariant variant;
 
@@ -23,7 +25,7 @@ class SmallButton extends StatelessWidget {
       width: size ?? 20,
       padding: Pads.zero,
       decoration: const ShadDecoration(secondaryBorder: ShadBorder.none, secondaryFocusedBorder: ShadBorder.none),
-      leading: child ?? Icon(icon),
+      leading: child ?? Icon(icon, size: iconSize),
       onPressed: onPressed,
       variant: variant,
     );

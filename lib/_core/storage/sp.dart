@@ -16,4 +16,4 @@ typedef SP = SharedPreferences;
   ],
 )
 // ignore: unused_element
-_() {}
+void _() {}
