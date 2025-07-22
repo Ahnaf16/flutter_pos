@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:pos/main.export.dart';
 
 extension StringEx on String {
@@ -75,4 +77,8 @@ extension EnumByName<T extends Enum> on Iterable<T> {
   }
 
   List<String> names() => map((e) => e.name).toList();
+}
+
+extension OBJEx on Object? {
+  Object? get inspect => dev.inspect(this);
 }

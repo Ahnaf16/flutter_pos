@@ -20,36 +20,9 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     return InventoryRecordState(type: type, parti: type.isPurchase ? null : Party.fromWalkIn());
   }
 
-  void addProduct(Product product, {Stock? newStock, WareHouse? warehouse, bool replaceExisting = false}) {
-    Stock? stock = newStock;
-
+  void addProduct(Product product, {Stock? stock, WareHouse? warehouse, bool replaceExisting = false}) {
     if (type.isSale) {
       stock = product.getEffectiveStock(_config.stockDistPolicy, warehouse?.id);
-    }
-
-    if (state.details.map((e) => e.product.id).contains(product.id) && type.isSale) {
-      final existing = state.details.where((e) => e.product.id == product.id);
-      final List<Stock> existingStock = existing.map((e) => e.stock).toList();
-
-      stock = product.getEffectiveStock(_config.stockDistPolicy, warehouse?.id, existingStock);
-
-      if (stock == null) {
-        cat('NO STOCK');
-        return;
-      }
-
-      cat(existingStock.map((e) => e.id).join(', '), stock.id);
-
-      // existingStock = state.details.where((e) => e.stock.id == stock?.id)?.stock;
-
-      // cat('${existingStock?.id}, ${stock?.id}');
-
-      if (existingStock.map((e) => e.id).contains(stock.id)) {
-        return changeProductQuantity(stock.id, (q) {
-          if (q >= (stock?.quantity ?? 0)) return q;
-          return q + 1;
-        });
-      }
     }
 
     if (stock == null) {
@@ -58,9 +31,19 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       return;
     }
 
+    if (state.details.map((e) => e.product.id).contains(product.id) && type.isSale) {
+      final existing = state.details.firstWhere((e) => e.product.id == product.id).stock;
+      if (existing.id != stock.id) return;
+      // if (stock.quantity <= 0) return;
+
+      return changeProductQuantity(product.id, (q) {
+        if (q >= existing.quantity) return q;
+        return q + 1;
+      });
+    }
     final qty = type.isSale ? 1 : stock.quantity;
     final details = InventoryDetails(
-      id: '',
+      id: ID.unique(),
       product: product,
       stock: stock,
       price: type.isSale ? product.salePrice : stock.purchasePrice,
@@ -71,17 +54,30 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     state = state.copyWith(details: [if (!replaceExisting) ...state.details, details]);
   }
 
+  void addInvDetails(Product product, Stock stock) {
+    final details = InventoryDetails(
+      id: ID.unique(),
+      product: product,
+      stock: stock,
+      price: product.salePrice,
+      quantity: 1,
+      createdDate: DateTime.now(),
+    );
+
+    state = state.copyWith(details: [...state.details, details]);
+  }
+
   void removeProduct(String pId, String sid) {
     state = state.copyWith(details: state.details.where((e) => e.product.id != pId || e.stock.id != sid).toList());
     if (state.details.isEmpty) {}
   }
 
-  void changeProductQuantity(String stockId, int Function(int oldQty) update) {
+  void changeProductQuantity(String id, int Function(int oldQty) update) {
     if (type == RecordType.purchase) return;
 
     final updatedDetails = [
       for (final item in state.details)
-        if (item.stock.id == stockId) item.copyWith(quantity: update(item.quantity)) else item,
+        if (item.id == id) item.copyWith(quantity: update(item.quantity)) else item,
     ];
 
     state = state.copyWith(details: updatedDetails);
@@ -107,10 +103,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
   void updatePrice(InventoryDetails detail, num price) {
     final updatedDetails = [
       for (final item in state.details)
-        if (item.product.id == detail.product.id && item.stock.id == detail.stock.id)
-          item.copyWith(price: price)
-        else
-          item,
+        if (item.id == detail.id && item.stock.id == detail.stock.id) item.copyWith(price: price) else item,
     ];
 
     state = state.copyWith(details: updatedDetails);
@@ -120,7 +113,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     if (type.isPurchase) {
       updateStockQuantity(detail.product.id, detail.stock.id, qty);
     } else {
-      changeProductQuantity(detail.stock.id, qty);
+      changeProductQuantity(detail.id, qty);
     }
   }
 
