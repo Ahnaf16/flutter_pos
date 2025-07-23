@@ -35,6 +35,7 @@ class DueAdjustmentView extends HookConsumerWidget {
       alignment: Alignment.topLeft,
       scrollable: !context.layout.isDesktop,
       body: LimitedWidthBox(
+        center: false,
         maxWidth: Layouts.maxContentWidth,
         child: Flex(
           direction: context.layout.isDesktop ? Axis.horizontal : Axis.vertical,
@@ -54,7 +55,7 @@ class DueAdjustmentView extends HookConsumerWidget {
                       //! user
                       VisibilityField<AppUser>(name: 'transaction_by', data: user, valueTransformer: (v) => v?.toMap()),
                       LimitedWidthBox(
-                        maxWidth: 500,
+                        maxWidth: 450,
                         center: false,
                         child: partiList.when(
                           loading: () => const Loading(),
@@ -83,10 +84,12 @@ class DueAdjustmentView extends HookConsumerWidget {
                           children: [
                             ShadCard(
                               expanded: false,
-                              height: 80,
-                              width: 80,
+                              height: 100,
+                              width: 100,
                               padding: Pads.zero,
-                              child: FittedBox(child: HostedImage.square(selectedParty.value!.getPhoto, dimension: 80)),
+                              child: FittedBox(
+                                child: HostedImage.square(selectedParty.value!.getPhoto, dimension: 100),
+                              ),
                             ),
                             Flexible(
                               child: Padding(
@@ -98,27 +101,27 @@ class DueAdjustmentView extends HookConsumerWidget {
                                     SpacedText(
                                       left: 'Name',
                                       right: selectedParty.value?.name ?? '--',
-                                      styleBuilder: (l, r) => (l, r.bold),
+                                      styleBuilder: (l, r) => (l, r),
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                     ),
                                     SpacedText(
                                       left: 'Phone',
                                       right: selectedParty.value?.phone ?? '--',
-                                      styleBuilder: (l, r) => (l, r.bold),
+                                      styleBuilder: (l, r) => (l, r),
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                     ),
                                     if (selectedParty.value?.email != null)
                                       SpacedText(
                                         left: 'Email',
                                         right: selectedParty.value?.email ?? '--',
-                                        styleBuilder: (l, r) => (l, r.bold),
+                                        styleBuilder: (l, r) => (l, r),
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                       ),
                                     if (selectedParty.value?.address != null)
                                       SpacedText(
                                         left: 'Address',
                                         right: selectedParty.value?.address ?? '--',
-                                        styleBuilder: (l, r) => (l, r.bold),
+                                        styleBuilder: (l, r) => (l, r),
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                       ),
 

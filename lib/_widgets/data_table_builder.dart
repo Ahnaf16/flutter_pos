@@ -55,6 +55,7 @@ class _DataTableBuilderState<T, R> extends State<DataTableBuilder<T, R>> {
             headerColor: context.colors.border,
             gridLineColor: context.colors.border,
             frozenPaneElevation: 0,
+
             frozenPaneLineColor: Colors.transparent,
           ),
           child: SfDataGrid(

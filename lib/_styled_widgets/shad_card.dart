@@ -172,7 +172,7 @@ class ShadCard extends StatelessWidget {
     final effectiveBackgroundColor = backgroundColor ?? theme.cardTheme.backgroundColor ?? theme.colorScheme.card;
     final effectiveRadius = radius ?? theme.cardTheme.radius ?? theme.radius;
     final effectiveBorder = border ?? theme.cardTheme.border ?? Border.all(color: theme.colorScheme.border);
-    final effectiveShadows = shadows ?? theme.cardTheme.shadows;
+    final effectiveShadows = shadows ?? [];
 
     final effectiveRowMainAxisSize = rowMainAxisSize ?? theme.cardTheme.rowMainAxisSize ?? MainAxisSize.min;
 

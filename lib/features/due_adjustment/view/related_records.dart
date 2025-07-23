@@ -69,6 +69,7 @@ class _InvCard extends HookWidget {
       child: Stack(
         children: [
           ShadCard(
+            shadows: const [],
             padding: Pads.padding(v: Insets.med, h: Insets.sm),
             child: Row(
               spacing: Insets.med,
@@ -100,14 +101,14 @@ class _InvCard extends HookWidget {
                         left: 'Paid',
                         right: rec.paidAmount.currency(),
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        styleBuilder: (l, r) => (context.text.muted, r.bold),
+                        styleBuilder: (l, r) => (context.text.muted, r),
                       ).conditionalExpanded(context.layout.isTablet),
 
                       SpacedText(
                         left: 'Total',
                         right: rec.total.currency(),
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        styleBuilder: (l, r) => (context.text.muted, r.bold),
+                        styleBuilder: (l, r) => (context.text.muted, r),
                       ).conditionalExpanded(context.layout.isTablet),
                       if (rec.due != 0)
                         SpacedText(

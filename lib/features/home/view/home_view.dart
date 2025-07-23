@@ -111,11 +111,11 @@ class HomeView extends HookConsumerWidget {
             direction: context.layout.isDesktop ? Axis.horizontal : Axis.vertical,
             spacing: Insets.med,
             children: [
-              PieWidget(start.value, end.value),
               ShadCard(
                 height: 600,
                 child: BarWidget(start.value, end.value),
               ).conditionalExpanded(context.layout.isDesktop),
+              PieWidget(start.value, end.value),
             ],
           ),
 

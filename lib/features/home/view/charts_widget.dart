@@ -134,32 +134,23 @@ class BarWidget extends HookConsumerWidget {
         color: theme.cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.op(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Text(
-                'Transactions',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
-              IconButton(
-                icon: Icon(Icons.more_vert, color: theme.iconTheme.color),
-                onPressed: () {},
-              ),
-            ],
+          Text(
+            'Transactions',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
-          const SizedBox(height: 16),
+          const Gap(16),
           Expanded(
             child: SfCartesianChart(
               title: ChartTitle(
@@ -201,7 +192,7 @@ class BarWidget extends HookConsumerWidget {
                   color: Colors.blueAccent,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                   spacing: 0.3,
-                  width: 0.8,
+                  width: 0.9,
                 ),
                 ColumnSeries<_BarData, String>(
                   name: 'Out',
@@ -211,7 +202,7 @@ class BarWidget extends HookConsumerWidget {
                   color: Colors.amber.shade700,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                   spacing: 0.3,
-                  width: 0.8,
+                  width: 0.9,
                 ),
                 ColumnSeries<_BarData, String>(
                   name: 'Return',
@@ -221,7 +212,7 @@ class BarWidget extends HookConsumerWidget {
                   color: Colors.redAccent,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                   spacing: 0.3,
-                  width: 0.8,
+                  width: 0.9,
                 ),
               ],
             ),

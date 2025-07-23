@@ -251,6 +251,7 @@ class _ProductSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShadCard(
+      shadows: const [],
       title: Text('Product summary (${details.length})'),
       childSeparator: ShadSeparator.horizontal(margin: Pads.med('tb')),
       child: Column(
@@ -260,26 +261,27 @@ class _ProductSummary extends StatelessWidget {
             children: [
               Expanded(
                 flex: 3,
-                child: Text('Product', style: context.text.list.bold),
+                child: Text('Product', style: context.text.list),
               ),
               Expanded(
                 flex: 2,
-                child: CenterLeft(child: Text('Unit Price', style: context.text.list.bold)),
+                child: CenterLeft(child: Text('Unit Price', style: context.text.list)),
               ),
               Expanded(
                 flex: 2,
-                child: CenterLeft(child: Text('Quantity', style: context.text.list.bold)),
+                child: CenterLeft(child: Text('Quantity', style: context.text.list)),
               ),
               if (returns.isNotEmpty)
                 Expanded(
                   flex: 2,
-                  child: CenterLeft(child: Text('Return', style: context.text.list.bold)),
+                  child: CenterLeft(child: Text('Return', style: context.text.list)),
                 ),
               Expanded(
-                child: CenterRight(child: Text('Total Price', style: context.text.list.bold)),
+                child: CenterRight(child: Text('Total Price', style: context.text.list)),
               ),
             ],
           ),
+          const Divider(),
           for (final d in details)
             Row(
               spacing: Insets.lg,

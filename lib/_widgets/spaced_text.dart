@@ -13,7 +13,7 @@ class SpacedText extends StatelessWidget {
     this.style,
     this.onTap,
     this.styleBuilder,
-    this.spaced = false,
+    this.spaced = true,
     this.crossAxisAlignment,
     this.builder,
     this.enableSelection = true,

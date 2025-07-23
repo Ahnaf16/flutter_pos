@@ -34,81 +34,22 @@ class PartyDetailsView extends HookConsumerWidget {
 
             children: [
               IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  spacing: Insets.med,
-                  children: [
-                    Expanded(
-                      child: ShadCard(
-                        title: Text('$typeName details'),
-                        childPadding: Pads.med('t'),
-                        child: Row(
-                          children: [
-                            if (party.photo != null)
-                              HostedImage.square(party.getPhoto, dimension: 80, radius: Corners.med),
-                            Flexible(
-                              child: Column(
-                                spacing: Insets.xs,
-                                children: [
-                                  SpacedText(left: 'Name', right: party.name, style: context.text.list),
-                                  SpacedText(left: 'Phone', right: party.phone, style: context.text.list),
-                                  if (party.email != null)
-                                    SpacedText(left: 'Email', right: party.email!, style: context.text.list),
-                                  if (party.address != null)
-                                    SpacedText(left: 'Address', right: party.address!, style: context.text.list),
-
-                                  SpacedText(
-                                    left: party.hasDue() ? 'Due' : 'Balance',
-                                    right: party.due.abs().currency(),
-                                    trailing: SmallButton(
-                                      icon: LuIcons.pen,
-                                      onPressed: () {
-                                        showShadDialog(
-                                          context: context,
-                                          builder: (context) => PartyBalanceDialog(party: party),
-                                        );
-                                      },
-                                    ),
-                                    style: context.text.lead,
-                                    styleBuilder: (l, r) {
-                                      return (l, r.bold.textColor(party.hasDue() ? Colors.red : Colors.green));
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                child: context.layout.isMobile
+                    ? Column(
+                        children: [
+                          _customerDetailsCard(typeName, party, context),
+                          const Gap(Insets.med),
+                          _invoiceSummaryCard(invList, context, party),
+                        ],
+                      )
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: Insets.med,
+                        children: [
+                          _customerDetailsCard(typeName, party, context),
+                          _invoiceSummaryCard(invList, context, party),
+                        ],
                       ),
-                    ),
-
-                    Expanded(
-                      child: ShadCard(
-                        title: const Text('Invoice summary'),
-                        childPadding: Pads.med('t'),
-                        child: Column(
-                          children: [
-                            SpacedText(left: 'Total Orders', right: '${invList.length}', style: context.text.list),
-                            SpacedText(
-                              left: 'Total Returns',
-                              right: '${invList.where((e) => e.status.isReturned).length}',
-                              style: context.text.list,
-                            ),
-                            SpacedText(
-                              left: party.isCustomer ? 'Total bought' : 'Total sold',
-                              right: invList
-                                  .whereNot((e) => e.status.isReturned)
-                                  .map((e) => e.paidAmount)
-                                  .sum
-                                  .currency(),
-                              style: context.text.list,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
               const Gap(Insets.med),
               ShadTabs<bool>(
@@ -131,6 +72,98 @@ class PartyDetailsView extends HookConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Expanded _invoiceSummaryCard(List<InventoryRecord> invList, BuildContext context, Party party) {
+    return Expanded(
+      child: ShadCard(
+        title: const Text('Invoice summary'),
+        childPadding: Pads.med('t'),
+        child: Column(
+          children: [
+            SpacedText(
+              left: 'Total Orders',
+              right: '${invList.length}',
+              style: context.text.list,
+            ),
+            SpacedText(
+              left: 'Total Returns',
+              right: '${invList.where((e) => e.status.isReturned).length}',
+              style: context.text.list,
+            ),
+            SpacedText(
+              left: party.isCustomer ? 'Total bought' : 'Total sold',
+              right: invList.whereNot((e) => e.status.isReturned).map((e) => e.paidAmount).sum.currency(),
+              style: context.text.list,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Expanded _customerDetailsCard(String typeName, Party party, BuildContext context) {
+    return Expanded(
+      child: ShadCard(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('$typeName details'),
+            Row(
+              children: [
+                Text(
+                  party.hasDue() ? 'Due: ${party.due.abs().currency()}' : 'Balance: ${party.due.abs().currency()}',
+                  style: TextStyle(
+                    color: party.hasDue() ? Colors.red : Colors.green,
+                  ),
+                ),
+                const Gap(Insets.med),
+                GestureDetector(
+                  onTap: () {
+                    showShadDialog(
+                      context: context,
+                      builder: (context) => PartyBalanceDialog(party: party),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: Corners.smBorder,
+                      color: context.colors.primary.op1,
+                    ),
+                    padding: Pads.sm(),
+                    child: Icon(
+                      LuIcons.pen,
+                      color: context.colors.foreground,
+                      size: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        childPadding: Pads.med('t'),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (party.photo != null) HostedImage.square(party.getPhoto, dimension: 100, radius: Corners.med),
+            const Gap(Insets.med),
+            Flexible(
+              child: Column(
+                spacing: Insets.xs,
+                children: [
+                  SpacedText(left: 'Name', right: party.name, style: context.text.list),
+                  SpacedText(left: 'Phone', right: party.phone, style: context.text.list),
+                  if (party.email != null) SpacedText(left: 'Email', right: party.email!, style: context.text.list),
+                  if (party.address != null)
+                    SpacedText(left: 'Address', right: party.address!, style: context.text.list),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

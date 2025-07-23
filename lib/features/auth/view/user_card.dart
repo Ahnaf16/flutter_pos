@@ -68,6 +68,7 @@ class UserCard extends StatelessWidget {
     final address = userOrParti.fold(identityNull, (r) => r?.address);
 
     return ShadCard(
+      shadows: const [],
       title: title == null ? null : Text(title!, style: titleStyle ?? context.theme.decoration.labelStyle),
       description: subtitle == null ? null : Text(subtitle!, style: context.theme.decoration.descriptionStyle),
       childPadding: ((title == null && subtitle == null) || childSeparator != null) ? Pads.zero : Pads.sm('t'),

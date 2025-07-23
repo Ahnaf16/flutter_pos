@@ -38,6 +38,7 @@ class FilePickerField extends StatelessWidget {
                 const ShadAvatar(LuIcons.upload),
                 const Gap(Insets.med),
                 Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: compact ? CrossAxisAlignment.start : CrossAxisAlignment.center,
                   children: [
                     const Text('Drag and drop files here'),

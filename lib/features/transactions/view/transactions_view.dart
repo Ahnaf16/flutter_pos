@@ -20,9 +20,9 @@ const _headings = [
   TableHeading.positional('To'),
   TableHeading.positional('From'),
   TableHeading.positional('Amount', 300.0),
-  TableHeading.positional('Account', 150.0, Alignment.center),
-  TableHeading.positional('Type', 200.0, Alignment.center),
-  TableHeading.positional('Date', 150.0, Alignment.center),
+  TableHeading.positional('Account', 250),
+  TableHeading.positional('Type', 250, Alignment.center),
+  TableHeading.positional('Date', 250, Alignment.center),
   TableHeading.positional('Action', 100.0, Alignment.centerRight),
 ];
 
@@ -38,17 +38,7 @@ class TransactionsView extends HookConsumerWidget {
 
     return BaseBody(
       title: 'Transaction logs',
-      // actions: [
-      //   ShadButton.outline(
-      //     child: const Text('Generate Report'),
-      //     onPressed: () {
-      //       showShadDialog(
-      //         context: context,
-      //         builder: (context) => const TrxReportView(),
-      //       );
-      //     },
-      //   ),
-      // ],
+
       body: Column(
         children: [
           FilterBar(
@@ -102,7 +92,11 @@ class TrxTable extends StatelessWidget {
           columnWidthMode: ColumnWidthMode.fill,
           maximumWidth: heading.max,
           minimumWidth: heading.minWidth ?? 150,
-          label: Container(padding: Pads.med(), alignment: alignment, child: Text(heading.name)),
+          label: Container(
+            padding: Pads.med(),
+            alignment: alignment,
+            child: Text(heading.name),
+          ),
         );
       },
       cellAlignment: Alignment.centerLeft,
@@ -201,7 +195,7 @@ class TrxTable extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     useFlexible: false,
                     style: context.text.list.primary(context),
-                    styleBuilder: (l, r) => (l, r.bold),
+                    styleBuilder: (l, r) => (l, r),
                   ),
                   const ShadSeparator.vertical(margin: Pads.zero, color: Colors.black),
                   SpacedText(
@@ -210,7 +204,7 @@ class TrxTable extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     useFlexible: false,
                     style: context.text.list.textColor(Colors.amber.shade900),
-                    styleBuilder: (l, r) => (l, r.bold),
+                    styleBuilder: (l, r) => (l, r),
                   ),
                   const ShadSeparator.vertical(margin: Pads.zero, color: Colors.black),
                   SpacedText(
@@ -219,7 +213,7 @@ class TrxTable extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     useFlexible: false,
                     style: context.text.list.error(context),
-                    styleBuilder: (l, r) => (l, r.bold),
+                    styleBuilder: (l, r) => (l, r),
                   ),
                 ],
               ),
@@ -309,115 +303,172 @@ class _TrxViewDialog extends HookConsumerWidget {
               ),
             ),
 
-            //! trx info
-            SpacedText(
-              left: 'Trx no',
-              right: trx.trxNo,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              style: context.text.list,
-              styleBuilder: (l, r) => (l, r.bold.primary(context)),
-              trailing: SmallButton(
-                icon: LuIcons.copy,
-                onPressed: () => Copier.copy(trx.trxNo),
-              ),
-            ),
-            if (trx.record != null)
-              SpacedText(
-                left: 'Related Invoice',
-                right: trx.record!.invoiceNo,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                style: context.text.list,
-                styleBuilder: (l, r) => (l, r.bold.primary(context)),
-                trailing: Row(
-                  spacing: Insets.med,
-                  children: [
-                    SmallButton(
-                      icon: LuIcons.copy,
-                      onPressed: () => Copier.copy(trx.record!.invoiceNo),
-                    ),
-                    SmallButton(
-                      icon: LuIcons.arrowUpRight,
-                      onPressed: () {
-                        context.nPop();
-                        if (trx.record!.type.isSale) {
-                          RPaths.saleDetails(trx.record!.id).pushNamed(context);
-                        } else {
-                          RPaths.purchaseDetails(trx.record!.id).pushNamed(context);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            SpacedText(
-              left: 'Amount',
-              right: trx.amount.currency(),
-              style: context.text.list,
-              styleBuilder: (l, r) => (l, r.bold),
-            ),
-            if (trx.payMethod != null)
-              SpacedText(left: 'Payment method', right: trx.payMethod!.name, styleBuilder: (l, r) => (l, r.bold)),
-
-            if (trx.account != null)
-              SpacedText(
-                left: 'Account',
-                right: trx.account?.name ?? '--',
-                style: context.text.list,
-                styleBuilder: (l, r) => (l, r.bold),
-                trailing: SmallButton(
-                  icon: LuIcons.arrowUpRight,
-                  onPressed: () {
-                    context.nPop();
-                    showShadDialog(
-                      context: context,
-                      builder: (context) => AccountViewDialog(acc: trx.account!),
-                    );
-                  },
-                ),
-              ),
-
-            SpacedText(left: 'Date', right: trx.date.formatDate(), styleBuilder: (l, r) => (l, r.bold)),
-
-            if (trx.note != null)
-              SpacedText(left: 'Note', right: trx.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),
-
-            if (trx.file != null)
-              ShadCard(
-                child: Row(
-                  spacing: Insets.sm,
-                  children: [
-                    const ShadAvatar(LuIcons.file),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+            ShadCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: Insets.sm,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('TRX NO:', style: context.text.list),
+                      Row(
+                        spacing: Insets.sm,
                         children: [
-                          Text(trx.file!.name, style: context.text.p),
-                          Text(trx.file!.ext),
+                          Text(trx.trxNo, style: context.text.list.primary(context)),
+                          SmallButton(
+                            icon: LuIcons.copy,
+                            onPressed: () => Copier.copy(trx.trxNo),
+                          ),
                         ],
                       ),
-                    ),
-                    ShadIconButton(
-                      icon: const Icon(LuIcons.download),
-                      onPressed: () async {
-                        final path = await trx.file!.download();
-                        if (!context.mounted) return;
-                        Toast.show(
-                          context,
-                          'Downloaded',
-                          action: (id) => SmallButton(
-                            icon: LuIcons.externalLink,
-                            onPressed: () => OpenFilex.open(path),
-                          ),
-                        );
-                      },
-                    ).toolTip('Download'),
-                  ],
-                ),
-              ),
+                    ],
+                  ),
+                  const Divider(),
+                  if (trx.record != null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Related Invoice:', style: context.text.list),
 
-            if (trx.customInfo.isNotEmpty) Text('Custom info:', style: context.theme.decoration.labelStyle),
-            for (final MapEntry(:key, :value) in trx.customInfo.entries)
-              SpacedText(left: key, right: value, styleBuilder: (l, r) => (l, r.bold)),
+                        Row(
+                          spacing: Insets.sm,
+                          children: [
+                            Text(trx.record!.invoiceNo, style: context.text.list.primary(context)),
+                            Row(
+                              spacing: Insets.med,
+                              children: [
+                                SmallButton(
+                                  icon: LuIcons.copy,
+                                  onPressed: () => Copier.copy(trx.record!.invoiceNo),
+                                ),
+                                SmallButton(
+                                  icon: LuIcons.arrowUpRight,
+                                  onPressed: () {
+                                    context.nPop();
+                                    if (trx.record!.type.isSale) {
+                                      RPaths.saleDetails(trx.record!.id).pushNamed(context);
+                                    } else {
+                                      RPaths.purchaseDetails(trx.record!.id).pushNamed(context);
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Amount:', style: context.text.list),
+                      Text(trx.amount.currency(), style: context.text.list),
+                    ],
+                  ),
+                  if (trx.payMethod != null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Payment method:', style: context.text.list),
+                        Text(trx.payMethod!.name, style: context.text.list),
+                      ],
+                    ),
+                  if (trx.account != null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Account:', style: context.text.list),
+                        Row(
+                          spacing: Insets.sm,
+                          children: [
+                            Text(trx.account?.name ?? '--', style: context.text.list),
+                            SmallButton(
+                              icon: LuIcons.arrowUpRight,
+                              onPressed: () {
+                                context.nPop();
+                                showShadDialog(
+                                  context: context,
+                                  builder: (context) => AccountViewDialog(acc: trx.account!),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Date:', style: context.text.list),
+                      Text(trx.date.formatDate(), style: context.text.list),
+                    ],
+                  ),
+                  if (trx.note != null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Note:', style: context.text.list),
+                        Text(trx.note ?? '--', style: context.text.list),
+                      ],
+                    ),
+
+                  if (trx.file != null)
+                    Row(
+                      spacing: Insets.sm,
+                      children: [
+                        const ShadAvatar(LuIcons.file),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(trx.file!.name, style: context.text.p),
+                              Text(trx.file!.ext),
+                            ],
+                          ),
+                        ),
+                        ShadIconButton(
+                          icon: const Icon(LuIcons.download),
+                          onPressed: () async {
+                            final path = await trx.file!.download();
+                            if (!context.mounted) return;
+                            Toast.show(
+                              context,
+                              'Downloaded',
+                              action: (id) => SmallButton(
+                                icon: LuIcons.externalLink,
+                                onPressed: () => OpenFilex.open(path),
+                              ),
+                            );
+                          },
+                        ).toolTip('Download'),
+                      ],
+                    ),
+
+                  if (trx.customInfo.isNotEmpty)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Custom info:', style: context.text.list),
+                        Column(
+                          children: [
+                            for (final MapEntry(:key, :value) in trx.customInfo.entries)
+                              Text('$key $value', style: context.text.list),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                  // if (trx.customInfo.isNotEmpty) Text('Custom info:', style: context.theme.decoration.labelStyle),
+                  // for (final MapEntry(:key, :value) in trx.customInfo.entries)
+                  //   SpacedText(left: key, right: value, styleBuilder: (l, r) => (l, r)),
+                ],
+              ),
+            ),
+
+            //! trx info
           ],
         ),
       ),
