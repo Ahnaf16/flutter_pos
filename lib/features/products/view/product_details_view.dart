@@ -75,24 +75,30 @@ class ProductDetailsView extends ConsumerWidget {
                           children: [
                             ShadCard(
                               expanded: false,
-                              child: HostedImage.square(product.getPhoto(35), dimension: 150, radius: Corners.med),
+                              child: HostedImage.square(product.getPhoto(35), dimension: 110, radius: Corners.med),
                             ),
                             Flexible(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                spacing: Insets.med,
+                                spacing: Insets.sm,
                                 children: [
                                   Row(
                                     spacing: Insets.sm,
                                     children: [
-                                      Text(product.name, style: context.text.h3),
+                                      Text(
+                                        product.name,
+                                        style: TextStyle(
+                                          fontSize: context.layout.isDesktop ? 18 : 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                       if (product.manufacturer != null)
                                         ShadBadge.outline(
                                           child: Text('${product.manufacturer}', style: context.text.muted),
                                         ),
                                     ],
                                   ),
-                                  Text(product.salePrice.currency(), style: context.text.h4.primary(context)),
+                                  Text(product.salePrice.currency(), style: context.text.large.primary(context)),
 
                                   Text(
                                     'SKU: ${product.sku}',
@@ -109,13 +115,19 @@ class ProductDetailsView extends ConsumerWidget {
                                         variant: product.quantity <= 0
                                             ? ShadBadgeVariant.destructive
                                             : ShadBadgeVariant.secondary,
-                                        child: Text('${product.quantity}${product.unitName}'),
+                                        child: Text(
+                                          '${product.quantity}${product.unitName}',
+                                          style: context.text.muted,
+                                        ),
                                       ),
                                       ShadBadge.raw(
                                         variant: product.nonEmptyStocks().isEmpty
                                             ? ShadBadgeVariant.destructive
                                             : ShadBadgeVariant.secondary,
-                                        child: Text('${product.nonEmptyStocks().length} Stocks'),
+                                        child: Text(
+                                          '${product.nonEmptyStocks().length} Stocks',
+                                          style: context.text.muted,
+                                        ),
                                       ),
                                     ],
                                   ),

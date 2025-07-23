@@ -47,7 +47,7 @@ class PieWidget extends HookConsumerWidget {
 
     return ShadCard(
       height: 600,
-      width: context.layout.isDesktop ? context.width * .25 : null,
+      width: context.layout.isDesktop ? context.width * .35 : null,
       child: SfCircularChart(
         title: const ChartTitle(
           text: 'Transactions by type',
@@ -81,6 +81,7 @@ class PieWidget extends HookConsumerWidget {
               labelPosition: ChartDataLabelPosition.outside,
               connectorLineSettings: ConnectorLineSettings(type: ConnectorType.curve),
             ),
+            innerRadius: '65%',
           ),
         ],
       ),
@@ -132,13 +133,13 @@ class BarWidget extends HookConsumerWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         color: theme.cardColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.op(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black.op(0.1),
+        //     blurRadius: 10,
+        //     offset: const Offset(0, 4),
+        //   ),
+        // ],
       ),
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -164,8 +165,10 @@ class BarWidget extends HookConsumerWidget {
                 borderColor: theme.dividerColor,
                 textStyle: theme.textTheme.bodySmall,
               ),
+
               legend: Legend(
                 isVisible: true,
+
                 position: LegendPosition.bottom,
                 textStyle: theme.textTheme.bodyMedium,
                 overflowMode: LegendItemOverflowMode.wrap,
@@ -189,12 +192,13 @@ class BarWidget extends HookConsumerWidget {
                   dataSource: inData(),
                   xValueMapper: (data, _) => data.x,
                   yValueMapper: (data, _) => data.y,
-                  color: Colors.blueAccent,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                  color: const Color(0xFF2FA2FF),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                   spacing: 0.3,
                   width: 0.9,
                 ),
-                LineSeries<_BarData, String>(
+
+                SplineSeries<_BarData, String>(
                   dataSource: returnData(),
                   xValueMapper: (d, _) => d.x,
                   yValueMapper: (d, _) => d.y,
@@ -207,7 +211,8 @@ class BarWidget extends HookConsumerWidget {
                     width: 6,
                   ),
                 ),
-                LineSeries<_BarData, String>(
+
+                SplineSeries<_BarData, String>(
                   dataSource: inData(),
                   xValueMapper: (d, _) => d.x,
                   yValueMapper: (d, _) => d.y,

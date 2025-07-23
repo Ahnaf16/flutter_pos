@@ -1,6 +1,7 @@
 // import 'package:pos/features/home/view/bar_widget.dart';
 // import 'package:pos/features/home/view/pie_widget.dart';
 // import 'package:pos/features/transactions/view/transactions_view.dart';
+
 import 'package:pos/features/filter/view/filter_bar.dart';
 import 'package:pos/features/home/view/charts_widget.dart';
 import 'package:pos/features/home/view/home_counter_widget.dart';
