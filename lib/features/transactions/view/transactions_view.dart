@@ -82,7 +82,7 @@ class TrxTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final heads = _headings.where((e) => !excludes.contains(e.name)).toList();
     return DataTableBuilder<TransactionLog, TableHeading>(
-      rowHeight: 120,
+      rowHeight: 70,
       items: logs,
       headings: heads,
       headingBuilderIndexed: (heading, i) {
@@ -134,17 +134,26 @@ class TrxTable extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Row(),
-                Text(data.account?.name.titleCase ?? '--', style: context.text.list),
-                if (accountAmounts) ...[
-                  if (data.customInfo case {'pre': final pre}) SpacedText(left: 'Pre', right: pre),
-                  if (data.customInfo case {'post': final post}) SpacedText(left: 'Post', right: post),
-                ],
+                ShadBadge.secondary(child: Text(data.account?.name.titleCase ?? '--', style: context.text.list)),
+                // if (accountAmounts) ...[
+                //   if (data.customInfo case {'pre': final pre}) SpacedText(left: 'Pre', right: pre),
+                //   if (data.customInfo case {'post': final post}) SpacedText(left: 'Post', right: post),
+                // ],
               ],
             ),
           ),
           'Type' => DataGridCell(
             columnName: head.name,
-            value: ShadBadge.secondary(child: Text(data.type.name.titleCase)).colored(data.type.color),
+            value: ShadBadge.secondary(
+              padding: const EdgeInsets.symmetric(horizontal: Insets.sm, vertical: Insets.xs),
+              child: Text(
+                data.type.name.titleCase,
+                style: TextStyle(
+                  color: data.type.color,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+            ),
           ),
           'Date' => DataGridCell(
             columnName: head.name,
@@ -152,8 +161,7 @@ class TrxTable extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(data.date.formatDate()),
-                Text(data.date.ago),
+                Text('${data.date.formatDate()} ${data.date.ago}'),
               ],
             ),
           ),
