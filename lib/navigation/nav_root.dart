@@ -210,12 +210,35 @@ class _BODY extends HookConsumerWidget {
                   for (final MapEntry(key: title, value: item) in items.entries) ...[
                     Text(title, style: context.text.small),
                     ...item.map(
-                      (e) => NavButton(
-                        label: e.text,
-                        icon: e.icon,
-                        selected: e.text == selectedValue.value,
-                        onPressed: () => selectedValue.value = e.text,
-                      ),
+                      (e) {
+                        if (e.children.isNotEmpty) {
+                          return NestedNav(
+                            label: e.text,
+                            icon: e.icon,
+                            selected: e.children.any((e) => e.text == selectedValue.value),
+                            children: [
+                              for (final child in e.children)
+                                NavButton(
+                                  label: child.text,
+                                  selected: child.text == selectedValue.value,
+                                  onPressed: () {
+                                    selectedValue.value = child.text;
+                                    child.path?.pushNamed(context);
+                                  },
+                                ),
+                            ],
+                          );
+                        }
+                        return NavButton(
+                          label: e.text,
+                          icon: e.icon,
+                          selected: e.text == selectedValue.value,
+                          onPressed: () {
+                            selectedValue.value = e.text;
+                            e.path?.pushNamed(context);
+                          },
+                        );
+                      },
                     ),
 
                     const Gap(Insets.sm),
@@ -290,7 +313,7 @@ class NavButton extends HookWidget {
         onTapUp: (_) => tapDown.value = false,
         child: ShadCard(
           // height: 45,
-          width: icon != null ? null : NavigationRoot.expandedPaneSize - 20,
+          width: icon != null ? null : NavigationRoot.expandedPaneSize,
           padding: Pads.sm(),
           backgroundColor: color,
           expanded: false,
@@ -323,20 +346,19 @@ class NestedNav extends ConsumerWidget {
     this.onPressed,
     required this.children,
     required this.icon,
-    required this.selectedValue,
+    required this.selected,
   });
 
   final String label;
-  final IconData icon;
+  final IconData? icon;
   final Function()? onPressed;
   final List<Widget> children;
-  final String selectedValue;
+  final bool selected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selected = label == selectedValue;
     return DecoContainer(
-      color: selected ? context.colors.border : null,
+      color: selected ? context.colors.border.op5 : null,
       borderRadius: Corners.med,
       child: ShadAccordionItem<String>(
         value: label,
@@ -355,7 +377,7 @@ class NestedNav extends ConsumerWidget {
             child: Column(
               spacing: Insets.xs,
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: children,
+              children: children.map((e) => Padding(padding: Pads.sm('lr'), child: e)).toList(),
             ),
           ),
         ),
@@ -374,11 +396,16 @@ Map<String, List<NavItem>> navItems(List<RolePermissions> p) {
       NavItem(text: 'Product', icon: LuIcons.package, path: RPaths.products),
       NavItem(text: 'Unit', icon: LuIcons.weight, path: RPaths.unit),
     ],
+    'Sales & Purchases': [
+      NavItem(text: 'Sales history', icon: LuIcons.chartColumn, path: RPaths.sales),
+      NavItem(text: 'Sales return', icon: LuIcons.undo2, path: RPaths.salesReturn),
+      NavItem(text: 'Purchase history', icon: LuIcons.receipt, path: RPaths.purchases),
+      NavItem(text: 'Purchase return', icon: LuIcons.refreshCw, path: RPaths.purchasesReturn),
+    ],
     'Contacts': [
       NavItem(
         text: 'Customers',
         icon: LuIcons.users,
-        path: RPaths.customer,
         children: [
           NavItem(text: 'All Customers', path: RPaths.customer),
           NavItem(text: 'Due Adjustment', path: RPaths.customerDueManagement),
@@ -393,23 +420,44 @@ Map<String, List<NavItem>> navItems(List<RolePermissions> p) {
         ],
       ),
     ],
+    'Team': [
+      NavItem(
+        text: 'Staff Management',
+        icon: LuIcons.users,
+        children: [
+          NavItem(text: 'All Staff', path: RPaths.staffs),
+          NavItem(text: 'Role & Permissions', path: RPaths.roles),
+        ],
+      ),
+    ],
+    'Logistics': [
+      NavItem(text: 'Warehouse', icon: LuIcons.warehouse, path: RPaths.warehouse),
+      NavItem(text: 'Stock transfer', icon: LuIcons.truck, path: RPaths.stockTransfer),
+      NavItem(text: 'Stock Logs', icon: LuIcons.fileText, path: RPaths.stockLog),
+    ],
+    'Accounting': [
+      NavItem(
+        text: 'Accounts',
+        icon: LuIcons.creditCard,
+        children: [
+          NavItem(text: 'Payment Accounts', path: RPaths.paymentAccount),
+          NavItem(text: 'Transactions', path: RPaths.transactions),
+        ],
+      ),
+      NavItem(
+        text: 'Expense',
+        icon: LuIcons.dollarSign,
+        children: [
+          NavItem(text: 'All Expenses', path: RPaths.expense),
+          NavItem(text: 'Category', path: RPaths.expenseCategory),
+        ],
+      ),
+      NavItem(text: 'Due Management', icon: LuIcons.calculator, path: RPaths.due),
+    ],
+    'System': [
+      NavItem(text: 'Settings', icon: LuIcons.package, path: RPaths.settings),
+    ],
   };
-}
-
-List<(String text, IconData icon, RPath? path)> _mobileItems(List<RolePermissions> p) {
-  return [
-    ('Dash', LuIcons.house, RPaths.home),
-    if (RolePermissions.isInGroup(p, RolePermissions.inventoryGroup)) ...[
-      if (p.contains(RolePermissions.makeSale)) ('POS', LuIcons.shoppingCart, RPaths.createSales),
-
-      if (p.contains(RolePermissions.manageProduct)) ('Products', LuIcons.box, RPaths.products),
-    ],
-
-    if (RolePermissions.isInGroup(p, RolePermissions.purchasesGroup)) ...[
-      if (p.contains(RolePermissions.makePurchase)) ('Purchase', LuIcons.scrollText, RPaths.purchases),
-    ],
-    ('More', LuIcons.layoutDashboard, RPaths.moreTools),
-  ];
 }
 
 class NavItem {
@@ -419,4 +467,9 @@ class NavItem {
   final IconData? icon;
   final RPath? path;
   final List<NavItem> children;
+
+  @override
+  String toString() {
+    return text;
+  }
 }
