@@ -59,7 +59,7 @@ class ShadFileField<T> extends ShadFormDecoration<T> {
                          const Gap(Insets.med),
                          ShadButton.outline(
                            size: ShadButtonSize.sm,
-                           child: const Text('Browse Files'),
+                           child: const SelectionContainer.disabled(child: Text('Browse Files')),
                            onPressed: () {},
                          ),
                        ],

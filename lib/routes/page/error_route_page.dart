@@ -20,7 +20,7 @@ class ErrorRoutePage extends StatelessWidget {
             ShadButton(
               onPressed: () => RPaths.home.go(context),
               leading: const Icon(Icons.arrow_back),
-              child: const Text('Go to home'),
+              child: const SelectionContainer.disabled(child: Text('Go to home')),
             ),
           ],
         ),

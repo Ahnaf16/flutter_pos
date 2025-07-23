@@ -69,7 +69,7 @@ class Pagination extends StatelessWidget {
     return ShadButton.ghost(
       onPressed: hasPrevious ? () => onPageChanged(page - 1) : null,
       leading: const Icon(LuIcons.chevronLeft, size: 12),
-      child: showLabel ? const Text('Previous') : null,
+      child: showLabel ? const SelectionContainer.disabled(child: Text('Previous')) : null,
     );
   }
 
@@ -77,7 +77,7 @@ class Pagination extends StatelessWidget {
     return ShadButton.ghost(
       onPressed: hasNext ? () => onPageChanged(page + 1) : null,
       trailing: const Icon(LuIcons.chevronRight, size: 12),
-      child: showLabel ? const Text('Next') : null,
+      child: showLabel ? const SelectionContainer.disabled(child: Text('Next')) : null,
     );
   }
 

@@ -20,7 +20,7 @@ class UserRolesView extends HookConsumerWidget {
       title: 'User Role',
       actions: [
         ShadButton(
-          child: const Text('Create New role'),
+          child: const SelectionContainer.disabled(child: Text('Create New role')),
           onPressed: () {
             RPaths.createRole.pushNamed(context);
           },
@@ -126,7 +126,9 @@ class UserRolesView extends HookConsumerWidget {
                                         c.nPop();
                                       }
                                     },
-                                    child: const Text('Delete'),
+                                    child: const SelectionContainer.disabled(
+                                      child: SelectionContainer.disabled(child: Text('Delete')),
+                                    ),
                                   ),
                                 ],
                               );

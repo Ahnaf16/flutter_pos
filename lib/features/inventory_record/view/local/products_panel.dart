@@ -157,7 +157,10 @@ class AddStockDialog extends HookConsumerWidget {
       description: const Text('Add stock details'),
 
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         ShadButton(
           onPressed: () {
             if (stock.value.warehouse == null) {
@@ -170,7 +173,7 @@ class AddStockDialog extends HookConsumerWidget {
 
             context.nPop(stock.value);
           },
-          child: const Text('Add'),
+          child: const SelectionContainer.disabled(child: Text('Add')),
         ),
       ],
       child: Container(

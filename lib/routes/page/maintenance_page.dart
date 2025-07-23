@@ -33,7 +33,7 @@ class MaintenancePage extends HookConsumerWidget {
                 loading.falsey();
               },
               leading: loading.value ? const Loading(primary: false) : const Icon(LuIcons.refreshCcw),
-              child: const Text('Reload'),
+              child: const SelectionContainer.disabled(child: Text('Reload')),
             ),
           ],
         ),

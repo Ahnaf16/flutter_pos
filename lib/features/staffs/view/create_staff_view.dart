@@ -30,7 +30,7 @@ class CreateStaffView extends HookConsumerWidget {
       actions: [
         SubmitButton(
           size: ShadButtonSize.lg,
-          child: Text(actionText),
+          child: SelectionContainer.disabled(child: Text(actionText)),
           onPressed: (l) async {
             final state = formKey.currentState!;
             if (!state.saveAndValidate()) return;
@@ -241,7 +241,10 @@ class _CreateStaffDialog extends HookConsumerWidget {
       title: const Text('Create Staff'),
       description: const Text('Enter a default password so the staff can log in. They can change it later.'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           child: const Text('Create'),
           onPressed: (l) async {

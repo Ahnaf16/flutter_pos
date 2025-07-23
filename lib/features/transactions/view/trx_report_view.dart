@@ -17,7 +17,10 @@ class TrxReportView extends HookConsumerWidget {
     return ShadDialog(
       title: const Text('Report'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             l.truthy();

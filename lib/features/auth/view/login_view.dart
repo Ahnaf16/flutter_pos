@@ -92,7 +92,7 @@ class LoginView extends HookConsumerWidget {
                         Row(
                           children: [
                             ShadButton.outline(
-                              child: const Text('Admin'),
+                              child: const SelectionContainer.disabled(child: Text('Admin')),
                               onPressed: () {
                                 email.text = 'admin@gmail.com';
                                 password.text = '12341234';
@@ -100,7 +100,7 @@ class LoginView extends HookConsumerWidget {
                             ),
                             if (!kReleaseMode)
                               ShadButton.outline(
-                                child: const Text('Tr'),
+                                child: const SelectionContainer.disabled(child: Text('Tr')),
                                 onPressed: () {
                                   email.text = 'tr@t.com';
                                   password.text = '12341234';

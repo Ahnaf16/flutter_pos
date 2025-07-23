@@ -195,7 +195,10 @@ class ReturnView extends HookConsumerWidget {
                                         'Deleting a ${isSale ? 'sale' : 'purchase'} return will adjust the stock and account balance but wont create and Transaction. Are you sure?',
                                       ),
                                       actions: [
-                                        ShadButton(onPressed: () => c.nPop(), child: const Text('Cancel')),
+                                        ShadButton(
+                                          onPressed: () => c.nPop(),
+                                          child: const SelectionContainer.disabled(child: Text('Cancel')),
+                                        ),
                                         ShadButton.destructive(
                                           onPressed: () async {
                                             final result = await invCtrl().delete(data);
@@ -203,7 +206,7 @@ class ReturnView extends HookConsumerWidget {
                                             result.showToast(context);
                                             c.nPop();
                                           },
-                                          child: const Text('Delete'),
+                                          child: const SelectionContainer.disabled(child: Text('Delete')),
                                         ),
                                       ],
                                     );

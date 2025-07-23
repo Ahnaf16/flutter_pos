@@ -22,7 +22,7 @@ class WarehouseView extends HookConsumerWidget {
       title: 'Warehouse',
       actions: [
         ShadButton(
-          child: const Text('Create warehouse'),
+          child: const SelectionContainer.disabled(child: Text('Create warehouse')),
           onPressed: () {
             RPaths.createWarehouse.pushNamed(context);
           },

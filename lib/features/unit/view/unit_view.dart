@@ -16,7 +16,7 @@ class UnitView extends HookConsumerWidget {
       title: 'Product Unit',
       actions: [
         ShadButton(
-          child: const Text('Add a Unit'),
+          child: const SelectionContainer.disabled(child: Text('Add a Unit')),
           onPressed: () {
             showShadDialog(context: context, builder: (context) => const UnitAddDialog());
           },
@@ -81,13 +81,16 @@ class UnitView extends HookConsumerWidget {
                                 title: const Text('Delete Product unit'),
                                 description: Text('This will delete ${data.name} permanently.'),
                                 actions: [
-                                  ShadButton(onPressed: () => c.nPop(), child: const Text('Cancel')),
+                                  ShadButton(
+                                    onPressed: () => c.nPop(),
+                                    child: const SelectionContainer.disabled(child: Text('Cancel')),
+                                  ),
                                   ShadButton.destructive(
                                     onPressed: () async {
                                       await ref.read(unitCtrlProvider.notifier).delete(data);
                                       if (c.mounted) c.nPop();
                                     },
-                                    child: const Text('Delete'),
+                                    child: const SelectionContainer.disabled(child: Text('Delete')),
                                   ),
                                 ],
                               );

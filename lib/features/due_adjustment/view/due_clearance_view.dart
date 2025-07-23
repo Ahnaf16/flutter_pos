@@ -285,7 +285,10 @@ class _DuePayDialog extends ConsumerWidget {
       title: const Text('Make due payment'),
       description: const Text('Confirm payment to supplier'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             final ctrl = ref.read(transactionLogCtrlProvider.notifier);
@@ -337,7 +340,10 @@ class _DueClearDialog extends ConsumerWidget {
       title: const Text('Clear due'),
       description: const Text('Clear supplier due'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             final ctrl = ref.read(transactionLogCtrlProvider.notifier);

@@ -202,7 +202,10 @@ class PartyBalanceDialog extends HookConsumerWidget {
       ),
 
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             final ctrl = ref.read(partiesCtrlProvider(party.isCustomer).notifier);

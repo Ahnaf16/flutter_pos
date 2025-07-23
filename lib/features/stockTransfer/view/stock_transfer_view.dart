@@ -80,7 +80,7 @@ class StockTransferView extends HookConsumerWidget {
                                 if (isMobile)
                                   ShadButton(
                                     leading: const Icon(LuIcons.plus),
-                                    child: const Text('Select a product'),
+                                    child: const SelectionContainer.disabled(child: Text('Select a product')),
                                     onPressed: () {
                                       _showSheet(context, viewingWh.viewing, tCtrl, formKey);
                                     },
@@ -105,7 +105,7 @@ class StockTransferView extends HookConsumerWidget {
                                   if (isMobile)
                                     ShadButton.link(
                                       leading: const Icon(LuIcons.pen),
-                                      child: const Text('Change Product'),
+                                      child: const SelectionContainer.disabled(child: Text('Change Product')),
                                       onPressed: () {
                                         _showSheet(context, viewingWh.viewing, tCtrl, formKey);
                                       },

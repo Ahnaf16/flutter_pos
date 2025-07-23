@@ -19,7 +19,7 @@ class ProductDetailsView extends ConsumerWidget {
       actions: [
         if (id != null)
           ShadButton(
-            child: const Text('Update'),
+            child: const SelectionContainer.disabled(child: Text('Update')),
             onPressed: () {
               RPaths.editProduct(id).pushNamed(context);
             },

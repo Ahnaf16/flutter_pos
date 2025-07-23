@@ -41,7 +41,7 @@ class InventoryRecordView extends HookConsumerWidget {
       title: 'All ${type.name}',
       actions: [
         ShadButton(
-          child: Text('Create ${type.name}'),
+          child: SelectionContainer.disabled(child: SelectionContainer.disabled(child: Text('Create ${type.name}'))),
           onPressed: () {
             if (type == RecordType.purchase) {
               RPaths.createPurchases.pushNamed(context);
@@ -491,7 +491,12 @@ class _InventoryViewDialog extends HookConsumerWidget {
       title: const Text('Inventory'),
       description: Text('Details of ${inventory.id}'),
 
-      actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
+      actions: [
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: SelectionContainer.disabled(child: Text('Cancel'))),
+        ),
+      ],
       child: Container(
         padding: Pads.padding(v: Insets.med),
         child: const Column(
@@ -517,7 +522,10 @@ class ReturnRecordDialog extends HookConsumerWidget {
       description: const Text('Do you want to return this inventory?'),
 
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             final state = formKey.currentState!;

@@ -7,7 +7,10 @@ class ProtectedPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseBody(
       body: Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Flexible(child: body(context))]),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Flexible(child: body(context))],
+        ),
       ),
     );
   }
@@ -25,7 +28,10 @@ class ProtectedPage extends StatelessWidget {
             const Icon(LuIcons.shield, size: 50),
             Text('Protected Page', style: context.text.h2),
             Text('You don\'t have permission to access this page', style: context.text.muted),
-            ShadButton.outline(onPressed: () => RPaths.home.go(context), child: const Text('Go to home')),
+            ShadButton.outline(
+              onPressed: () => RPaths.home.go(context),
+              child: const SelectionContainer.disabled(child: Text('Go to home')),
+            ),
           ],
         ),
       ),

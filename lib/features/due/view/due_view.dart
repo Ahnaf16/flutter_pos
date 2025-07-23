@@ -6,6 +6,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 const _headings = [
   TableHeading.positional('#', 80.0),
   TableHeading.positional('Name'),
+  TableHeading.positional('Balance', 300),
   TableHeading.positional('Amount', 350.0),
   TableHeading.positional('Date', 250.0),
   TableHeading.positional('Action', 100.0),
@@ -58,6 +59,7 @@ class DueView extends HookConsumerWidget {
                     return switch (head.name) {
                       '#' => DataGridCell(columnName: head.name, value: Text((dues.indexOf(data) + 1).toString())),
                       'Name' => DataGridCell(columnName: head.name, value: _PartyNameBuilder(data.parti)),
+                      'Balance' => DataGridCell(columnName: head.name, value: _BalanceNameBuilder(data.parti)),
                       'Amount' => DataGridCell(
                         columnName: head.name,
                         value: Column(
@@ -68,7 +70,7 @@ class DueView extends HookConsumerWidget {
                             SpacedText(
                               left: 'Amount',
                               right: data.amount.abs().currency(),
-                              styleBuilder: (l, r) => (l, r.bold),
+                              styleBuilder: (l, r) => (l, r),
                             ),
                             SpacedText(
                               left: 'Before',
@@ -155,10 +157,25 @@ class _PartyNameBuilder extends StatelessWidget {
               ),
               Text(parti.phone),
               if (parti.hasDue()) Text('Due: ${parti.due.abs().currency()}'),
-              if (parti.hasBalance()) Text('Balance: ${parti.due.abs().currency()}'),
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _BalanceNameBuilder extends StatelessWidget {
+  const _BalanceNameBuilder(this.parti);
+  final Party parti;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      spacing: Insets.xs,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (parti.hasBalance()) Text(parti.due.abs().currency()),
       ],
     );
   }

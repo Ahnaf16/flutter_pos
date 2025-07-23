@@ -125,7 +125,10 @@ class AddWarehouseDialog extends HookConsumerWidget {
     return ShadDialog(
       title: const Text('Create Warehouse'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
 
         SubmitButton(
           size: ShadButtonSize.lg,

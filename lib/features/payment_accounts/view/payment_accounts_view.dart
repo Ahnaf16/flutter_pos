@@ -28,7 +28,7 @@ class PaymentAccountsView extends HookConsumerWidget {
       title: 'Payment Accounts',
       actions: [
         ShadButton(
-          child: const Text('Add a account'),
+          child: const SelectionContainer.disabled(child: Text('Add a account')),
           onPressed: () {
             showShadDialog(context: context, builder: (context) => const AccountAddDialog());
           },
@@ -209,7 +209,10 @@ class _AccountBalanceTransfer extends HookConsumerWidget {
         title: const Text('Account'),
         description: Text('Transfer balance from ${acc.name}'),
         actions: [
-          ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+          ShadButton.destructive(
+            onPressed: () => context.nPop(),
+            child: const SelectionContainer.disabled(child: Text('Cancel')),
+          ),
           ShadButton(
             enabled: acc.amount > 0,
             onPressed: () async {
@@ -226,7 +229,7 @@ class _AccountBalanceTransfer extends HookConsumerWidget {
                 if (result.success) context.nPop();
               }
             },
-            child: const Text('Transfer'),
+            child: const SelectionContainer.disabled(child: Text('Transfer')),
           ),
         ],
         child: Container(
@@ -314,7 +317,10 @@ class _AccountDeleteDialog extends HookConsumerWidget {
         title: const Text('Delete Account'),
         description: Text('Are you sure you want to delete ${acc.name}?'),
         actions: [
-          ShadButton(onPressed: () => context.nPop(), child: const Text('Cancel')),
+          ShadButton(
+            onPressed: () => context.nPop(),
+            child: const SelectionContainer.disabled(child: Text('Cancel')),
+          ),
           SubmitButton(
             variant: ShadButtonVariant.destructive,
             onPressed: (l) async {
@@ -339,7 +345,7 @@ class _AccountDeleteDialog extends HookConsumerWidget {
                 if (result.success) context.nPop();
               }
             },
-            child: Text(needToTransfer ? 'Transfer and Delete' : 'Delete'),
+            child: SelectionContainer.disabled(child: Text(needToTransfer ? 'Transfer and Delete' : 'Delete')),
           ),
         ],
         child: Container(
@@ -415,7 +421,12 @@ class AccountViewDialog extends HookConsumerWidget {
     return ShadDialog(
       title: const Text('Account'),
       description: Text('Details of ${acc.name}'),
-      actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
+      actions: [
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
+      ],
       child: Container(
         padding: Pads.padding(v: Insets.med),
         child: Column(

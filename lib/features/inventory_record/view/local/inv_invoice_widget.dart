@@ -18,7 +18,10 @@ class InvInvoiceWidget extends HookConsumerWidget {
         children: [Text('Print invoice'), CloseButton()],
       ),
       actions: [
-        ShadButton.destructive(child: const Text('Cancel'), onPressed: () => context.nPop()),
+        ShadButton.destructive(
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+          onPressed: () => context.nPop(),
+        ),
         SubmitButton(
           leading: const Icon(LuIcons.printer),
           onPressed: (l) async {

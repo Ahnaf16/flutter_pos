@@ -48,7 +48,7 @@ class FilePickerField extends StatelessWidget {
                 const Gap(Insets.med),
                 ShadButton.outline(
                   size: ShadButtonSize.sm,
-                  child: const Text('Browse Files'),
+                  child: const SelectionContainer.disabled(child: Text('Browse Files')),
                   onPressed: () async {
                     if (selectedFile != null) return;
                     final files = await fileUtil.pickSingleFile();

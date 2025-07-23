@@ -16,26 +16,43 @@ class _HomeCounterWidgetState extends ConsumerState<HomeCounterWidget> {
   @override
   Widget build(BuildContext context) {
     final counters = ref.watch(homeCountersProvider(widget.start, widget.end));
+
     final counterGradients = <String, List<Color>>{
-      'Products': [const Color(0xFFE0F7FA).op4, const Color(0xFFB2EBF2)],
-      'Sales': [const Color(0xFFE8F5E9).op4, const Color(0xFFC8E6C9)],
-      'Purchase': [const Color(0xFFE3F2FD).op4, const Color(0xFFBBDEFB)],
-      'Sales Return': [const Color(0xFFFFF3E0).op4, const Color(0xFFFFCCBC)],
-      'Purchase Return': [const Color(0xFFF3E5F5).op4, const Color(0xFFE1BEE7)],
-      'Customer due': [const Color(0xFFE1F5FE).op4, const Color(0xFFB3E5FC)],
-      'Supplier due': [const Color(0xFFFFF9C4).op4, const Color(0xFFFFF176)],
-      'Total account balance': [const Color(0xFFFFEBEE).op4, const Color(0xFFFFCDD2)],
+      'Products': context.isDark
+          ? [const Color(0xFF4B8A99).op(0.5), const Color(0xFF2A5D6A)]
+          : [const Color(0xFFE0F7FA).op4, const Color(0xFFB2EBF2)],
+      'Sales': context.isDark
+          ? [const Color(0xFF5A8B57).op(0.5), const Color(0xFF3B6139)]
+          : [const Color(0xFFE8F5E9).op4, const Color(0xFFC8E6C9)],
+      'Purchase': context.isDark
+          ? [const Color(0xFF5A85B2).op(0.5), const Color(0xFF3A5F8B)]
+          : [const Color(0xFFE3F2FD).op4, const Color(0xFFBBDEFB)],
+      'Sales Return': context.isDark
+          ? [const Color(0xFF9B5B38).op(0.5), const Color(0xFF743F2A)]
+          : [const Color(0xFFFFF3E0).op4, const Color(0xFFFFCCBC)],
+      'Purchase Return': context.isDark
+          ? [const Color(0xFF7B4B8A).op(0.5), const Color(0xFF5C346A)]
+          : [const Color(0xFFF3E5F5).op4, const Color(0xFFE1BEE7)],
+      'Customer due': context.isDark
+          ? [const Color(0xFF4B8BA6).op(0.5), const Color(0xFF2F6276)]
+          : [const Color(0xFFE1F5FE).op4, const Color(0xFFB3E5FC)],
+      'Supplier due': context.isDark
+          ? [const Color(0xFFA68B00).op(0.5), const Color(0xFF7A6500)]
+          : [const Color(0xFFFFF9C4).op4, const Color(0xFFFFF176)],
+      'Total account balance': context.isDark
+          ? [const Color(0xFF8B3F4A).op(0.5), const Color(0xFF6A2F3A)]
+          : [const Color(0xFFFFEBEE).op4, const Color(0xFFFFCDD2)],
     };
 
     final iconColors = <String, Color>{
-      'Products': const Color(0xFF11717F),
-      'Sales': const Color(0xFF4B7249),
-      'Purchase': const Color(0xFF376086),
-      'Sales Return': const Color(0xFFAA582F),
-      'Purchase Return': const Color(0xFF91479D),
-      'Customer due': const Color(0xFF2D8199),
-      'Supplier due': const Color(0xFFB99700),
-      'Total account balance': const Color(0xFF91479D),
+      'Products': context.isDark ? const Color(0xFF66B3C2) : const Color(0xFF11717F),
+      'Sales': context.isDark ? const Color(0xFF73B071) : const Color(0xFF4B7249),
+      'Purchase': context.isDark ? const Color(0xFF6B9ED1) : const Color(0xFF376086),
+      'Sales Return': context.isDark ? const Color(0xFFD17A4B) : const Color(0xFFAA582F),
+      'Purchase Return': context.isDark ? const Color(0xFFA466B8) : const Color(0xFF91479D),
+      'Customer due': context.isDark ? const Color(0xFF6AB8D1) : const Color(0xFF2D8199),
+      'Supplier due': context.isDark ? const Color(0xFFD1B000) : const Color(0xFFB99700),
+      'Total account balance': context.isDark ? const Color(0xFFB85A6B) : const Color(0xFF91479D),
     };
 
     return GridView.builder(
@@ -62,7 +79,7 @@ class _HomeCounterWidgetState extends ConsumerState<HomeCounterWidget> {
                 scale: hover ? 1.03 : 1.0,
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeOut,
-                child: GestureDetector(
+                child: InkWell(
                   onTap: () => path.pushNamed(context),
                   child: Container(
                     padding: Pads.med(),
@@ -108,7 +125,10 @@ class _HomeCounterWidgetState extends ConsumerState<HomeCounterWidget> {
                           child: CircleAvatar(
                             backgroundColor: iconColors[title],
                             radius: 20,
-                            child: Icon(icon),
+                            child: Icon(
+                              icon,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ],
