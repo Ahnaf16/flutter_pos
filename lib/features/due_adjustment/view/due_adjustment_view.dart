@@ -365,18 +365,18 @@ class _DueClearDialog extends ConsumerWidget {
         TextSpan(
           children: [
             TextSpan(text: 'You are about to pay ', style: context.text.muted),
-            TextSpan(text: log.amount.currency(), style: context.text.p.bold),
+            TextSpan(text: log.amount.currency(), style: context.text.p),
             TextSpan(text: ' to ', style: context.text.muted),
-            TextSpan(text: log.transactedTo?.name, style: context.text.p.bold),
+            TextSpan(text: log.transactedTo?.name, style: context.text.p),
             TextSpan(text: ' from ', style: context.text.muted),
-            TextSpan(text: log.account?.name, style: context.text.p.bold),
+            TextSpan(text: log.account?.name, style: context.text.p),
             const TextSpan(text: '.\n'),
             TextSpan(text: 'Current balance of ', style: context.text.muted),
-            TextSpan(text: '${log.account?.name} : ', style: context.text.p.bold),
-            TextSpan(text: log.account?.amount.currency(), style: context.text.p.bold),
+            TextSpan(text: '${log.account?.name} : ', style: context.text.p),
+            TextSpan(text: log.account?.amount.currency(), style: context.text.p),
             const TextSpan(text: '.\n'),
             TextSpan(text: 'Updated balance : ', style: context.text.muted),
-            TextSpan(text: (log.account!.amount - log.amount).currency(), style: context.text.p.bold),
+            TextSpan(text: (log.account!.amount - log.amount).currency(), style: context.text.p),
           ],
         ),
       ),
@@ -420,18 +420,18 @@ class _DuePayDialog extends ConsumerWidget {
       child: Text.rich(
         TextSpan(
           children: [
-            TextSpan(text: log.transactionForm?.name, style: context.text.p.bold),
+            TextSpan(text: log.transactionForm?.name, style: context.text.p),
             TextSpan(text: ' is about to pay you ', style: context.text.muted),
-            TextSpan(text: log.amount.currency(), style: context.text.p.bold),
+            TextSpan(text: log.amount.currency(), style: context.text.p),
             TextSpan(text: ' for due clearance', style: context.text.muted),
 
             const TextSpan(text: '.\n'),
             TextSpan(text: 'Current balance of ', style: context.text.muted),
-            TextSpan(text: '${log.account?.name} : ', style: context.text.p.bold),
-            TextSpan(text: log.account?.amount.currency(), style: context.text.p.bold),
+            TextSpan(text: '${log.account?.name} : ', style: context.text.p),
+            TextSpan(text: log.account?.amount.currency(), style: context.text.p),
             const TextSpan(text: '.\n'),
             TextSpan(text: 'Updated balance : ', style: context.text.muted),
-            TextSpan(text: (log.account!.amount + log.amount).currency(), style: context.text.p.bold),
+            TextSpan(text: (log.account!.amount + log.amount).currency(), style: context.text.p),
           ],
         ),
       ),
@@ -475,9 +475,9 @@ class _TransferDialog extends ConsumerWidget {
       child: Text.rich(
         TextSpan(
           children: [
-            TextSpan(text: log.transactionForm?.name, style: context.text.p.bold),
+            TextSpan(text: log.transactionForm?.name, style: context.text.p),
             TextSpan(text: ' is about to transfer  ', style: context.text.muted),
-            TextSpan(text: log.amount.currency(), style: context.text.p.bold),
+            TextSpan(text: log.amount.currency(), style: context.text.p),
             TextSpan(text: ' to:\n', style: context.text.muted),
             for (final i in log.customInfo.entries) ...[
               TextSpan(text: '${i.key} : ', style: context.text.muted),
@@ -495,11 +495,11 @@ class _TransferDialog extends ConsumerWidget {
               ),
             ] else ...[
               TextSpan(text: 'Current balance of ', style: context.text.muted),
-              TextSpan(text: '${log.account?.name} : ', style: context.text.p.bold),
-              TextSpan(text: log.account?.amount.currency(), style: context.text.p.bold),
+              TextSpan(text: '${log.account?.name} : ', style: context.text.p),
+              TextSpan(text: log.account?.amount.currency(), style: context.text.p),
               const TextSpan(text: '.\n'),
               TextSpan(text: 'Updated balance : ', style: context.text.muted),
-              TextSpan(text: (log.account!.amount - log.amount).currency(), style: context.text.p.bold),
+              TextSpan(text: (log.account!.amount - log.amount).currency(), style: context.text.p),
             ],
           ],
         ),

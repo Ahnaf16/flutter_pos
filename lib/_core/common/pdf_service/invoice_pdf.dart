@@ -72,7 +72,7 @@ class _Invoice extends StatelessWidget {
           _SpacedText(
             left: '${rec.type.isSale ? 'Customer' : 'Supplier'} Name',
             right: rec.getParti.name,
-            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            styleBuilder: (l, r) => (l, r.copyWith()),
             spaced: true,
           ),
 
@@ -81,14 +81,14 @@ class _Invoice extends StatelessWidget {
               left: 'Phone',
               right: rec.getParti.phone,
               spaced: true,
-              styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+              styleBuilder: (l, r) => (l, r.copyWith()),
             ),
             if (rec.getParti.address != null)
               _SpacedText(
                 left: 'Address',
                 right: rec.getParti.address!,
                 spaced: true,
-                styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+                styleBuilder: (l, r) => (l, r.copyWith()),
               ),
           ],
           _gapH(Insets.lg),
@@ -124,32 +124,32 @@ class _Invoice extends StatelessWidget {
             left: 'Subtotal',
             right: rec.subtotal.currency(),
             spaced: true,
-            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            styleBuilder: (l, r) => (l, r.copyWith()),
           ),
           _SpacedText(
             left: 'Discount',
             right: rec.discount.currency(),
             spaced: true,
-            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            styleBuilder: (l, r) => (l, r),
           ),
           _SpacedText(
             left: 'Shipping',
             right: rec.shipping.currency(),
             spaced: true,
-            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            styleBuilder: (l, r) => (l, r),
           ),
           _SpacedText(
             left: 'Vat',
             right: rec.vat.currency(),
             spaced: true,
-            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            styleBuilder: (l, r) => (l, r),
           ),
           _SpacedText(
             left: 'Total',
             right: rec.total.currency(),
             spaced: true,
             style: theme.header4,
-            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            styleBuilder: (l, r) => (l, r),
           ),
           Divider(color: PdfColors.black),
           if (rec.account != null)
@@ -157,19 +157,19 @@ class _Invoice extends StatelessWidget {
               left: 'Paid By',
               right: rec.account!.name,
               spaced: true,
-              styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+              styleBuilder: (l, r) => (l, r),
             ),
           _SpacedText(
             left: 'Paid amount',
             right: rec.paidAmount.currency(),
             spaced: true,
-            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            styleBuilder: (l, r) => (l, r),
           ),
           _SpacedText(
             left: 'Due amount',
             right: rec.due.currency(),
             spaced: true,
-            styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+            styleBuilder: (l, r) => (l, r),
           ),
           if (rec.returnRecord != null)
             _SpacedText(
@@ -177,7 +177,7 @@ class _Invoice extends StatelessWidget {
               right: (rec.returnRecord!.detailsQtyMap.values.sum.abs()).toString(),
               style: theme.header5,
               spaced: true,
-              styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+              styleBuilder: (l, r) => (l, r),
             ),
           if (rec.returnRecord != null)
             _SpacedText(
@@ -185,7 +185,7 @@ class _Invoice extends StatelessWidget {
               right: (rec.returnRecord!.totalReturn).currency(),
               style: theme.header4,
               spaced: true,
-              styleBuilder: (l, r) => (l, r.copyWith(fontWeight: FontWeight.bold)),
+              styleBuilder: (l, r) => (l, r),
             ),
         ],
       ),
