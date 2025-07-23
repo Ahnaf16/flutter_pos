@@ -18,7 +18,10 @@ class AccountAddDialog extends HookConsumerWidget {
       title: Text('$actionTxt account'),
       description: Text(acc == null ? 'Fill the form to add a new account' : 'Update the form for ${acc!.name}'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             final state = formKey.currentState!;

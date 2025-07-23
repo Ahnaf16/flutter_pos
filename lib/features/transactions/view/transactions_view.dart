@@ -266,7 +266,12 @@ class _TrxViewDialog extends HookConsumerWidget {
         ],
       ),
 
-      actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
+      actions: [
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
+      ],
       child: Container(
         padding: Pads.padding(v: Insets.med),
         child: Column(

@@ -15,7 +15,10 @@ class UnitAddDialog extends HookConsumerWidget {
       title: Text('$actionTxt Unit'),
       description: Text(unit == null ? 'Fill the form and add a new unit' : 'Fill the form to update ${unit!.name}'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             final state = formKey.currentState!;

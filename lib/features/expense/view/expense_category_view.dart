@@ -21,7 +21,7 @@ class ExpenseCategoryView extends HookConsumerWidget {
       title: 'Expense category',
       actions: [
         ShadButton(
-          child: const Text('Add a category'),
+          child: const SelectionContainer.disabled(child: Text('Add a category')),
           onPressed: () {
             showShadDialog(context: context, builder: (context) => const ExCategoryAddDialog());
           },
@@ -85,7 +85,10 @@ class ExpenseCategoryView extends HookConsumerWidget {
                                 title: const Text('Delete Category'),
                                 description: Text('This will delete ${data.name} permanently.'),
                                 actions: [
-                                  ShadButton(onPressed: () => c.nPop(), child: const Text('Cancel')),
+                                  ShadButton(
+                                    onPressed: () => c.nPop(),
+                                    child: const SelectionContainer.disabled(child: Text('Cancel')),
+                                  ),
                                   ShadButton.destructive(
                                     onPressed: () async {
                                       await ref.read(expenseCategoryCtrlProvider.notifier).delete(data);
@@ -149,7 +152,10 @@ class ExCategoryAddDialog extends HookConsumerWidget {
         category == null ? 'Fill the form to add a new Category' : 'Fill the form to update ${category!.name}',
       ),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             final state = formKey.currentState!;

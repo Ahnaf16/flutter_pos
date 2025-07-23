@@ -340,7 +340,10 @@ class _DueClearDialog extends ConsumerWidget {
       title: const Text('Clear customer due'),
       description: const Text('Confirm customer due clearance'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             final ctrl = ref.read(transactionLogCtrlProvider.notifier);
@@ -393,7 +396,10 @@ class _DuePayDialog extends ConsumerWidget {
       title: const Text('Customer due payment'),
       description: const Text('Confirm due payment from customer'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             final ctrl = ref.read(transactionLogCtrlProvider.notifier);
@@ -445,7 +451,10 @@ class _TransferDialog extends ConsumerWidget {
       title: const Text('Transfer balance'),
       description: const Text('Confirm balance transfer from customer'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             final ctrl = ref.read(transactionLogCtrlProvider.notifier);

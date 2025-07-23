@@ -12,13 +12,16 @@ class ProductViewDialog extends HookConsumerWidget {
       description: Text('Details of ${product.name}'),
       constraints: const BoxConstraints(maxWidth: 700),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         ShadButton(
           onPressed: () {
             context.nPop();
             RPaths.productDetails(product.id).pushNamed(context);
           },
-          child: const Text('Full Details'),
+          child: const SelectionContainer.disabled(child: Text('Full Details')),
         ),
       ],
       child: Container(

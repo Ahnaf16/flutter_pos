@@ -33,7 +33,7 @@ class PartiesView extends HookConsumerWidget {
       title: isCustomer ? 'Customers' : 'Suppliers',
       actions: [
         ShadButton(
-          child: const Text('Create'),
+          child: const SelectionContainer.disabled(child: Text('Create')),
           onPressed: () {
             showShadDialog(
               context: context,
@@ -236,7 +236,10 @@ class _PartyDeleteDialog extends StatelessWidget {
         ),
       ),
       actions: [
-        ShadButton(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           variant: ShadButtonVariant.destructive,
           onPressed: (l) async {
@@ -245,7 +248,7 @@ class _PartyDeleteDialog extends StatelessWidget {
             l.falsey();
             if (context.mounted) context.nPop();
           },
-          child: const Text('Delete'),
+          child: const SelectionContainer.disabled(child: Text('Delete')),
         ),
       ],
     );
@@ -316,7 +319,10 @@ class _PartiAddDialog extends HookConsumerWidget {
         parti == null ? 'Fill the form and to add a new ${type.name}' : 'Fill the form to update ${parti!.name}',
       ),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
 
         SubmitButton(
           onPressed: (l) async {
@@ -465,7 +471,10 @@ class PartiViewDialog extends HookConsumerWidget {
       ),
 
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         ShadButton(
           onPressed: () {
             context.nPop();
@@ -475,7 +484,7 @@ class PartiViewDialog extends HookConsumerWidget {
               RPaths.supplierDetails(parti.id).pushNamed(context);
             }
           },
-          child: const Text('Full Details'),
+          child: const SelectionContainer.disabled(child: Text('Full Details')),
         ),
       ],
       child: Container(

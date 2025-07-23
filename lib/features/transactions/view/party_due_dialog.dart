@@ -31,7 +31,10 @@ class PartyDueDialog extends HookConsumerWidget {
       title: Text('${parti.type.name.titleCase} Due adjustment'),
 
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           enabled: parti.hasDue() == true,
           onPressed: (l) async {
@@ -152,7 +155,10 @@ class SupplierDueDialog extends HookConsumerWidget {
       title: Text('${parti?.type.name.titleCase ?? ''} Due payment'),
 
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           enabled: parti != null && parti?.hasBalance() == true,
           onPressed: (l) async {

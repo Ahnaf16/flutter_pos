@@ -58,7 +58,9 @@ class SubmitButton extends HookWidget {
           enabled: enabled,
           trailing: loadingPosition == LoadingPosition.trailing ? _buildLoading(trailing, isLoading.value) : null,
           leading: loadingPosition == LoadingPosition.leading ? _buildLoading(leading, isLoading.value) : null,
-          child: loadingPosition == LoadingPosition.center ? (_buildLoading(child, isLoading.value)) ?? child : child,
+          child: loadingPosition == LoadingPosition.center
+              ? (_buildLoading(child, isLoading.value)) ?? child
+              : SelectionContainer.disabled(child: child),
         ),
       ),
     );

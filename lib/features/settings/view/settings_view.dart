@@ -51,7 +51,7 @@ class SettingsView extends HookConsumerWidget {
                                 hoverBackgroundColor: context.colors.primary.op1,
                                 hoverForegroundColor: context.colors.foreground,
                                 foregroundColor: context.colors.foreground,
-                                leading: Text(_paths[i].$1),
+                                leading: SelectionContainer.disabled(child: Text(_paths[i].$1)),
                                 onPressed: () => index.value = i,
                               ),
                             ),

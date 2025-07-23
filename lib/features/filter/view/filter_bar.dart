@@ -472,7 +472,7 @@ class DateRangeSelector extends HookConsumerWidget {
                 secondaryFocusedBorder: ShadBorder.none,
                 secondaryBorder: ShadBorder.none,
               ),
-              child: const Text('Cancel'),
+              child: const SelectionContainer.disabled(child: Text('Cancel')),
               onPressed: () => context.nPop(),
             ),
             ShadButton(
@@ -481,7 +481,7 @@ class DateRangeSelector extends HookConsumerWidget {
                 secondaryFocusedBorder: ShadBorder.none,
                 secondaryBorder: ShadBorder.none,
               ),
-              child: const Text('Submit'),
+              child: const SelectionContainer.disabled(child: Text('Submit')),
               onPressed: () {
                 onApply?.call(from.value, to.value);
                 // state.value = state.value = state.value = state.value.copyWith(
@@ -530,7 +530,7 @@ class _NumRangeSelector extends HookConsumerWidget {
                 secondaryFocusedBorder: ShadBorder.none,
                 secondaryBorder: ShadBorder.none,
               ),
-              child: const Text('Cancel'),
+              child: const SelectionContainer.disabled(child: Text('Cancel')),
               onPressed: () => context.nPop(),
             ),
             ShadButton(
@@ -539,7 +539,7 @@ class _NumRangeSelector extends HookConsumerWidget {
                 secondaryFocusedBorder: ShadBorder.none,
                 secondaryBorder: ShadBorder.none,
               ),
-              child: const Text('Submit'),
+              child: const SelectionContainer.disabled(child: Text('Submit')),
               onPressed: () {
                 context.nPop();
               },

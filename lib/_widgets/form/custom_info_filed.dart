@@ -53,7 +53,7 @@ class CustomInfoFiled extends HookWidget {
                     ShadButton(
                       size: ShadButtonSize.sm,
                       leading: const Icon(LuIcons.plus),
-                      child: const Text('Add field'),
+                      child: const SelectionContainer.disabled(child: Text('Add field')),
                       onPressed: () => _addingMethod(field),
                     ),
                   ],

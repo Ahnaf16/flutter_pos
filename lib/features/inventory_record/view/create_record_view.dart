@@ -82,7 +82,7 @@ class CreateRecordView extends HookConsumerWidget {
                                       if (isLast) {
                                         return ShadButton.secondary(
                                           leading: const Icon(LuIcons.plus),
-                                          child: const Text('Add Product'),
+                                          child: const SelectionContainer.disabled(child: Text('Add Product')),
                                           onPressed: () {
                                             showShadSheet(
                                               context: context,
@@ -788,7 +788,10 @@ class _ChangePriceDialog extends HookConsumerWidget {
       title: const Text('Adjust price'),
       description: const Text('Adjust stock price'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         ShadButton(
           onPressed: () {
             if (price.value <= 0) return Toast.showErr(context, 'Price must be greater than zero');
@@ -798,7 +801,7 @@ class _ChangePriceDialog extends HookConsumerWidget {
             }
             context.nPop((price.value, qty.value));
           },
-          child: const Text('Submit'),
+          child: const SelectionContainer.disabled(child: Text('Submit')),
         ),
       ],
       child: Container(

@@ -22,14 +22,14 @@ class StockView extends HookConsumerWidget {
       actions: [
         if (permissions.contains(RolePermissions.makePurchase))
           ShadButton(
-            child: const Text('Purchase'),
+            child: const SelectionContainer.disabled(child: Text('Purchase')),
             onPressed: () {
               RPaths.createPurchases.pushNamed(context);
             },
           ),
         if (permissions.contains(RolePermissions.manageProduct))
           ShadButton(
-            child: const Text('Add a Product'),
+            child: const SelectionContainer.disabled(child: Text('Add a Product')),
             onPressed: () {
               RPaths.createProduct.pushNamed(context);
             },

@@ -37,7 +37,7 @@ class ExpenseView extends HookConsumerWidget {
       title: 'Expense',
       actions: [
         ShadButton(
-          child: const Text('Add a expense'),
+          child: const SelectionContainer.disabled(child: Text('Add a expense')),
           onPressed: () {
             showShadDialog(context: context, builder: (context) => const _ExpenseAddDialog());
           },
@@ -177,7 +177,12 @@ class _ExpenseViewDialog extends HookConsumerWidget {
     return ShadDialog(
       title: const Text('Expense'),
       description: const Text('Details of an expense'),
-      actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
+      actions: [
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
+      ],
       child: Container(
         padding: Pads.padding(v: Insets.med),
         child: Column(
@@ -293,7 +298,10 @@ class _ExpenseAddDialog extends HookConsumerWidget {
       title: Text('$actionTxt Expense'),
       description: Text(ex == null ? 'Fill the form to add an expense' : 'Fill the form to update'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
         SubmitButton(
           onPressed: (l) async {
             final state = formKey.currentState!;

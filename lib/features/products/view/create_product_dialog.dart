@@ -20,7 +20,10 @@ class CreateProductDialog extends HookConsumerWidget {
       title: const Text('Create Product'),
 
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
 
         SubmitButton(
           child: const Text('Create product'),

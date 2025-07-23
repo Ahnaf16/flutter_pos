@@ -49,6 +49,7 @@ class BaseBody extends StatelessWidget {
     if (scrollable) {
       child = SingleChildScrollView(child: child);
     }
+
     return SelectionArea(
       child: Scaffold(
         appBar: noAPPBar

@@ -29,10 +29,13 @@ class ProductsView extends HookConsumerWidget {
       title: 'Products',
       actions: [
         ShadButton(
-          child: const Text('Add a Product'),
           onPressed: () {
             RPaths.createProduct.pushNamed(context);
           },
+
+          child: const SelectionContainer.disabled(
+            child: SelectionContainer.disabled(child: Text('Add a Product')),
+          ),
         ),
       ],
       body: Column(
@@ -115,13 +118,16 @@ class ProductsView extends HookConsumerWidget {
                                         'This will delete ${data.name} and its ${data.stock.length} stocks permanently.',
                                       ),
                                       actions: [
-                                        ShadButton(onPressed: () => c.nPop(), child: const Text('Cancel')),
+                                        ShadButton(
+                                          onPressed: () => c.nPop(),
+                                          child: const SelectionContainer.disabled(child: Text('Cancel')),
+                                        ),
                                         ShadButton.destructive(
                                           onPressed: () async {
                                             await ref.read(productsCtrlProvider.notifier).deleteProduct(data);
                                             if (c.mounted) c.nPop();
                                           },
-                                          child: const Text('Delete'),
+                                          child: const SelectionContainer.disabled(child: Text('Delete')),
                                         ),
                                       ],
                                     );
@@ -162,8 +168,7 @@ class ProductsView extends HookConsumerWidget {
       return Wrap(
         spacing: Insets.med,
         runSpacing: Insets.xs,
-        // crossAxisAlignment: CrossAxisAlignment.start,
-        // mainAxisSize: MainAxisSize.min,
+
         children: [
           ShadCard(
             expanded: false,
@@ -171,7 +176,8 @@ class ProductsView extends HookConsumerWidget {
             child: HostedImage.square(product.getPhoto(), radius: Corners.sm, dimension: imgSize),
           ),
 
-          Flexible(
+          SizedBox(
+            width: 200,
             child: Column(
               spacing: gap,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,7 +202,8 @@ class ProductsView extends HookConsumerWidget {
         runSpacing: Insets.xs,
 
         children: [
-          Flexible(
+          SizedBox(
+            width: 200,
             child: Column(
               spacing: gap,
               crossAxisAlignment: CrossAxisAlignment.start,

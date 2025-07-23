@@ -27,7 +27,7 @@ class DiscountTypePopOver extends HookConsumerWidget {
                 for (final t in DiscountType.values)
                   ShadButton.ghost(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    child: Text(t.name.up),
+                    child: SelectionContainer.disabled(child: Text(t.name.up)),
                     onPressed: () {
                       popCtrl.hide();
                       onTypeChange(t);
@@ -44,7 +44,7 @@ class DiscountTypePopOver extends HookConsumerWidget {
         size: ShadButtonSize.sm,
         height: 32,
         onPressed: () => popCtrl.toggle(),
-        child: Text(type.name.up),
+        child: SelectionContainer.disabled(child: Text(type.name.up)),
       ),
     );
   }

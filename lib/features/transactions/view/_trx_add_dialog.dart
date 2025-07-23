@@ -21,7 +21,10 @@ class _TransferDialog extends HookConsumerWidget {
       title: const Text('Transfer money'),
       description: const Text('Transfer money to someone'),
       actions: [
-        ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel')),
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
 
         SubmitButton(
           onPressed: (l) async {

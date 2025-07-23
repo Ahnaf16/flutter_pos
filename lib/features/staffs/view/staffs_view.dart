@@ -29,7 +29,7 @@ class StaffsView extends HookConsumerWidget {
       title: 'Staffs',
       actions: [
         ShadButton(
-          child: const Text('Create Staff'),
+          child: const SelectionContainer.disabled(child: Text('Create Staff')),
           onPressed: () {
             RPaths.createStaffs.pushNamed(context);
           },
@@ -183,7 +183,12 @@ class _StaffViewDialog extends HookConsumerWidget {
       title: const Text('Staff'),
       description: Text('Details of ${user.name}'),
 
-      actions: [ShadButton.destructive(onPressed: () => context.nPop(), child: const Text('Cancel'))],
+      actions: [
+        ShadButton.destructive(
+          onPressed: () => context.nPop(),
+          child: const SelectionContainer.disabled(child: Text('Cancel')),
+        ),
+      ],
       child: Container(
         padding: Pads.padding(v: Insets.med),
         child: Column(

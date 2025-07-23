@@ -501,7 +501,7 @@ class _Header extends ConsumerWidget {
 
         if (!rec.status.isReturned)
           ShadButton.destructive(
-            leading: const Text('Return'),
+            leading: const SelectionContainer.disabled(child: Text('Return')),
             onPressed: () {
               showShadDialog(
                 context: context,

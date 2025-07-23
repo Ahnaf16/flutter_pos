@@ -150,7 +150,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
                     onPressed: () => ref.read(authCtrlProvider.notifier).signOut(),
                     leading: const Icon(LucideIcons.logOut),
                     mainAxisAlignment: MainAxisAlignment.start,
-                    child: const Text('Logout'),
+                    child: const SelectionContainer.disabled(child: Text('Logout')),
                   ),
                 ],
                 ShadButton.ghost(
@@ -159,7 +159,9 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   onPressed: () => themeCtrl().toggleMode(),
                   leading: Icon(themeMode == ThemeMode.dark ? LucideIcons.sun : LucideIcons.moon),
-                  child: Text(themeMode == ThemeMode.dark ? 'Light mode' : 'Dark mode'),
+                  child: SelectionContainer.disabled(
+                    child: Text(themeMode == ThemeMode.dark ? 'Light mode' : 'Dark mode'),
+                  ),
                 ),
                 Text(kVersion, style: context.text.muted.size(12)),
               ],
