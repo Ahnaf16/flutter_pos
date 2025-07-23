@@ -22,7 +22,7 @@ const _headings = [
   TableHeading.positional('Amount', 300.0),
   TableHeading.positional('Account', 250),
   TableHeading.positional('Type', 250, Alignment.center),
-  TableHeading.positional('Date', 250, Alignment.center),
+  TableHeading.positional('Date', 300, Alignment.center),
   TableHeading.positional('Action', 100.0, Alignment.centerRight),
 ];
 

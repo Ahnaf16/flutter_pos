@@ -8,7 +8,7 @@ extension TextStyleExtensions on TextStyle {
   TextStyle get regular => weight(FontWeight.normal);
   TextStyle get medium => weight(FontWeight.w500);
   TextStyle get semiBold => weight(FontWeight.w600);
-  TextStyle get bold => weight(FontWeight.w700);
+  TextStyle get bold => weight(FontWeight.w400);
   TextStyle get extraBold => weight(FontWeight.w800);
   TextStyle get black => weight(FontWeight.w900);
 

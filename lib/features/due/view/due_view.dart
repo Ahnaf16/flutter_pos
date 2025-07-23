@@ -216,13 +216,13 @@ class _PartiViewDialog extends HookConsumerWidget {
                         SpacedText(
                           left: 'Name',
                           right: parti.name,
-                          styleBuilder: (l, r) => (l, r.bold),
+                          styleBuilder: (l, r) => (l, r),
                           crossAxisAlignment: CrossAxisAlignment.center,
                         ),
                         SpacedText(
                           left: 'Phone Number',
                           right: parti.phone,
-                          styleBuilder: (l, r) => (l, r.bold),
+                          styleBuilder: (l, r) => (l, r),
                           crossAxisAlignment: CrossAxisAlignment.center,
                           onTap: (left, right) => Copier.copy(right),
                         ),
@@ -230,7 +230,7 @@ class _PartiViewDialog extends HookConsumerWidget {
                         SpacedText(
                           left: 'Email',
                           right: parti.email ?? '--',
-                          styleBuilder: (l, r) => (l, r.bold),
+                          styleBuilder: (l, r) => (l, r),
                           crossAxisAlignment: CrossAxisAlignment.center,
                           onTap: (left, right) => Copier.copy(right),
                         ),
@@ -238,13 +238,13 @@ class _PartiViewDialog extends HookConsumerWidget {
                         SpacedText(
                           left: 'Address',
                           right: parti.address ?? '--',
-                          styleBuilder: (l, r) => (l, r.bold),
+                          styleBuilder: (l, r) => (l, r),
                           crossAxisAlignment: CrossAxisAlignment.center,
                         ),
                         SpacedText(
                           left: 'Current Due',
                           right: parti.due.currency(),
-                          styleBuilder: (l, r) => (l, r.bold),
+                          styleBuilder: (l, r) => (l, r),
                           builder: (r) => Text(r, style: context.text.small.textColor(parti.dueColor())),
                           crossAxisAlignment: CrossAxisAlignment.center,
                           trailing: parti.due == 0
@@ -258,12 +258,12 @@ class _PartiViewDialog extends HookConsumerWidget {
                                           TextSpan(text: '${parti.name} '),
                                           TextSpan(
                                             text: parti.due.isNegative ? 'Owe' : 'Will pay',
-                                            style: context.text.small.bold,
+                                            style: context.text.small,
                                           ),
                                           const TextSpan(text: ' you'),
                                           TextSpan(
                                             text: ' ${parti.due.abs().currency()}',
-                                            style: context.text.small.bold,
+                                            style: context.text.small,
                                           ),
                                         ],
                                       ),
@@ -283,10 +283,10 @@ class _PartiViewDialog extends HookConsumerWidget {
             SpacedText(
               left: log.isDueAdded ? 'Added to due' : 'Subtracted from due',
               right: log.amount.abs().currency(),
-              styleBuilder: (l, r) => (l, r.bold),
+              styleBuilder: (l, r) => (l, r),
             ),
-            SpacedText(left: 'Post amount', right: log.postAmount.currency(), styleBuilder: (l, r) => (l, r.bold)),
-            SpacedText(left: 'Date', right: log.date.formatDate(), styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(left: 'Post amount', right: log.postAmount.currency(), styleBuilder: (l, r) => (l, r)),
+            SpacedText(left: 'Date', right: log.date.formatDate(), styleBuilder: (l, r) => (l, r)),
             SpacedText(left: 'Note', right: log.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),
           ],
         ),
