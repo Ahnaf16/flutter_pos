@@ -1,6 +1,5 @@
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/main.export.dart';
-import 'package:pos/navigation/nav_root.dart';
 
 class MoreToolsView extends ConsumerWidget {
   const MoreToolsView({super.key});
@@ -8,7 +7,9 @@ class MoreToolsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final permissions = ref.watch(authStateSyncProvider).toNullable()?.role?.permissions ?? [];
-    final items = navItems(permissions).map((e) => e.$2 == null ? null : (e.$1, e.$2!, e.$3!)).nonNulls.toList();
+    // final items = navItems(
+    //   permissions,
+    // ).map((e) => e.icon == null ? null : (e.text, e.icon!, e.path!)).nonNulls.toList();
 
     return BaseBody(
       title: 'More Tools',
@@ -28,14 +29,14 @@ class MoreToolsView extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: items.length,
+            itemCount: 0,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               mainAxisExtent: 140,
             ),
-            itemBuilder: (context, index) => _ToolCard(item: items[index]),
+            itemBuilder: (context, index) => _ToolCard(item: ('Item $index', Icons.home, RPaths.home)),
           );
         },
       ),

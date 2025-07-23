@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pos/main.export.dart';
 
@@ -35,6 +38,12 @@ extension WidgetEx on Widget {
   Widget conditionalFlexible(bool condition, [int flex = 1]) => condition ? Flexible(flex: flex, child: this) : this;
 
   Widget toolTip(String? text) => text == null ? this : ShadTooltip(builder: (context) => Text(text), child: this);
+
+  Widget debugView() {
+    if (kReleaseMode) return this;
+    final colors = [...Colors.accents, ...Colors.primaries];
+    return ColoredBox(color: colors[Random().nextInt(colors.length)], child: this);
+  }
 }
 
 extension ShadIconButtonEx on ShadIconButton {

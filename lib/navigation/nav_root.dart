@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:pos/features/auth/controller/auth_ctrl.dart';
-import 'package:pos/features/filter/controller/filter_ctrl.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/warehouse/controller/warehouse_ctrl.dart';
@@ -19,101 +18,29 @@ class NavigationRoot extends HookConsumerWidget {
 
     final rootPath = context.routeState.uri.pathSegments.first;
 
-    final index = useState(0);
-    final expanded = useState(true);
-    final showLabel = useState(true);
+    final selectedValue = useState('DashBoard');
     final drawerOpen = useState(false);
     final isMobile = context.layout.isMobile;
 
-    useEffect(() {
-      if (!isMobile) {
-        final items = navItems(authUser.valueOrNull?.role?.getPermissions ?? []);
-        index.value = items.indexWhere((item) => item.$3?.path.contains(rootPath) ?? false);
-      }
-      return null;
-    }, [rootPath, authUser.value]);
-
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.layout.isDesktop) {
-          expanded.value = true;
-        } else {
-          expanded.value = false;
-        }
-        Future.delayed(expanded.value ? 250.ms : 0.ms, () {
-          showLabel.value = expanded.value;
-        });
-      });
-
-      return null;
-    }, [context.layout.isDesktop]);
+    // useEffect(() {
+    //   if (!isMobile) {
+    //     final items = navItems(authUser.valueOrNull?.role?.getPermissions ?? []);
+    //     selectedValue.value = items.indexWhere((item) => item.$3?.path.contains(rootPath) ?? false);
+    //   }
+    //   return null;
+    // }, [rootPath, authUser.value]);
 
     return authUser.when(
       error: (e, s) => ErrorView(e, s, prov: authCtrlProvider),
       loading: () => const SplashPage(),
       data: (user) {
-        final p = user?.role?.getPermissions ?? [];
+        final permissions = user?.role?.getPermissions ?? [];
         return Scaffold(
-          bottomNavigationBar: !context.layout.isMobile
-              ? null
-              : ShadCard(
-                  height: 78,
-                  padding: Pads.padding(padding: Insets.sm),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    spacing: Insets.sm,
-                    children: [
-                      for (final (text, icon, path) in _mobileItems(p))
-                        Expanded(
-                          child: Builder(
-                            builder: (context) {
-                              final i = _mobileItems(p).map((e) => e.$1).toList().indexOf(text);
-
-                              final selected = index.value == i;
-                              return GestureDetector(
-                                onTap: () {
-                                  index.value = i;
-                                  path?.go(context);
-                                },
-                                child: DecoContainer.animated(
-                                  duration: 250.ms,
-                                  borderRadius: Corners.sm,
-                                  color: selected ? context.colors.primary.op2 : Colors.transparent,
-                                  padding: Pads.xs(),
-                                  alignment: Alignment.center,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    spacing: Insets.xs,
-                                    children: [
-                                      Icon(icon, size: 22),
-                                      Text(text, style: context.text.muted, textAlign: TextAlign.center, maxLines: 1),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-          appBar: context.layout.isMobile
-              ? null
-              : _AppBar(
-                  user: user,
-                  onLeadingPressed: () {
-                    if (!context.layout.isMobile) expanded.toggle();
-                    Future.delayed(expanded.value ? 250.ms : 0.ms, () {
-                      showLabel.toggle();
-                    });
-                  },
-                ),
+          appBar: context.layout.isMobile ? null : _AppBar(user: user),
           body: _BODY(
-            expanded: expanded,
-            showLabel: showLabel,
             drawerOpen: drawerOpen,
-            index: index,
-            permissions: user?.role?.getPermissions ?? [],
+            selectedValue: selectedValue,
+            permissions: permissions,
             child: child,
           ),
         );
@@ -123,10 +50,9 @@ class NavigationRoot extends HookConsumerWidget {
 }
 
 class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
-  const _AppBar({this.user, this.onLeadingPressed});
+  const _AppBar({this.user});
 
   final AppUser? user;
-  final VoidCallback? onLeadingPressed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -160,16 +86,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
           Text(config.shop.shopName ?? kAppName),
         ],
       ),
-
-      leading: UnconstrainedBox(
-        child: ShadButton.ghost(
-          leading: const Icon(LuIcons.panelRightClose, size: 20),
-          onPressed: onLeadingPressed,
-          padding: Pads.zero,
-        ),
-      ),
       scrolledUnderElevation: 0,
-
       actions: [
         if (!kReleaseMode) ...[
           DefaultTextStyle(
@@ -261,51 +178,48 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
 
 class _BODY extends HookConsumerWidget {
   const _BODY({
-    required this.expanded,
-    required this.showLabel,
     required this.drawerOpen,
-    required this.index,
+    required this.selectedValue,
     required this.permissions,
     required this.child,
   });
 
-  final ValueNotifier<bool> expanded;
-  final ValueNotifier<bool> showLabel;
   final ValueNotifier<bool> drawerOpen;
-  final ValueNotifier<int> index;
+  final ValueNotifier<String> selectedValue;
   final Widget child;
   final List<RolePermissions> permissions;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final items = navItems(permissions);
+
     final nav = SingleChildScrollView(
       padding: Pads.med(),
       child: LimitedWidthBox(
-        maxWidth: expanded.value ? NavigationRoot.expandedPaneSize : NavigationRoot.collapsedPaneSize,
+        maxWidth: NavigationRoot.expandedPaneSize,
         center: false,
         child: IntrinsicWidth(
-          child: Column(
-            spacing: Insets.xs,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-
+          child: ShadAccordion<String>(
             children: [
-              for (final (text, icon, path) in items)
-                if (!expanded.value && icon == null)
-                  const SizedBox.shrink()
-                else
-                  NavButton(
-                    label: text,
-                    icon: icon,
-                    showLabel: showLabel.value,
-                    expanded: expanded.value,
-                    selected: index.value == items.indexOf((text, icon, path)),
-                    onPressed: () {
-                      ref.invalidate(filterCtrlProvider);
-                      index.value = items.indexOf((text, icon, path));
-                      if (path != null) path.go(context);
-                    },
-                  ),
+              Column(
+                spacing: Insets.xs,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final MapEntry(key: title, value: item) in items.entries) ...[
+                    Text(title, style: context.text.small),
+                    ...item.map(
+                      (e) => NavButton(
+                        label: e.text,
+                        icon: e.icon,
+                        selected: e.text == selectedValue.value,
+                        onPressed: () => selectedValue.value = e.text,
+                      ),
+                    ),
+
+                    const Gap(Insets.sm),
+                  ],
+                ],
+              ),
             ],
           ),
         ),
@@ -342,38 +256,15 @@ class NavButton extends HookWidget {
     this.icon,
     this.onPressed,
     this.selected = false,
-    this.showLabel = true,
-    this.expanded = false,
   });
 
   final String label;
   final IconData? icon;
   final bool selected;
-  final bool showLabel;
-  final bool expanded;
   final Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    if (icon == null && expanded) {
-      return DecoContainer(
-        padding: Pads.padding(top: Insets.sm),
-        child: Text(label, maxLines: 1).animate().fadeIn(duration: 250.ms),
-      );
-    }
-
-    Widget? child;
-
-    if (showLabel) {
-      child = OverflowMarquee(
-        step: 50,
-        delayDuration: 2.seconds,
-        child: Text(label, overflow: TextOverflow.ellipsis, maxLines: 1),
-      ).animate().fadeIn(duration: 100.ms);
-    } else {
-      child = null;
-    }
-
     final hovered = useState(false);
     final tapDown = useState(false);
 
@@ -396,8 +287,9 @@ class NavButton extends HookWidget {
         onTapCancel: () => tapDown.value = false,
         onTapUp: (_) => tapDown.value = false,
         child: ShadCard(
-          height: 45,
-          padding: Pads.med(),
+          // height: 45,
+          width: icon != null ? null : NavigationRoot.expandedPaneSize - 20,
+          padding: Pads.sm(),
           backgroundColor: color,
           expanded: false,
           border: const Border(),
@@ -405,64 +297,101 @@ class NavButton extends HookWidget {
           rowCrossAxisAlignment: CrossAxisAlignment.center,
           columnMainAxisAlignment: MainAxisAlignment.center,
           childPadding: Pads.med('l'),
-          leading: Icon(icon),
-          child: child,
+          leading: icon == null ? null : Icon(icon),
+          child: OverflowMarquee(
+            step: 50,
+            delayDuration: 2.seconds,
+            child: Text(
+              label,
+              maxLines: 1,
+              style: context.text.large,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-List<(String text, IconData? icon, RPath? path)> navItems(List<RolePermissions> p) {
-  return [
-    ('Home', null, null),
-    ('Dashboard', LuIcons.house, RPaths.home),
-    if (RolePermissions.isInGroup(p, RolePermissions.inventoryGroup)) ...[
-      if (p.contains(RolePermissions.makeSale)) ('New Sale', LuIcons.shoppingCart, RPaths.createSales),
-      ('Inventory', null, null),
-      if (p.contains(RolePermissions.manageProduct)) ('Products', LuIcons.box, RPaths.products),
-      if (p.contains(RolePermissions.manageUnit)) ('Unit', LuIcons.ruler, RPaths.unit),
-    ],
-    if (RolePermissions.isInGroup(p, RolePermissions.salesGroup)) ...[
-      ('Sales', null, null),
-      if (p.contains(RolePermissions.makeSale)) ('Sales History', LuIcons.shoppingCart, RPaths.sales),
-      if (p.contains(RolePermissions.returnSale)) ('Sales Return', LuIcons.undo, RPaths.salesReturn),
-    ],
-    if (RolePermissions.isInGroup(p, RolePermissions.purchasesGroup)) ...[
-      ('Purchases', null, null),
-      if (p.contains(RolePermissions.makePurchase)) ('Purchase History', LuIcons.scrollText, RPaths.purchases),
-      if (p.contains(RolePermissions.returnPurchase)) ('Purchase Return', LuIcons.undo, RPaths.purchasesReturn),
-    ],
-    if (RolePermissions.isInGroup(p, RolePermissions.peopleGroup)) ...[
-      ('Customer', null, null),
-      if (p.contains(RolePermissions.manageCustomer)) ('Customers', LuIcons.users, RPaths.customer),
-      if (p.contains(RolePermissions.manageCustomer)) ('Due Adjustment', LuIcons.users, RPaths.customerDueManagement),
-      ('Supplier', null, null),
-      if (p.contains(RolePermissions.manageSupplier)) ('Suppliers', LuIcons.usersRound, RPaths.supplier),
-      if (p.contains(RolePermissions.manageSupplier))
-        ('Due Clearance', LuIcons.usersRound, RPaths.supplierDueManagement),
-      ('Staff', null, null),
-      if (p.contains(RolePermissions.manageStaff)) ('Staffs', LuIcons.userCog, RPaths.staffs),
-      if (p.contains(RolePermissions.manageRole)) ('Roles', LuIcons.shield, RPaths.roles),
-    ],
-    if (RolePermissions.isInGroup(p, RolePermissions.logisticsGroup)) ...[
-      ('Logistics', null, null),
-      if (p.contains(RolePermissions.manageWarehouse)) ('Warehouse', LuIcons.gitBranch, RPaths.warehouse),
-      if (p.contains(RolePermissions.transferStock)) ('Stock Transfer', LuIcons.arrowUpDown, RPaths.stockTransfer),
-      if (p.contains(RolePermissions.manageStock)) ('Stock logs', LuIcons.arrowUp01, RPaths.stockLog),
-    ],
-    if (RolePermissions.isInGroup(p, RolePermissions.accountingGroup)) ...[
-      ('Accounting', null, null),
-      if (p.contains(RolePermissions.manageAccounts)) ('Payment Accounts', LuIcons.creditCard, RPaths.paymentAccount),
-      if (p.contains(RolePermissions.manageExpanse)) ('Expense', LuIcons.wallet, RPaths.expense),
-      if (p.contains(RolePermissions.manageExpanse)) ('Expense Category', LuIcons.variable, RPaths.expenseCategory),
-      if (p.contains(RolePermissions.transactions)) ('Transactions', LuIcons.landmark, RPaths.transactions),
-      if (p.contains(RolePermissions.due)) ('Due', LuIcons.coins, RPaths.due),
-    ],
+class NestedNav extends ConsumerWidget {
+  const NestedNav({
+    super.key,
+    required this.label,
+    this.onPressed,
+    required this.children,
+    required this.icon,
+    required this.selectedValue,
+  });
 
-    ('Configuration', null, null),
-    ('Settings', LuIcons.settings2, RPaths.settings),
-  ];
+  final String label;
+  final IconData icon;
+  final Function()? onPressed;
+  final List<Widget> children;
+  final String selectedValue;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = label == selectedValue;
+    return DecoContainer(
+      color: selected ? context.colors.border : null,
+      borderRadius: Corners.med,
+      child: ShadAccordionItem<String>(
+        value: label,
+        padding: Pads.sm(),
+        title: Row(
+          spacing: Insets.med,
+          children: [
+            Icon(icon),
+            Text(label, maxLines: 1, style: context.text.large),
+          ],
+        ),
+        separator: const Gap(0),
+        underlineTitleOnHover: false,
+        child: CenterRight(
+          child: IntrinsicWidth(
+            child: Column(
+              spacing: Insets.xs,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: children,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Map<String, List<NavItem>> navItems(List<RolePermissions> p) {
+  return {
+    'Main': [
+      NavItem(text: 'DashBoard', icon: LuIcons.house, path: RPaths.home),
+      NavItem(text: 'New Sale', icon: LuIcons.circlePlus, path: RPaths.createSales),
+    ],
+    'Inventory': [
+      NavItem(text: 'Product', icon: LuIcons.package, path: RPaths.products),
+      NavItem(text: 'Unit', icon: LuIcons.weight, path: RPaths.unit),
+    ],
+    'Contacts': [
+      NavItem(
+        text: 'Customers',
+        icon: LuIcons.users,
+        path: RPaths.customer,
+        children: [
+          NavItem(text: 'All Customers', path: RPaths.customer),
+          NavItem(text: 'Due Adjustment', path: RPaths.customerDueManagement),
+        ],
+      ),
+      NavItem(
+        text: 'Suppliers',
+        icon: LuIcons.building2,
+        children: [
+          NavItem(text: 'All Suppliers', path: RPaths.supplier),
+          NavItem(text: 'Due Clearance', path: RPaths.supplierDueManagement),
+        ],
+      ),
+    ],
+  };
 }
 
 List<(String text, IconData icon, RPath? path)> _mobileItems(List<RolePermissions> p) {
@@ -479,4 +408,13 @@ List<(String text, IconData icon, RPath? path)> _mobileItems(List<RolePermission
     ],
     ('More', LuIcons.layoutDashboard, RPaths.moreTools),
   ];
+}
+
+class NavItem {
+  NavItem({required this.text, this.icon, this.path, this.children = const []});
+
+  final String text;
+  final IconData? icon;
+  final RPath? path;
+  final List<NavItem> children;
 }
