@@ -33,7 +33,7 @@ class CreateRecordView extends HookConsumerWidget {
         key: formKey,
         onChanged: () {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            final state = formKey.currentState?..saveAndValidate();
+            final state = formKey.currentState;
             recordCtrl().setInputsFromMap(state?.instantValue ?? {});
           });
         },
@@ -123,6 +123,7 @@ class CreateRecordView extends HookConsumerWidget {
                                           recordCtrl().changeQuantity(detail, (_) => q);
                                           recordCtrl().updatePrice(detail, p);
                                         },
+                                        onStockChange: (stock) => recordCtrl().updateStock(detail.id, stock),
                                         onQtyEnd: () async {
                                           final allStockIds = record.details.map((e) => e.stock.id).toList();
 
@@ -171,6 +172,8 @@ class CreateRecordView extends HookConsumerWidget {
                                     _Summary(
                                       record: record,
                                       onSubmit: () async {
+                                        if (formKey.currentState?.saveAndValidate() == false) return;
+
                                         final (res, inv) = await recordCtrl().submit();
                                         if (context.mounted) res.showToast(context);
 
@@ -179,6 +182,8 @@ class CreateRecordView extends HookConsumerWidget {
 
                                           final config = await ref.read(configCtrlAsyncProvider.future);
                                           if (!context.mounted) return;
+
+                                          context.pop();
 
                                           if (inv != null) {
                                             await showShadDialog(
@@ -210,10 +215,6 @@ class CreateRecordView extends HookConsumerWidget {
                         type: type,
                         userHouse: user?.warehouse,
                         onProductSelect: (p, s, w) async {
-                          // final selected = await showShadDialog(
-                          //   context: context,
-                          //   builder: (context) => StockSelectionDialog(product: p, wh: w),
-                          // );
                           recordCtrl().addProduct(p, stock: s, warehouse: w);
                         },
                       ),
@@ -405,14 +406,15 @@ class _ProductTile extends StatelessWidget {
     required this.onProductRemove,
     required this.type,
     required this.onQtyEnd,
+    required this.onStockChange,
   });
 
   final InventoryDetails detail;
   final int index;
   final Function(num price, int qty) onChange;
   final void Function() onQtyEnd;
-
   final Function(String pId) onProductRemove;
+  final Function(Stock? stock) onStockChange;
   final RecordType type;
 
   @override
@@ -462,20 +464,28 @@ class _ProductTile extends StatelessWidget {
               ),
               Row(
                 children: [
-                  if (type.isSale)
-                    ShadIconButton(
-                      icon: const Icon(LuIcons.pen, size: 15),
-                      height: 30,
-                      width: 30,
-                      onPressed: () async {
+                  ShadIconButton(
+                    icon: const Icon(LuIcons.pen, size: 15),
+                    height: 30,
+                    width: 30,
+                    onPressed: () async {
+                      if (type.isSale) {
                         final result = await showShadDialog<(num, int)>(
                           context: context,
                           builder: (context) => _ChangePriceDialog(detail, type),
                         );
-                        if (result == null) return;
-                        onChange(result.$1, result.$2);
-                      },
-                    ),
+                        if (result != null) onChange(result.$1, result.$2);
+                      } else {
+                        final st = await showShadDialog<Stock>(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (context) => AddStockDialog(exStock: detail.stock),
+                        );
+
+                        onStockChange(st);
+                      }
+                    },
+                  ),
                   ShadIconButton.destructive(
                     icon: const Icon(LuIcons.x),
                     onPressed: () => onProductRemove(product.id),
@@ -527,7 +537,7 @@ class _ProductTile extends StatelessWidget {
                       height: 30,
                       width: 30,
                       onPressed: () {
-                        if (availableQty == 0 && isSale) return;
+                        if (availableQty == 0 && isSale) return onQtyEnd();
                         onChange(price, qty + 1);
                       },
                     ),
@@ -629,20 +639,28 @@ class _ProductTile extends StatelessWidget {
 
         Row(
           children: [
-            if (type.isSale)
-              ShadIconButton(
-                icon: const Icon(LuIcons.pen, size: 15),
-                height: 30,
-                width: 30,
-                onPressed: () async {
+            ShadIconButton(
+              icon: const Icon(LuIcons.pen, size: 15),
+              height: 30,
+              width: 30,
+              onPressed: () async {
+                if (type.isSale) {
                   final result = await showShadDialog<(num, int)>(
                     context: context,
                     builder: (context) => _ChangePriceDialog(detail, type),
                   );
-                  if (result == null) return;
-                  onChange(result.$1, result.$2);
-                },
-              ),
+                  if (result != null) onChange(result.$1, result.$2);
+                } else {
+                  final st = await showShadDialog<Stock>(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) => AddStockDialog(exStock: detail.stock),
+                  );
+
+                  onStockChange(st);
+                }
+              },
+            ),
             ShadIconButton.destructive(
               icon: const Icon(LuIcons.x),
               onPressed: () => onProductRemove(product.id),

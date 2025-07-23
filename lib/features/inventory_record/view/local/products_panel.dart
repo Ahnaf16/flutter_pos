@@ -101,7 +101,7 @@ class ProductsPanel extends HookConsumerWidget {
                             final res = await showShadDialog<Stock>(
                               barrierDismissible: false,
                               context: context,
-                              builder: (context) => const _AddStockDialog(),
+                              builder: (context) => const AddStockDialog(),
                             );
                             onProductSelect(product, res, null);
                           }
@@ -140,15 +140,17 @@ class ProductsPanel extends HookConsumerWidget {
   }
 }
 
-class _AddStockDialog extends HookConsumerWidget {
-  const _AddStockDialog();
+class AddStockDialog extends HookConsumerWidget {
+  const AddStockDialog({super.key, this.exStock});
+
+  final Stock? exStock;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final viewingWh = ref.watch(viewingWHProvider);
     final warehouseList = ref.watch(warehouseCtrlProvider);
 
-    final stock = useState<Stock>(Stock.empty(ID.unique()));
+    final stock = useState<Stock>(exStock ?? Stock.empty(ID.unique()));
 
     return ShadDialog(
       title: const Text('Stock'),
@@ -188,6 +190,7 @@ class _AddStockDialog extends HookConsumerWidget {
                     hintText: 'Enter purchase price',
                     isRequired: true,
                     numeric: true,
+                    initialValue: stock.value.purchasePrice != 0 ? stock.value.purchasePrice.toString() : null,
                     onChanged: (value) {
                       stock.value = stock.value.copyWith(purchasePrice: Parser.toNum(value));
                     },
@@ -204,6 +207,7 @@ class _AddStockDialog extends HookConsumerWidget {
                     label: 'Quantity',
                     hintText: 'Enter Stock quantity',
                     isRequired: true,
+                    initialValue: stock.value.quantity != 0 ? stock.value.quantity.toString() : null,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     onChanged: (value) {
                       stock.value = stock.value.copyWith(quantity: Parser.toInt(value));
@@ -219,7 +223,7 @@ class _AddStockDialog extends HookConsumerWidget {
                         child: ShadSelectField<WareHouse>(
                           label: 'Choose warehouse',
                           hintText: 'Warehouse',
-                          initialValue: viewingWh.my,
+                          initialValue: stock.value.warehouse ?? viewingWh.my,
                           enabled: viewingWh.my?.isDefault == true,
                           options: warehouses,
                           optionBuilder: (context, value, index) => ShadOption(value: value, child: Text(value.name)),
