@@ -32,14 +32,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
     }
 
     if (state.details.map((e) => e.product.id).contains(product.id) && type.isSale) {
-      final existing = state.details.firstWhere((e) => e.product.id == product.id).stock;
-      if (existing.id != stock.id) return;
-      // if (stock.quantity <= 0) return;
-
-      return changeProductQuantity(product.id, (q) {
-        if (q >= existing.quantity) return q;
-        return q + 1;
-      });
+      return;
     }
     final qty = type.isSale ? 1 : stock.quantity;
     final details = InventoryDetails(
@@ -55,6 +48,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
   }
 
   void addInvDetails(Product product, Stock stock) {
+    if (type == RecordType.purchase) return;
     final details = InventoryDetails(
       id: ID.unique(),
       product: product,
@@ -93,6 +87,20 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
             quantity: update(item.quantity),
             stock: item.stock.copyWith(quantity: update(item.stock.quantity)),
           )
+        else
+          item,
+    ];
+
+    state = state.copyWith(details: updatedDetails);
+  }
+
+  void updateStock(String id, Stock? stock) {
+    if (type == RecordType.sale || stock == null) return;
+
+    final updatedDetails = [
+      for (final item in state.details)
+        if (item.id == id && item.stock.id == stock.id)
+          item.copyWith(quantity: stock.quantity, price: stock.purchasePrice, stock: stock)
         else
           item,
     ];

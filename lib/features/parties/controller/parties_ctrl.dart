@@ -82,6 +82,7 @@ class PartiesCtrl extends _$PartiesCtrl {
     final res = await _repo.updateDue(party, amount, !amount.isNegative, note);
     return res.fold(leftResult, (r) {
       ref.invalidate(partiesCtrlProvider);
+      ref.invalidate(partyDetailsProvider);
       return rightResult('Parti updated successfully');
     });
   }
