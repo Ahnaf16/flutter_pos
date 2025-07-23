@@ -48,6 +48,15 @@ class HomeView extends HookConsumerWidget {
                 if (config.shop.shopLogo != null) CircleImage(Img.aw(config.shop.shopLogo!), radius: 20),
                 Text(config.shop.shopName ?? kAppName),
               ],
+              if (!context.layout.isMobile) ...[
+                Text(
+                  'Welcome to ${config.shop.shopName ?? kAppName}',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              ],
               Expanded(
                 child: CenterRight(
                   child: ShadSelect<int>(
