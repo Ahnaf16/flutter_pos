@@ -62,7 +62,7 @@ class HomeView extends HookConsumerWidget {
                       'Welcome to ${config.shop.shopName ?? kAppName}',
                       style: const TextStyle(
                         fontSize: 24,
-                        fontWeight: FontWeight.w300,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
