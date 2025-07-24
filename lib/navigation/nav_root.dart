@@ -158,6 +158,7 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
     }
 
     useEffect(() {
+      // cat('');
       fetchHouses();
       return null;
     }, [user?.id, user?.warehouse?.isDefault]);

@@ -14,6 +14,6 @@ class AppRoot extends HookConsumerWidget {
       };
     }, const []);
 
-    return child;
+    return Layouts.init(context, child);
   }
 }

@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_ctrl.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class AuthCtrl extends _$AuthCtrl {
   final _repo = locate<AuthRepo>();
 

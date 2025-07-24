@@ -23,22 +23,21 @@ final currentUserProvider = FutureProvider<AppUser?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserRef = FutureProviderRef<AppUser?>;
-String _$authCtrlHash() => r'215feb227083a2fe65acf6ee609dca5b555b933f';
+String _$authCtrlHash() => r'40728562d499ecc19320cff364aa5c4e0793e10c';
 
 /// See also [AuthCtrl].
 @ProviderFor(AuthCtrl)
-final authCtrlProvider =
-    AutoDisposeAsyncNotifierProvider<AuthCtrl, AppUser?>.internal(
-      AuthCtrl.new,
-      name: r'authCtrlProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$authCtrlHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+final authCtrlProvider = AsyncNotifierProvider<AuthCtrl, AppUser?>.internal(
+  AuthCtrl.new,
+  name: r'authCtrlProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$authCtrlHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef _$AuthCtrl = AutoDisposeAsyncNotifier<AppUser?>;
+typedef _$AuthCtrl = AsyncNotifier<AppUser?>;
 String _$authStateSyncHash() => r'cdf79882efd28862604decad839a71e6266ddde5';
 
 /// See also [AuthStateSync].

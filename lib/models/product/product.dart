@@ -167,28 +167,26 @@ class Product {
   List<Stock> stocksByHouse(String? houseId) =>
       houseId == null ? stock : stock.where((e) => e.warehouse?.id == houseId).toList();
 
-  Stock? getLatestStock([String? warehouseId, List<Stock>? ignore]) {
-    List<Stock> filteredStock = stock.whereNot((e) => e.quantity == 0).toList();
+  Stock? getLatestStock([String? warehouseId]) {
+    List<Stock> filteredStock = stock.where((e) => e.quantity != 0).toList();
 
-    if (ignore != null) {
-      filteredStock = filteredStock.whereNot((e) => ignore.map((e) => e.id).contains(e.id)).toList();
-    }
     if (warehouseId != null) {
-      filteredStock = stocksByHouse(warehouseId);
+      filteredStock = stocksByHouse(warehouseId).where((e) => e.quantity != 0).toList();
     }
 
     if (filteredStock.isEmpty) return null;
 
     final s = filteredStock.reduce((a, b) => a.createdAt.isAfter(b.createdAt) ? a : b);
+
     if (s.quantity <= 0) return null;
     return s;
   }
 
-  Stock? getOldestStock([String? warehouseId, List<Stock>? ignore]) {
+  Stock? getOldestStock([String? warehouseId]) {
     List<Stock> filteredStock = stock;
 
     if (warehouseId != null) {
-      filteredStock = stocksByHouse(warehouseId);
+      filteredStock = stocksByHouse(warehouseId).where((e) => e.quantity != 0).toList();
     }
 
     if (filteredStock.isEmpty) return null;
@@ -199,10 +197,13 @@ class Product {
     return s;
   }
 
-  Stock? getEffectiveStock(StockDistPolicy policy, String? warehouseId, [List<Stock>? ignore]) {
+  Stock? getEffectiveStock(
+    StockDistPolicy policy,
+    String? warehouseId,
+  ) {
     return switch (policy) {
-      StockDistPolicy.newerFirst => getLatestStock(warehouseId, ignore),
-      StockDistPolicy.olderFirst => getOldestStock(warehouseId, ignore),
+      StockDistPolicy.newerFirst => getLatestStock(warehouseId),
+      StockDistPolicy.olderFirst => getOldestStock(warehouseId),
     };
   }
 

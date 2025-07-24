@@ -1,4 +1,4 @@
 {
   "dart.flutterSdkPath": ".fvm/versions/3.32.6",
-  "build-runner.flutterPath": ".fvm/versions/3.32.0/bin/flutter"
+  "build-runner.flutterPath": ".fvm/versions/3.32.6/bin/flutter"
 }

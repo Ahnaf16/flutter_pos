@@ -59,6 +59,7 @@ const _$pub = (
     navigatorResizable: "^1.0.2",
     timeago: "^3.7.1",
     syncfusionFlutterCharts: "^29.2.8",
+    scaledApp: "^2.3.0",
   ),
   devDependencies: (
     flutterTest: (sdk: "flutter"),

@@ -215,27 +215,6 @@ class BarWidget extends HookConsumerWidget {
                     width: 6,
                   ),
                 ),
-
-                // ColumnSeries<_BarData, String>(
-                //   name: 'Out',
-                //   dataSource: outData(),
-                //   xValueMapper: (data, _) => data.x,
-                //   yValueMapper: (data, _) => data.y,
-                //   color: Colors.amber.shade700,
-                //   borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-                //   spacing: 0.3,
-                //   width: 0.9,
-                // ),
-                // ColumnSeries<_BarData, String>(
-                //   name: 'Return',
-                //   dataSource: returnData(),
-                //   xValueMapper: (data, _) => data.x,
-                //   yValueMapper: (data, _) => data.y,
-                //   color: Colors.redAccent,
-                //   borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-                //   spacing: 0.3,
-                //   width: 0.9,
-                // ),
               ],
             ),
           ),
@@ -246,9 +225,12 @@ class BarWidget extends HookConsumerWidget {
 }
 
 class LineChartWidget extends HookConsumerWidget {
-  const LineChartWidget(this.start, this.end, {super.key});
+  const LineChartWidget(this.start, this.end, {super.key, this.showSale = true, this.showPurchase = true});
   final DateTime? start;
   final DateTime? end;
+
+  final bool showSale;
+  final bool showPurchase;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -298,24 +280,26 @@ class LineChartWidget extends HookConsumerWidget {
           numberFormat: currencyFormate(compact: true),
         ),
         series: [
-          SplineSeries<_LineData, DateTime>(
-            name: 'Sale',
-            dataSource: sale(),
-            xValueMapper: (data, _) => data.x,
-            yValueMapper: (data, _) => data.y,
-            color: RecordType.sale.color,
-            markerSettings: const MarkerSettings(isVisible: true),
-            splineType: SplineType.monotonic,
-          ),
-          SplineSeries<_LineData, DateTime>(
-            name: 'Purchase',
-            dataSource: purchase(),
-            xValueMapper: (data, _) => data.x,
-            yValueMapper: (data, _) => data.y,
-            color: RecordType.purchase.color,
-            markerSettings: const MarkerSettings(isVisible: true),
-            splineType: SplineType.monotonic,
-          ),
+          if (showSale)
+            SplineSeries<_LineData, DateTime>(
+              name: 'Sale',
+              dataSource: sale(),
+              xValueMapper: (data, _) => data.x,
+              yValueMapper: (data, _) => data.y,
+              color: RecordType.sale.color,
+              markerSettings: const MarkerSettings(isVisible: true),
+              splineType: SplineType.monotonic,
+            ),
+          if (showPurchase)
+            SplineSeries<_LineData, DateTime>(
+              name: 'Purchase',
+              dataSource: purchase(),
+              xValueMapper: (data, _) => data.x,
+              yValueMapper: (data, _) => data.y,
+              color: RecordType.purchase.color,
+              markerSettings: const MarkerSettings(isVisible: true),
+              splineType: SplineType.monotonic,
+            ),
         ],
       ),
     );

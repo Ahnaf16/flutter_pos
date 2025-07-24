@@ -2,9 +2,10 @@ import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class HomeCounterWidget extends ConsumerStatefulWidget {
-  const HomeCounterWidget(this.start, this.end, {super.key});
+  const HomeCounterWidget(this.start, this.end, {super.key, required this.permissions});
   final DateTime? start;
   final DateTime? end;
+  final List<RolePermissions> permissions;
 
   @override
   ConsumerState<HomeCounterWidget> createState() => _HomeCounterWidgetState();
@@ -54,6 +55,16 @@ class _HomeCounterWidgetState extends ConsumerState<HomeCounterWidget> {
       'Supplier due': context.isDark ? const Color(0xFFD1B000) : const Color(0xFFB99700),
       'Total account balance': context.isDark ? const Color(0xFFB85A6B) : const Color(0xFF91479D),
     };
+    final routeMaps = <String, bool>{
+      'Products': widget.permissions.contains(RolePermissions.manageProduct),
+      'Sales': widget.permissions.contains(RolePermissions.makeSale),
+      'Purchase': widget.permissions.contains(RolePermissions.makePurchase),
+      'Sales Return': widget.permissions.contains(RolePermissions.returnSale),
+      'Purchase Return': widget.permissions.contains(RolePermissions.returnPurchase),
+      'Customer due': widget.permissions.contains(RolePermissions.due),
+      'Supplier due': widget.permissions.contains(RolePermissions.due),
+      'Total account balance': widget.permissions.contains(RolePermissions.manageAccounts),
+    };
 
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -68,6 +79,8 @@ class _HomeCounterWidgetState extends ConsumerState<HomeCounterWidget> {
       itemBuilder: (context, index) {
         final MapEntry(key: (title, path, icon), :value) = counters.entries.toList()[index];
 
+        final canNavigate = routeMaps[title] ?? false;
+
         return MouseRegion(
           onEnter: (_) => hoveredIndex.value = index,
           onExit: (_) => hoveredIndex.value = null,
@@ -80,7 +93,9 @@ class _HomeCounterWidgetState extends ConsumerState<HomeCounterWidget> {
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeOut,
                 child: InkWell(
-                  onTap: () => path.pushNamed(context),
+                  onTap: () {
+                    if (canNavigate) path.pushNamed(context);
+                  },
                   child: Container(
                     padding: Pads.med(),
                     decoration: BoxDecoration(
@@ -110,13 +125,16 @@ class _HomeCounterWidgetState extends ConsumerState<HomeCounterWidget> {
                             Text(title, style: context.text.list.op(.5), maxLines: 1, overflow: TextOverflow.ellipsis),
                             OverflowMarquee(child: Text(value.toString(), style: context.text.h4)),
                             const Gap(Insets.sm),
-                            Row(
-                              children: [
-                                Text('View all', style: context.text.list.op(.5)),
-                                const Gap(3),
-                                const Icon(Icons.arrow_outward_rounded, size: 15),
-                              ],
-                            ),
+                            if (canNavigate)
+                              Row(
+                                children: [
+                                  Text('View all', style: context.text.list.op(.5)),
+                                  const Gap(3),
+                                  const Icon(Icons.arrow_outward_rounded, size: 15),
+                                ],
+                              )
+                            else
+                              const Gap(0),
                           ],
                         ),
                         Positioned(

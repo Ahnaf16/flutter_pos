@@ -1,7 +1,6 @@
-import 'package:scaled_app/scaled_app.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-
 import 'package:pos/main.export.dart';
+import 'package:scaled_app/scaled_app.dart';
 
 void main() async {
   ScaledWidgetsFlutterBinding.ensureInitialized(
@@ -40,7 +39,7 @@ class PosApp extends HookConsumerWidget {
         darkTheme: Theme.of(context),
         routerConfig: route,
         builder: (context, child) {
-          return ShadAppBuilder(child: child, builder: (context, child) => Layouts.init(context, child));
+          return ShadAppBuilder(child: child);
         },
       ),
     );
