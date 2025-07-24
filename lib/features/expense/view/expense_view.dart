@@ -93,7 +93,9 @@ class ExpenseView extends HookConsumerWidget {
 
                       'Category' => DataGridCell(
                         columnName: head.name,
-                        value: ShadBadge.secondary(child: Text(data.category.name.titleCase, style: context.text.list)),
+                        value: ShadBadge.secondary(
+                          child: Text(data.category?.name.titleCase ?? 'n/A', style: context.text.list),
+                        ),
                       ),
 
                       'Expanse By' => DataGridCell(
@@ -271,7 +273,8 @@ class _ExpenseViewDialog extends HookConsumerWidget {
 
             //! trx info
             SpacedText(left: 'Amount', right: ex.amount.currency(), styleBuilder: (l, r) => (l, r)),
-            SpacedText(left: 'Category', right: ex.category.name, styleBuilder: (l, r) => (l, r)),
+            if (ex.category != null)
+              SpacedText(left: 'Category', right: ex.category!.name, styleBuilder: (l, r) => (l, r)),
             SpacedText(left: 'Account', right: ex.account.name, styleBuilder: (l, r) => (l, r)),
             SpacedText(left: 'Date', right: ex.date.formatDate(), styleBuilder: (l, r) => (l, r)),
             SpacedText(left: 'Note', right: ex.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),

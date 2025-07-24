@@ -40,7 +40,7 @@ class ExpenseCtrl extends _$ExpenseCtrl {
           e.expenseBy.phone.low.contains(query) ||
           e.expenseBy.email.low.contains(query) ||
           e.expanseFor.low.contains(query) ||
-          e.category.name.low.contains(query);
+          (e.category?.name.low.contains(query) ?? false);
     }).toList();
     state = AsyncData(list);
   }
