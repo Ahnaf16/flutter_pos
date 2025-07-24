@@ -171,9 +171,8 @@ class ProductsView extends HookConsumerWidget {
   static Widget nameCellBuilder(Product? product, [double gap = Insets.xs, double imgSize = 40]) => Builder(
     builder: (context) {
       if (product == null) return const Text('Unknown product');
-      return Wrap(
+      return Row(
         spacing: Insets.med,
-        runSpacing: Insets.xs,
 
         children: [
           ShadCard(
@@ -182,8 +181,7 @@ class ProductsView extends HookConsumerWidget {
             child: HostedImage.square(product.getPhoto(), radius: Corners.sm, dimension: imgSize),
           ),
 
-          SizedBox(
-            width: 150,
+          Flexible(
             child: Column(
               spacing: gap,
               crossAxisAlignment: CrossAxisAlignment.start,
