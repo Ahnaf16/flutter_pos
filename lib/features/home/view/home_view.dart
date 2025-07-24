@@ -137,7 +137,12 @@ class HomeView extends HookConsumerWidget {
               spacing: Insets.med,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Transactions'),
+                Text(
+                  'Transactions',
+                  style: context.text.large.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 ShadButton.link(
                   child: const SelectionContainer.disabled(child: Text('View all')),
                   onPressed: () => RPaths.transactions.pushNamed(context),

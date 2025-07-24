@@ -45,13 +45,18 @@ class PieWidget extends HookConsumerWidget {
       return data;
     }
 
+    final theme = Theme.of(context);
     return ShadCard(
       height: 600,
       width: context.layout.isDesktop ? context.width * .35 : null,
       child: SfCircularChart(
-        title: const ChartTitle(
+        title: ChartTitle(
           text: 'Transactions by type',
           alignment: ChartAlignment.near,
+          textStyle: theme.textTheme.titleLarge?.copyWith(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         legend: const Legend(isVisible: true, position: LegendPosition.bottom),
         tooltipBehavior: TooltipBehavior(enable: true, duration: 1000),
@@ -286,14 +291,22 @@ class LineChartWidget extends HookConsumerWidget {
       return data;
     }
 
+    final theme = Theme.of(context);
+
     return ShadCard(
+      title: Padding(
+        padding: const EdgeInsets.only(bottom: 10.0),
+        child: Text(
+          'Invoice records',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       child: SfCartesianChart(
-        title: const ChartTitle(text: 'Invoice records', alignment: ChartAlignment.near),
         tooltipBehavior: TooltipBehavior(enable: true),
         legend: const Legend(isVisible: true, position: LegendPosition.bottom),
-        primaryXAxis: const DateTimeAxis(
-          // maximum: DateTime.now().addDays(1),
-        ),
+        primaryXAxis: const DateTimeAxis(),
         primaryYAxis: NumericAxis(
           numberFormat: currencyFormate(compact: true),
         ),
