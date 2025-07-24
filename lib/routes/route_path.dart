@@ -46,6 +46,7 @@ class RPaths {
   static RPath customer = const RPath('/customer');
   static RPath customerDetails(String id) => RPath('/customer_details', {'id': id});
   static RPath customerDueManagement = const RPath('/customer_due_management');
+  static RPath customerMoneyTransfer = const RPath('/customer_money_transfer');
 
   // supplier
   static RPath supplier = const RPath('/supplier');

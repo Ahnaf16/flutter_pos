@@ -29,7 +29,7 @@ builder_clean:
 assets_gen: ## generates assets using flutter-gen and adds inline html preview for assets
 	@echo "╠ Generating assets"
 	@fluttergen
-	@dart run bin/gen_assets_preview.dart || (echo "Error in project"; exit 1)
+	@fvm dart run bin/gen_assets_preview.dart || (echo "Error in project"; exit 1)
 
  
 build_web: ## build for web

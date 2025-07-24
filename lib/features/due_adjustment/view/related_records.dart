@@ -8,13 +8,13 @@ class RelatedRecords extends ConsumerWidget {
     this.unpaid = false,
     this.scroll = true,
   });
-  final Party party;
+  final Party? party;
   final bool unpaid;
   final bool scroll;
 
   @override
   Widget build(BuildContext context, ref) {
-    final inventoryList = ref.watch(recordsByPartiProvider(party.id));
+    final inventoryList = ref.watch(recordsByPartiProvider(party?.id));
 
     return ShadCard(
       title: Text(unpaid ? 'Unpaid/Partial invoices' : 'Recent Invoices', style: context.text.p),
@@ -29,7 +29,9 @@ class RelatedRecords extends ConsumerWidget {
           } else {
             inventories = inventories.takeFirst(10);
           }
-          if (inventories.isEmpty) return const EmptyWidget('No Invoice Found');
+          if (inventories.isEmpty) {
+            return EmptyWidget(party == null ? 'Select a user to see related records' : 'No Invoice Found');
+          }
 
           return ListView.separated(
             shrinkWrap: true,

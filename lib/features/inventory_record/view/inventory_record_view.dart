@@ -303,18 +303,14 @@ class RecordTable extends ConsumerWidget {
                     child: Text(
                       'Phone: ${parti.phone}',
 
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w300,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.w300),
                     ),
                   ),
                 if (parti?.email != null)
                   OverflowMarquee(
                     child: Text(
                       'Email: ${parti!.email}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w300,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.w300),
                     ),
                   ),
               ],
