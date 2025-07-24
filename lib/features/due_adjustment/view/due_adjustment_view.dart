@@ -251,8 +251,9 @@ class DueAdjustmentView extends HookConsumerWidget {
 
                       const Gap(Insets.xl),
 
-                      if (selectedParty.value?.hasDue() == true)
+                      if (!isTransfer)
                         SubmitButton(
+                          enabled: selectedParty.value?.hasDue() == true,
                           onPressed: (l) async {
                             final state = formKey.currentState!;
                             if (!state.saveAndValidate()) return;
@@ -283,51 +284,51 @@ class DueAdjustmentView extends HookConsumerWidget {
                           },
                           child: const Text('Due payment'),
                         ),
+                      if (isTransfer)
+                        SubmitButton(
+                          enabled: selectedParty.value?.hasBalance() == true,
+                          onPressed: (l) async {
+                            final state = formKey.currentState!;
+                            if (!state.saveAndValidate()) return;
+                            final data = QMap.from(state.transformedValues);
 
-                      SubmitButton(
-                        enabled: selectedParty.value?.hasBalance() == true,
-                        onPressed: (l) async {
-                          final state = formKey.currentState!;
-                          if (!state.saveAndValidate()) return;
-                          final data = QMap.from(state.transformedValues);
+                            final transfer = isTransfer;
 
-                          final transfer = isTransfer;
+                            data.addAll({
+                              'date': DateTime.now().toIso8601String(),
+                              'transaction_type': (transfer ? TransactionType.transfer : TransactionType.payment).name,
+                              if (transfer) 'transaction_from': selectedParty.value?.toMap(),
+                              if (!transfer) 'transaction_to': selectedParty.value?.toMap(),
+                            });
+                            if (!transfer) data.remove('custom_info');
 
-                          data.addAll({
-                            'date': DateTime.now().toIso8601String(),
-                            'transaction_type': (transfer ? TransactionType.transfer : TransactionType.payment).name,
-                            if (transfer) 'transaction_from': selectedParty.value?.toMap(),
-                            if (!transfer) 'transaction_to': selectedParty.value?.toMap(),
-                          });
-                          if (!transfer) data.remove('custom_info');
+                            final log = TransactionLog.fromMap(data);
 
-                          final log = TransactionLog.fromMap(data);
+                            final err = log.validate();
+                            if (err != null) {
+                              return Toast.showErr(context, err);
+                            }
 
-                          final err = log.validate();
-                          if (err != null) {
-                            return Toast.showErr(context, err);
-                          }
-
-                          bool? ok;
-                          if (transfer) {
-                            ok = await showShadDialog<bool>(
-                              context: context,
-                              builder: (context) => _TransferDialog(log, selectedFile.value),
-                            );
-                          } else {
-                            ok = await showShadDialog<bool>(
-                              context: context,
-                              builder: (context) => _DueClearDialog(log, selectedFile.value),
-                            );
-                          }
-                          if (ok == true) {
-                            selectedFile.value = null;
-                            selectedParty.value = null;
-                            state.reset();
-                          }
-                        },
-                        child: Text(isTransfer ? 'Transfer balance' : 'Clear due'),
-                      ),
+                            bool? ok;
+                            if (transfer) {
+                              ok = await showShadDialog<bool>(
+                                context: context,
+                                builder: (context) => _TransferDialog(log, selectedFile.value),
+                              );
+                            } else {
+                              ok = await showShadDialog<bool>(
+                                context: context,
+                                builder: (context) => _DueClearDialog(log, selectedFile.value),
+                              );
+                            }
+                            if (ok == true) {
+                              selectedFile.value = null;
+                              selectedParty.value = null;
+                              state.reset();
+                            }
+                          },
+                          child: Text(isTransfer ? 'Transfer balance' : 'Clear due'),
+                        ),
                     ],
                   ),
                 ),

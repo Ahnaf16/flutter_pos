@@ -446,7 +446,13 @@ class RecordTable extends ConsumerWidget {
             if (data.hasDue) ...[
               const Gap(5),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  if (data.type.isSale) {
+                    RPaths.customerDueManagement.pushNamed(context, extra: data.party);
+                  } else {
+                    RPaths.supplierDueManagement.pushNamed(context, extra: data.party);
+                  }
+                },
                 child: Icon(Icons.arrow_outward_outlined, size: 16, color: context.colors.primary),
               ),
             ],
