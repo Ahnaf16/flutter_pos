@@ -431,13 +431,26 @@ class RecordTable extends ConsumerWidget {
   Widget _dueBuilder(InventoryRecord data) {
     return Builder(
       builder: (context) {
-        return Text(
-          data.hasDue ? '- ${data.due.abs().currency()}' : data.due.abs().currency(),
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: data.hasDue ? Colors.red : Colors.green,
-          ),
+        return Row(
+          children: [
+            Flexible(
+              child: Text(
+                data.hasDue ? '- ${data.due.abs().currency()}' : data.due.abs().currency(),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: data.hasDue ? Colors.red : Colors.green,
+                ),
+              ),
+            ),
+            if (data.hasDue) ...[
+              const Gap(5),
+              InkWell(
+                onTap: () {},
+                child: Icon(Icons.arrow_outward_outlined, size: 16, color: context.colors.primary),
+              ),
+            ],
+          ],
         );
       },
     );

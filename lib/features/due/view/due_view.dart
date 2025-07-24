@@ -42,7 +42,7 @@ class DueView extends HookConsumerWidget {
               error: (e, s) => ErrorView(e, s, prov: dueLogCtrlProvider),
               data: (dues) {
                 return DataTableBuilder<DueLog, TableHeading>(
-                  rowHeight: 80,
+                  rowHeight: 100,
                   items: dues,
                   headings: _headings,
                   headingBuilderIndexed: (heading, i) {
