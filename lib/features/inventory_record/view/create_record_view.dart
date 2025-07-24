@@ -709,7 +709,6 @@ class _PartiSection extends HookConsumerWidget {
           child: ShadInputDecorator(
             child: Row(
               spacing: Insets.sm,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 LimitedWidthBox(
                   maxWidth: context.layout.isMobile ? 300 : 400,
@@ -738,21 +737,23 @@ class _PartiSection extends HookConsumerWidget {
 
                 if (parti != null)
                   Padding(
-                    padding: Pads.sm(),
+                    padding: Pads.sm().copyWith(
+                      top: parti.isWalkIn ? 25 : 7,
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: Insets.sm,
                       children: [
-                        DecoContainer(
-                          color: context.colors.border,
-                          borderRadius: Corners.sm,
-                          child: HostedImage.square(
-                            parti.getPhoto,
-                            radius: Corners.sm,
-                            dimension: context.layout.isMobile ? 50 : 60,
+                        if (!parti.isWalkIn)
+                          DecoContainer(
+                            color: context.colors.border,
+                            borderRadius: Corners.sm,
+                            child: HostedImage.square(
+                              parti.getPhoto,
+                              radius: Corners.sm,
+                              dimension: context.layout.isMobile ? 50 : 60,
+                            ),
                           ),
-                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
