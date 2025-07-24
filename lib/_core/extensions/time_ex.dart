@@ -31,6 +31,24 @@ extension DateTimeEx on DateTime {
 
   DateTime get justDate => DateTime(year, month, day);
 
+  /// Returns just the date based on [pattern]. Other values will be ignored
+  /// pattern = 'h', 'm', 's'
+  /// if pattern is 'h' then the returned [DateTime] will only have hours with year, month and day.
+  DateTime just(String pattern) {
+    final date = copyWith(
+      year: year,
+      month: month,
+      day: day,
+      hour: pattern.contains('h') ? hour : 0,
+      minute: pattern.contains('m') ? minute : 0,
+      second: pattern.contains('s') ? second : 0,
+      millisecond: 0,
+      microsecond: 0,
+    );
+
+    return date;
+  }
+
   /// Returns the date as `MM/dd/yyyy`
   String get postString => formatDate('MM/dd/yyyy');
 

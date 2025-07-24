@@ -258,15 +258,16 @@ class LineChartWidget extends HookConsumerWidget {
         .sortWithDate((e) => e.date)
         .filterByDateRange(start, end, (e) => e.date);
 
-    final max = useState(DateTime.now().addDays(1));
+    final sameDay = (start?.justDate == end?.justDate) && (start != null && end != null);
 
     List<_LineData> sale() {
       final data = <_LineData>[];
 
-      final invList = inventory.where((e) => e.type.isSale).groupListsBy((e) => e.date.justDate);
+      final invList = inventory
+          .where((e) => e.type.isSale)
+          .groupListsBy((e) => sameDay ? e.date.just('h') : e.date.justDate);
       for (final inv in invList.entries) {
         data.add(_LineData(inv.key, inv.value.map((e) => e.total).sum));
-        max.value = inv.key.isAfter(max.value) ? inv.key : max.value;
       }
 
       return data;
@@ -275,7 +276,9 @@ class LineChartWidget extends HookConsumerWidget {
     List<_LineData> purchase() {
       final data = <_LineData>[];
 
-      final invList = inventory.where((e) => e.type.isPurchase).groupListsBy((e) => e.date.justDate);
+      final invList = inventory
+          .where((e) => e.type.isPurchase)
+          .groupListsBy((e) => sameDay ? e.date.just('h') : e.date.justDate);
       for (final inv in invList.entries) {
         data.add(_LineData(inv.key, inv.value.map((e) => e.total).sum));
       }
@@ -283,12 +286,16 @@ class LineChartWidget extends HookConsumerWidget {
       return data;
     }
 
+    cat(purchase().map((e) => e.x));
+
     return ShadCard(
       child: SfCartesianChart(
         title: const ChartTitle(text: 'Invoice records', alignment: ChartAlignment.near),
         tooltipBehavior: TooltipBehavior(enable: true),
         legend: const Legend(isVisible: true, position: LegendPosition.bottom),
-        primaryXAxis: DateTimeAxis(maximum: max.value),
+        primaryXAxis: const DateTimeAxis(
+          // maximum: DateTime.now().addDays(1),
+        ),
         primaryYAxis: NumericAxis(
           numberFormat: currencyFormate(compact: true),
         ),
