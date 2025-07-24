@@ -5,6 +5,7 @@ import 'package:pos/features/home/controller/home_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/record_editing_ctrl.dart';
 import 'package:pos/features/inventory_record/view/local/discount_type_pop_over.dart';
 import 'package:pos/features/inventory_record/view/local/inv_invoice_widget.dart';
+import 'package:pos/features/inventory_record/view/local/no_product_select.dart';
 import 'package:pos/features/inventory_record/view/local/products_panel.dart';
 import 'package:pos/features/inventory_record/view/payment_account_select.dart';
 import 'package:pos/features/inventory_record/view/stock_selection_dialog.dart';
@@ -71,89 +72,92 @@ class CreateRecordView extends HookConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 //! selected products
-                                Expanded(
-                                  child: ListView.separated(
-                                    padding: Pads.med('blr'),
-                                    itemCount: record.details.length + (isMobile ? 1 : 0),
-                                    shrinkWrap: true,
-                                    separatorBuilder: (_, _) => const ShadSeparator.horizontal(),
-                                    itemBuilder: (BuildContext context, int index) {
-                                      final isLast = index == record.details.length && isMobile;
-                                      if (isLast) {
-                                        return ShadButton.secondary(
-                                          leading: const Icon(LuIcons.plus),
-                                          child: const SelectionContainer.disabled(child: Text('Add Product')),
-                                          onPressed: () {
-                                            showShadSheet(
-                                              context: context,
-                                              side: ShadSheetSide.right,
-                                              useRootNavigator: true,
-                                              builder: (context) => ShadSheet(
-                                                constraints: BoxConstraints(maxWidth: context.width * .8),
-                                                padding: Pads.xl('tb'),
-                                                title: Row(
-                                                  spacing: Insets.med,
-                                                  children: [
-                                                    ShadIconButton.ghost(
-                                                      icon: const Icon(LuIcons.x),
-                                                      onPressed: () => context.nPop(),
+                                record.details.isEmpty
+                                    ? const NoProductSelectedView()
+                                    : Expanded(
+                                        child: ListView.separated(
+                                          padding: Pads.med('blr'),
+                                          itemCount: record.details.length + (isMobile ? 1 : 0),
+                                          shrinkWrap: true,
+                                          separatorBuilder: (_, _) => const ShadSeparator.horizontal(),
+                                          itemBuilder: (BuildContext context, int index) {
+                                            final isLast = index == record.details.length && isMobile;
+                                            if (isLast) {
+                                              return ShadButton.secondary(
+                                                leading: const Icon(LuIcons.plus),
+                                                child: const SelectionContainer.disabled(child: Text('Add Product')),
+                                                onPressed: () {
+                                                  showShadSheet(
+                                                    context: context,
+                                                    side: ShadSheetSide.right,
+                                                    useRootNavigator: true,
+                                                    builder: (context) => ShadSheet(
+                                                      constraints: BoxConstraints(maxWidth: context.width * .8),
+                                                      padding: Pads.xl('tb'),
+                                                      title: Row(
+                                                        spacing: Insets.med,
+                                                        children: [
+                                                          ShadIconButton.ghost(
+                                                            icon: const Icon(LuIcons.x),
+                                                            onPressed: () => context.nPop(),
+                                                          ),
+                                                          const Text('Add Product'),
+                                                        ],
+                                                      ),
+                                                      scrollable: false,
+                                                      child: ProductsPanel(
+                                                        type: type,
+                                                        userHouse: user?.warehouse,
+                                                        onProductSelect: (p, s, w) {
+                                                          recordCtrl().addProduct(p, stock: s, warehouse: w);
+                                                        },
+                                                      ),
                                                     ),
-                                                    const Text('Add Product'),
-                                                  ],
-                                                ),
-                                                scrollable: false,
-                                                child: ProductsPanel(
-                                                  type: type,
-                                                  userHouse: user?.warehouse,
-                                                  onProductSelect: (p, s, w) {
-                                                    recordCtrl().addProduct(p, stock: s, warehouse: w);
+                                                  );
+                                                },
+                                              );
+                                            }
+                                            final detail = record.details[index];
+                                            return _ProductTile(
+                                              detail: detail,
+                                              index: index,
+                                              type: type,
+                                              onChange: (p, q) {
+                                                recordCtrl().changeQuantity(detail, (_) => q);
+                                                recordCtrl().updatePrice(detail, p);
+                                              },
+                                              onStockChange: (stock) => recordCtrl().updateStock(detail.id, stock),
+                                              onQtyEnd: () async {
+                                                final allStockIds = record.details.map((e) => e.stock.id).toList();
+
+                                                final stocks = detail.product
+                                                    .sortByNewest(vWh.viewing?.id)
+                                                    .where((e) => e.quantity > 0 && !allStockIds.contains(e.id))
+                                                    .toList();
+
+                                                if (stocks.isEmpty) {
+                                                  return Toast.showErr(context, 'No stock available');
+                                                }
+                                                final selected = await showShadDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return StockSelectionDialog(
+                                                      product: detail.product,
+                                                      stocks: stocks,
+                                                      detailIds: allStockIds,
+                                                    );
                                                   },
-                                                ),
-                                              ),
+                                                );
+                                                if (selected case final Stock s) {
+                                                  recordCtrl().addInvDetails(detail.product, s);
+                                                }
+                                              },
+                                              onProductRemove: (pId) =>
+                                                  recordCtrl().removeProduct(pId, detail.stock.id),
                                             );
                                           },
-                                        );
-                                      }
-                                      final detail = record.details[index];
-                                      return _ProductTile(
-                                        detail: detail,
-                                        index: index,
-                                        type: type,
-                                        onChange: (p, q) {
-                                          recordCtrl().changeQuantity(detail, (_) => q);
-                                          recordCtrl().updatePrice(detail, p);
-                                        },
-                                        onStockChange: (stock) => recordCtrl().updateStock(detail.id, stock),
-                                        onQtyEnd: () async {
-                                          final allStockIds = record.details.map((e) => e.stock.id).toList();
-
-                                          final stocks = detail.product
-                                              .sortByNewest(vWh.viewing?.id)
-                                              .where((e) => e.quantity > 0 && !allStockIds.contains(e.id))
-                                              .toList();
-
-                                          if (stocks.isEmpty) {
-                                            return Toast.showErr(context, 'No stock available');
-                                          }
-                                          final selected = await showShadDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return StockSelectionDialog(
-                                                product: detail.product,
-                                                stocks: stocks,
-                                                detailIds: allStockIds,
-                                              );
-                                            },
-                                          );
-                                          if (selected case final Stock s) {
-                                            recordCtrl().addInvDetails(detail.product, s);
-                                          }
-                                        },
-                                        onProductRemove: (pId) => recordCtrl().removeProduct(pId, detail.stock.id),
-                                      );
-                                    },
-                                  ),
-                                ),
+                                        ),
+                                      ),
                                 const ShadSeparator.horizontal(),
                                 //! calculations
                                 Flex(
@@ -746,12 +750,12 @@ class _PartiSection extends HookConsumerWidget {
                       children: [
                         if (!parti.isWalkIn)
                           DecoContainer(
-                            color: context.colors.border,
+                            color: context.colors.border.op3,
                             borderRadius: Corners.sm,
                             child: HostedImage.square(
                               parti.getPhoto,
                               radius: Corners.sm,
-                              dimension: context.layout.isMobile ? 50 : 60,
+                              dimension: context.layout.isMobile ? 50 : 50,
                             ),
                           ),
                         Column(

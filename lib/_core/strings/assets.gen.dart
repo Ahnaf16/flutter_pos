@@ -1,3 +1,5 @@
+// dart format width=120
+
 /// GENERATED CODE - DO NOT MODIFY BY HAND
 /// *****************************************************
 ///  FlutterGen
@@ -5,7 +7,7 @@
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
-// ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
+// ignore_for_file: deprecated_member_use,directives_ordering,implicit_dynamic_list_literal,unnecessary_import
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -15,14 +17,17 @@ import 'package:vector_graphics/vector_graphics.dart' as _vg;
 class $AssetsSvgGen {
   const $AssetsSvgGen();
 
-/// <img src="/Users/ahnafsakil/DEVELOPMENT/Flutter_projects/pos/assets/svg/bank_note_down.svg" width="50" height="50"/>
+/// <img src="/Users/jakir/flutter_project/flutter_pos/assets/svg/bank_note_down.svg" width="50" height="50"/>
   SvgGenImage get bankNoteDown => const SvgGenImage('assets/svg/bank_note_down.svg');
 
-/// <img src="/Users/ahnafsakil/DEVELOPMENT/Flutter_projects/pos/assets/svg/bank_note_up.svg" width="50" height="50"/>
+/// <img src="/Users/jakir/flutter_project/flutter_pos/assets/svg/bank_note_up.svg" width="50" height="50"/>
   SvgGenImage get bankNoteUp => const SvgGenImage('assets/svg/bank_note_up.svg');
 
+/// <img src="/Users/jakir/flutter_project/flutter_pos/assets/svg/product_svg.svg" width="50" height="50"/>
+  SvgGenImage get productSvg => const SvgGenImage('assets/svg/product_svg.svg');
+
   /// List of all assets
-  List<SvgGenImage> get values => [bankNoteDown, bankNoteUp];
+  List<SvgGenImage> get values => [bankNoteDown, bankNoteUp, productSvg];
 }
 
 class Assets {
@@ -55,6 +60,7 @@ class SvgGenImage {
     String? semanticsLabel,
     bool excludeFromSemantics = false,
     _svg.SvgTheme? theme,
+    _svg.ColorMapper? colorMapper,
     ColorFilter? colorFilter,
     Clip clipBehavior = Clip.hardEdge,
     @deprecated Color? color,
@@ -65,7 +71,13 @@ class SvgGenImage {
     if (_isVecFormat) {
       loader = _vg.AssetBytesLoader(_assetName, assetBundle: bundle, packageName: package);
     } else {
-      loader = _svg.SvgAssetLoader(_assetName, assetBundle: bundle, packageName: package, theme: theme);
+      loader = _svg.SvgAssetLoader(
+        _assetName,
+        assetBundle: bundle,
+        packageName: package,
+        theme: theme,
+        colorMapper: colorMapper,
+      );
     }
     return _svg.SvgPicture(
       loader,
