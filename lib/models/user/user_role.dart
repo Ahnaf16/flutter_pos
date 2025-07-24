@@ -39,6 +39,7 @@ class UserRole {
 
   static UserRole? tyrParse(dynamic value) {
     try {
+      if (value case final UserRole r) return r;
       if (value case final Document doc) return UserRole.fromDoc(doc);
       if (value case final Map map) return UserRole.fromMap(map.toStringKey());
       return null;

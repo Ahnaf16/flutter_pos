@@ -20,7 +20,7 @@ class Expense {
   final AppUser expenseBy;
   final DateTime date;
   final String? note;
-  final ExpenseCategory category;
+  final ExpenseCategory? category;
   final AwFile? file;
 
   factory Expense.fromDoc(Document doc) => Expense.fromMap(doc.data);
@@ -34,7 +34,7 @@ class Expense {
       expenseBy: AppUser.fromMap(map['users']),
       date: DateTime.parse(map['date']),
       note: map['note'],
-      category: ExpenseCategory.fromMap(map['expanseCategory']),
+      category: ExpenseCategory.tryParse(map['expanseCategory']),
       file: AwFile.tryParse(map['file']),
     );
   }
@@ -61,7 +61,7 @@ class Expense {
     'users': expenseBy.toMap(),
     'date': date.toIso8601String(),
     'note': note,
-    'expanseCategory': category.toMap(),
+    'expanseCategory': category?.toMap(),
     'file': file?.toMap(),
   };
   QMap toAwPost() => {
@@ -71,7 +71,7 @@ class Expense {
     'users': expenseBy.id,
     'date': date.toIso8601String(),
     'note': note,
-    'expanseCategory': category.id,
+    'expanseCategory': category?.id,
     'file': file?.id,
   };
 
