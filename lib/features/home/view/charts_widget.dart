@@ -133,13 +133,6 @@ class BarWidget extends HookConsumerWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         color: theme.cardColor,
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.black.op(0.1),
-        //     blurRadius: 10,
-        //     offset: const Offset(0, 4),
-        //   ),
-        // ],
       ),
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -168,7 +161,6 @@ class BarWidget extends HookConsumerWidget {
 
               legend: Legend(
                 isVisible: true,
-
                 position: LegendPosition.bottom,
                 textStyle: theme.textTheme.bodyMedium,
                 overflowMode: LegendItemOverflowMode.wrap,
@@ -176,14 +168,10 @@ class BarWidget extends HookConsumerWidget {
               ),
               plotAreaBorderWidth: 0,
               primaryXAxis: CategoryAxis(
-                axisLine: const AxisLine(width: 0),
-                majorTickLines: const MajorTickLines(size: 0),
                 labelStyle: theme.textTheme.bodySmall,
               ),
               primaryYAxis: NumericAxis(
                 numberFormat: currencyFormate(compact: true),
-                axisLine: const AxisLine(width: 0),
-                majorTickLines: const MajorTickLines(size: 0),
                 labelStyle: theme.textTheme.bodySmall,
               ),
               series: [
@@ -205,6 +193,7 @@ class BarWidget extends HookConsumerWidget {
                   name: 'Return',
                   color: Colors.redAccent,
                   width: 2.5,
+                  splineType: SplineType.monotonic,
                   markerSettings: const MarkerSettings(
                     isVisible: true,
                     height: 6,
@@ -213,11 +202,12 @@ class BarWidget extends HookConsumerWidget {
                 ),
 
                 SplineSeries<_BarData, String>(
-                  dataSource: inData(),
+                  dataSource: outData(),
                   xValueMapper: (d, _) => d.x,
                   yValueMapper: (d, _) => d.y,
                   name: 'Out',
                   color: Colors.amber.shade700,
+                  splineType: SplineType.monotonic,
                   width: 2.5,
                   markerSettings: const MarkerSettings(
                     isVisible: true,
@@ -255,7 +245,7 @@ class BarWidget extends HookConsumerWidget {
   }
 }
 
-class LineChartWidget extends ConsumerWidget {
+class LineChartWidget extends HookConsumerWidget {
   const LineChartWidget(this.start, this.end, {super.key});
   final DateTime? start;
   final DateTime? end;
@@ -268,12 +258,15 @@ class LineChartWidget extends ConsumerWidget {
         .sortWithDate((e) => e.date)
         .filterByDateRange(start, end, (e) => e.date);
 
+    final max = useState(DateTime.now().addDays(1));
+
     List<_LineData> sale() {
       final data = <_LineData>[];
 
       final invList = inventory.where((e) => e.type.isSale).groupListsBy((e) => e.date.justDate);
       for (final inv in invList.entries) {
         data.add(_LineData(inv.key, inv.value.map((e) => e.total).sum));
+        max.value = inv.key.isAfter(max.value) ? inv.key : max.value;
       }
 
       return data;
@@ -295,7 +288,7 @@ class LineChartWidget extends ConsumerWidget {
         title: const ChartTitle(text: 'Invoice records', alignment: ChartAlignment.near),
         tooltipBehavior: TooltipBehavior(enable: true),
         legend: const Legend(isVisible: true, position: LegendPosition.bottom),
-        primaryXAxis: DateTimeAxis(maximum: DateTime.now().addDays(10)),
+        primaryXAxis: DateTimeAxis(maximum: max.value),
         primaryYAxis: NumericAxis(
           numberFormat: currencyFormate(compact: true),
         ),
@@ -303,10 +296,11 @@ class LineChartWidget extends ConsumerWidget {
           SplineSeries<_LineData, DateTime>(
             name: 'Sale',
             dataSource: sale(),
-            xValueMapper: (data, _) => data.x.justDate,
+            xValueMapper: (data, _) => data.x,
             yValueMapper: (data, _) => data.y,
             color: RecordType.sale.color,
             markerSettings: const MarkerSettings(isVisible: true),
+            splineType: SplineType.monotonic,
           ),
           SplineSeries<_LineData, DateTime>(
             name: 'Purchase',
@@ -315,6 +309,7 @@ class LineChartWidget extends ConsumerWidget {
             yValueMapper: (data, _) => data.y,
             color: RecordType.purchase.color,
             markerSettings: const MarkerSettings(isVisible: true),
+            splineType: SplineType.monotonic,
           ),
         ],
       ),

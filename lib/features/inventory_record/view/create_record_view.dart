@@ -183,7 +183,11 @@ class CreateRecordView extends HookConsumerWidget {
                                           final config = await ref.read(configCtrlAsyncProvider.future);
                                           if (!context.mounted) return;
 
-                                          context.pop();
+                                          if (type.isPurchase) {
+                                            RPaths.purchases.goNamed(context);
+                                          } else {
+                                            RPaths.sales.goNamed(context);
+                                          }
 
                                           if (inv != null) {
                                             await showShadDialog(
@@ -694,14 +698,15 @@ class _PartiSection extends HookConsumerWidget {
       ),
       error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
       data: (parties) {
+        if (type.isSale) {
+          parties = [Party.fromWalkIn(), ...parties];
+        }
         return Padding(
           padding: Pads.sm('lrt'),
           child: ShadInputDecorator(
             child: Row(
               spacing: Insets.sm,
               crossAxisAlignment: CrossAxisAlignment.start,
-              // runSpacing: Insets.sm,
-              // crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 LimitedWidthBox(
                   maxWidth: context.layout.isMobile ? 300 : 400,
@@ -713,7 +718,9 @@ class _PartiSection extends HookConsumerWidget {
                     initialValue: parti,
                     options: parties,
                     optionBuilder: (_, value, _) => ShadOption(value: value, child: Text(value.name)),
-                    onChanged: (v) => onSelect(v),
+                    onChanged: (v) {
+                      onSelect(v);
+                    },
                     selectedBuilder: (_, v) => Text(v.name),
                     searchBuilder: (v) => v.name,
                     outsideTrailing: ShadIconButton.outline(

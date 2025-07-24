@@ -9,23 +9,22 @@ class NavigationRoot extends HookConsumerWidget {
   const NavigationRoot(this.child, {super.key});
   final Widget child;
 
-  static double expandedPaneSize = 200.0;
-  static double collapsedPaneSize = 40.0;
+  static double expandedPaneSize = 220.0;
+  // static double collapsedPaneSize = 40.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authUser = ref.watch(currentUserProvider);
 
-    final rootPath = context.routeState.uri.pathSegments.first;
+    // final rootPath = context.routeState.uri.pathSegments.first;
 
     final selectedValue = useState('DashBoard');
-    final drawerOpen = useState(false);
-    final isMobile = context.layout.isMobile;
+    final isDesk = context.layout.isDesktop;
 
     // useEffect(() {
     //   if (!isMobile) {
     //     final items = navItems(authUser.valueOrNull?.role?.getPermissions ?? []);
-    //     selectedValue.value = items.indexWhere((item) => item.$3?.path.contains(rootPath) ?? false);
+    //     selectedValue.value = items.entries.where((i) =>i. ).firstOrNull?.key ?? 'DashBoard';
     //   }
     //   return null;
     // }, [rootPath, authUser.value]);
@@ -36,16 +35,101 @@ class NavigationRoot extends HookConsumerWidget {
       data: (user) {
         final permissions = user?.role?.getPermissions ?? [];
         return Scaffold(
-          appBar: context.layout.isMobile ? null : _AppBar(user: user),
-          body: _BODY(
-            drawerOpen: drawerOpen,
-            selectedValue: selectedValue,
-            permissions: permissions,
-            child: child,
-          ),
+          appBar: isDesk
+              ? _AppBar(user: user)
+              : AppBar(
+                  scrolledUnderElevation: 0,
+                  actions: [
+                    if (!context.routeState.matchedLocation.contains(RPaths.createSales.path))
+                      ShadButton(
+                        leading: const Icon(LuIcons.calculator),
+                        onPressed: () => RPaths.createSales.pushNamed(context),
+                        child: const Text('POS'),
+                      ),
+                    const Gap(10),
+                  ],
+                ),
+          drawer: isDesk ? null : NavItemWIdget(selectedValue: selectedValue, permissions: permissions),
+          body: _BODY(selectedValue: selectedValue, permissions: permissions, child: child),
         );
       },
     );
+  }
+}
+
+class NavItemWIdget extends ConsumerWidget {
+  const NavItemWIdget({super.key, required this.selectedValue, required this.permissions});
+  final ValueNotifier<String> selectedValue;
+  final List<RolePermissions> permissions;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = navItems(permissions);
+
+    final nav = SingleChildScrollView(
+      padding: Pads.med(),
+      child: LimitedWidthBox(
+        maxWidth: NavigationRoot.expandedPaneSize,
+        center: false,
+        child: IntrinsicWidth(
+          child: ShadAccordion<String>(
+            children: [
+              Column(
+                spacing: Insets.xs,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final MapEntry(key: title, value: item) in items.entries) ...[
+                    Text(title, style: context.text.small),
+                    ...item.map(
+                      (e) {
+                        if (e.children.isNotEmpty) {
+                          return NestedNav(
+                            label: e.text,
+                            icon: e.icon,
+                            selected: e.children.any((e) => e.text == selectedValue.value),
+                            children: [
+                              for (final child in e.children)
+                                NavButton(
+                                  label: child.text,
+                                  selected: child.text == selectedValue.value,
+                                  onPressed: () {
+                                    selectedValue.value = child.text;
+                                    child.path?.goNamed(context);
+                                  },
+                                ),
+                            ],
+                          );
+                        }
+                        return NavButton(
+                          label: e.text,
+                          icon: e.icon,
+                          selected: e.text == selectedValue.value,
+                          onPressed: () {
+                            selectedValue.value = e.text;
+                            e.path?.goNamed(context);
+                          },
+                        );
+                      },
+                    ),
+
+                    const Gap(Insets.sm),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (!context.layout.isDesktop) {
+      return Drawer(
+        shape: const RoundedRectangleBorder(),
+        child: nav,
+      );
+    }
+
+    return nav;
   }
 }
 
@@ -180,77 +264,17 @@ class _AppBar extends HookConsumerWidget implements PreferredSizeWidget {
 
 class _BODY extends HookConsumerWidget {
   const _BODY({
-    required this.drawerOpen,
     required this.selectedValue,
     required this.permissions,
     required this.child,
   });
 
-  final ValueNotifier<bool> drawerOpen;
   final ValueNotifier<String> selectedValue;
-  final Widget child;
   final List<RolePermissions> permissions;
+  final Widget child;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final items = navItems(permissions);
-
-    final nav = SingleChildScrollView(
-      padding: Pads.med(),
-      child: LimitedWidthBox(
-        maxWidth: NavigationRoot.expandedPaneSize,
-        center: false,
-        child: IntrinsicWidth(
-          child: ShadAccordion<String>(
-            children: [
-              Column(
-                spacing: Insets.xs,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (final MapEntry(key: title, value: item) in items.entries) ...[
-                    Text(title, style: context.text.small),
-                    ...item.map(
-                      (e) {
-                        if (e.children.isNotEmpty) {
-                          return NestedNav(
-                            label: e.text,
-                            icon: e.icon,
-                            selected: e.children.any((e) => e.text == selectedValue.value),
-                            children: [
-                              for (final child in e.children)
-                                NavButton(
-                                  label: child.text,
-                                  selected: child.text == selectedValue.value,
-                                  onPressed: () {
-                                    selectedValue.value = child.text;
-                                    child.path?.pushNamed(context);
-                                  },
-                                ),
-                            ],
-                          );
-                        }
-                        return NavButton(
-                          label: e.text,
-                          icon: e.icon,
-                          selected: e.text == selectedValue.value,
-                          onPressed: () {
-                            selectedValue.value = e.text;
-                            e.path?.pushNamed(context);
-                          },
-                        );
-                      },
-                    ),
-
-                    const Gap(Insets.sm),
-                  ],
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-
     return Stack(
       children: [
         Column(
@@ -260,15 +284,14 @@ class _BODY extends HookConsumerWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (!context.layout.isMobile) nav,
-                  if (!context.layout.isMobile) const ShadSeparator.vertical(margin: Pads.zero),
+                  if (context.layout.isDesktop) NavItemWIdget(selectedValue: selectedValue, permissions: permissions),
+                  if (context.layout.isDesktop) const ShadSeparator.vertical(margin: Pads.zero),
                   Expanded(child: child),
                 ],
               ),
             ),
           ],
         ),
-        if (context.layout.isMobile && drawerOpen.value) ShadCard(width: 300, child: nav),
       ],
     );
   }
@@ -329,7 +352,7 @@ class NavButton extends HookWidget {
             child: Text(
               label,
               maxLines: 1,
-              style: context.text.large,
+              style: context.text.small,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -367,7 +390,7 @@ class NestedNav extends ConsumerWidget {
           spacing: Insets.med,
           children: [
             Icon(icon),
-            Text(label, maxLines: 1, style: context.text.large),
+            Text(label, maxLines: 1, style: context.text.small),
           ],
         ),
         separator: const Gap(0),
@@ -391,16 +414,33 @@ Map<String, List<NavItem>> navItems(List<RolePermissions> p) {
     'Main': [
       NavItem(text: 'DashBoard', icon: LuIcons.house, path: RPaths.home),
       NavItem(text: 'New Sale', icon: LuIcons.circlePlus, path: RPaths.createSales),
+      NavItem(text: 'New Purchase', icon: LuIcons.circlePlus, path: RPaths.createPurchases),
     ],
     'Inventory': [
       NavItem(text: 'Product', icon: LuIcons.package, path: RPaths.products),
       NavItem(text: 'Unit', icon: LuIcons.weight, path: RPaths.unit),
     ],
     'Sales & Purchases': [
-      NavItem(text: 'Sales history', icon: LuIcons.chartColumn, path: RPaths.sales),
-      NavItem(text: 'Sales return', icon: LuIcons.undo2, path: RPaths.salesReturn),
-      NavItem(text: 'Purchase history', icon: LuIcons.receipt, path: RPaths.purchases),
-      NavItem(text: 'Purchase return', icon: LuIcons.refreshCw, path: RPaths.purchasesReturn),
+      NavItem(
+        text: 'Sales',
+        icon: LuIcons.chartColumn,
+        children: [
+          NavItem(text: 'Sales history', path: RPaths.sales),
+          NavItem(text: 'Sales return', path: RPaths.salesReturn),
+        ],
+      ),
+      NavItem(
+        text: 'Purchase',
+        icon: LuIcons.receipt,
+        children: [
+          NavItem(text: 'Purchase history', path: RPaths.purchases),
+          NavItem(text: 'Purchase return', path: RPaths.purchasesReturn),
+        ],
+      ),
+      // NavItem(text: 'Sales history', icon: LuIcons.chartColumn, path: RPaths.sales),
+      // NavItem(text: 'Sales return', icon: LuIcons.undo2, path: RPaths.salesReturn),
+      // NavItem(text: 'Purchase history', icon: LuIcons.receipt, path: RPaths.purchases),
+      // NavItem(text: 'Purchase return', icon: LuIcons.refreshCw, path: RPaths.purchasesReturn),
     ],
     'Contacts': [
       NavItem(
@@ -432,8 +472,16 @@ Map<String, List<NavItem>> navItems(List<RolePermissions> p) {
     ],
     'Logistics': [
       NavItem(text: 'Warehouse', icon: LuIcons.warehouse, path: RPaths.warehouse),
-      NavItem(text: 'Stock transfer', icon: LuIcons.truck, path: RPaths.stockTransfer),
-      NavItem(text: 'Stock Logs', icon: LuIcons.fileText, path: RPaths.stockLog),
+      NavItem(
+        text: 'Stock',
+        icon: LuIcons.truck,
+        children: [
+          NavItem(text: 'Stock transfer', path: RPaths.stockTransfer),
+          NavItem(text: 'Stock Logs', path: RPaths.stockLog),
+        ],
+      ),
+      // NavItem(text: 'Stock transfer', icon: LuIcons.truck, path: RPaths.stockTransfer),
+      // NavItem(text: 'Stock Logs', icon: LuIcons.fileText, path: RPaths.stockLog),
     ],
     'Accounting': [
       NavItem(
@@ -455,7 +503,7 @@ Map<String, List<NavItem>> navItems(List<RolePermissions> p) {
       NavItem(text: 'Due Management', icon: LuIcons.calculator, path: RPaths.due),
     ],
     'System': [
-      NavItem(text: 'Settings', icon: LuIcons.package, path: RPaths.settings),
+      NavItem(text: 'Settings', icon: LuIcons.settings, path: RPaths.settings),
     ],
   };
 }
