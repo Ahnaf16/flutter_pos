@@ -134,7 +134,7 @@ class TrxTable extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Row(),
-                ShadBadge.secondary(child: Text(data.account?.name.titleCase ?? '--', style: context.text.small)),
+                ShadBadge.secondary(child: Text(data.account?.name ?? '--', style: context.text.small)),
                 // if (accountAmounts) ...[
                 //   if (data.customInfo case {'pre': final pre}) SpacedText(left: 'Pre', right: pre),
                 //   if (data.customInfo case {'post': final post}) SpacedText(left: 'Post', right: post),
