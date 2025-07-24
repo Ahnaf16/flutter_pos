@@ -246,8 +246,8 @@ class _PartiViewDialog extends HookConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                         ),
                         SpacedText(
-                          left: 'Current Due',
-                          right: parti.due.currency(),
+                          left: parti.hasDue() ? 'Current Due' : 'Current Balance',
+                          right: parti.due.abs().currency(),
                           styleBuilder: (l, r) => (l, r),
                           builder: (r) => Text(r, style: context.text.small.textColor(parti.dueColor())),
                           crossAxisAlignment: CrossAxisAlignment.center,
