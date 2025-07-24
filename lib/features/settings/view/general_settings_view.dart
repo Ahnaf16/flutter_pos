@@ -33,99 +33,200 @@ class GeneralSettingsView extends HookConsumerWidget {
               spacing: Insets.med,
               children: [
                 const Gap(Insets.sm),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: ShadTextField(
-                        name: 'currency_symbol',
-                        label: 'Currency symbol',
-                        hintText: 'Enter currency symbol',
+                context.layout.isMobile
+                    ? Column(
+                        children: [
+                          ShadTextField(
+                            name: 'currency_symbol',
+                            label: 'Currency symbol',
+                            hintText: 'Enter currency symbol',
+                          ),
+                          const Gap(Insets.med),
+                          FormBuilderField<bool>(
+                            name: 'currency_symbol_on_left',
+                            builder: (form) {
+                              return ShadInputDecorator(
+                                label: const Text(
+                                  'currency symbol side',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                child: ShadSelect<bool>(
+                                  initialValue: form.value,
+                                  minWidth: context.width,
+                                  maxWidth: context.width,
+                                  maxHeight: 80,
+                                  placeholder: const Text('Select'),
+                                  selectedOptionBuilder: (context, value) => Text(value ? 'Left' : 'Right'),
+                                  onChanged: (value) => form.didChange(value),
+                                  itemCount: 2,
+                                  optionsBuilder: (_, i) =>
+                                      ShadOption(value: i == 0, child: Text(i == 0 ? 'Left' : 'Right')),
+                                ),
+                              );
+                            },
+                          ),
+                          const Gap(Insets.med),
+                          ShadTextField(
+                            name: 'invoice_prefix',
+                            label: 'Invoice prefix',
+                            hintText: 'Enter invoice prefix',
+                          ),
+                          const Gap(Insets.med),
+                          ShadTextField(
+                            name: 'sku_prefix',
+                            label: 'SKU prefix',
+                            hintText: 'Enter SKU prefix',
+                          ),
+                          const Gap(Insets.med),
+                          accountList.maybeWhen(
+                            orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                            data: (accounts) {
+                              return ShadSelectField<PaymentAccount>(
+                                hintText: 'Set a default payment account',
+                                label: 'Default payment account',
+                                initialValue: config.defaultAccount,
+                                options: accounts,
+                                valueTransformer: (value) => value?.toMap(),
+                                optionBuilder: (_, v, i) {
+                                  return ShadOption(value: v, child: Text(v.name));
+                                },
+                                selectedBuilder: (_, v) => Text(v.name),
+                              );
+                            },
+                          ),
+                          const Gap(Insets.med),
+                          FormBuilderField<String>(
+                            name: 'stock_distribution_policy',
+                            builder: (form) {
+                              return ShadInputDecorator(
+                                label: const Text('Stock distribution policy'),
+                                child: ShadSelect<StockDistPolicy>(
+                                  minWidth: context.width,
+                                  maxWidth: context.width,
+                                  maxHeight: 80,
+                                  initialValue: StockDistPolicy.values.tryByName(form.value),
+                                  placeholder: const Text('Select'),
+                                  selectedOptionBuilder: (context, value) => Text(value.name.titleCase),
+                                  itemCount: StockDistPolicy.values.length,
+                                  onChanged: (value) => form.didChange(value?.name),
+                                  optionsBuilder: (_, i) => ShadOption<StockDistPolicy>(
+                                    value: StockDistPolicy.values[i],
+                                    child: Text(StockDistPolicy.values[i].name.titleCase),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ShadTextField(
+                                  name: 'currency_symbol',
+                                  label: 'Currency symbol',
+                                  hintText: 'Enter currency symbol',
+                                ),
+                              ),
+                              Expanded(
+                                child: FormBuilderField<bool>(
+                                  name: 'currency_symbol_on_left',
+                                  builder: (form) {
+                                    return ShadInputDecorator(
+                                      label: const Text(
+                                        'currency symbol side',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      child: ShadSelect<bool>(
+                                        initialValue: form.value,
+                                        minWidth: 350,
+                                        maxWidth: 350,
+                                        maxHeight: 80,
+                                        placeholder: const Text('Select'),
+                                        selectedOptionBuilder: (context, value) => Text(value ? 'Left' : 'Right'),
+                                        onChanged: (value) => form.didChange(value),
+                                        itemCount: 2,
+                                        optionsBuilder: (_, i) =>
+                                            ShadOption(value: i == 0, child: Text(i == 0 ? 'Left' : 'Right')),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Gap(Insets.med),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ShadTextField(
+                                  name: 'invoice_prefix',
+                                  label: 'Invoice prefix',
+                                  hintText: 'Enter invoice prefix',
+                                ),
+                              ),
+                              Expanded(
+                                child: ShadTextField(
+                                  name: 'sku_prefix',
+                                  label: 'SKU prefix',
+                                  hintText: 'Enter SKU prefix',
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Gap(Insets.med),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: accountList.maybeWhen(
+                                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                                  data: (accounts) {
+                                    return ShadSelectField<PaymentAccount>(
+                                      hintText: 'Set a default payment account',
+                                      label: 'Default payment account',
+                                      initialValue: config.defaultAccount,
+                                      options: accounts,
+                                      valueTransformer: (value) => value?.toMap(),
+                                      optionBuilder: (_, v, i) {
+                                        return ShadOption(value: v, child: Text(v.name));
+                                      },
+                                      selectedBuilder: (_, v) => Text(v.name),
+                                    );
+                                  },
+                                ),
+                              ),
+                              Expanded(
+                                child: FormBuilderField<String>(
+                                  name: 'stock_distribution_policy',
+                                  builder: (form) {
+                                    return ShadInputDecorator(
+                                      label: const Text('Stock distribution policy'),
+                                      child: ShadSelect<StockDistPolicy>(
+                                        minWidth: 348,
+                                        maxWidth: 348,
+                                        maxHeight: 80,
+                                        initialValue: StockDistPolicy.values.tryByName(form.value),
+                                        placeholder: const Text('Select'),
+                                        selectedOptionBuilder: (context, value) => Text(value.name.titleCase),
+                                        itemCount: StockDistPolicy.values.length,
+                                        onChanged: (value) => form.didChange(value?.name),
+                                        optionsBuilder: (_, i) => ShadOption<StockDistPolicy>(
+                                          value: StockDistPolicy.values[i],
+                                          child: Text(StockDistPolicy.values[i].name.titleCase),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                    Expanded(
-                      child: FormBuilderField<bool>(
-                        name: 'currency_symbol_on_left',
-                        builder: (form) {
-                          return ShadInputDecorator(
-                            label: const Text('currency symbol side'),
-                            child: ShadSelect<bool>(
-                              initialValue: form.value,
-                              minWidth: 250,
-                              maxWidth: 300,
-                              maxHeight: 80,
-                              placeholder: const Text('Select'),
-                              selectedOptionBuilder: (context, value) => Text(value ? 'Left' : 'Right'),
-                              onChanged: (value) => form.didChange(value),
-                              itemCount: 2,
-                              optionsBuilder: (_, i) =>
-                                  ShadOption(value: i == 0, child: Text(i == 0 ? 'Left' : 'Right')),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: ShadTextField(
-                        name: 'invoice_prefix',
-                        label: 'Invoice prefix',
-                        hintText: 'Enter invoice prefix',
-                      ),
-                    ),
-                    Expanded(
-                      child: ShadTextField(
-                        name: 'sku_prefix',
-                        label: 'SKU prefix',
-                        hintText: 'Enter SKU prefix',
-                      ),
-                    ),
-                  ],
-                ),
-
-                accountList.maybeWhen(
-                  orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
-                  data: (accounts) {
-                    return ShadSelectField<PaymentAccount>(
-                      name: 'default_account',
-                      hintText: 'Set a default payment account',
-                      label: 'Default payment account',
-                      initialValue: config.defaultAccount,
-                      options: accounts,
-                      valueTransformer: (value) => value?.toMap(),
-                      optionBuilder: (_, v, i) {
-                        return ShadOption(value: v, child: Text(v.name));
-                      },
-                      selectedBuilder: (_, v) => Text(v.name),
-                    );
-                  },
-                ),
-                FormBuilderField<String>(
-                  name: 'stock_distribution_policy',
-                  builder: (form) {
-                    return ShadInputDecorator(
-                      label: const Text('Stock distribution policy'),
-                      child: ShadSelect<StockDistPolicy>(
-                        minWidth: 250,
-                        maxWidth: 300,
-                        maxHeight: 80,
-                        initialValue: StockDistPolicy.values.tryByName(form.value),
-                        placeholder: const Text('Select'),
-                        selectedOptionBuilder: (context, value) => Text(value.name.titleCase),
-                        itemCount: StockDistPolicy.values.length,
-                        onChanged: (value) => form.didChange(value?.name),
-                        optionsBuilder: (_, i) => ShadOption<StockDistPolicy>(
-                          value: StockDistPolicy.values[i],
-                          child: Text(StockDistPolicy.values[i].name.titleCase),
-                        ),
-                      ),
-                    );
-                  },
-                ),
 
                 const Gap(Insets.med),
                 SubmitButton(

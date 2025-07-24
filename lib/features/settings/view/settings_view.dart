@@ -36,7 +36,7 @@ class SettingsView extends HookConsumerWidget {
               children: [
                 if (ly.isDesktop)
                   SizedBox(
-                    width: 150,
+                    width: 200,
                     child: IntrinsicWidth(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,

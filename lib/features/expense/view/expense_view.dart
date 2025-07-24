@@ -15,11 +15,12 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 const _headings = [
   TableHeading.positional('#', 50.0),
   TableHeading.positional('Amount'),
-  TableHeading.positional('By', 250.0),
-  TableHeading.positional('For', 200),
-  TableHeading.positional('Category', 150.0),
-  TableHeading.positional('Account', 150.0),
-  TableHeading.positional('date', 130.0),
+  TableHeading.positional('Expanse By', 230),
+  TableHeading.positional('Gmail', 230),
+  TableHeading.positional('Expanse For', 230),
+  TableHeading.positional('Category', 200),
+  TableHeading.positional('Account', 200),
+  TableHeading.positional('date', 200),
   TableHeading.positional('Action', 100.0, Alignment.centerRight),
 ];
 
@@ -58,7 +59,7 @@ class ExpenseView extends HookConsumerWidget {
               error: (e, s) => ErrorView(e, s, prov: expenseCtrlProvider),
               data: (expenses) {
                 return DataTableBuilder<Expense, TableHeading>(
-                  rowHeight: 110,
+                  rowHeight: 90,
                   items: expenses,
                   headings: _headings,
                   headingBuilder: (heading) {
@@ -83,27 +84,25 @@ class ExpenseView extends HookConsumerWidget {
                       ),
                       'Amount' => DataGridCell(
                         columnName: head.name,
-                        value: Text(data.amount.currency(), style: context.text.lead),
+                        value: Text(data.amount.currency(), style: context.text.list),
                       ),
-                      'For' => DataGridCell(
+                      'Expanse For' => DataGridCell(
                         columnName: head.name,
-                        value: Text(data.expanseFor, style: context.text.p, maxLines: 2),
-                      ),
-                      'Category' => DataGridCell(
-                        columnName: head.name,
-                        value: ShadBadge.secondary(child: Text(data.category.name.titleCase, style: context.text.p)),
+                        value: Text(data.expanseFor, style: context.text.list, maxLines: 2),
                       ),
 
-                      'By' => DataGridCell(
+                      'Category' => DataGridCell(
                         columnName: head.name,
-                        value: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(data.expenseBy.name, style: context.text.list),
-                            Text(data.expenseBy.email, style: context.text.small, maxLines: 1),
-                          ],
-                        ),
+                        value: ShadBadge.secondary(child: Text(data.category.name.titleCase, style: context.text.list)),
+                      ),
+
+                      'Expanse By' => DataGridCell(
+                        columnName: head.name,
+                        value: Text(data.expenseBy.name, style: context.text.list),
+                      ),
+                      'Gmail' => DataGridCell(
+                        columnName: head.name,
+                        value: Text(data.expenseBy.email, style: context.text.list, maxLines: 2),
                       ),
                       'Account' => DataGridCell(
                         columnName: head.name,
@@ -131,7 +130,14 @@ class ExpenseView extends HookConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(data.date.formatDate()),
-                            Text(data.date.ago),
+                            const Gap(3),
+                            Text(
+                              data.date.ago,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -206,20 +212,20 @@ class _ExpenseViewDialog extends HookConsumerWidget {
                         SpacedText(
                           left: 'Name',
                           right: user.name,
-                          styleBuilder: (l, r) => (l, r.bold),
+                          styleBuilder: (l, r) => (l, r),
                           crossAxisAlignment: CrossAxisAlignment.center,
                         ),
                         SpacedText(
                           left: 'Phone Number',
                           right: user.phone,
-                          styleBuilder: (l, r) => (l, r.bold),
+                          styleBuilder: (l, r) => (l, r),
                           crossAxisAlignment: CrossAxisAlignment.center,
                           onTap: (left, right) => Copier.copy(right),
                         ),
                         SpacedText(
                           left: 'Email',
                           right: user.email,
-                          styleBuilder: (l, r) => (l, r.bold),
+                          styleBuilder: (l, r) => (l, r),
                           crossAxisAlignment: CrossAxisAlignment.center,
                           onTap: (left, right) => Copier.copy(right),
                         ),
@@ -264,10 +270,10 @@ class _ExpenseViewDialog extends HookConsumerWidget {
               ),
 
             //! trx info
-            SpacedText(left: 'Amount', right: ex.amount.currency(), styleBuilder: (l, r) => (l, r.bold)),
-            SpacedText(left: 'Category', right: ex.category.name, styleBuilder: (l, r) => (l, r.bold)),
-            SpacedText(left: 'Account', right: ex.account.name, styleBuilder: (l, r) => (l, r.bold)),
-            SpacedText(left: 'Date', right: ex.date.formatDate(), styleBuilder: (l, r) => (l, r.bold)),
+            SpacedText(left: 'Amount', right: ex.amount.currency(), styleBuilder: (l, r) => (l, r)),
+            SpacedText(left: 'Category', right: ex.category.name, styleBuilder: (l, r) => (l, r)),
+            SpacedText(left: 'Account', right: ex.account.name, styleBuilder: (l, r) => (l, r)),
+            SpacedText(left: 'Date', right: ex.date.formatDate(), styleBuilder: (l, r) => (l, r)),
             SpacedText(left: 'Note', right: ex.note ?? '--', styleBuilder: (l, r) => (l, context.text.muted)),
           ],
         ),

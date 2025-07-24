@@ -18,35 +18,6 @@ class CreateUserRoleView extends HookConsumerWidget {
 
     return BaseBody(
       title: '$actionText Role',
-      actions: [
-        SubmitButton(
-          size: ShadButtonSize.lg,
-          child: Text(actionText),
-          onPressed: (l) async {
-            final state = formKey.currentState!;
-            if (!state.saveAndValidate()) return;
-            final data = state.value;
-
-            (bool, String)? result;
-
-            if (updatingId != null) {
-              l.truthy();
-              result = await updateCtrl().updateRole(data);
-              l.falsey();
-            } else {
-              l.truthy();
-              final ctrl = ref.read(userRolesCtrlProvider.notifier);
-              result = await ctrl.createRole(data);
-              l.falsey();
-            }
-            if (result case final Result r) {
-              if (!context.mounted) return;
-              r.showToast(context);
-              if (r.success) context.pop();
-            }
-          },
-        ),
-      ],
 
       body: updatingRole.when(
         error: (e, s) => ErrorView(e, s, prov: updateRoleCtrlProvider(updatingId)),
@@ -68,7 +39,7 @@ class CreateUserRoleView extends HookConsumerWidget {
                     childPadding: Pads.med('t'),
                     title: const Text('User Roles'),
                     description: const Text('Add a Role name and its permissions'),
-                    childSeparator: const SizedBox(width: 750, child: ShadSeparator.horizontal(thickness: 1)),
+                    childSeparator: const SizedBox(width: 700, child: ShadSeparator.horizontal(thickness: 1)),
                     child: LimitedWidthBox(
                       maxWidth: 700,
                       center: false,
@@ -133,6 +104,33 @@ class CreateUserRoleView extends HookConsumerWidget {
                                   ],
                                 ),
                               );
+                            },
+                          ),
+                          SubmitButton(
+                            size: ShadButtonSize.lg,
+                            child: Text(actionText),
+                            onPressed: (l) async {
+                              final state = formKey.currentState!;
+                              if (!state.saveAndValidate()) return;
+                              final data = state.value;
+
+                              (bool, String)? result;
+
+                              if (updatingId != null) {
+                                l.truthy();
+                                result = await updateCtrl().updateRole(data);
+                                l.falsey();
+                              } else {
+                                l.truthy();
+                                final ctrl = ref.read(userRolesCtrlProvider.notifier);
+                                result = await ctrl.createRole(data);
+                                l.falsey();
+                              }
+                              if (result case final Result r) {
+                                if (!context.mounted) return;
+                                r.showToast(context);
+                                if (r.success) context.pop();
+                              }
                             },
                           ),
                         ],

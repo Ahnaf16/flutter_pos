@@ -6,8 +6,8 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 const _headings = [
   TableHeading.positional('#', 50.0),
   TableHeading.positional('Name'),
-  TableHeading.positional('Enabled', 300.0),
-  TableHeading.positional('Action', 400.0, Alignment.centerRight),
+  TableHeading.positional('Enabled', 150),
+  TableHeading.positional('Action', 200, Alignment.centerRight),
 ];
 
 class ExpenseCategoryView extends HookConsumerWidget {
