@@ -3,7 +3,7 @@ import 'package:pos/features/unit/view/unit_add_dialog.dart';
 import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-const _headings = [('#', 60.0), ('Name', double.nan), ('Active', 200.0), ('Action', 200.0)];
+const _headings = [('#', 60.0), ('Name', double.nan), ('Active', 80.0), ('Action', 200.0)];
 
 class UnitView extends HookConsumerWidget {
   const UnitView({super.key});

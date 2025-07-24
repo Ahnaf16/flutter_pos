@@ -27,48 +27,6 @@ class CreateStaffView extends HookConsumerWidget {
 
     return BaseBody(
       title: '$actionText Staff',
-      actions: [
-        SubmitButton(
-          size: ShadButtonSize.lg,
-          child: SelectionContainer.disabled(child: Text(actionText)),
-          onPressed: (l) async {
-            final state = formKey.currentState!;
-            if (!state.saveAndValidate()) return;
-            final data = state.value;
-
-            final ctrl = ref.read(staffsCtrlProvider.notifier);
-
-            (bool, String)? result;
-
-            if (updatingId != null) {
-              l.truthy();
-              result = await updateCtrl().updateStaff(data, selectedFile.value);
-              l.falsey();
-            } else {
-              l.truthy();
-              final (ok, msg) = await ctrl.checkAvailability(data['email']);
-              l.falsey();
-
-              if (!ok) {
-                state.fields['email']?.invalidate(msg);
-                return;
-              }
-
-              result = await showShadDialog<Result>(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) => _CreateStaffDialog(data: data, file: selectedFile.value),
-              );
-            }
-
-            if (result case final Result r) {
-              if (!context.mounted) return;
-              r.showToast(context);
-              if (r.success) context.pop();
-            }
-          },
-        ),
-      ],
       body: updatingStaff.when(
         error: (e, s) => ErrorView(e, s, prov: updateStaffCtrlProvider(updatingId)),
         loading: () => const Loading(),
@@ -211,6 +169,46 @@ class CreateStaffView extends HookConsumerWidget {
                                 ),
                               ),
                             ),
+                          ),
+                          SubmitButton(
+                            size: ShadButtonSize.lg,
+                            child: SelectionContainer.disabled(child: Text(actionText)),
+                            onPressed: (l) async {
+                              final state = formKey.currentState!;
+                              if (!state.saveAndValidate()) return;
+                              final data = state.value;
+
+                              final ctrl = ref.read(staffsCtrlProvider.notifier);
+
+                              (bool, String)? result;
+
+                              if (updatingId != null) {
+                                l.truthy();
+                                result = await updateCtrl().updateStaff(data, selectedFile.value);
+                                l.falsey();
+                              } else {
+                                l.truthy();
+                                final (ok, msg) = await ctrl.checkAvailability(data['email']);
+                                l.falsey();
+
+                                if (!ok) {
+                                  state.fields['email']?.invalidate(msg);
+                                  return;
+                                }
+
+                                result = await showShadDialog<Result>(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (context) => _CreateStaffDialog(data: data, file: selectedFile.value),
+                                );
+                              }
+
+                              if (result case final Result r) {
+                                if (!context.mounted) return;
+                                r.showToast(context);
+                                if (r.success) context.pop();
+                              }
+                            },
                           ),
                         ],
                       ),

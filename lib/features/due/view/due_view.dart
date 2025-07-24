@@ -6,10 +6,12 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 const _headings = [
   TableHeading.positional('#', 80.0),
   TableHeading.positional('Name'),
-  TableHeading.positional('Balance', 300),
-  TableHeading.positional('Amount', 350.0),
-  TableHeading.positional('Date', 250.0),
-  TableHeading.positional('Action', 100.0),
+  TableHeading.positional('Balance', 200),
+  TableHeading.positional('Amount', 230),
+  TableHeading.positional('Before', 230),
+  TableHeading.positional('After', 230),
+  TableHeading.positional('Date', 230),
+  TableHeading.positional('Action', 80),
 ];
 
 class DueView extends HookConsumerWidget {
@@ -40,7 +42,7 @@ class DueView extends HookConsumerWidget {
               error: (e, s) => ErrorView(e, s, prov: dueLogCtrlProvider),
               data: (dues) {
                 return DataTableBuilder<DueLog, TableHeading>(
-                  rowHeight: 100,
+                  rowHeight: 80,
                   items: dues,
                   headings: _headings,
                   headingBuilderIndexed: (heading, i) {
@@ -62,31 +64,20 @@ class DueView extends HookConsumerWidget {
                       'Balance' => DataGridCell(columnName: head.name, value: _BalanceNameBuilder(data.parti)),
                       'Amount' => DataGridCell(
                         columnName: head.name,
-                        value: Column(
-                          spacing: Insets.xs,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SpacedText(
-                              left: 'Amount',
-                              right: data.amount.abs().currency(),
-                              styleBuilder: (l, r) => (l, r),
-                            ),
-                            SpacedText(
-                              left: 'Before',
-                              right: data.oldAmount.currency(),
-                              styleBuilder: (l, r) {
-                                return (l, r.textColor(data.oldAmount > 0 ? Colors.red : Colors.green));
-                              },
-                            ),
-                            SpacedText(
-                              left: 'After',
-                              right: data.postAmount.currency(),
-                              styleBuilder: (l, r) {
-                                return (l, r.textColor(data.postAmount > 0 ? Colors.red : Colors.green));
-                              },
-                            ),
-                          ],
+                        value: Text(
+                          data.amount.abs().currency(),
+                        ),
+                      ),
+                      'Before' => DataGridCell(
+                        columnName: head.name,
+                        value: Text(
+                          data.oldAmount.currency(),
+                        ),
+                      ),
+                      'After' => DataGridCell(
+                        columnName: head.name,
+                        value: Text(
+                          data.postAmount.currency(),
                         ),
                       ),
                       'Date' => DataGridCell(
@@ -96,7 +87,14 @@ class DueView extends HookConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(data.date.formatDate()),
-                            Text(data.date.ago),
+                            const Gap(3),
+                            Text(
+                              data.date.ago,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -152,7 +150,13 @@ class _PartyNameBuilder extends StatelessWidget {
                   Flexible(
                     child: OverflowMarquee(child: Text(parti.name, style: context.text.list)),
                   ),
-                  if (!parti.isCustomer) ShadBadge.outline(child: Text(parti.type.name)),
+                  if (!parti.isCustomer)
+                    ShadBadge.outline(
+                      child: Text(
+                        parti.type.name,
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
+                      ),
+                    ),
                 ],
               ),
               Text(parti.phone),
@@ -175,7 +179,7 @@ class _BalanceNameBuilder extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (parti.hasBalance()) Text(parti.due.abs().currency()),
+        Text(parti.due.abs().currency() ?? 0.currency()),
       ],
     );
   }

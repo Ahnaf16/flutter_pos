@@ -8,6 +8,8 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
   TableHeading.positional('Name'),
+  TableHeading.positional('Phone', 250, Alignment.center),
+  TableHeading.positional('Email', 250, Alignment.center),
   TableHeading.positional('Role', 200.0, Alignment.center),
   TableHeading.positional('Warehouse', 200.0, Alignment.center),
   TableHeading.positional('Active', 200.0, Alignment.center),
@@ -71,6 +73,8 @@ class StaffsView extends HookConsumerWidget {
                   cellBuilder: (data, head) {
                     return switch (head.name) {
                       'Name' => DataGridCell(columnName: head.name, value: _nameCellBuilder(data)),
+                      'Phone' => DataGridCell(columnName: head.name, value: _phoneCellBuilder(data)),
+                      'Email' => DataGridCell(columnName: head.name, value: _emailCellBuilder(data)),
                       'Warehouse' => DataGridCell(columnName: head.name, value: Text(data.warehouse?.name ?? '--')),
                       'Role' => DataGridCell(columnName: head.name, value: Text(data.role?.name ?? '--')),
                       'Active' => DataGridCell(
@@ -149,23 +153,37 @@ class StaffsView extends HookConsumerWidget {
     builder: (context) {
       return Row(
         spacing: Insets.med,
-        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           CircleImage(staff.getPhoto, borderWidth: 1, radius: 20),
 
           Flexible(
-            child: Column(
-              spacing: Insets.xs,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                OverflowMarquee(child: Text(staff.name, style: context.text.list)),
-                OverflowMarquee(child: Text('Phone: ${staff.phone}')),
-                OverflowMarquee(child: Text('Email: ${staff.email}')),
-              ],
-            ),
+            child: OverflowMarquee(child: Text(staff.name, style: context.text.list)),
           ),
+        ],
+      );
+    },
+  );
+  Widget _phoneCellBuilder(AppUser staff) => Builder(
+    builder: (context) {
+      return Column(
+        spacing: Insets.xs,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OverflowMarquee(child: Text(staff.phone)),
+        ],
+      );
+    },
+  );
+  Widget _emailCellBuilder(AppUser staff) => Builder(
+    builder: (context) {
+      return Column(
+        spacing: Insets.xs,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OverflowMarquee(child: Text(staff.email)),
         ],
       );
     },

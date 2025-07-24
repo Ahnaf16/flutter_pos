@@ -18,36 +18,6 @@ class CreateWarehouseView extends HookConsumerWidget {
 
     return BaseBody(
       title: '$actionText Warehouse',
-      actions: [
-        SubmitButton(
-          size: ShadButtonSize.lg,
-          child: Text(actionText),
-          onPressed: (l) async {
-            final state = formKey.currentState!;
-            if (!state.saveAndValidate()) return;
-            final data = state.value;
-
-            (bool, String)? result;
-
-            if (updatingId != null) {
-              l.truthy();
-              result = await updateCtrl().updateWarehouse(data);
-              l.falsey();
-            } else {
-              l.truthy();
-              final ctrl = ref.read(warehouseCtrlProvider.notifier);
-              result = await ctrl.createWarehouse(data);
-              l.falsey();
-            }
-
-            if (result case final Result r) {
-              if (!context.mounted) return;
-              r.showToast(context);
-              if (r.success) context.pop();
-            }
-          },
-        ),
-      ],
 
       body: updatingWh.when(
         error: (e, s) => ErrorView(e, s, prov: updateWarehouseCtrlProvider(updatingId)),
@@ -70,7 +40,7 @@ class CreateWarehouseView extends HookConsumerWidget {
                     childPadding: Pads.med('t'),
                     title: const Text('Warehouse Details'),
                     description: const Text('Add warehouse names, address and contact details'),
-                    childSeparator: const SizedBox(width: 750, child: ShadSeparator.horizontal(thickness: 1)),
+                    childSeparator: const SizedBox(width: 700, child: ShadSeparator.horizontal(thickness: 1)),
                     child: LimitedWidthBox(
                       maxWidth: 700,
                       center: false,
@@ -100,6 +70,34 @@ class CreateWarehouseView extends HookConsumerWidget {
                             label: 'Contact Number',
                             hintText: 'Enter contact persons number',
                             isRequired: true,
+                          ),
+                          SubmitButton(
+                            size: ShadButtonSize.lg,
+                            child: Text(actionText),
+                            onPressed: (l) async {
+                              final state = formKey.currentState!;
+                              if (!state.saveAndValidate()) return;
+                              final data = state.value;
+
+                              (bool, String)? result;
+
+                              if (updatingId != null) {
+                                l.truthy();
+                                result = await updateCtrl().updateWarehouse(data);
+                                l.falsey();
+                              } else {
+                                l.truthy();
+                                final ctrl = ref.read(warehouseCtrlProvider.notifier);
+                                result = await ctrl.createWarehouse(data);
+                                l.falsey();
+                              }
+
+                              if (result case final Result r) {
+                                if (!context.mounted) return;
+                                r.showToast(context);
+                                if (r.success) context.pop();
+                              }
+                            },
                           ),
                         ],
                       ),

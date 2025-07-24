@@ -49,7 +49,7 @@ class ReturnView extends HookConsumerWidget {
               error: (e, s) => ErrorView(e, s, prov: inventoryReturnCtrlProvider),
               data: (inventories) {
                 return DataTableBuilder<ReturnRecord, TableHeading>(
-                  rowHeight: 110,
+                  rowHeight: 100,
                   items: inventories,
                   headings: _headings,
                   headingBuilderIndexed: (heading, i) {
@@ -144,7 +144,14 @@ class ReturnView extends HookConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(data.returnDate.formatDate()),
-                            Text(data.returnDate.ago),
+                            const Gap(3),
+                            Text(
+                              data.returnDate.ago,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
                           ],
                         ),
                       ),

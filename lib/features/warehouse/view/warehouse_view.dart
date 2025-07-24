@@ -5,10 +5,12 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
   TableHeading.positional('#', 50.0),
-  TableHeading.positional('Name', 200.0),
-  TableHeading.positional('Address'),
-  TableHeading.positional('Default', 200.0),
-  TableHeading.positional('Action', 260.0),
+  TableHeading.positional('Name'),
+  TableHeading.positional('Phone', 300),
+  TableHeading.positional('Contact Person', 300),
+  TableHeading.positional('Address', 300),
+  TableHeading.positional('Default', 200),
+  TableHeading.positional('Action', 200),
 ];
 
 class WarehouseView extends HookConsumerWidget {
@@ -42,7 +44,7 @@ class WarehouseView extends HookConsumerWidget {
               error: (e, s) => ErrorView(e, s, prov: warehouseCtrlProvider),
               data: (warehouses) {
                 return DataTableBuilder<WareHouse, TableHeading>(
-                  rowHeight: 100,
+                  rowHeight: 80,
                   items: warehouses,
                   headings: _headings,
                   headingBuilder: (heading) {
@@ -66,6 +68,8 @@ class WarehouseView extends HookConsumerWidget {
                         value: Text((warehouses.indexWhere((e) => e.id == data.id) + 1).toString()),
                       ),
                       'Name' => DataGridCell(columnName: head.name, value: Text(data.name)),
+                      'Phone' => DataGridCell(columnName: head.name, value: _phoneCellBuilder(data)),
+                      'Contact Person' => DataGridCell(columnName: head.name, value: _contectCellBuilder(data)),
                       'Address' => DataGridCell(columnName: head.name, value: _addressCellBuilder(data)),
                       'Default' => DataGridCell(
                         columnName: head.name,
@@ -78,7 +82,13 @@ class WarehouseView extends HookConsumerWidget {
                               builder: (context) => _WarehouseDefaultDialog(house: data),
                             );
                           },
-                          child: Text(data.isDefault ? 'Default' : 'Not Default'),
+                          child: Text(
+                            data.isDefault ? 'Default' : 'Not Default',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
                         ),
                       ),
                       'Action' => DataGridCell(
@@ -88,16 +98,22 @@ class WarehouseView extends HookConsumerWidget {
                           children: [
                             ShadButton(
                               size: ShadButtonSize.sm,
+                              height: 40,
+                              width: 40,
                               leading: const Icon(LuIcons.eye),
                               onPressed: () => RPaths.warehouseDetails(data.id).pushNamed(context),
                             ).colored(Colors.blue).toolTip('View'),
                             ShadButton(
                               size: ShadButtonSize.sm,
+                              height: 40,
+                              width: 40,
                               leading: const Icon(LuIcons.pen),
                               onPressed: () => RPaths.editWarehouse(data.id).pushNamed(context),
                             ).colored(Colors.green).toolTip('Edit'),
                             ShadButton(
                               size: ShadButtonSize.sm,
+                              height: 40,
+                              width: 40,
                               leading: const Icon(LuIcons.trash),
                               onPressed: () {
                                 showShadDialog(
@@ -145,9 +161,31 @@ class WarehouseView extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (house.contactPerson != null) OverflowMarquee(child: Text(house.contactPerson ?? '--')),
-          OverflowMarquee(child: Text('Phone: ${house.contactNumber}')),
           OverflowMarquee(child: Text(house.address, maxLines: 2)),
+        ],
+      );
+    },
+  );
+  Widget _phoneCellBuilder(WareHouse house) => Builder(
+    builder: (context) {
+      return Column(
+        spacing: Insets.xs,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OverflowMarquee(child: Text(house.contactNumber)),
+        ],
+      );
+    },
+  );
+  Widget _contectCellBuilder(WareHouse house) => Builder(
+    builder: (context) {
+      return Column(
+        spacing: Insets.xs,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (house.contactPerson != null) OverflowMarquee(child: Text(house.contactPerson ?? '--')),
         ],
       );
     },
