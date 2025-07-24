@@ -12,7 +12,7 @@ const _headings = [
   TableHeading.positional('Stock'),
   TableHeading.positional('Purchase'),
   TableHeading.positional('Sale'),
-  TableHeading.positional('Action', 200.0, Alignment.center),
+  TableHeading.positional('Action', 200, Alignment.center),
 ];
 
 class ProductsView extends HookConsumerWidget {
@@ -48,7 +48,7 @@ class ProductsView extends HookConsumerWidget {
               error: (e, s) => ErrorView(e, s, prov: productsCtrlProvider),
               data: (products) {
                 return DataTableBuilder<Product, TableHeading>(
-                  rowHeight: 120,
+                  rowHeight: 80,
                   items: products,
 
                   headings: _headings,
@@ -95,17 +95,23 @@ class ProductsView extends HookConsumerWidget {
                           children: [
                             ShadButton.secondary(
                               size: ShadButtonSize.sm,
+                              height: 40,
+                              width: 40,
                               leading: const Icon(LuIcons.eye),
                               onPressed: () {
                                 RPaths.productDetails(data.id).pushNamed(context);
                               },
                             ).colored(Colors.blue).toolTip('View'),
                             ShadButton.secondary(
+                              height: 40,
+                              width: 40,
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.pen),
                               onPressed: () => RPaths.editProduct(data.id).pushNamed(context),
                             ).colored(Colors.green).toolTip('Edit'),
                             ShadButton.secondary(
+                              height: 40,
+                              width: 40,
                               size: ShadButtonSize.sm,
                               leading: const Icon(LuIcons.trash),
                               onPressed: () {
@@ -177,14 +183,13 @@ class ProductsView extends HookConsumerWidget {
           ),
 
           SizedBox(
-            width: 200,
+            width: 150,
             child: Column(
               spacing: gap,
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(product.name, style: context.text.list, overflow: TextOverflow.ellipsis),
-
+                Text(product.name, style: context.text.list, maxLines: 1, overflow: TextOverflow.ellipsis),
                 if (product.manufacturer != null)
                   Text(product.manufacturer ?? '--', style: context.text.muted, overflow: TextOverflow.ellipsis),
               ],

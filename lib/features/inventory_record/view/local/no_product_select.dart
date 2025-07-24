@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pos/_core/_core.dart';
+import 'package:pos/main.export.dart';
 
 class NoProductSelectedView extends StatelessWidget {
-  const NoProductSelectedView({super.key});
+  const NoProductSelectedView({this.onTap, this.isButtonEnabled = false, super.key});
+  final Function()? onTap;
+  final bool isButtonEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +39,13 @@ class NoProductSelectedView extends StatelessWidget {
                   color: Colors.black38,
                 ),
               ),
+              const SizedBox(height: 16),
+              if (isButtonEnabled)
+                ShadButton(
+                  leading: const Icon(LuIcons.plus),
+                  onPressed: onTap,
+                  child: const SelectionContainer.disabled(child: Text('Select a product')),
+                ),
             ],
           ),
         ),
