@@ -286,8 +286,6 @@ class LineChartWidget extends HookConsumerWidget {
       return data;
     }
 
-    cat(purchase().map((e) => e.x));
-
     return ShadCard(
       child: SfCartesianChart(
         title: const ChartTitle(text: 'Invoice records', alignment: ChartAlignment.near),
