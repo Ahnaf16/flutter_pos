@@ -35,27 +35,29 @@ class FilePickerField extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (selectedFile == null) ...[
-                const ShadAvatar(LuIcons.upload),
-                const Gap(Insets.med),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: compact ? CrossAxisAlignment.start : CrossAxisAlignment.center,
                   children: [
+                    const Gap(Insets.sm),
+                    const ShadAvatar(LuIcons.upload),
+                    const Gap(Insets.med),
                     const Text('Drag and drop files here'),
+
                     Text('Or click browse (max 3MB)', style: context.text.muted.size(12)),
+                    const Gap(Insets.med),
+                    ShadButton.outline(
+                      size: ShadButtonSize.sm,
+                      child: const SelectionContainer.disabled(child: Text('Browse Files')),
+                      onPressed: () async {
+                        if (selectedFile != null) return;
+                        final files = await fileUtil.pickSingleFile();
+                        final file = files.fold(identityNull, identity);
+                        onSelect(file);
+                      },
+                    ),
                   ],
                 ),
                 const Gap(Insets.med),
-                ShadButton.outline(
-                  size: ShadButtonSize.sm,
-                  child: const SelectionContainer.disabled(child: Text('Browse Files')),
-                  onPressed: () async {
-                    if (selectedFile != null) return;
-                    final files = await fileUtil.pickSingleFile();
-                    final file = files.fold(identityNull, identity);
-                    onSelect(file);
-                  },
-                ),
               ] else
                 FileTIle(file: right(selectedFile!), onClear: () => onSelect(null)).conditionalExpanded(compact),
             ],
