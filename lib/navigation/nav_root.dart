@@ -413,90 +413,113 @@ Map<String, List<NavItem>> navItems(List<RolePermissions> p) {
   return {
     'Main': [
       NavItem(text: 'DashBoard', icon: LuIcons.house, path: RPaths.home),
-      NavItem(text: 'New Sale', icon: LuIcons.circlePlus, path: RPaths.createSales),
-      NavItem(text: 'New Purchase', icon: LuIcons.circlePlus, path: RPaths.createPurchases),
+      if (p.contains(RolePermissions.makeSale))
+        NavItem(text: 'New Sale', icon: LuIcons.circlePlus, path: RPaths.createSales),
+      if (p.contains(RolePermissions.makePurchase))
+        NavItem(text: 'New Purchase', icon: LuIcons.circlePlus, path: RPaths.createPurchases),
     ],
-    'Inventory': [
-      NavItem(text: 'Product', icon: LuIcons.package, path: RPaths.products),
-      NavItem(text: 'Unit', icon: LuIcons.weight, path: RPaths.unit),
-    ],
-    'Sales & Purchases': [
-      NavItem(
-        text: 'Sales',
-        icon: LuIcons.chartColumn,
-        children: [
-          NavItem(text: 'Sales history', path: RPaths.sales),
-          NavItem(text: 'Sales return', path: RPaths.salesReturn),
-        ],
-      ),
-      NavItem(
-        text: 'Purchase',
-        icon: LuIcons.receipt,
-        children: [
-          NavItem(text: 'Purchase history', path: RPaths.purchases),
-          NavItem(text: 'Purchase return', path: RPaths.purchasesReturn),
-        ],
-      ),
-    ],
-    'Contacts': [
-      NavItem(
-        text: 'Customers',
-        icon: LuIcons.users,
-        children: [
-          NavItem(text: 'All Customers', path: RPaths.customer),
-          NavItem(text: 'Transfer money', path: RPaths.customerMoneyTransfer),
-          NavItem(text: 'Due Adjustment', path: RPaths.customerDueManagement),
-        ],
-      ),
-      NavItem(
-        text: 'Suppliers',
-        icon: LuIcons.building2,
-        children: [
-          NavItem(text: 'All Suppliers', path: RPaths.supplier),
-          NavItem(text: 'Due Clearance', path: RPaths.supplierDueManagement),
-        ],
-      ),
-    ],
-    'Team': [
-      NavItem(
-        text: 'Staff Management',
-        icon: LuIcons.users,
-        children: [
-          NavItem(text: 'All Staff', path: RPaths.staffs),
-          NavItem(text: 'Role & Permissions', path: RPaths.roles),
-        ],
-      ),
-    ],
-    'Logistics': [
-      NavItem(text: 'Warehouse', icon: LuIcons.warehouse, path: RPaths.warehouse),
-      NavItem(
-        text: 'Stock',
-        icon: LuIcons.truck,
-        children: [
-          NavItem(text: 'Stock transfer', path: RPaths.stockTransfer),
-          NavItem(text: 'Stock Logs', path: RPaths.stockLog),
-        ],
-      ),
-    ],
-    'Accounting': [
-      NavItem(
-        text: 'Accounts',
-        icon: LuIcons.creditCard,
-        children: [
-          NavItem(text: 'Payment Accounts', path: RPaths.paymentAccount),
-          NavItem(text: 'Transactions', path: RPaths.transactions),
-        ],
-      ),
-      NavItem(
-        text: 'Expense',
-        icon: LuIcons.dollarSign,
-        children: [
-          NavItem(text: 'All Expenses', path: RPaths.expense),
-          NavItem(text: 'Category', path: RPaths.expenseCategory),
-        ],
-      ),
-      NavItem(text: 'Due Management', icon: LuIcons.calculator, path: RPaths.due),
-    ],
+
+    if (RolePermissions.isInGroup(p, RolePermissions.inventoryGroup))
+      'Inventory': [
+        if (p.contains(RolePermissions.manageProduct))
+          NavItem(text: 'Product', icon: LuIcons.package, path: RPaths.products),
+        if (p.contains(RolePermissions.manageUnit)) NavItem(text: 'Unit', icon: LuIcons.weight, path: RPaths.unit),
+      ],
+
+    if (RolePermissions.isInGroup(p, RolePermissions.salesPurchasesGroup))
+      'Sales & Purchases': [
+        if (RolePermissions.isInGroup(p, RolePermissions.salesGroup))
+          NavItem(
+            text: 'Sales',
+            icon: LuIcons.chartColumn,
+            children: [
+              if (p.contains(RolePermissions.makeSale)) NavItem(text: 'Sales history', path: RPaths.sales),
+              if (p.contains(RolePermissions.returnSale)) NavItem(text: 'Sales return', path: RPaths.salesReturn),
+            ],
+          ),
+        if (RolePermissions.isInGroup(p, RolePermissions.purchasesGroup))
+          NavItem(
+            text: 'Purchase',
+            icon: LuIcons.receipt,
+            children: [
+              if (p.contains(RolePermissions.makePurchase)) NavItem(text: 'Purchase history', path: RPaths.purchases),
+              if (p.contains(RolePermissions.returnPurchase))
+                NavItem(text: 'Purchase return', path: RPaths.purchasesReturn),
+            ],
+          ),
+      ],
+    if (RolePermissions.isInGroup(p, RolePermissions.contactsGroup))
+      'Contacts': [
+        if (p.contains(RolePermissions.manageCustomer))
+          NavItem(
+            text: 'Customers',
+            icon: LuIcons.users,
+            children: [
+              NavItem(text: 'All Customers', path: RPaths.customer),
+              NavItem(text: 'Transfer money', path: RPaths.customerMoneyTransfer),
+              NavItem(text: 'Due Adjustment', path: RPaths.customerDueManagement),
+            ],
+          ),
+        if (p.contains(RolePermissions.manageSupplier))
+          NavItem(
+            text: 'Suppliers',
+            icon: LuIcons.building2,
+            children: [
+              NavItem(text: 'All Suppliers', path: RPaths.supplier),
+              NavItem(text: 'Due Clearance', path: RPaths.supplierDueManagement),
+            ],
+          ),
+      ],
+
+    if (RolePermissions.isInGroup(p, RolePermissions.teamsGroup))
+      'Team': [
+        NavItem(
+          text: 'Staff Management',
+          icon: LuIcons.users,
+          children: [
+            if (p.contains(RolePermissions.manageStaff)) NavItem(text: 'All Staff', path: RPaths.staffs),
+            if (p.contains(RolePermissions.manageRole)) NavItem(text: 'Role & Permissions', path: RPaths.roles),
+          ],
+        ),
+      ],
+
+    if (RolePermissions.isInGroup(p, RolePermissions.logisticsGroup))
+      'Logistics': [
+        if (p.contains(RolePermissions.manageWarehouse))
+          NavItem(text: 'Warehouse', icon: LuIcons.warehouse, path: RPaths.warehouse),
+        if (p.contains(RolePermissions.transferStock))
+          NavItem(
+            text: 'Stock',
+            icon: LuIcons.truck,
+            children: [
+              NavItem(text: 'Stock transfer', path: RPaths.stockTransfer),
+              NavItem(text: 'Stock Logs', path: RPaths.stockLog),
+            ],
+          ),
+      ],
+    if (RolePermissions.isInGroup(p, RolePermissions.accountingGroup))
+      'Accounting': [
+        NavItem(
+          text: 'Accounts',
+          icon: LuIcons.creditCard,
+          children: [
+            if (p.contains(RolePermissions.manageAccounts))
+              NavItem(text: 'Payment Accounts', path: RPaths.paymentAccount),
+            NavItem(text: 'Transactions', path: RPaths.transactions),
+          ],
+        ),
+        if (p.contains(RolePermissions.manageExpanse))
+          NavItem(
+            text: 'Expense',
+            icon: LuIcons.dollarSign,
+            children: [
+              NavItem(text: 'All Expenses', path: RPaths.expense),
+              NavItem(text: 'Category', path: RPaths.expenseCategory),
+            ],
+          ),
+        if (p.contains(RolePermissions.due))
+          NavItem(text: 'Due Management', icon: LuIcons.calculator, path: RPaths.due),
+      ],
     'System': [
       NavItem(text: 'Settings', icon: LuIcons.settings, path: RPaths.settings),
     ],
