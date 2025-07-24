@@ -195,6 +195,7 @@ class DueClearanceView extends HookConsumerWidget {
                     const Gap(Insets.xl),
                     if (selectedParty.value?.hasBalance() == true)
                       SubmitButton(
+                        enabled: selectedParty.value?.hasBalance() == true,
                         onPressed: (l) async {
                           final state = formKey.currentState!;
                           if (!state.saveAndValidate()) return;
@@ -223,9 +224,9 @@ class DueClearanceView extends HookConsumerWidget {
                         },
                         child: const Text('Make due payment'),
                       ),
-
-                    if (selectedParty.value?.hasDue() == true)
+                    if (selectedParty.value?.hasBalance() != true)
                       SubmitButton(
+                        enabled: selectedParty.value?.hasDue() == true,
                         onPressed: (l) async {
                           final state = formKey.currentState!;
                           if (!state.saveAndValidate()) return;
@@ -260,12 +261,12 @@ class DueClearanceView extends HookConsumerWidget {
               ),
             ).conditionalExpanded(context.layout.isDesktop, 2),
 
-            if (selectedParty.value != null)
-              RelatedRecords(
-                scroll: context.layout.isDesktop,
-                party: selectedParty.value!,
-                unpaid: selectedParty.value?.hasBalance() == true,
-              ).conditionalExpanded(context.layout.isDesktop),
+            // if (selectedParty.value != null)
+            RelatedRecords(
+              scroll: context.layout.isDesktop,
+              party: selectedParty.value,
+              unpaid: selectedParty.value?.hasBalance() == true,
+            ).conditionalExpanded(context.layout.isDesktop),
           ],
         ),
       ),

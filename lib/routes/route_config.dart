@@ -136,6 +136,11 @@ class AppRouter extends Notifier<GoRouter> {
             redirect: (_, _) => RolePermissions.manageCustomer.redirect(p),
             (_) => const DueAdjustmentView(),
           ),
+          AppRoute(
+            RPaths.customerMoneyTransfer,
+            redirect: (_, _) => RolePermissions.manageCustomer.redirect(p),
+            (_) => const DueAdjustmentView(transferMoney: true),
+          ),
           //! supplier
           AppRoute(
             RPaths.supplier,

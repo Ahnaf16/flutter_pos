@@ -437,10 +437,6 @@ Map<String, List<NavItem>> navItems(List<RolePermissions> p) {
           NavItem(text: 'Purchase return', path: RPaths.purchasesReturn),
         ],
       ),
-      // NavItem(text: 'Sales history', icon: LuIcons.chartColumn, path: RPaths.sales),
-      // NavItem(text: 'Sales return', icon: LuIcons.undo2, path: RPaths.salesReturn),
-      // NavItem(text: 'Purchase history', icon: LuIcons.receipt, path: RPaths.purchases),
-      // NavItem(text: 'Purchase return', icon: LuIcons.refreshCw, path: RPaths.purchasesReturn),
     ],
     'Contacts': [
       NavItem(
@@ -448,6 +444,7 @@ Map<String, List<NavItem>> navItems(List<RolePermissions> p) {
         icon: LuIcons.users,
         children: [
           NavItem(text: 'All Customers', path: RPaths.customer),
+          NavItem(text: 'Transfer money', path: RPaths.customerMoneyTransfer),
           NavItem(text: 'Due Adjustment', path: RPaths.customerDueManagement),
         ],
       ),
@@ -480,8 +477,6 @@ Map<String, List<NavItem>> navItems(List<RolePermissions> p) {
           NavItem(text: 'Stock Logs', path: RPaths.stockLog),
         ],
       ),
-      // NavItem(text: 'Stock transfer', icon: LuIcons.truck, path: RPaths.stockTransfer),
-      // NavItem(text: 'Stock Logs', icon: LuIcons.fileText, path: RPaths.stockLog),
     ],
     'Accounting': [
       NavItem(

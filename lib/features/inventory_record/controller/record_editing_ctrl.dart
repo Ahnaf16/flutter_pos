@@ -201,6 +201,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
 
     return res.fold(leftResult, (r) {
       ref.invalidate(inventoryCtrlProvider);
+      ref.invalidate(productsCtrlProvider);
       ref.invalidateSelf();
       return (true, 'Record returned successfully');
     });

@@ -10,13 +10,17 @@ import 'package:pos/features/transactions/controller/transactions_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class DueAdjustmentView extends HookConsumerWidget {
-  const DueAdjustmentView({super.key});
+  const DueAdjustmentView({super.key, this.transferMoney});
+
+  final bool? transferMoney;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final extra = context.tryGetExtra<Party>();
-    final transfer = context.query('isTransfer') == 'true';
+    final path = context.routeState.matchedLocation;
 
-    final formKey = useMemoized(GlobalKey<FormBuilderState>.new);
+    final extra = context.tryGetExtra<Party>();
+    final isTransfer = transferMoney ?? context.query('isTransfer') == 'true';
+
+    final formKey = useMemoized(GlobalKey<FormBuilderState>.new, [path]);
 
     final selectedParty = useState<Party?>(extra);
 
@@ -26,12 +30,16 @@ class DueAdjustmentView extends HookConsumerWidget {
     final partiList = ref.watch(partiesCtrlProvider(true));
     final accountList = ref.watch(paymentAccountsCtrlProvider());
 
-    final isTransfer = useState(transfer);
-
     final selectedFile = useState<PFile?>(null);
 
+    useValueChanged(path, (_, _) async {
+      formKey.currentState?.reset();
+      selectedParty.value = null;
+      selectedFile.value = null;
+    });
+
     return BaseBody(
-      title: 'Customer due adjustment',
+      title: isTransfer ? 'Money transfer' : 'Customer due adjustment',
       alignment: Alignment.topLeft,
       scrollable: !context.layout.isDesktop,
       body: LimitedWidthBox(
@@ -43,17 +51,26 @@ class DueAdjustmentView extends HookConsumerWidget {
           spacing: Insets.med,
           children: [
             ShadCard(
-              title: const Text('Adjustment Details'),
-              childPadding: Pads.med('t'),
+              title: Padding(
+                padding: Pads.med('tlr'),
+                child: const Text('Adjustment Details'),
+              ),
+
               height: context.layout.isDesktop ? double.maxFinite : null,
+              padding: Pads.zero,
               child: FormBuilder(
                 key: formKey,
                 child: SingleChildScrollView(
+                  padding: Pads.med(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       //! user
-                      VisibilityField<AppUser>(name: 'transaction_by', data: user, valueTransformer: (v) => v?.toMap()),
+                      VisibilityField<AppUser>(
+                        name: 'transaction_by',
+                        data: user,
+                        valueTransformer: (v) => v?.toMap(),
+                      ),
                       LimitedWidthBox(
                         maxWidth: 450,
                         center: false,
@@ -178,7 +195,7 @@ class DueAdjustmentView extends HookConsumerWidget {
                                   name: 'payment_account',
                                   hintText: 'select an account',
                                   label: 'Payment account',
-                                  isRequired: !isTransfer.value,
+                                  isRequired: !isTransfer,
                                   initialValue: config.defaultAccount,
                                   options: accounts,
                                   valueTransformer: (value) => value?.toMap(),
@@ -202,12 +219,12 @@ class DueAdjustmentView extends HookConsumerWidget {
                       //! transfer balance
                       if (selectedParty.value?.hasBalance() == true) ...[
                         const Gap(Insets.med),
-                        ShadCheckbox(
-                          value: isTransfer.value,
-                          onChanged: (v) => isTransfer.value = v,
-                          label: const Text('Transfer balance'),
-                        ),
-                        if (isTransfer.value) ...[
+                        // ShadCheckbox(
+                        //   value: isTransfer.value,
+                        //   onChanged: (v) => isTransfer.value = v,
+                        //   label: const Text('Transfer balance'),
+                        // ),
+                        if (isTransfer) ...[
                           const Gap(Insets.med),
                           ShadCard(
                             padding: Pads.med(),
@@ -246,7 +263,7 @@ class DueAdjustmentView extends HookConsumerWidget {
                               'transaction_from': selectedParty.value?.toMap(),
                               'transacted_to_shop': true,
                             });
-                            if (!isTransfer.value) data.remove('custom_info');
+                            if (!isTransfer) data.remove('custom_info');
 
                             final log = TransactionLog.fromMap(data);
                             final err = log.validate();
@@ -266,62 +283,63 @@ class DueAdjustmentView extends HookConsumerWidget {
                           },
                           child: const Text('Due payment'),
                         ),
-                      if (selectedParty.value?.hasBalance() == true)
-                        SubmitButton(
-                          onPressed: (l) async {
-                            final state = formKey.currentState!;
-                            if (!state.saveAndValidate()) return;
-                            final data = QMap.from(state.transformedValues);
 
-                            final transfer = isTransfer.value;
+                      SubmitButton(
+                        enabled: selectedParty.value?.hasBalance() == true,
+                        onPressed: (l) async {
+                          final state = formKey.currentState!;
+                          if (!state.saveAndValidate()) return;
+                          final data = QMap.from(state.transformedValues);
 
-                            data.addAll({
-                              'date': DateTime.now().toIso8601String(),
-                              'transaction_type': (transfer ? TransactionType.transfer : TransactionType.payment).name,
-                              if (transfer) 'transaction_from': selectedParty.value?.toMap(),
-                              if (!transfer) 'transaction_to': selectedParty.value?.toMap(),
-                            });
-                            if (!transfer) data.remove('custom_info');
+                          final transfer = isTransfer;
 
-                            final log = TransactionLog.fromMap(data);
+                          data.addAll({
+                            'date': DateTime.now().toIso8601String(),
+                            'transaction_type': (transfer ? TransactionType.transfer : TransactionType.payment).name,
+                            if (transfer) 'transaction_from': selectedParty.value?.toMap(),
+                            if (!transfer) 'transaction_to': selectedParty.value?.toMap(),
+                          });
+                          if (!transfer) data.remove('custom_info');
 
-                            final err = log.validate();
-                            if (err != null) {
-                              return Toast.showErr(context, err);
-                            }
+                          final log = TransactionLog.fromMap(data);
 
-                            bool? ok;
-                            if (transfer) {
-                              ok = await showShadDialog<bool>(
-                                context: context,
-                                builder: (context) => _TransferDialog(log, selectedFile.value),
-                              );
-                            } else {
-                              ok = await showShadDialog<bool>(
-                                context: context,
-                                builder: (context) => _DueClearDialog(log, selectedFile.value),
-                              );
-                            }
-                            if (ok == true) {
-                              selectedFile.value = null;
-                              selectedParty.value = null;
-                              state.reset();
-                            }
-                          },
-                          child: Text(isTransfer.value ? 'Transfer balance' : 'Clear due'),
-                        ),
+                          final err = log.validate();
+                          if (err != null) {
+                            return Toast.showErr(context, err);
+                          }
+
+                          bool? ok;
+                          if (transfer) {
+                            ok = await showShadDialog<bool>(
+                              context: context,
+                              builder: (context) => _TransferDialog(log, selectedFile.value),
+                            );
+                          } else {
+                            ok = await showShadDialog<bool>(
+                              context: context,
+                              builder: (context) => _DueClearDialog(log, selectedFile.value),
+                            );
+                          }
+                          if (ok == true) {
+                            selectedFile.value = null;
+                            selectedParty.value = null;
+                            state.reset();
+                          }
+                        },
+                        child: Text(isTransfer ? 'Transfer balance' : 'Clear due'),
+                      ),
                     ],
                   ),
                 ),
               ),
             ).conditionalExpanded(context.layout.isDesktop, 2),
 
-            if (selectedParty.value != null)
-              RelatedRecords(
-                scroll: context.layout.isDesktop,
-                party: selectedParty.value!,
-                unpaid: selectedParty.value?.hasDue() == true,
-              ).conditionalExpanded(context.layout.isDesktop),
+            // if (selectedParty.value != null)
+            RelatedRecords(
+              scroll: context.layout.isDesktop,
+              party: selectedParty.value,
+              unpaid: selectedParty.value?.hasDue() == true,
+            ).conditionalExpanded(context.layout.isDesktop),
           ],
         ),
       ),
