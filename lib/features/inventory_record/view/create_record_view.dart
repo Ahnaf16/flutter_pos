@@ -325,17 +325,20 @@ class _Summary extends StatelessWidget {
                   spacing: Insets.sm,
                   children: [
                     SpacedText(
+                      spaced: true,
                       left: 'Subtotal',
                       right: record.subtotal().currency(),
                       styleBuilder: (l, r) => (l, r.bold),
                     ),
                     SpacedText(
+                      spaced: true,
                       left: 'Total',
                       right: record.totalPrice().currency(),
                       crossAxisAlignment: CrossAxisAlignment.center,
                       styleBuilder: (l, r) => (l, context.text.large),
                     ),
                     SpacedText(
+                      spaced: true,
                       left: record.hasExtra ? 'Extra' : 'Due',
                       right: record.due.abs().currency(),
                       styleBuilder: (l, r) {
@@ -444,7 +447,7 @@ class _ProductTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(product.name),
+                    Text(product.name, maxLines: 1),
                     if (product.manufacturer != null)
                       Text('${product.manufacturer}', style: context.text.muted.size(12).textHeight(1)),
                     const Gap(Insets.xs),
@@ -567,7 +570,7 @@ class _ProductTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(product.name),
+                    Text(product.name, maxLines: 1, overflow: TextOverflow.ellipsis),
                     if (product.manufacturer != null)
                       Text('${product.manufacturer}', style: context.text.muted.size(12).textHeight(1)),
                     const Gap(Insets.xs),

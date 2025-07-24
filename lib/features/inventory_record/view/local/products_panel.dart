@@ -76,7 +76,10 @@ class ProductsPanel extends HookConsumerWidget {
                             child: DecoContainer(
                               color: context.colors.border.op8,
                               alignment: Alignment.center,
-                              child: Text(product.name, maxLines: 2),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                child: Text(product.name, maxLines: 2),
+                              ),
                             ),
                           ),
                           Positioned(

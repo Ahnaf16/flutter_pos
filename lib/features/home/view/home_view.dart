@@ -132,7 +132,7 @@ class HomeView extends HookConsumerWidget {
           LineChartWidget(start.value, end.value),
 
           ShadCard(
-            height: 850,
+            height: 550,
             title: Row(
               spacing: Insets.med,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

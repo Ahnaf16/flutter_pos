@@ -158,10 +158,17 @@ class TrxTable extends StatelessWidget {
           'Date' => DataGridCell(
             columnName: head.name,
             value: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('${data.date.formatDate()} ${data.date.ago}'),
+                Text(data.date.formatDate()),
+                const Gap(3),
+                Text(
+                  data.date.ago,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
               ],
             ),
           ),
@@ -256,12 +263,17 @@ class _TrxViewDialog extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ShadDialog(
-      title: Text('${trx.type.name.titleCase} log'),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('${trx.type.name.titleCase} log'),
+          ShadBadge(child: Text(trx.type.name.titleCase)).colored(trx.type.color),
+        ],
+      ),
       description: Row(
         spacing: Insets.sm,
         children: [
           Text('Details of a ${trx.type.name}'),
-          ShadBadge(child: Text(trx.type.name.titleCase)).colored(trx.type.color),
           if (trx.isBetweenAccount) const ShadBadge(child: Text('Account balance transfer')),
         ],
       ),
