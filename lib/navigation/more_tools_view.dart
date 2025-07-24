@@ -1,4 +1,3 @@
-import 'package:pos/features/auth/controller/auth_ctrl.dart';
 import 'package:pos/main.export.dart';
 
 class MoreToolsView extends ConsumerWidget {
@@ -6,7 +5,7 @@ class MoreToolsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final permissions = ref.watch(authStateSyncProvider).toNullable()?.role?.permissions ?? [];
+    // final permissions = ref.watch(authStateSyncProvider).toNullable()?.role?.permissions ?? [];
     // final items = navItems(
     //   permissions,
     // ).map((e) => e.icon == null ? null : (e.text, e.icon!, e.path!)).nonNulls.toList();
