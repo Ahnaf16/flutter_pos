@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:pos/features/home/controller/home_ctrl.dart';
+import 'package:pos/features/inventory_record/view/local/no_product_select.dart';
 import 'package:pos/features/inventory_record/view/local/products_panel.dart';
 import 'package:pos/features/products/controller/products_ctrl.dart';
 import 'package:pos/features/settings/controller/settings_ctrl.dart';
@@ -63,30 +64,11 @@ class StockTransferView extends HookConsumerWidget {
                       if (product == null)
                         Padding(
                           padding: Pads.xl(),
-                          child: ShadCard(
-                            border: const Border(),
-                            shadows: const [],
-                            padding: Pads.med(),
-                            rowGap: Insets.lg,
-                            expanded: false,
-                            rowCrossAxisAlignment: CrossAxisAlignment.center,
-
-                            child: Column(
-                              spacing: Insets.med,
-                              children: [
-                                const Icon(LuIcons.circleOff, size: 30),
-                                Text('No Product Selected', style: context.text.lead),
-                                const Text('Select a product to see other options'),
-                                if (isMobile)
-                                  ShadButton(
-                                    leading: const Icon(LuIcons.plus),
-                                    child: const SelectionContainer.disabled(child: Text('Select a product')),
-                                    onPressed: () {
-                                      _showSheet(context, viewingWh.viewing, tCtrl, formKey);
-                                    },
-                                  ),
-                              ],
-                            ),
+                          child: NoProductSelectedView(
+                            isButtonEnabled: isMobile ? true : false,
+                            onTap: () {
+                              _showSheet(context, viewingWh.viewing, tCtrl, formKey);
+                            },
                           ),
                         )
                       else
