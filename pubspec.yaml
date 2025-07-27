@@ -97,7 +97,7 @@ flutter_gen:
     lottie: true
 
 # appwrite
-secret API key:
+secret API key: igen_flutter_pos
 account:
   name: ahnaf
   email: ahnafsakil9@gmail.com
