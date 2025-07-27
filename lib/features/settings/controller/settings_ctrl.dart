@@ -14,7 +14,7 @@ class ConfigCtrl extends _$ConfigCtrl {
     return Config.def();
   }
 
-  FVoid init() async {
+  Future<Config> init() async {
     final (err, config) = await _repo.getConfig().toRecord();
 
     if (config != null) {
@@ -23,6 +23,17 @@ class ConfigCtrl extends _$ConfigCtrl {
       await sp.symbolOnLeft.setValue(config.symbolLeft);
 
       state = config;
+    }
+    return state;
+  }
+
+  FVoid checkAccount() async {
+    final config = await init();
+    final acc = config.defAccount;
+    if (acc != null && !acc.isActive) {
+      await _repo.updateConfig(config.copyWith(defAccount: () => null));
+      await init();
+      ref.invalidate(configCtrlAsyncProvider);
     }
   }
 

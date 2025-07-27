@@ -176,6 +176,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       ref.invalidate(productsCtrlProvider);
       ref.invalidate(inventoryCtrlProvider);
       ref.invalidate(paymentAccountsCtrlProvider);
+      ref.invalidate(configCtrlProvider);
       ref.invalidateSelf();
       final inv = InventoryRecord.tryParse(r);
       return ((true, 'Record created successfully'), inv);
@@ -189,6 +190,7 @@ class RecordEditingCtrl extends _$RecordEditingCtrl {
       ref.invalidate(productsCtrlProvider);
       ref.invalidate(inventoryCtrlProvider);
       ref.invalidate(paymentAccountsCtrlProvider);
+      ref.invalidate(configCtrlProvider);
 
       ref.invalidateSelf();
       final inv = InventoryRecord.tryParse(r);

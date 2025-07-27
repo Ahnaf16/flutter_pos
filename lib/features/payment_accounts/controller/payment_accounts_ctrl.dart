@@ -1,4 +1,5 @@
 import 'package:pos/features/payment_accounts/repository/payment_accounts_repo.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -76,7 +77,8 @@ class PaymentAccountsCtrl extends _$PaymentAccountsCtrl {
     final res = await _repo.updateAccount(acc.copyWith(isActive: isActive));
     return await res.fold(leftResult, (r) async {
       state = await AsyncValue.guard(() async => build(onlyActive));
-      return rightResult('Unit updated successfully');
+      ref.read(configCtrlProvider.notifier).checkAccount();
+      return rightResult('Account updated successfully');
     });
   }
 }

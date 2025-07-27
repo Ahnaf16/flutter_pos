@@ -70,7 +70,7 @@ class StockTransferState {
       StockDistPolicy.olderFirst => product!.sortByOldest(from?.id),
     };
 
-    return list;
+    return list.where((e) => e.quantity > 0).toList();
   }
 
   Stock? constrictStockToSend() {
