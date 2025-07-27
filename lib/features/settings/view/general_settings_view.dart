@@ -188,6 +188,7 @@ class GeneralSettingsView extends HookConsumerWidget {
                                     return ShadSelectField<PaymentAccount>(
                                       hintText: 'Set a default payment account',
                                       label: 'Default payment account',
+                                      name: 'default_account',
                                       initialValue: config.defaultAccount,
                                       options: accounts,
                                       valueTransformer: (value) => value?.toMap(),

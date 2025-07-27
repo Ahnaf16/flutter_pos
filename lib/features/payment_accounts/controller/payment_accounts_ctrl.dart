@@ -77,7 +77,7 @@ class PaymentAccountsCtrl extends _$PaymentAccountsCtrl {
     final res = await _repo.updateAccount(acc.copyWith(isActive: isActive));
     return await res.fold(leftResult, (r) async {
       state = await AsyncValue.guard(() async => build(onlyActive));
-      ref.read(configCtrlProvider.notifier).checkAccount();
+      await ref.read(configCtrlProvider.notifier).checkAccount();
       return rightResult('Account updated successfully');
     });
   }
