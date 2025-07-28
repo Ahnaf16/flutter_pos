@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 
@@ -16,98 +15,98 @@ class ShadXFile {
 }
 
 // TODO
-class ShadFileField<T> extends ShadFormDecoration<T> {
-  ShadFileField({
-    super.key,
-    super.decoration,
-    super.onChanged,
-    super.valueTransformer,
-    super.enabled,
-    super.onSaved,
-    super.autovalidateMode = AutovalidateMode.disabled,
-    super.onReset,
-    super.focusNode,
-    super.restorationId,
-    String? name,
-    super.initialValue,
-    this.label,
-    this.hintText,
-    this.isRequired = false,
-    this.validators,
-    this.helperText,
-  }) : super(
-         name: name ?? label?.snakeCase ?? hintText?.snakeCase ?? 'field',
-         validator: FormBuilderValidators.compose([if (isRequired) FormBuilderValidators.required(), ...?validators]),
-         builder: (FormFieldState<T?> field) {
-           //  final state = field as _ShadFileFieldState<T>;
-           return Builder(
-             builder: (context) {
-               return ShadCard(
-                 title: Text('Upload File', style: context.text.p),
-                 description: Text('Select a file to upload', style: context.text.muted),
-                 padding: Pads.xl().copyWith(top: Insets.med),
-                 childPadding: Pads.med('t'),
-                 width: 700,
-                 child: ShadDottedBorder(
-                   child: Center(
-                     child: Column(
-                       children: [
-                         const ShadAvatar(LuIcons.upload),
-                         const Gap(Insets.med),
-                         const Text('Drag and drop files here'),
-                         Text('Or click browse (max 3MB)', style: context.text.muted.size(12)),
-                         const Gap(Insets.med),
-                         ShadButton.outline(
-                           size: ShadButtonSize.sm,
-                           child: const SelectionContainer.disabled(child: Text('Browse Files')),
-                           onPressed: () {},
-                         ),
-                       ],
-                     ),
-                   ),
-                 ),
-               );
-             },
-           );
-         },
-       );
+// class ShadFileField<T> extends ShadFormDecoration<T> {
+//   ShadFileField({
+//     super.key,
+//     super.decoration,
+//     super.onChanged,
+//     super.valueTransformer,
+//     super.enabled,
+//     super.onSaved,
+//     super.autovalidateMode = AutovalidateMode.disabled,
+//     super.onReset,
+//     super.focusNode,
+//     super.restorationId,
+//     String? name,
+//     super.initialValue,
+//     this.label,
+//     this.hintText,
+//     this.isRequired = false,
+//     this.validators,
+//     this.helperText,
+//   }) : super(
+//          name: name ?? label?.snakeCase ?? hintText?.snakeCase ?? 'field',
+//          validator: FormBuilderValidators.compose([if (isRequired) FormBuilderValidators.required(), ...?validators]),
+//          builder: (FormFieldState<T?> field) {
+//            //  final state = field as _ShadFileFieldState<T>;
+//            return Builder(
+//              builder: (context) {
+//                return ShadCard(
+//                  title: Text('Upload File', style: context.text.p),
+//                  description: Text('Select a file to upload', style: context.text.muted),
+//                  padding: Pads.xl().copyWith(top: Insets.med),
+//                  childPadding: Pads.med('t'),
+//                  width: 700,
+//                  child: ShadDottedBorder(
+//                    child: Center(
+//                      child: Column(
+//                        children: [
+//                          const ShadAvatar(LuIcons.upload),
+//                          const Gap(Insets.med),
+//                          const Text('Drag and drop files here'),
+//                          Text('Or click browse (max 3MB)', style: context.text.muted.size(12)),
+//                          const Gap(Insets.med),
+//                          ShadButton.outline(
+//                            size: ShadButtonSize.sm,
+//                            child: const SelectionContainer.disabled(child: Text('Browse Files')),
+//                            onPressed: () {},
+//                          ),
+//                        ],
+//                      ),
+//                    ),
+//                  ),
+//                );
+//              },
+//            );
+//          },
+//        );
 
-  final String? helperText;
-  final String? hintText;
-  final bool isRequired;
-  final String? label;
-  final List<FormFieldValidator<T>>? validators;
+//   final String? helperText;
+//   final String? hintText;
+//   final bool isRequired;
+//   final String? label;
+//   final List<FormFieldValidator<T>>? validators;
 
-  @override
-  ShadFormDecorationState<ShadFileField<T>, T> createState() => _ShadFileFieldState<T>();
-}
+//   @override
+//   ShadFormDecorationState<ShadFileField<T>, T> createState() => _ShadFileFieldState<T>();
+// }
 
-class _ShadFileFieldState<T> extends ShadFormDecorationState<ShadFileField<T>, T> {
-  // @override
-  // void didChange(T? value) {
-  //   super.didChange(value);
-  //  }
+// class _ShadFileFieldState<T> extends ShadFormDecorationState<ShadFileField<T>, T> {
+//   // @override
+//   // void didChange(T? value) {
+//   //   super.didChange(value);
+//   //  }
 
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  // }
+//   // @override
+//   // void dispose() {
+//   //   super.dispose();
+//   // }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  // }
+//   // @override
+//   // void initState() {
+//   //   super.initState();
+//   // }
 
-  @override
-  void reset() {
-    super.reset();
-    setState(() {});
-  }
+//   @override
+//   void reset() {
+//     super.reset();
+//     setState(() {});
+//   }
 
-  void clear() {
-    setState(() {});
-  }
-}
+//   void clear() {
+//     setState(() {});
+//   }
+// }
 
 class ShadDottedBorder extends StatelessWidget {
   const ShadDottedBorder({

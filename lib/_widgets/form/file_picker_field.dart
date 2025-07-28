@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:pos/main.export.dart';
 
-class FilePickerField extends StatelessWidget {
+class FilePickerField extends HookConsumerWidget {
   const FilePickerField({
     super.key,
     this.selectedFile,
@@ -18,15 +18,15 @@ class FilePickerField extends StatelessWidget {
   final String? subtitle;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ShadCard(
       border: const Border(),
       shadows: const [],
-
       title: Text(title ?? 'Upload File', style: context.text.p),
       description: subtitle == null ? null : Text(subtitle!, style: context.text.muted),
       padding: Pads.zero,
       childPadding: Pads.xs('t'),
+
       child: ShadDottedBorder(
         color: context.colors.foreground.op3,
         child: Center(
@@ -35,28 +35,7 @@ class FilePickerField extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (selectedFile == null) ...[
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Gap(Insets.sm),
-                    const ShadAvatar(LuIcons.upload),
-                    const Gap(Insets.med),
-                    const Text('Drag and drop files here'),
-
-                    Text('Or click browse (max 3MB)', style: context.text.muted.size(12)),
-                    const Gap(Insets.med),
-                    ShadButton.outline(
-                      size: ShadButtonSize.sm,
-                      child: const SelectionContainer.disabled(child: Text('Browse Files')),
-                      onPressed: () async {
-                        if (selectedFile != null) return;
-                        final files = await fileUtil.pickSingleFile();
-                        final file = files.fold(identityNull, identity);
-                        onSelect(file);
-                      },
-                    ),
-                  ],
-                ),
+                FileSelectionZone(selectedFile: selectedFile, onSelect: onSelect),
                 const Gap(Insets.med),
               ] else
                 FileTIle(file: right(selectedFile!), onClear: () => onSelect(null)).conditionalExpanded(compact),
@@ -64,6 +43,43 @@ class FilePickerField extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class FileSelectionZone extends HookConsumerWidget {
+  const FileSelectionZone({
+    super.key,
+    required this.selectedFile,
+    required this.onSelect,
+  });
+
+  final PFile? selectedFile;
+  final Function(PFile? file) onSelect;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Gap(Insets.sm),
+        const ShadAvatar(LuIcons.upload),
+        const Gap(Insets.med),
+        const Text('Drag and drop files here'),
+
+        Text('Or click browse (max 3MB)', style: context.text.muted.size(12)),
+        const Gap(Insets.med),
+        ShadButton.outline(
+          size: ShadButtonSize.sm,
+          child: const SelectionContainer.disabled(child: Text('Browse Files')),
+          onPressed: () async {
+            if (selectedFile != null) return;
+            final files = await fileUtil.pickSingleFile();
+            final file = files.fold(identityNull, identity);
+            onSelect(file);
+          },
+        ),
+      ],
     );
   }
 }
