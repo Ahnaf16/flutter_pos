@@ -16,18 +16,23 @@ class NavigationRoot extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authUser = ref.watch(currentUserProvider);
 
-    // final rootPath = context.routeState.uri.pathSegments.first;
+    final rootPath = context.routeState.uri.pathSegments.first;
 
     final selectedValue = useState('DashBoard');
     final isDesk = context.layout.isDesktop;
 
-    // useEffect(() {
-    //   if (!isMobile) {
-    //     final items = navItems(authUser.valueOrNull?.role?.getPermissions ?? []);
-    //     selectedValue.value = items.entries.where((i) =>i. ).firstOrNull?.key ?? 'DashBoard';
-    //   }
-    //   return null;
-    // }, [rootPath, authUser.value]);
+    useEffect(() {
+      if (isDesk) {
+        final items = navItems(authUser.valueOrNull?.role?.getPermissions ?? []);
+        final selected = items.values
+            .expand((e) => e.expand((x) => x.children))
+            .firstWhereOrNull((x) => x.path?.name == rootPath)
+            ?.text;
+
+        selectedValue.value = selected ?? 'DashBoard';
+      }
+      return null;
+    }, [rootPath, authUser.value]);
 
     return authUser.when(
       error: (e, s) => ErrorView(e, s, prov: authCtrlProvider),

@@ -57,10 +57,14 @@ extension NumEx on num {
   String readableByte([int? decimals]) => Parser.formatBytes(toInt(), decimals ?? 2);
 
   String currency() {
-    return currencyFormate(value: this).format(clean);
+    final value = currencyFormate(value: this).format(clean);
+    if (value.endsWith('.00')) return value.substring(0, value.length - 3);
+    return value;
   }
 
-  num get clean => this is double && this % 1 == 0 ? toInt() : this;
+  num get clean {
+    return this is double && this % 1 == 0 ? toInt() : this;
+  }
 
   bool get isDecimal => this is double && this % 1 != 0;
 

@@ -4,9 +4,9 @@ import 'package:pos/main.export.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 const _headings = [
-  TableHeading.positional('#', 80.0),
+  TableHeading.positional('#', 50.0),
   TableHeading.positional('Name'),
-  TableHeading.positional('Balance', 200),
+  // TableHeading.positional('Balance', 200),
   TableHeading.positional('Amount', 230),
   TableHeading.positional('Before', 230),
   TableHeading.positional('After', 230),
@@ -30,7 +30,6 @@ class DueView extends HookConsumerWidget {
         children: [
           FilterBar(
             hintText: 'Search by name, email or phone',
-
             onSearch: (q) => dueCtrl().search(q),
             onReset: () => dueCtrl().refresh(),
             showDateRange: true,
@@ -61,7 +60,7 @@ class DueView extends HookConsumerWidget {
                     return switch (head.name) {
                       '#' => DataGridCell(columnName: head.name, value: Text((dues.indexOf(data) + 1).toString())),
                       'Name' => DataGridCell(columnName: head.name, value: _PartyNameBuilder(data.parti)),
-                      'Balance' => DataGridCell(columnName: head.name, value: _BalanceNameBuilder(data.parti)),
+                      // 'Balance' => DataGridCell(columnName: head.name, value: _BalanceNameBuilder(data.parti)),
                       'Amount' => DataGridCell(
                         columnName: head.name,
                         value: Text(
@@ -133,53 +132,26 @@ class _PartyNameBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      spacing: Insets.med,
+      spacing: Insets.sm,
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CircleImage(parti.getPhoto, borderWidth: 1, radius: 20),
-
+        CircleImage(parti.getPhoto, borderWidth: 1, radius: 15),
         Flexible(
           child: Column(
             spacing: Insets.xs,
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                spacing: Insets.sm,
-                children: [
-                  Flexible(
-                    child: OverflowMarquee(child: Text(parti.name, style: context.text.list)),
-                  ),
-                  if (!parti.isCustomer)
-                    ShadBadge.outline(
-                      child: Text(
-                        parti.type.name,
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
-                      ),
-                    ),
-                ],
+              Flexible(
+                child: Text(parti.name, style: context.text.list, maxLines: 1),
               ),
-              Text(parti.phone),
-              if (parti.hasDue()) Text('Due: ${parti.due.abs().currency()}'),
+              Text(parti.phone, maxLines: 1),
+              if (parti.due != 0)
+                Text(parti.due.abs().currency(), style: context.text.muted.textColor(parti.dueColor())),
             ],
           ),
         ),
-      ],
-    );
-  }
-}
-
-class _BalanceNameBuilder extends StatelessWidget {
-  const _BalanceNameBuilder(this.parti);
-  final Party parti;
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      spacing: Insets.xs,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(parti.due.abs().currency()),
       ],
     );
   }

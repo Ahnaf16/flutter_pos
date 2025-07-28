@@ -266,7 +266,7 @@ class RecordTable extends ConsumerWidget {
           mouseCursor: SystemMouseCursors.click,
           child: GestureDetector(
             onTap: () {
-              if (parti == null) return;
+              if (parti == null || parti.isWalkIn) return;
               showShadDialog(
                 context: context,
                 builder: (context) => PartiViewDialog(parti: parti),

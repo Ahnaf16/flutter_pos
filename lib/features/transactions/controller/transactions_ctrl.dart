@@ -3,6 +3,7 @@ import 'package:pos/features/filter/controller/filter_ctrl.dart';
 import 'package:pos/features/inventory_record/controller/inventory_record_ctrl.dart';
 import 'package:pos/features/parties/controller/parties_ctrl.dart';
 import 'package:pos/features/payment_accounts/controller/payment_accounts_ctrl.dart';
+import 'package:pos/features/settings/controller/settings_ctrl.dart';
 import 'package:pos/features/transactions/repository/transactions_repo.dart';
 import 'package:pos/main.export.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -57,6 +58,7 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
       ref.invalidateSelf();
       ref.invalidate(partiesCtrlProvider);
       ref.invalidate(paymentAccountsCtrlProvider);
+      ref.invalidate(configCtrlProvider);
       return rightResult('Due adjusted successfully');
     });
   }
@@ -68,6 +70,7 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
       ref.invalidate(partiesCtrlProvider);
       ref.invalidate(paymentAccountsCtrlProvider);
       ref.invalidate(recordsByPartiProvider);
+      ref.invalidate(configCtrlProvider);
       return rightResult('Due paid successfully');
     });
   }
@@ -78,6 +81,7 @@ class TransactionLogCtrl extends _$TransactionLogCtrl {
       ref.invalidateSelf();
       ref.invalidate(partiesCtrlProvider);
       ref.invalidate(paymentAccountsCtrlProvider);
+      ref.invalidate(configCtrlProvider);
       return rightResult('Balance transferred successfully');
     });
   }

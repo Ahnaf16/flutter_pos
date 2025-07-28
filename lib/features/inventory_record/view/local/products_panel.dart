@@ -60,6 +60,7 @@ class ProductsPanel extends HookConsumerWidget {
                   final qty = product.quantityByHouse(hId);
                   return HoverBuilder(
                     child: ShadCard(
+                      padding: Pads.xs(),
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
@@ -67,6 +68,7 @@ class ProductsPanel extends HookConsumerWidget {
                             color: context.colors.border,
                             borderRadius: Corners.sm,
                             alignment: Alignment.center,
+                            clipChild: true,
                             child: HostedImage.square(product.getPhoto(), radius: Corners.sm),
                           ),
                           Positioned(
@@ -76,10 +78,10 @@ class ProductsPanel extends HookConsumerWidget {
                             child: DecoContainer(
                               color: context.colors.border.op8,
                               alignment: Alignment.center,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 5),
-                                child: Text(product.name, maxLines: 2),
-                              ),
+                              borderRadius: Corners.sm,
+                              clipChild: true,
+                              padding: const EdgeInsets.symmetric(horizontal: 5).copyWith(bottom: 5),
+                              child: Text(product.name, maxLines: 2, style: context.text.muted.textHeight(1)),
                             ),
                           ),
                           Positioned(
@@ -118,6 +120,7 @@ class ProductsPanel extends HookConsumerWidget {
                                 color: hovering ? context.colors.border.op7 : Colors.transparent,
                                 alignment: Alignment.center,
                                 borderRadius: Corners.med,
+                                clipChild: true,
                                 child: hovering
                                     ? DecoContainer(
                                         color: context.colors.primary.op9,
