@@ -12,6 +12,7 @@ void main() async {
   );
   usePathUrlStrategy();
   GoRouter.optionURLReflectsImperativeAPIs = true;
+  logAw = false;
 
   await initDependencies();
 

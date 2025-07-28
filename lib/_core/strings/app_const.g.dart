@@ -10,7 +10,7 @@ const _$pub = (
   name: "pos",
   description: "A new Flutter project.",
   publishTo: "none",
-  version: "1.0.8+8",
+  version: "1.0.9+9",
   environment: (sdk: "^3.8.0"),
   dependencies: (
     flutter: (sdk: "flutter"),
@@ -60,6 +60,7 @@ const _$pub = (
     timeago: "^3.7.1",
     syncfusionFlutterCharts: "^29.2.8",
     scaledApp: "^2.3.0",
+    superDragAndDrop: "^0.9.1",
   ),
   devDependencies: (
     flutterTest: (sdk: "flutter"),
@@ -77,6 +78,6 @@ const _$pub = (
     lineLength: 120,
     integrations: (flutterSvg: true, lottie: true),
   ),
-  secretAPIKey: null,
+  secretAPIKey: "igen_flutter_pos",
   account: (name: "ahnaf", email: "ahnafsakil9@gmail.com", password: 12341234),
 );

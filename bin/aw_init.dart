@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:pos/_core/database/aw_const.dart';
-
-final _dbId = AWConst.databaseId.id;
-final _userCollId = AWConst.collections.users.id;
-final _roleCollId = AWConst.collections.role.id;
-final _configCollId = AWConst.collections.config.id;
-final _configDocId = AWConst.docs.config.id;
-final _whCollId = AWConst.collections.warehouse.id;
+const _dbId = '6805362c0032bd189cd2';
+const _userCollId = '680536a4003be2a282af';
+const _roleCollId = '6805c0c30020316ea3e6';
+const _configCollId = '6805c476002d4333ccb1';
+const _configDocId = 'APP_CONFIG';
+const _whCollId = '6805bdcd00107f585ff2';
 const _whDocId = '68240e5547c2c832c574';
 const _adminRoleId = '680a082b001d1b08d793';
 const _adminId = '6817c1c0002570812122';

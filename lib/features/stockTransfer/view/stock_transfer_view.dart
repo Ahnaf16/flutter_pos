@@ -236,7 +236,7 @@ class StockTransferView extends HookConsumerWidget {
                               title: const Text('Warehouse'),
                               description: const Text('Select warehouse and stock to transfer'),
                               child: warehouseList.maybeWhen(
-                                orElse: () => ShadCard(padding: kDefInputPadding, child: const Loading()),
+                                orElse: () => const SizedBox.square(dimension: 20, child: Loading()),
                                 data: (warehouses) {
                                   return Column(
                                     children: [

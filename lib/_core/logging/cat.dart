@@ -4,13 +4,14 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+bool logAw = true;
 final _ansi = AnsiColor();
 
 void cat(dynamic msg, [dynamic name]) => Cat._(name?.toString()).log(msg);
 void catErr(String name, Object? error, [StackTrace? stackTrace]) => Cat._(name).logErr(error, stackTrace);
 
 void catAw(dynamic msg, [dynamic name]) {
-  Cat._(name?.toString(), _ansi.green, _ansi.cyan).log(msg);
+  if (logAw) Cat._(name?.toString(), _ansi.green, _ansi.cyan).log(msg);
 }
 
 class Cat {
