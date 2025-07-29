@@ -73,7 +73,7 @@ class CreateRecordView extends HookConsumerWidget {
                               children: [
                                 //! selected products
                                 record.details.isEmpty
-                                    ? const NoProductSelectedView()
+                                    ? const Expanded(child: NoProductSelectedView())
                                     : Expanded(
                                         child: ListView.separated(
                                           padding: Pads.med('blr'),

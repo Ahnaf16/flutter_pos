@@ -18,7 +18,7 @@ const _headings = [
   TableHeading.positional('Parti'),
   TableHeading.positional('Product', 400.0),
   TableHeading.positional('Vat & Shipping', 300.0),
-  TableHeading.positional('Due', double.nan, Alignment.center, 300.0),
+  TableHeading.positional('Due', double.nan, Alignment.center, 250.0),
   TableHeading.positional('Discount', double.nan, Alignment.center, 250),
   TableHeading.positional('Amount', 350),
   TableHeading.positional('Account', 150, Alignment.center),
@@ -432,6 +432,7 @@ class RecordTable extends ConsumerWidget {
     return Builder(
       builder: (context) {
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Flexible(
               child: Text(
