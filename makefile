@@ -25,6 +25,7 @@ builder_run:
 builder_clean:
 	@echo "╠ Running build clean..."
 	@fvm dart run build_runner clean
+	@fvm dart run build_runner build -d
 
 assets_gen: ## generates assets using flutter-gen and adds inline html preview for assets
 	@echo "╠ Generating assets"
